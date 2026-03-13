@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Flatmate — Livvo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #059669; --green-light: #34D399; --green-dark: #047857;
+  --bg-dark: #030f08; --surface-dark: #071a0f; --border-dark: #0d2a18;
+  --text-dark: #f0faf5; --muted-dark: #6b9e82;
+}
+body { background: var(--bg-dark); color: var(--text-dark); font-family: "DM Sans", sans-serif; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px; padding: 0 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(3,15,8,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(5,150,105,0.12);
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
+.logo-word span { color: var(--green-light); }
+.nav-links { display: flex; align-items: center; gap: 20px; }
+.nav-links a { font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; }
+.nav-links a:hover { color: var(--text-dark); }
+
+.page { max-width: 1100px; margin: 0 auto; padding: 100px 24px 80px; }
+.page h1 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.8rem; letter-spacing: -0.03em; margin-bottom: 8px; }
+.page .lead { font-size: 0.95rem; color: var(--muted-dark); margin-bottom: 36px; line-height: 1.6; }
+
+/* Filters */
+.filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; }
+.filters select {
+  background: var(--surface-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 10px;
+  padding: 10px 36px 10px 14px;
+  font-family: inherit; font-size: 0.88rem; color: var(--text-dark);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%236b9e82' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  cursor: pointer;
+}
+.filters select option { background: #fff; color: #0a1f14; }
+
+/* Profile cards */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+.profile-card {
+  background: var(--surface-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.25s;
+}
+.profile-card:hover { border-color: rgba(52,211,153,0.3); }
+.card-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.card-avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-light));
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; color: white;
+  flex-shrink: 0; overflow: hidden;
+}
+.card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.card-info { flex: 1; min-width: 0; }
+.card-name { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 4px; }
+.card-meta { font-size: 0.8rem; color: var(--muted-dark); margin-bottom: 12px; }
+.card-about { font-size: 0.88rem; line-height: 1.6; color: var(--muted-dark); margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.card-budget { font-size: 0.9rem; font-weight: 600; color: var(--green-light); }
+.card-actions { display: flex; gap: 10px; }
+.btn-connect, .btn-profile { padding: 8px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; border: none; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+.btn-connect { background: var(--green); color: white; }
+.btn-connect:hover { background: var(--green-dark); }
+.btn-profile { background: rgba(255,255,255,0.08); color: var(--text-dark); border: 1px solid var(--border-dark); }
+.btn-profile:hover { border-color: var(--green); color: var(--green-light); }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; visibility: hidden; transition: all 0.25s; }
+.modal-overlay.open { opacity: 1; visibility: visible; }
+.modal {
+  background: var(--surface-dark); border: 1px solid var(--border-dark);
+  border-radius: 20px; max-width: 420px; width: 100%;
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-header { padding: 24px 24px 16px; display: flex; align-items: flex-start; gap: 20px; }
+.modal-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.6rem; color: white; flex-shrink: 0; overflow: hidden; }
+.modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.modal-title { flex: 1; }
+.modal-title h3 { font-family: "Outfit", sans-serif; font-size: 1.25rem; margin-bottom: 4px; }
+.modal-title .meta { font-size: 0.85rem; color: var(--muted-dark); }
+.modal-close { background: none; border: none; color: var(--muted-dark); cursor: pointer; padding: 4px; }
+.modal-close:hover { color: var(--text-dark); }
+.modal-body { padding: 0 24px 24px; }
+.modal-body .row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 12px; }
+.modal-body .row span:first-child { color: var(--muted-dark); }
+.modal-body .row span:last-child { font-weight: 500; }
+.modal-about { font-size: 0.9rem; line-height: 1.6; color: var(--muted-dark); margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-dark); }
+.modal-footer { padding: 20px 24px; border-top: 1px solid var(--border-dark); }
+.modal-footer .btn-connect { width: 100%; padding: 12px; }
+
+.no-profile { text-align: center; padding: 80px 24px; background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 20px; }
+.no-profile h3 { font-family: "Outfit", sans-serif; font-size: 1.2rem; margin-bottom: 12px; }
+.no-profile p { color: var(--muted-dark); margin-bottom: 24px; line-height: 1.6; }
+.no-profile a { color: var(--green-light); font-weight: 600; }
+
+@media (max-width: 600px) { nav { padding: 0 20px; } .nav-links { display: none; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="logo-word">li<span>vv</span>o</span>
+  </a>
+  <div class="nav-links">
+    <a href="flatmate-profile.html">Edit profile</a>
+    <a href="flatmate-login.html">Log out</a>
+  </div>
+</nav>
+
+<div class="page">
+  <h1>Find your flatmate</h1>
+  <p class="lead">People looking for flatshares in your city. Match by budget, lifestyle and move-in date.</p>
+
+  <div class="filters">
+    <select id="filterCity" onchange="filterProfiles()">
+      <option value="">All cities</option>
+      <option value="athens">Athens</option>
+      <option value="paris">Paris</option>
+      <option value="london">London</option>
+      <option value="barcelona">Barcelona</option>
+    </select>
+    <select id="filterLifestyle" onchange="filterProfiles()">
+      <option value="">Anyone</option>
+      <option value="student">Student</option>
+      <option value="intern">Intern</option>
+      <option value="nomad">Nomad</option>
+    </select>
+  </div>
+
+  <div class="cards-grid" id="profilesGrid"></div>
+</div>
+
+<div class="modal-overlay" id="profileModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-avatar" id="modalAvatar">?</div>
+      <div class="modal-title">
+        <h3 id="modalName">Name</h3>
+        <div class="meta" id="modalMeta">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="row"><span>Budget</span><span id="modalBudget">—</span></div>
+      <div class="row"><span>Move-in</span><span id="modalMoveIn">—</span></div>
+      <div class="row"><span>Lifestyle</span><span id="modalLifestyle">—</span></div>
+      <div class="row"><span>Nationality</span><span id="modalNationality">—</span></div>
+      <div class="modal-about" id="modalAbout"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-connect" id="modalConnectBtn">Connect</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  if (!localStorage.getItem('livvo_flatmate_logged_in')) {
+    window.location.href = 'flatmate-signup.html';
+  }
+
+  const demoProfiles = [
+    { id: 1, name: "Marie L.", city: "athens", lifestyle: "student", nationality: "French", budget: 550, moveIn: "Sep 2025", about: "Erasmus student in architecture. Love cooking, coffee and exploring. Looking for a chill flatmate to share the Athens adventure.", initial: "M", photo: null },
+    { id: 2, name: "Jakob K.", city: "athens", lifestyle: "intern", nationality: "German", budget: 650, moveIn: "Oct 2025", about: "Marketing intern for 6 months. Into running and good food. Prefer a balanced vibe — work hard, relax together.", initial: "J", photo: null },
+    { id: 3, name: "Sofia M.", city: "athens", lifestyle: "nomad", nationality: "Spanish", budget: 700, moveIn: "Nov 2025", about: "Digital nomad, remote designer. Need a quiet space to work, but love weekend explorations and dinners out.", initial: "S", photo: null },
+    { id: 4, name: "Lucas P.", city: "paris", lifestyle: "student", nationality: "Brazilian", budget: 600, moveIn: "Jan 2026", about: "Exchange student in business. Easy-going, love sports and music. Want to make the most of Paris!", initial: "L", photo: null },
+  ];
+
+  function avatarHtml(p) {
+    if (p.photo) return '<img src="' + p.photo + '" alt="">';
+    return p.initial || '?';
+  }
+
+  function renderProfiles(profiles) {
+    const grid = document.getElementById('profilesGrid');
+    if (profiles.length === 0) {
+      grid.innerHTML = '<div class="no-profile" style="grid-column:1/-1"><h3>No matches yet</h3><p>More people are joining every day. Complete your profile and check back soon — or invite friends to Livvo!</p><a href="flatmate-profile.html">Complete your profile</a></div>';
+      return;
+    }
+    grid.innerHTML = profiles.map((p, i) => `
+      <div class="profile-card">
+        <div class="card-header">
+          <div class="card-avatar">${avatarHtml(p)}</div>
+          <div class="card-info">
+            <div class="card-name">${p.name}</div>
+            <div class="card-meta">${p.nationality} · ${p.lifestyle} · ${p.moveIn}</div>
+          </div>
+        </div>
+        <div class="card-about">${p.about}</div>
+        <div class="card-footer">
+          <span class="card-budget">€${p.budget}/mo</span>
+          <div class="card-actions">
+            <button class="btn-profile" data-action="see" data-idx="${i}">See profile</button>
+            <button class="btn-connect" data-action="connect" data-idx="${i}">Connect</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const p = profiles[+this.dataset.idx];
+        if (this.dataset.action === 'see') seeProfile(p);
+        else connect(p.name);
+      });
+    });
+  }
+
+  function seeProfile(p) {
+    document.getElementById('modalAvatar').innerHTML = avatarHtml(p);
+    document.getElementById('modalName').textContent = p.name;
+    document.getElementById('modalMeta').textContent = p.nationality + ' · ' + p.lifestyle + ' · ' + p.moveIn;
+    document.getElementById('modalBudget').textContent = '€' + p.budget + '/mo';
+    document.getElementById('modalMoveIn').textContent = p.moveIn;
+    document.getElementById('modalLifestyle').textContent = p.lifestyle.charAt(0).toUpperCase() + p.lifestyle.slice(1);
+    document.getElementById('modalNationality').textContent = p.nationality;
+    document.getElementById('modalAbout').textContent = p.about || 'No bio.';
+    document.getElementById('modalConnectBtn').onclick = function() { closeModal(); connect(p.name); };
+    document.getElementById('profileModal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('profileModal').classList.remove('open');
+  }
+
+  document.getElementById('profileModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  function filterProfiles() {
+    const city = document.getElementById('filterCity').value;
+    const lifestyle = document.getElementById('filterLifestyle').value;
+    let list = [...demoProfiles];
+    if (city) list = list.filter(p => p.city === city);
+    if (lifestyle) list = list.filter(p => p.lifestyle === lifestyle);
+    renderProfiles(list);
+  }
+
+  function connect(name) {
+    alert('Connect with ' + name + ' — Messaging coming soon! For now, join the waitlist and we\'ll notify you when Livvo launches.');
+  }
+
+  filterProfiles();
+</script>
+</body>
+</html>
