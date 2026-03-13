@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>List Your Property — Livvo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #059669; --green-light: #34D399; --green-dark: #047857;
+  --green-glow: rgba(5,150,105,0.2);
+  --bg-dark: #030f08; --surface-dark: #071a0f; --border-dark: #0d2a18;
+  --bg-light: #ffffff; --surface-light: #f7faf8; --border-light: #e4ede8;
+  --text-dark: #f0faf5; --text-light: #0a1f14; --muted-dark: #6b9e82; --muted-light: #4a7c5e;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg-dark); color: var(--text-dark); font-family: "DM Sans", sans-serif; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px; padding: 0 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(3,15,8,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(5,150,105,0.12);
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
+.logo-word span { color: var(--green-light); }
+.nav-links { display: flex; align-items: center; gap: 16px; }
+.nav-links a { font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; }
+.nav-links a:hover { color: var(--text-dark); }
+
+.page { max-width: 720px; margin: 0 auto; padding: 100px 24px 80px; }
+.steps-bar { display: flex; gap: 0; margin-bottom: 48px; }
+.step-item { flex: 1; text-align: center; padding: 12px; border-bottom: 3px solid var(--border-dark); font-size: 0.78rem; color: var(--muted-dark); }
+.step-item.done { border-color: var(--green); color: var(--green-light); }
+.step-item.active { border-color: var(--green-light); color: var(--green-light); font-weight: 600; }
+
+.wizard-step { display: none; }
+.wizard-step.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.wizard-step h2 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.6rem; letter-spacing: -0.03em; margin-bottom: 8px; }
+.wizard-step .sub { font-size: 0.9rem; color: var(--muted-dark); margin-bottom: 32px; line-height: 1.5; }
+
+.form-group { margin-bottom: 24px; }
+.form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted-dark); margin-bottom: 8px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-dark);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: "DM Sans", sans-serif; font-size: 0.95rem;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-group input::placeholder, .form-group textarea::placeholder { color: var(--muted-dark); opacity: 0.7; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); }
+.form-group select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%236b9e82' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; cursor: pointer; }
+.form-group textarea { min-height: 100px; resize: vertical; }
+
+/* Photo upload */
+.photo-zone {
+  border: 2px dashed var(--border-dark);
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.02);
+}
+.photo-zone:hover, .photo-zone.dragover { border-color: var(--green); background: rgba(5,150,105,0.06); }
+.photo-zone .icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.6; }
+.photo-zone p { font-size: 0.9rem; color: var(--muted-dark); margin-bottom: 8px; }
+.photo-zone span { font-size: 0.8rem; color: var(--green-light); }
+.photo-preview { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.photo-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-dark); }
+.photo-preview .remove { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: #ef4444; color: white; border: none; cursor: pointer; font-size: 12px; line-height: 1; }
+.photo-preview .thumb-wrap { position: relative; }
+
+/* Amenities grid */
+.amenities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 20px; }
+.amenity-check { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-dark); border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+.amenity-check:hover { border-color: var(--green); background: rgba(5,150,105,0.06); }
+.amenity-check input { accent-color: var(--green); cursor: pointer; flex-shrink: 0; }
+.amenity-check input:checked + span { color: var(--green-light); font-weight: 500; }
+
+/* Map */
+#propMap { height: 260px; border-radius: 14px; border: 1px solid var(--border-dark); margin-top: 12px; }
+.map-hint { font-size: 0.8rem; color: var(--muted-dark); margin-top: 10px; }
+
+/* ID upload */
+.id-zone {
+  border: 2px dashed var(--border-dark);
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.02);
+}
+.id-zone:hover { border-color: var(--green); background: rgba(5,150,105,0.06); }
+.id-zone.uploaded { border-style: solid; border-color: var(--green); background: rgba(5,150,105,0.08); }
+.id-zone .icon { font-size: 2rem; margin-bottom: 12px; }
+.id-zone p { font-size: 0.9rem; color: var(--muted-dark); }
+.id-zone .filename { font-size: 0.85rem; color: var(--green-light); margin-top: 8px; }
+
+/* Price/duration row */
+.price-duration { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 600px) { .price-duration { grid-template-columns: 1fr; } .amenities-grid { grid-template-columns: 1fr; } }
+
+/* Buttons */
+.btn-row { display: flex; justify-content: space-between; margin-top: 40px; gap: 16px; flex-wrap: wrap; }
+.btn-secondary { background: transparent; color: var(--muted-dark); border: 1px solid var(--border-dark); border-radius: 10px; padding: 14px 28px; font-family: "DM Sans", sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-secondary:hover { border-color: var(--green); color: var(--text-dark); }
+.btn-primary { background: var(--green); color: white; border: none; border-radius: 10px; padding: 14px 32px; font-family: "DM Sans", sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html.html" class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="logo-word">li<span>vv</span>o</span>
+  </a>
+  <div class="nav-links">
+    <a href="landlord-dashboard.html">Dashboard</a>
+    <a href="landlord-login.html">Log out</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="steps-bar">
+    <div class="step-item active" data-step="1">Photos</div>
+    <div class="step-item" data-step="2">Details</div>
+    <div class="step-item" data-step="3">Price & Duration</div>
+    <div class="step-item" data-step="4">Location</div>
+    <div class="step-item" data-step="5">Verification</div>
+  </div>
+
+  <!-- Step 1: Photos -->
+  <div class="wizard-step active" id="step1">
+    <h2>Add photos</h2>
+    <p class="sub">Upload at least 3 photos. High-quality images help attract tenants.</p>
+    <div class="form-group">
+      <div class="photo-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
+        <div class="icon">📷</div>
+        <p>Drag & drop or click to upload</p>
+        <span>PNG, JPG — max 5MB each</span>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none" />
+      <div class="photo-preview" id="photoPreview"></div>
+    </div>
+    <div class="btn-row"><span></span><button class="btn-primary" onclick="goStep(2)">Continue</button></div>
+  </div>
+
+  <!-- Step 2: Title, type, bedrooms, amenities -->
+  <div class="wizard-step" id="step2">
+    <h2>Property details</h2>
+    <p class="sub">Tell tenants what your property offers.</p>
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="propTitle" placeholder="e.g. Stylish 2-Bed Apartment with Terrace" />
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="propDesc" placeholder="Describe your property, neighbourhood, what makes it special..."></textarea>
+    </div>
+    <div class="price-duration">
+      <div class="form-group">
+        <label>Property type</label>
+        <select id="propType">
+          <option value="">Select</option>
+          <option value="studio">Studio</option>
+          <option value="apartment">Apartment</option>
+          <option value="house">House</option>
+          <option value="room">Room in shared</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Bedrooms</label>
+        <select id="propBeds">
+          <option value="">Select</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4+</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Amenities</label>
+      <div class="amenities-grid">
+        <label class="amenity-check"><input type="checkbox" id="a_wifi"><span>WiFi</span></label>
+        <label class="amenity-check"><input type="checkbox" id="a_terrace"><span>Terrace / Balcony</span></label>
+        <label class="amenity-check"><input type="checkbox" id="a_bills"><span>Bills included</span></label>
+        <label class="amenity-check"><input type="checkbox" id="a_ac"><span>Air conditioning</span></label>
+        <label class="amenity-check"><input type="checkbox" id="a_washing"><span>Washing machine</span></label>
+        <label class="amenity-check"><input type="checkbox" id="a_dishwasher"><span>Dishwasher</span></label>
+        <label class="amenity-check"><input type="checkbox" id="a_parking"><span>Parking</span></label>
+        <label class="amenity-check"><input type="checkbox" id="a_elevator"><span>Elevator</span></label>
+        <label class="amenity-check"><input type="checkbox" id="a_kitchen"><span>Kitchen</span></label>
+        <label class="amenity-check"><input type="checkbox" id="a_workspace"><span>Workspace</span></label>
+        <label class="amenity-check"><input type="checkbox" id="a_pets"><span>Pets allowed</span></label>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn-secondary" onclick="goStep(1)">Back</button><button class="btn-primary" onclick="goStep(3)">Continue</button></div>
+  </div>
+
+  <!-- Step 3: Price & Duration -->
+  <div class="wizard-step" id="step3">
+    <h2>Price & duration</h2>
+    <p class="sub">Set your monthly price and how long tenants can rent.</p>
+    <div class="price-duration">
+      <div class="form-group">
+        <label>Price (€/month)</label>
+        <input type="number" id="propPrice" placeholder="e.g. 700" min="1" step="10" />
+      </div>
+      <div class="form-group">
+        <label>Minimum stay</label>
+        <select id="propMinStay">
+          <option value="1">1 month</option>
+          <option value="2">2 months</option>
+          <option value="3" selected>3 months</option>
+          <option value="6">6 months</option>
+          <option value="9">9 months</option>
+          <option value="12">12 months</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Maximum stay (optional)</label>
+      <select id="propMaxStay">
+        <option value="">No limit</option>
+        <option value="6">6 months</option>
+        <option value="9">9 months</option>
+        <option value="12">12 months</option>
+        <option value="24">24 months</option>
+      </select>
+    </div>
+    <div class="btn-row"><button class="btn-secondary" onclick="goStep(2)">Back</button><button class="btn-primary" onclick="goStep(4)">Continue</button></div>
+  </div>
+
+  <!-- Step 4: Location & Map -->
+  <div class="wizard-step" id="step4">
+    <h2>Location</h2>
+    <p class="sub">Add the address. It will be shown on a map to help tenants find you.</p>
+    <div class="form-group">
+      <label>City</label>
+      <select id="propCity">
+        <option value="athens" selected>Athens</option>
+        <option value="paris">Paris</option>
+        <option value="london">London</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Address (exact address shared only after enquiry)</label>
+      <input type="text" id="propAddress" placeholder="e.g. Platia Viktoria, Athens 104 38" />
+    </div>
+    <div class="form-group">
+      <label>Pin your location on the map</label>
+      <div id="propMap"></div>
+      <p class="map-hint">Click on the map to set your property location. Drag the marker to adjust.</p>
+    </div>
+    <div class="btn-row"><button class="btn-secondary" onclick="goStep(3)">Back</button><button class="btn-primary" onclick="goStep(5)">Continue</button></div>
+  </div>
+
+  <!-- Step 5: ID Verification -->
+  <div class="wizard-step" id="step5">
+    <h2>Verify your identity</h2>
+    <p class="sub">Upload an ID document (passport or national ID). This ensures trust for all tenants.</p>
+    <div class="form-group">
+      <div class="id-zone" id="idZone" onclick="document.getElementById('idInput').click()">
+        <div class="icon">🪪</div>
+        <p>Drop ID document or click to upload</p>
+        <span class="filename" id="idFilename"></span>
+      </div>
+      <input type="file" id="idInput" accept="image/*,.pdf" style="display:none" />
+    </div>
+    <div class="btn-row"><button class="btn-secondary" onclick="goStep(4)">Back</button><button class="btn-primary" id="submitBtn" onclick="submitProperty()">Publish listing</button></div>
+  </div>
+</div>
+
+<script>
+  if (!localStorage.getItem('livvo_landlord_verified') && !localStorage.getItem('livvo_landlord_logged_in')) {
+    window.location.href = 'landlord-login.html';
+  }
+  let currentStep = 1;
+  let marker = null;
+  let map = null;
+  const propertyData = { photos: [], lat: 37.9898, lng: 23.7322 };
+
+  // Photo upload
+  const photoZone = document.getElementById('photoZone');
+  const photoInput = document.getElementById('photoInput');
+  const photoPreview = document.getElementById('photoPreview');
+
+  ['dragenter','dragover','dragleave','drop'].forEach(e => {
+    photoZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); });
+  });
+  ['dragenter','dragover'].forEach(e => photoZone.addEventListener(e, () => photoZone.classList.add('dragover')));
+  ['dragleave','drop'].forEach(e => photoZone.addEventListener(e, () => photoZone.classList.remove('dragover')));
+  photoZone.addEventListener('drop', e => {
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    addPhotos(files);
+  });
+  photoInput.addEventListener('change', () => addPhotos(Array.from(photoInput.files)));
+
+  function addPhotos(files) {
+    files.forEach(f => {
+      const url = URL.createObjectURL(f);
+      propertyData.photos.push(url);
+      const wrap = document.createElement('div');
+      wrap.className = 'thumb-wrap';
+      wrap.innerHTML = `<img src="${url}" alt=""/><button class="remove" onclick="removePhoto(this)">×</button>`;
+      photoPreview.appendChild(wrap);
+    });
+    photoInput.value = '';
+  }
+  function removePhoto(btn) {
+    const wrap = btn.closest('.thumb-wrap');
+    const idx = Array.from(photoPreview.children).indexOf(wrap);
+    propertyData.photos.splice(idx, 1);
+    wrap.remove();
+  }
+
+  // ID upload
+  document.getElementById('idInput').addEventListener('change', function() {
+    const f = this.files[0];
+    if (f) {
+      document.getElementById('idZone').classList.add('uploaded');
+      document.getElementById('idFilename').textContent = '✓ ' + f.name;
+      propertyData.idFile = f.name;
+    }
+  });
+
+  // Steps
+  function goStep(n) {
+    document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + n).classList.add('active');
+    document.querySelectorAll('.step-item').forEach(s => {
+      s.classList.remove('active','done');
+      const num = parseInt(s.dataset.step);
+      if (num < n) s.classList.add('done');
+      else if (num === n) s.classList.add('active');
+    });
+    currentStep = n;
+    if (n === 4 && !map) initMap();
+  }
+  window.goStep = goStep;
+
+  function initMap() {
+    map = L.map('propMap', { zoomControl: true, scrollWheelZoom: true }).setView([37.9898, 23.7322], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(map);
+    const icon = L.divIcon({ html: '<div style="background:#059669;width:24px;height:24px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>', className: '', iconSize: [24,24], iconAnchor: [12,12] });
+    marker = L.marker([37.9898, 23.7322], { draggable: true, icon }).addTo(map);
+    marker.on('dragend', () => {
+      const pos = marker.getLatLng();
+      propertyData.lat = pos.lat;
+      propertyData.lng = pos.lng;
+    });
+    map.on('click', e => {
+      marker.setLatLng(e.latlng);
+      propertyData.lat = e.latlng.lat;
+      propertyData.lng = e.latlng.lng;
+    });
+  }
+
+  function submitProperty() {
+    const title = document.getElementById('propTitle').value.trim() || 'My Property';
+    const price = document.getElementById('propPrice').value || 700;
+    const city = document.getElementById('propCity').value;
+    const idUploaded = propertyData.idFile;
+    if (!idUploaded) { alert('Please upload your ID document to continue.'); return; }
+    const listing = {
+      id: 'prop_' + Date.now(),
+      title, price: parseInt(price),
+      city, address: document.getElementById('propAddress').value || 'Address shared after enquiry',
+      lat: propertyData.lat, lng: propertyData.lng,
+      type: document.getElementById('propType').value || 'apartment',
+      beds: document.getElementById('propBeds').value || '2',
+      minStay: document.getElementById('propMinStay').value,
+      maxStay: document.getElementById('propMaxStay').value,
+      amenities: ['wifi','terrace','bills','ac','washing','dishwasher','parking','elevator','kitchen','workspace','pets'].filter(a => document.getElementById('a_'+a)?.checked),
+      photos: propertyData.photos,
+      status: 'live',
+      createdAt: new Date().toISOString()
+    };
+    const list = JSON.parse(localStorage.getItem('livvo_properties') || '[]');
+    list.push(listing);
+    localStorage.setItem('livvo_properties', JSON.stringify(list));
+    alert('Your property is live! Redirecting to your dashboard.');
+    window.location.href = 'landlord-dashboard.html';
+  }
+  window.submitProperty = submitProperty;
+</script>
+</body>
+</html>

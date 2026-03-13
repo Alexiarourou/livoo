@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>List Your Property — Livvo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #059669; --green-light: #34D399; --green-dark: #047857;
+  --green-glow: rgba(5,150,105,0.2);
+  --bg-dark: #030f08; --surface-dark: #071a0f; --border-dark: #0d2a18;
+  --bg-light: #ffffff; --surface-light: #f7faf8; --border-light: #e4ede8;
+  --text-dark: #f0faf5; --text-light: #0a1f14; --muted-dark: #6b9e82; --muted-light: #4a7c5e;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg-dark); color: var(--text-dark); font-family: "DM Sans", sans-serif; min-height: 100vh; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px; padding: 0 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(3,15,8,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(5,150,105,0.12);
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
+.logo-word span { color: var(--green-light); }
+.nav-back { font-size: 0.83rem; color: var(--muted-dark); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+.nav-back:hover { color: var(--text-dark); }
+
+/* PAGE */
+.page { min-height: 100vh; padding: 100px 24px 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.auth-card {
+  width: 100%; max-width: 420px;
+  background: var(--surface-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 20px;
+  padding: 40px 36px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+}
+.auth-card h1 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.03em; margin-bottom: 8px; }
+.auth-card .sub { font-size: 0.88rem; color: var(--muted-dark); margin-bottom: 28px; line-height: 1.5; }
+
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted-dark); margin-bottom: 8px; }
+.form-group input {
+  width: 100%; background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-dark);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: "DM Sans", sans-serif; font-size: 0.95rem;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-group input::placeholder { color: var(--muted-dark); opacity: 0.7; }
+.form-group input:focus { border-color: var(--green); }
+.form-group input.error { border-color: #ef4444; }
+
+.btn-primary {
+  width: 100%; background: var(--green);
+  color: white; border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-family: "DM Sans", sans-serif; font-size: 0.95rem; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.verify-note { font-size: 0.8rem; color: var(--muted-dark); margin-top: 20px; padding: 14px; background: rgba(5,150,105,0.08); border: 1px solid rgba(52,211,153,0.2); border-radius: 10px; line-height: 1.6; }
+.verify-note strong { color: var(--green-light); }
+
+.auth-footer { margin-top: 24px; text-align: center; font-size: 0.85rem; color: var(--muted-dark); }
+.auth-footer a { color: var(--green-light); text-decoration: none; font-weight: 600; }
+.auth-footer a:hover { text-decoration: underline; }
+
+.step-indicator { display: flex; gap: 8px; margin-bottom: 24px; }
+.step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-dark); transition: background 0.2s; }
+.step-dot.active { background: var(--green-light); }
+.step-dot.done { background: var(--green); }
+
+.success-msg { display: none; text-align: center; padding: 24px; }
+.success-msg.show { display: block; }
+.success-msg .icon { width: 48px; height: 48px; margin: 0 auto 16px; background: rgba(5,150,105,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--green-light); font-size: 1.5rem; }
+.success-msg h3 { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 8px; }
+.success-msg p { font-size: 0.9rem; color: var(--muted-dark); margin-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html.html" class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <span class="logo-word">li<span>vv</span>o</span>
+  </a>
+  <a href="index.html.html" class="nav-back">← Back to Livvo</a>
+</nav>
+
+<div class="page">
+  <div class="auth-card">
+    <div class="step-indicator">
+      <span class="step-dot active" id="step1"></span>
+      <span class="step-dot" id="step2"></span>
+    </div>
+
+    <!-- Step 1: Email + Password -->
+    <div id="form-signup">
+      <h1>Create your landlord account</h1>
+      <p class="sub">List your property and reach thousands of verified tenants.</p>
+      <form id="signupForm">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="Min. 8 characters" required minlength="8" />
+        </div>
+        <button type="submit" class="btn-primary">Create account</button>
+      </form>
+    </div>
+
+    <!-- Step 2: Verification key -->
+    <div id="form-verify" style="display: none;">
+      <h1>Check your email</h1>
+      <p class="sub">We sent a 6-digit verification code to <strong id="verify-email"></strong></p>
+      <form id="verifyForm">
+        <div class="form-group">
+          <label>Verification code</label>
+          <input type="text" name="code" placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}" required />
+        </div>
+        <button type="submit" class="btn-primary">Verify & continue</button>
+      </form>
+      <div class="verify-note">Didn't receive it? Check spam or <a href="#" onclick="resendCode(); return false;">resend code</a>.</div>
+    </div>
+
+    <!-- Success -->
+    <div id="success" class="success-msg">
+      <div class="icon">✓</div>
+      <h3>Account created!</h3>
+      <p>You're verified. Redirecting to list your property…</p>
+    </div>
+  </div>
+
+  <p class="auth-footer">Already have an account? <a href="landlord-login.html">Log in</a></p>
+</div>
+
+<script>
+  let pendingEmail = '';
+
+  document.getElementById('signupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = this.email.value;
+    const password = this.password.value;
+    pendingEmail = email;
+    localStorage.setItem('livvo_landlord_email', email);
+    localStorage.setItem('livvo_landlord_password', password); // In real app: never store plain password
+    document.getElementById('form-signup').style.display = 'none';
+    document.getElementById('form-verify').style.display = 'block';
+    document.getElementById('verify-email').textContent = email;
+    document.getElementById('step1').classList.remove('active');
+    document.getElementById('step1').classList.add('done');
+    document.getElementById('step2').classList.add('active');
+  });
+
+  document.getElementById('verifyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const code = this.code.value;
+    if (code.length === 6) {
+      localStorage.setItem('livvo_landlord_verified', '1');
+      document.getElementById('form-verify').style.display = 'none';
+      document.getElementById('success').classList.add('show');
+      setTimeout(() => window.location.href = 'landlord-list-property.html', 1500);
+    }
+  });
+
+  function resendCode() {
+    alert('Verification code resent to ' + pendingEmail + '\n\n(Demo: use any 6 digits to continue)');
+  }
+</script>
+</body>
+</html>
