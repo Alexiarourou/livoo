@@ -172,16 +172,21 @@ nav {
     <h2 class="sidebar-title">Filters</h2>
     <form class="sidebar-filters" id="filterForm" onsubmit="return false;">
       <div class="filter-block">
-        <label class="filter-block-label">Search</label>
-        <input type="text" id="searchInput" class="filter-select" placeholder="e.g. terrace, 2-bed, Platia Viktoria..." style="background:white;padding:10px 14px" oninput="applyFilters()" onkeyup="applyFilters()">
-      </div>
-      <div class="filter-block">
         <label class="filter-block-label">City</label>
-        <select class="filter-select" id="filterCity" onchange="applyFilters()">
-          <option value="">All cities</option>
+        <select class="filter-select" id="filterCity" onchange="onCityChange()">
           <option value="athens" selected>Athens</option>
-          <option value="paris">Paris (coming soon)</option>
-          <option value="london">London (coming soon)</option>
+          <option value="paris">Paris</option>
+          <option value="london">London</option>
+          <option value="barcelona">Barcelona</option>
+          <option value="berlin">Berlin</option>
+          <option value="amsterdam">Amsterdam</option>
+          <option value="madrid">Madrid</option>
+          <option value="milan">Milan</option>
+          <option value="lisbon">Lisbon</option>
+          <option value="dublin">Dublin</option>
+          <option value="prague">Prague</option>
+          <option value="vienna">Vienna</option>
+          <option value="brussels">Brussels</option>
         </select>
       </div>
       <div class="filter-block">
@@ -288,11 +293,20 @@ nav {
   ];
 
 
+  function onCityChange() {
+    const city = document.getElementById("filterCity").value;
+    const cityNames = { paris: "Paris", london: "London", barcelona: "Barcelona", berlin: "Berlin", amsterdam: "Amsterdam", madrid: "Madrid", milan: "Milan", lisbon: "Lisbon", dublin: "Dublin", prague: "Prague", vienna: "Vienna", brussels: "Brussels" };
+    if (city && city !== "athens") {
+      window.location.href = "coming-soon.html?city=" + (cityNames[city] || city);
+      return;
+    }
+    applyFilters();
+  }
+
   function getFilters() {
     const preset = document.getElementById("pricePreset").value;
     const [priceMin, priceMax] = preset ? preset.split("-").map(Number) : [null, null];
     return {
-      search: (document.getElementById("searchInput")?.value || "").toLowerCase().trim(),
       city: document.getElementById("filterCity").value,
       who: document.getElementById("filterWho").value,
       type: document.getElementById("filterType").value,
@@ -317,12 +331,6 @@ nav {
   function filterProps() {
     const f = getFilters();
     let list = properties.filter(p => {
-      if (f.search) {
-        const searchable = `${p.title} ${p.location} ${p.specs}`.toLowerCase();
-        const words = f.search.split(/[\s-]+/).filter(w => w.length > 0);
-        const matches = words.every(word => searchable.includes(word));
-        if (!matches) return false;
-      }
       if (f.city && f.city !== "athens") return false;
       if (f.beds) {
         const minBeds = parseInt(f.beds);
@@ -401,7 +409,6 @@ nav {
 
   function applyFilters() { renderCards(filterProps()); }
   function clearFilters() {
-    document.getElementById("searchInput").value = "";
     document.getElementById("filterCity").value = "athens";
     document.getElementById("filterWho").value = "";
     document.getElementById("filterType").value = "";
