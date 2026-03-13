@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Livvo — Find a Home. Find Your People.</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #059669;
+    --green-light: #34D399;
+    --green-dark: #047857;
+    --green-glow: rgba(5,150,105,0.2);
+    --bg-dark: #030f08;
+    --surface-dark: #071a0f;
+    --border-dark: #0d2a18;
+    --bg-light: #ffffff;
+    --surface-light: #f7faf8;
+    --border-light: #e4ede8;
+    --text-dark: #f0faf5;
+    --text-light: #0a1f14;
+    --muted-dark: #6b9e82;
+    --muted-light: #4a7c5e;
+  }
+
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg-dark); color: var(--text-dark); font-family: 'DM Sans', sans-serif; font-weight: 300; overflow-x: hidden; }
+
+  /* ==================
+     NAVBAR
+  ==================== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 0 48px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(3,15,8,0.94);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(5,150,105,0.12);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .logo-icon {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--green), var(--green-light));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px var(--green-glow);
+  }
+
+  .logo-word {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: -0.04em;
+    color: var(--text-dark);
+  }
+
+  .logo-word span { color: var(--green-light); }
+
+  .nav-center {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+  }
+
+  .nav-item { position: relative; }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    color: var(--muted-dark);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    cursor: pointer;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .nav-link:hover { color: var(--text-dark); background: rgba(255,255,255,0.04); }
+  .nav-link svg { width: 12px; height: 12px; transition: transform 0.2s; }
+  .nav-item:hover .nav-link svg { transform: rotate(180deg); }
+
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: #0a1f12;
+    border: 1px solid var(--border-dark);
+    border-radius: 14px;
+    padding: 8px;
+    min-width: 230px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  }
+
+  .nav-item:hover .dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+
+  .dropdown-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+
+  .dropdown-item:hover { background: rgba(5,150,105,0.08); }
+
+  .dropdown-icon {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: rgba(5,150,105,0.1);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .dropdown-icon svg, .entry-icon svg, .benefit-icon svg, .community-icon svg, .landlord-icon svg, .community-tag svg { width: 18px; height: 18px; }
+  .entry-icon svg { width: 28px; height: 28px; }
+  .benefit-icon svg, .community-icon svg, .landlord-icon svg { width: 24px; height: 24px; }
+  .community-tag svg { width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px; }
+  .dropdown-icon svg { width: 18px; height: 18px; }
+  .dropdown-icon svg path, .entry-icon svg path, .benefit-icon svg path, .community-icon svg path, .landlord-icon svg path { stroke: var(--green-light); }
+  .light-section .benefit-icon svg path, .light-section .landlord-icon svg path { stroke: var(--green); }
+  .community-tag svg path, .mini-emoji svg path { stroke: var(--green-light); }
+  .city-item svg { width: 16px; height: 16px; margin-right: 6px; flex-shrink: 0; }
+  .city-item svg path { stroke: var(--muted-dark); }
+  .tab { display: inline-flex; align-items: center; }
+  .tab svg { width: 16px; height: 16px; margin-right: 6px; flex-shrink: 0; }
+  .tab svg path { stroke: var(--muted-light); }
+  .tab.active svg path { stroke: var(--green); }
+
+  .dropdown-text strong { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-dark); margin-bottom: 2px; }
+  .dropdown-text span { font-size: 0.73rem; color: var(--muted-dark); line-height: 1.4; }
+
+  .dropdown-divider { height: 1px; background: var(--border-dark); margin: 6px 8px; }
+
+  .city-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 0.83rem;
+    color: var(--muted-dark);
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+
+  .city-item:hover { background: rgba(5,150,105,0.08); color: var(--text-dark); }
+  .city-soon { margin-left: auto; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(5,150,105,0.1); color: var(--green-light); padding: 2px 7px; border-radius: 20px; }
+
+  .nav-right { display: flex; align-items: center; gap: 8px; }
+
+  .btn-outline {
+    padding: 8px 18px;
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
+    font-size: 0.83rem;
+    color: var(--muted-dark);
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-outline:hover { border-color: var(--green); color: var(--text-dark); }
+
+  .btn-primary-nav {
+    padding: 8px 20px;
+    background: var(--green);
+    border-radius: 8px;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+    box-shadow: 0 2px 12px var(--green-glow);
+  }
+
+  .btn-primary-nav:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+  /* ==================
+     HERO — TWO ENTRY POINTS
+  ==================== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 140px 24px 100px;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-dark);
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(5,150,105,0.13), transparent),
+      radial-gradient(ellipse 40% 40% at 15% 85%, rgba(52,211,153,0.05), transparent),
+      radial-gradient(ellipse 40% 40% at 85% 85%, rgba(5,150,105,0.05), transparent);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(5,150,105,0.1);
+    border: 1px solid rgba(52,211,153,0.2);
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: var(--green-light);
+    margin-bottom: 36px;
+    animation: fadeUp 0.6s ease both;
+    position: relative; z-index: 1;
+  }
+
+  .badge-dot { width: 6px; height: 6px; background: var(--green-light); border-radius: 50%; animation: pulse 2s infinite; }
+
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.75)} }
+
+  .hero h1 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3rem, 7.5vw, 6rem);
+    letter-spacing: -0.045em;
+    line-height: 1.02;
+    max-width: 860px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.1s ease both;
+    position: relative; z-index: 1;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--green), var(--green-light) 60%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    line-height: 1.72;
+    color: var(--muted-dark);
+    max-width: 500px;
+    margin-bottom: 56px;
+    animation: fadeUp 0.6s 0.2s ease both;
+    position: relative; z-index: 1;
+  }
+
+  /* TWO BIG ENTRY POINT CARDS */
+  .entry-points {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 720px;
+    width: 100%;
+    animation: fadeUp 0.6s 0.3s ease both;
+    position: relative; z-index: 1;
+  }
+
+  .entry-card {
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(52,211,153,0.12);
+    border-radius: 20px;
+    padding: 36px 28px;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .entry-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(5,150,105,0.08), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .entry-card:hover {
+    border-color: var(--green);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(5,150,105,0.15);
+  }
+
+  .entry-card:hover::before { opacity: 1; }
+
+  .entry-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: rgba(5,150,105,0.12);
+    border: 1px solid rgba(52,211,153,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+  }
+
+  .entry-card h3 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: -0.03em;
+    color: var(--text-dark);
+  }
+
+  .entry-card p {
+    font-size: 0.85rem;
+    line-height: 1.65;
+    color: var(--muted-dark);
+  }
+
+  .entry-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--green-light);
+    margin-top: 4px;
+  }
+
+  /* ==================
+     STATS STRIP
+  ==================== */
+  .stats-strip {
+    background: rgba(5,150,105,0.05);
+    border-top: 1px solid var(--border-dark);
+    border-bottom: 1px solid var(--border-dark);
+    padding: 28px 48px;
+    display: flex;
+    justify-content: center;
+    gap: 64px;
+    flex-wrap: wrap;
+  }
+
+  .strip-stat { text-align: center; }
+  .strip-value { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.6rem; letter-spacing: -0.03em; color: var(--green-light); line-height: 1; margin-bottom: 4px; }
+  .strip-label { font-size: 0.72rem; color: var(--muted-dark); letter-spacing: 0.06em; }
+
+  /* ==================
+     LIGHT SECTIONS
+  ==================== */
+  .light-section { background: var(--bg-light); color: var(--text-light); padding: 100px 24px; }
+  .light-section .section-inner { max-width: 1100px; margin: 0 auto; }
+
+  .section-label-light {
+    font-size: 0.62rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+  }
+
+  .section-label-light::before { content:''; display:block; width:28px; height:2px; background:var(--green); border-radius:2px; }
+
+  .section-h2 { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: clamp(2rem, 4.5vw, 3.2rem); letter-spacing: -0.035em; line-height: 1.1; color: var(--text-light); margin-bottom: 16px; }
+  .section-h2 em { font-style: normal; color: var(--green); }
+  .section-p { font-size: 1rem; line-height: 1.78; color: var(--muted-light); max-width: 520px; margin-bottom: 56px; }
+
+  /* ==================
+     FIND A HOME SECTION
+  ==================== */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface-light);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    padding: 6px;
+    margin-bottom: 40px;
+    width: fit-content;
+  }
+
+  .tab {
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--muted-light);
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tab.active { background: white; color: var(--text-light); box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-weight: 600; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .benefit-card {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 32px 28px;
+    transition: all 0.25s;
+  }
+
+  .benefit-card:hover { border-color: var(--green); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(5,150,105,0.1); }
+
+  .benefit-icon { font-size: 2rem; margin-bottom: 16px; }
+  .benefit-card h4 { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--text-light); margin-bottom: 10px; }
+  .benefit-card p { font-size: 0.87rem; line-height: 1.7; color: var(--muted-light); }
+
+  /* Duration */
+  .duration-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 48px; }
+
+  .duration-pill {
+    padding: 11px 22px;
+    border: 1.5px solid var(--border-light);
+    border-radius: 100px;
+    font-size: 0.87rem;
+    font-weight: 500;
+    color: var(--muted-light);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+  }
+
+  .duration-pill:hover, .duration-pill.active { border-color: var(--green); color: var(--green); background: rgba(5,150,105,0.04); }
+  .duration-note { font-size: 0.8rem; color: var(--muted-light); margin-top: 14px; font-style: italic; }
+
+  /* How it works */
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 56px; position: relative; }
+  .steps::before { content:''; position:absolute; top:28px; left:14%; right:14%; height:1px; background:linear-gradient(90deg,transparent,var(--green),transparent); opacity:0.2; }
+
+  .step { text-align: center; padding: 8px; }
+  .step-num { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,rgba(5,150,105,0.1),rgba(52,211,153,0.05)); border:1.5px solid rgba(5,150,105,0.2); display:flex; align-items:center; justify-content:center; font-family:'Outfit',sans-serif; font-weight:800; font-size:1.2rem; color:var(--green); margin:0 auto 20px; }
+  .step h4 { font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem; color:var(--text-light); margin-bottom:8px; }
+  .step p { font-size:0.8rem; color:var(--muted-light); line-height:1.65; }
+
+  /* ==================
+     COMMUNITY SECTION — DARK
+  ==================== */
+  .dark-section { background: var(--bg-dark); padding: 100px 24px; }
+  .dark-section .section-inner { max-width: 1100px; margin: 0 auto; }
+
+  .section-label-dark { font-size:0.62rem; letter-spacing:0.26em; text-transform:uppercase; color:var(--green-light); margin-bottom:14px; display:flex; align-items:center; gap:10px; font-weight:600; }
+  .section-label-dark::before { content:''; display:block; width:28px; height:2px; background:var(--green-light); border-radius:2px; }
+
+  .section-h2-dark { font-family:'Outfit',sans-serif; font-weight:800; font-size:clamp(2rem,4.5vw,3.2rem); letter-spacing:-0.035em; line-height:1.1; color:var(--text-dark); margin-bottom:16px; }
+  .section-h2-dark em { font-style:normal; color:var(--green-light); }
+
+  /* Community feature grid */
+  .community-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 56px;
+  }
+
+  .community-card {
+    background: var(--surface-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: 20px;
+    padding: 36px 28px;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .community-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--green), var(--green-light));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .community-card:hover { transform: translateY(-4px); border-color: rgba(52,211,153,0.2); box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
+  .community-card:hover::after { opacity: 1; }
+
+  .community-icon { font-size: 2.2rem; margin-bottom: 18px; }
+
+  .community-card h3 { font-family:'Outfit',sans-serif; font-weight:700; font-size:1.1rem; color:var(--text-dark); margin-bottom:10px; }
+  .community-card p { font-size:0.87rem; line-height:1.72; color:var(--muted-dark); }
+
+  /* Community big CTA card */
+  .community-hero-card {
+    background: linear-gradient(135deg, rgba(5,150,105,0.12), rgba(52,211,153,0.05));
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: 24px;
+    padding: 56px 48px;
+    margin-top: 16px;
+  }
+
+  .community-hero-card h3 { font-family:'Outfit',sans-serif; font-weight:800; font-size:1.8rem; letter-spacing:-0.03em; line-height:1.2; color:var(--text-dark); margin-bottom:14px; }
+  .community-hero-card h3 em { font-style:normal; color:var(--green-light); }
+  .community-hero-card p { font-size:0.92rem; line-height:1.75; color:var(--muted-dark); margin-bottom:28px; }
+
+  .community-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .community-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(5,150,105,0.1);
+    border: 1px solid rgba(52,211,153,0.15);
+    padding: 7px 14px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    color: var(--green-light);
+    font-weight: 500;
+  }
+
+  /* ==================
+     FOR LANDLORDS — LIGHT
+  ==================== */
+  .landlord-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 56px;
+  }
+
+  .landlord-card {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    padding: 36px 28px;
+    transition: all 0.25s;
+  }
+
+  .landlord-card:hover { border-color: var(--green); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(5,150,105,0.1); }
+
+  .landlord-icon { font-size: 2.2rem; margin-bottom: 18px; }
+  .landlord-card h3 { font-family:'Outfit',sans-serif; font-weight:700; font-size:1.1rem; color:var(--text-light); margin-bottom:10px; }
+  .landlord-card p { font-size:0.87rem; line-height:1.72; color:var(--muted-light); }
+
+  /* ==================
+     CTA SECTION
+  ==================== */
+  .cta-section {
+    background: linear-gradient(135deg, #021a0d, #041f10);
+    padding: 120px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:700px; height:500px; background:radial-gradient(ellipse,rgba(5,150,105,0.15),transparent 65%); pointer-events:none; }
+
+  .cta-section h2 { font-family:'Outfit',sans-serif; font-weight:900; font-size:clamp(2.2rem,5vw,4rem); letter-spacing:-0.045em; line-height:1.08; max-width:640px; margin:0 auto 20px; position:relative; z-index:1; }
+  .cta-section h2 em { font-style:normal; background:linear-gradient(135deg,var(--green),var(--green-light)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .cta-section p { font-size:1rem; color:var(--muted-dark); max-width:420px; margin:0 auto 48px; line-height:1.72; position:relative; z-index:1; }
+
+  .waitlist-wrap { display:flex; flex-direction:column; align-items:center; gap:12px; position:relative; z-index:1; }
+
+  .waitlist-form { display:flex; gap:8px; max-width:460px; width:100%; }
+  .waitlist-form input { flex:1; background:rgba(255,255,255,0.06); border:1px solid var(--border-dark); border-radius:10px; padding:14px 18px; color:var(--text-dark); font-family:'DM Sans',sans-serif; font-size:0.92rem; outline:none; transition:border-color 0.2s; }
+  .waitlist-form input::placeholder { color:var(--muted-dark); }
+  .waitlist-form input:focus { border-color:var(--green); }
+  .waitlist-form button { background:var(--green); color:white; border:none; border-radius:10px; padding:14px 22px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+  .waitlist-form button:hover { background:var(--green-dark); transform:translateY(-1px); }
+
+  .success-msg { display:none; background:rgba(5,150,105,0.1); border:1px solid rgba(52,211,153,0.25); border-radius:10px; padding:14px 24px; color:var(--green-light); font-size:0.88rem; max-width:460px; width:100%; text-align:center; }
+  .success-msg svg path { stroke: currentColor; }
+
+  /* Buttons */
+  .btn-big-primary { background:linear-gradient(135deg,var(--green),var(--green-dark)); color:white; border:none; border-radius:12px; padding:16px 36px; font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:600; cursor:pointer; box-shadow:0 4px 24px var(--green-glow); transition:all 0.2s; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
+  .btn-big-primary:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(5,150,105,0.4); }
+
+  .btn-big-outline { background:transparent; color:var(--muted-light); border:1.5px solid var(--border-light); border-radius:12px; padding:16px 36px; font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:500; cursor:pointer; transition:all 0.2s; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
+  .btn-big-outline:hover { border-color:var(--green); color:var(--green); }
+
+  /* ==================
+     FOOTER
+  ==================== */
+  footer { background: #020a05; border-top: 1px solid var(--border-dark); padding: 56px 48px 40px; }
+
+  .footer-top { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:48px; margin-bottom:48px; }
+
+  .footer-brand p { font-size:0.83rem; color:var(--muted-dark); line-height:1.7; margin-top:14px; max-width:240px; }
+
+  .footer-col h5 { font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted-dark); margin-bottom:16px; font-weight:600; }
+  .footer-col a { display:block; font-size:0.83rem; color:var(--muted-dark); text-decoration:none; margin-bottom:10px; transition:color 0.2s; }
+  .footer-col a:hover { color:var(--text-dark); }
+
+  .footer-bottom { border-top:1px solid var(--border-dark); padding-top:24px; display:flex; justify-content:space-between; align-items:center; }
+  .footer-copy { font-size:0.75rem; color:var(--muted-dark); }
+
+  /* Animations */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
+  .reveal { opacity:0; transform:translateY(24px); transition:opacity 0.65s ease,transform 0.65s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  /* Mobile */
+  @media (max-width: 900px) {
+    nav { padding: 0 20px; }
+    .nav-center { display: none; }
+    .entry-points { grid-template-columns: 1fr; }
+    .tab-content.active { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: repeat(2,1fr); }
+    .steps::before { display: none; }
+    .community-grid { grid-template-columns: 1fr; }
+    .community-hero-card { padding: 40px 32px; }
+    .landlord-grid { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .stats-strip { gap: 32px; padding: 20px 24px; }
+  }
+
+  @media (max-width: 600px) {
+    .footer-top { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    .tabs { width: 100%; }
+    .tab { flex: 1; text-align: center; padding: 10px 8px; font-size: 0.78rem; }
+    .waitlist-form { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 18 18" fill="none">
+        <path d="M2 3L9 15L16 3" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M5.5 3L9 9L12.5 3" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+      </svg>
+    </div>
+    <div class="logo-word">li<span>vv</span>o</div>
+  </a>
+
+  <ul class="nav-center">
+    <li class="nav-item">
+      <button class="nav-link">Find a Home <svg viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="dropdown">
+        <a class="dropdown-item" href="search-athens.html">
+          <div class="dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg></div>
+          <div class="dropdown-text"><strong>Erasmus Students</strong><span>Semester stays in top European cities</span></div>
+        </a>
+        <a class="dropdown-item" href="search-athens.html">
+          <div class="dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
+          <div class="dropdown-text"><strong>Interns & Professionals</strong><span>Short placement or internship stays</span></div>
+        </a>
+        <a class="dropdown-item" href="search-athens.html">
+          <div class="dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <div class="dropdown-text"><strong>Digital Nomads</strong><span>Live and work from Europe's best cities</span></div>
+        </a>
+      </div>
+    </li>
+
+    <li class="nav-item">
+      <button class="nav-link">Community <svg viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="dropdown">
+        <a class="dropdown-item" href="#community">
+          <div class="dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="dropdown-text"><strong>Find a Flatmate</strong><span>Match with compatible people in your city</span></div>
+        </a>
+        <a class="dropdown-item" href="#community">
+          <div class="dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg></div>
+          <div class="dropdown-text"><strong>Student Groups</strong><span>Connect with people from your university</span></div>
+        </a>
+        <a class="dropdown-item" href="#community">
+          <div class="dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div class="dropdown-text"><strong>City Guides</strong><span>Local tips from people who've been there</span></div>
+        </a>
+        <a class="dropdown-item" href="#community">
+          <div class="dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3 22 2l-1 18-17-1"/><path d="m12 5 2 2"/><path d="m8 9 2 2"/><path d="m16 7 2 2"/></svg></div>
+          <div class="dropdown-text"><strong>Events & Meetups</strong><span>Meet people in your city in real life</span></div>
+        </a>
+      </div>
+    </li>
+
+    <li class="nav-item">
+      <button class="nav-link">For Landlords <svg viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="dropdown">
+        <a class="dropdown-item" href="#for-landlords">
+          <div class="dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></div>
+          <div class="dropdown-text"><strong>List Your Property</strong><span>Reach thousands of vetted tenants</span></div>
+        </a>
+        <a class="dropdown-item" href="#for-landlords">
+          <div class="dropdown-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h0M12 15h0M17 15h0M7 11h0M12 11h0"/></svg></div>
+          <div class="dropdown-text"><strong>Tenant Verification</strong><span>ID checks and document upload</span></div>
+        </a>
+      </div>
+    </li>
+
+    <li class="nav-item">
+      <button class="nav-link">Cities <svg viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="dropdown" style="min-width:180px">
+        <a class="city-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Paris</a>
+        <a class="city-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>London</a>
+        <a class="city-item" href="search-athens.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Athens</a>
+        <div class="dropdown-divider"></div>
+        <a class="city-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>More coming <span class="city-soon">2026</span></a>
+      </div>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" href="faqs.html">FAQs</a>
+    </li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="#for-landlords" class="btn-outline">List Property</a>
+    <a href="search-athens.html" class="btn-primary-nav">Browse Properties</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-badge"><span class="badge-dot"></span>Community for students & young professionals moving abroad</div>
+  <h1>Find a home.<br><em>Find your people.</em></h1>
+  <p class="hero-sub">The community for students and young professionals moving abroad. Flatshares, flatmates, and your tribe — all before you arrive. Housing meets social network meets relocation.</p>
+
+  <div class="entry-points">
+    <a href="search-athens.html" class="entry-card">
+      <div class="entry-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></div>
+      <h3>Find a Flatshare</h3>
+      <p>Verified furnished rentals and shared flats for 1–12 months. No guarantor, no long lease. Browse or list a room.</p>
+      <div class="entry-arrow">Browse properties →</div>
+    </a>
+    <a href="#community" class="entry-card">
+      <div class="entry-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <h3>Find Your People</h3>
+      <p>Match with flatmates, join student groups, get city tips. Connect before you land — so you never arrive alone.</p>
+      <div class="entry-arrow">Join the community →</div>
+    </a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip reveal">
+  <div class="strip-stat"><div class="strip-value">300k+</div><div class="strip-label">Erasmus students per year</div></div>
+  <div class="strip-stat"><div class="strip-value">500k+</div><div class="strip-label">European interns annually</div></div>
+  <div class="strip-stat"><div class="strip-value">Flexible</div><div class="strip-label">Duration — you decide</div></div>
+  <div class="strip-stat"><div class="strip-value">€0</div><div class="strip-label">To join & browse</div></div>
+</div>
+
+<!-- FIND A HOME — LIGHT -->
+<section class="light-section" id="find-home">
+  <div class="section-inner">
+    <div class="section-label-light reveal">Flatshares & Rentals</div>
+    <h2 class="section-h2 reveal">The right flatshare abroad,<br><em>for exactly how long you need.</em></h2>
+    <p class="section-p reveal">Livvo connects you with verified furnished flatshares and rentals across Europe. No impossible paperwork, no guarantors, no 12-month commitments. Plus flatmate matching so you arrive knowing your people.</p>
+
+    <div class="tabs reveal">
+      <button class="tab active" onclick="switchTab(event,'students')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Students</button>
+      <button class="tab" onclick="switchTab(event,'interns')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns</button>
+      <button class="tab" onclick="switchTab(event,'nomads')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads</button>
+    </div>
+
+    <div class="tab-content active" id="tab-students">
+      <div class="benefit-card"><div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></div><h4>No guarantor needed</h4><p>Verified through your university email. No local guarantor, no credit history, no impossible paperwork.</p></div>
+      <div class="benefit-card"><div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><h4>Semester-friendly stays</h4><p>Find homes available for exactly your semester dates. Landlords on Livvo understand the Erasmus calendar.</p></div>
+      <div class="benefit-card"><div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h0M12 15h0M17 15h0M7 11h0M12 11h0"/></svg></div><h4>Simple verification</h4><p>Upload your student ID directly through Livvo. Get verified faster and move to the top of landlord shortlists.</p></div>
+    </div>
+
+    <div class="tab-content" id="tab-interns">
+      <div class="benefit-card"><div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><h4>Fast setup</h4><p>Your internship starts in 3 weeks. Livvo gets you a verified furnished home quickly so you can focus on your role.</p></div>
+      <div class="benefit-card"><div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><h4>Professional documentation</h4><p>Upload your work placement letter directly through Livvo. Clear agreements perfect for employer reimbursement.</p></div>
+      <div class="benefit-card"><div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></div><h4>Central locations</h4><p>Properties near business districts and transport links. No long commutes on your first week in a new city.</p></div>
+    </div>
+
+    <div class="tab-content" id="tab-nomads">
+      <div class="benefit-card"><div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><h4>Stay as long as you like</h4><p>1 month or 12 months — you decide. Livvo landlords offer flexible durations so you never feel locked in.</p></div>
+      <div class="benefit-card"><div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg></div><h4>Work-ready homes</h4><p>Fast WiFi, dedicated workspace, fully furnished and equipped. Everything you need to work from anywhere.</p></div>
+      <div class="benefit-card"><div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><h4>Local knowledge built in</h4><p>Every city on Livvo comes with community guides, coworking recommendations and nomad meetups.</p></div>
+    </div>
+
+    <!-- Duration -->
+    <div style="margin-top:64px">
+      <div class="section-label-light reveal">Flexible Duration</div>
+      <h2 class="section-h2 reveal" style="font-size:clamp(1.6rem,3vw,2.2rem)">Stay for as long<br><em>as you need.</em></h2>
+      <p class="section-p reveal" style="margin-bottom:0">Each landlord sets their own available periods. Duration is always agreed directly between you and your landlord — Livvo just makes the connection.</p>
+      <div class="duration-grid reveal">
+        <div class="duration-pill active">1 Month</div>
+        <div class="duration-pill">2 Months</div>
+        <div class="duration-pill">3 Months</div>
+        <div class="duration-pill">6 Months</div>
+        <div class="duration-pill">9 Months</div>
+        <div class="duration-pill">12 Months</div>
+        <div class="duration-pill">12+ Months</div>
+        <div class="duration-pill">Negotiate directly</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS — ALT LIGHT -->
+<section class="light-section" style="background:var(--surface-light);padding-top:0">
+  <div class="section-inner">
+    <div class="section-label-light reveal">How It Works</div>
+    <h2 class="section-h2 reveal">Find your home abroad<br><em>in four simple steps.</em></h2>
+    <div class="steps reveal">
+      <div class="step"><div class="step-num">1</div><h4>Tell us where you're going</h4><p>Choose your city, rough dates and how long you need. No commitment — just browsing.</p></div>
+      <div class="step"><div class="step-num">2</div><h4>Browse verified listings</h4><p>Every property is checked by our team. Real photos, real landlords, transparent pricing.</p></div>
+      <div class="step"><div class="step-num">3</div><h4>Connect directly</h4><p>Message the landlord, upload your ID and agree your terms — all through Livvo. Simple and safe.</p></div>
+      <div class="step"><div class="step-num">4</div><h4>Move in & find your people</h4><p>You're already connected. Join Livvo groups in your city, meet your flatmates, get local tips — feel at home from day one.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMUNITY — DARK -->
+<section class="dark-section" id="community">
+  <div class="section-inner">
+    <div class="section-label-dark reveal">Community</div>
+    <h2 class="section-h2-dark reveal">You don't just need a home.<br><em>You need your people.</em></h2>
+    <p class="reveal" style="font-size:1rem;line-height:1.78;color:var(--muted-dark);max-width:540px;margin-bottom:56px">Livvo isn't just housing — it's your social network for moving abroad. Join student groups, find flatmates, get local tips. Connect before you land so you never arrive alone. Free for everyone, whether you rent through us or not.</p>
+
+    <div class="community-grid reveal">
+      <div class="community-card">
+        <div class="community-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Find a Flatmate</h3>
+        <p>Match with compatible people based on budget, lifestyle, nationality and move-in date. Find your perfect flatmate before you even land.</p>
+      </div>
+      <div class="community-card">
+        <div class="community-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg></div>
+        <h3>Student Groups by City</h3>
+        <p>See who from your university is living in the same city this semester. Connect, organise, explore together.</p>
+      </div>
+      <div class="community-card">
+        <div class="community-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <h3>City Guides & Local Tips</h3>
+        <p>Real advice from people who've lived there. Best neighbourhoods, hidden gems, what to avoid — all from the community.</p>
+      </div>
+      <div class="community-card">
+        <div class="community-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3 22 2l-1 18-17-1"/><path d="m12 5 2 2"/><path d="m8 9 2 2"/><path d="m16 7 2 2"/></svg></div>
+        <h3>Events & Meetups</h3>
+        <p>From casual drinks to organised day trips — Livvo brings people together in every city. No more spending your first week alone.</p>
+      </div>
+      <div class="community-card">
+        <div class="community-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+        <h3>Nomad Connections</h3>
+        <p>A dedicated space for digital nomads. Share coworking spots, visa tips, remote work advice and city recommendations.</p>
+      </div>
+      <div class="community-card">
+        <div class="community-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>Meet People from Your University</h3>
+        <p>Going on Erasmus? Find others from your home university heading to the same city. Arrive knowing friendly faces.</p>
+      </div>
+    </div>
+
+    <div class="community-hero-card reveal">
+      <div>
+        <h3>The community is free.<br><em>For everyone. Always.</em></h3>
+        <p>You don't need to rent through Livvo to join. Create a free profile, tell us your city and dates — we'll connect you with flatmates, student groups, and locals before you arrive. Housing + social network + relocation, all in one.</p>
+        <div class="community-tags">
+          <span class="community-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Flatmate matching</span>
+          <span class="community-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Student groups</span>
+          <span class="community-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>City guides</span>
+          <span class="community-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3 22 2l-1 18-17-1"/><path d="m12 5 2 2"/><path d="m8 9 2 2"/><path d="m16 7 2 2"/></svg>Meetups</span>
+          <span class="community-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomad network</span>
+          <span class="community-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>University connections</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOR LANDLORDS — LIGHT -->
+<section class="light-section" id="for-landlords">
+  <div class="section-inner">
+    <div class="section-label-light reveal">For Landlords</div>
+    <h2 class="section-h2 reveal">A better kind of tenant.<br><em>A better kind of letting.</em></h2>
+    <p class="section-p reveal">List your furnished property and connect directly with vetted, pre-qualified tenants. You set the duration, price and terms. Livvo handles the rest.</p>
+    <div class="landlord-grid reveal">
+      <div class="landlord-card">
+        <div class="landlord-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+        <h3>Reach the right tenants</h3>
+        <p>Students, interns and nomads actively looking for exactly what you offer — furnished, flexible duration, no long commitments. Your ideal tenant is already here.</p>
+      </div>
+      <div class="landlord-card">
+        <div class="landlord-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <h3>You set the duration</h3>
+        <p>List for 1 month, 3 months, 6 months, 12 months or anything in between. You decide what works for your property and your schedule.</p>
+      </div>
+      <div class="landlord-card">
+        <div class="landlord-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h0M12 15h0M17 15h0M7 11h0M12 11h0"/></svg></div>
+        <h3>Verified tenants only</h3>
+        <p>Every tenant uploads their ID and proof documents through Livvo before contacting you. You only hear from people who are serious and verified.</p>
+      </div>
+    </div>
+    <div style="margin-top:40px;display:flex;gap:12px;flex-wrap:wrap" class="reveal">
+      <a href="/cdn-cgi/l/email-protection#ea828f868685aa86839c9c85c4848f9e" class="btn-big-primary">List Your Property →</a>
+      <a href="/cdn-cgi/l/email-protection#771f121b1b18371b1e01011859191203" class="btn-big-outline">Talk to us</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="waitlist">
+  <h2 class="reveal">Your next chapter<br>starts with <em>Livvo.</em></h2>
+  <p class="reveal">Join the waitlist and be the first to find your home and your people when Livvo launches in your city.</p>
+  <div class="waitlist-wrap reveal">
+    <div class="waitlist-form">
+      <input type="email" id="emailInput" placeholder="Enter your email address" />
+      <button onclick="joinWaitlist()">Get Early Access</button>
+    </div>
+    <div class="success-msg" id="successMsg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:20px;height:20px;display:inline-block;vertical-align:-4px;margin-right:6px"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3 22 2l-1 18-17-1"/><path d="m12 5 2 2"/><path d="m8 9 2 2"/><path d="m16 7 2 2"/></svg>You're on the list! We'll be in touch when Livvo launches in your city.</div>
+    <div style="font-size:0.72rem;color:var(--muted-dark)">Free forever · No spam · Unsubscribe anytime</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 18 18" fill="none">
+            <path d="M2 3L9 15L16 3" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5.5 3L9 9L12.5 3" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+          </svg>
+        </div>
+        <div class="logo-word">li<span>vv</span>o</div>
+      </a>
+      <p>Find a home. Find your people. Flatshares, flatmates, and community for students and young professionals moving abroad.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Find a Home</h5>
+      <a href="search-athens.html">Erasmus Students</a>
+      <a href="search-athens.html">Interns & Professionals</a>
+      <a href="search-athens.html">Digital Nomads</a>
+      <a href="search-athens.html">All Cities</a>
+    </div>
+    <div class="footer-col">
+      <h5>Community</h5>
+      <a href="#">Find a Flatmate</a>
+      <a href="#">Student Groups</a>
+      <a href="#">City Guides</a>
+      <a href="#">Events & Meetups</a>
+      <a href="#">Nomad Network</a>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <a href="#">For Landlords</a>
+      <a href="faqs.html">FAQs</a>
+      <a href="#">About Us</a>
+      <a href="/cdn-cgi/l/email-protection#7018151c1c1f301c1906061f5e1e1504">Contact</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 Livvo · Find a home. Find your people.</div>
+    <div class="footer-copy"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8a0ada4a4a788a4a1bebea7e6a6adbc">[email&#160;protected]</a> · Paris · London · Athens</div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Tab switching
+  function switchTab(event, tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+  }
+
+  // Duration pills
+  document.querySelectorAll('.duration-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.duration-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    });
+  });
+
+
+  // Waitlist — connected to Formspree
+  async function joinWaitlist() {
+    const email = document.getElementById('emailInput').value;
+    if (!email || !email.includes('@')) {
+      document.getElementById('emailInput').style.borderColor = '#ef4444';
+      return;
+    }
+    const btn = document.querySelector('.waitlist-form button');
+    btn.textContent = 'Joining...';
+    btn.disabled = true;
+    try {
+      await fetch('https://formspree.io/f/mbdzykvg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ email: email, source: 'livvo.net waitlist' })
+      });
+      document.querySelector('.waitlist-form').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    } catch(e) {
+      btn.textContent = 'Get Early Access';
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
