@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us — Livvo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #059669; --green-light: #34D399; --green-dark: #047857;
+  --green-glow: rgba(5,150,105,0.2);
+  --bg-dark: #030f08; --surface-dark: #071a0f; --border-dark: #0d2a18;
+  --text-dark: #f0faf5; --muted-dark: #6b9e82;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg-dark); color: var(--text-dark); font-family: "DM Sans", sans-serif; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px; padding: 0 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(3,15,8,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(5,150,105,0.12);
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
+.logo-word span { color: var(--green-light); }
+.nav-links { display: flex; align-items: center; gap: 20px; }
+.nav-links a { font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; }
+.nav-links a:hover { color: var(--text-dark); }
+.btn-nav { background: var(--green); color: white; padding: 8px 20px; border-radius: 8px; font-size: 0.83rem; font-weight: 600; text-decoration: none; }
+.btn-nav:hover { background: var(--green-dark); }
+
+.page { max-width: 720px; margin: 0 auto; padding: 120px 24px 80px; }
+.page h1 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 12px; }
+.page .lead { font-size: 1rem; color: var(--muted-dark); line-height: 1.7; margin-bottom: 48px; }
+
+.about-section { margin-bottom: 48px; }
+.about-section h2 { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 16px; color: var(--text-dark); }
+.about-section p { font-size: 0.98rem; line-height: 1.75; color: var(--muted-dark); margin-bottom: 16px; }
+.about-section p:last-child { margin-bottom: 0; }
+
+.founder {
+  background: var(--surface-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
+  padding: 32px;
+  margin: 48px 0;
+  display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap;
+}
+.founder-avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-light));
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; color: white;
+  flex-shrink: 0;
+}
+.founder-info { flex: 1; min-width: 200px; }
+.founder-info .name { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 4px; color: var(--green-light); }
+.founder-info .role { font-size: 0.9rem; color: var(--muted-dark); margin-bottom: 12px; }
+.founder-info p { font-size: 0.95rem; line-height: 1.7; color: var(--muted-dark); }
+
+.back-link { display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--muted-dark); text-decoration: none; margin-bottom: 32px; transition: color 0.2s; }
+.back-link:hover { color: var(--text-dark); }
+
+.cta-box {
+  margin-top: 48px;
+  text-align: center;
+  padding: 32px;
+  background: rgba(5,150,105,0.06);
+  border: 1px solid rgba(5,150,105,0.2);
+  border-radius: 16px;
+}
+.cta-box p { margin-bottom: 16px; color: var(--muted-dark); }
+.cta-box a { display: inline-block; background: var(--green); color: white; padding: 12px 28px; border-radius: 10px; font-weight: 600; text-decoration: none; }
+.cta-box a:hover { background: var(--green-dark); }
+
+@media (max-width: 600px) { nav { padding: 0 20px; } .nav-links { display: none; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="logo-word">li<span>vv</span>o</span>
+  </a>
+  <div class="nav-links">
+    <a href="search-athens.html">Browse Properties</a>
+    <a href="flatmate-signup.html">Find a Flatmate</a>
+    <a href="faqs.html">FAQs</a>
+    <a href="index.html#waitlist" class="btn-nav">Get Early Access</a>
+  </div>
+</nav>
+
+<div class="page">
+  <a href="index.html" class="back-link">← Back to home</a>
+  <h1>About Us</h1>
+  <p class="lead">Livvo helps students, interns and young professionals find a home and their people when moving abroad. No guarantor, no hassle — just a smoother start to your adventure.</p>
+
+  <div class="about-section">
+    <h2>Our Mission</h2>
+    <p>Moving to a new city is exciting — but it's also scary. Finding a place to live, a flatmate you gel with, and a community that gets you shouldn't feel impossible. Livvo exists to make that easier.</p>
+    <p>We offer verified flatshares and furnished rentals for 1–12 months, plus tools to match with compatible flatmates before you land. Our goal is simple: help you find a home and find your people.</p>
+  </div>
+
+  <div class="about-section">
+    <h2>Who We Are</h2>
+    <p>Livvo was built for people who've been through it — the stress of flat hunting abroad, the joy of meeting the right roommate, the loneliness of arriving somewhere new without a network. We're here to change that experience for the better.</p>
+  </div>
+
+  <div class="founder">
+    <div class="founder-avatar">A</div>
+    <div class="founder-info">
+      <div class="name">Alexia</div>
+      <div class="role">Founder, Livvo</div>
+      <p>Hi, I'm Alexia. I started Livvo because I saw too many friends struggle to find housing and community when moving abroad for studies or work. I wanted to create a place where finding a flat and a flatmate could actually feel simple and human. Livvo is that place — and I'm glad you're here.</p>
+    </div>
+  </div>
+
+  <div class="about-section">
+    <h2>What We Offer</h2>
+    <p><strong>Flatshares & rentals</strong> — Furnished rooms for 1–12 months in European cities like Athens, Paris, London, Barcelona and more. No guarantor required — we verify you through your university or work.</p>
+    <p><strong>Find a flatmate</strong> — Match with people based on budget, lifestyle, nationality and move-in date. Connect before you arrive so you're not starting from zero.</p>
+    <p><strong>Community</strong> — Student groups, city guides, events. Because a city feels different when you know people.</p>
+  </div>
+
+  <div class="cta-box">
+    <p>Ready to find your home and your people?</p>
+    <a href="index.html#waitlist">Join the waitlist</a>
+  </div>
+</div>
+
+</body>
+</html>
