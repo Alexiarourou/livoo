@@ -8,10 +8,9 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --green: #059669; --green-light: #34D399; --green-dark: #047857;
-  --green-glow: rgba(5,150,105,0.2);
-  --bg-dark: #030f08; --surface-dark: #071a0f; --border-dark: #0d2a18;
-  --text-dark: #f0faf5; --muted-dark: #6b9e82;
+  --green: #059669; --green-light: #10b981; --green-dark: #047857;
+  --bg-dark: #f0f7f2; --surface-dark: #ffffff; --border-dark: #d4e5dc;
+  --text-dark: #1a2e24; --muted-dark: #4a7c5e;
 }
 html { scroll-behavior: smooth; }
 body { background: var(--bg-dark); color: var(--text-dark); font-family: "DM Sans", sans-serif; min-height: 100vh; }
@@ -20,13 +19,13 @@ nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
   height: 64px; padding: 0 48px;
   display: flex; align-items: center; justify-content: space-between;
-  background: rgba(3,15,8,0.95); backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(5,150,105,0.12);
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-dark);
 }
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
 .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
 .logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
-.logo-word span { color: var(--green-light); }
+.logo-word span { color: var(--green); }
 .nav-links { display: flex; align-items: center; gap: 20px; }
 .nav-links a { font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; }
 .nav-links a:hover { color: var(--text-dark); }
@@ -58,7 +57,7 @@ nav {
   flex-shrink: 0;
 }
 .founder-info { flex: 1; min-width: 200px; }
-.founder-info .name { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 4px; color: var(--green-light); }
+.founder-info .name { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 4px; color: var(--green); }
 .founder-info .role { font-size: 0.9rem; color: var(--muted-dark); margin-bottom: 12px; }
 .founder-info p { font-size: 0.95rem; line-height: 1.7; color: var(--muted-dark); }
 
