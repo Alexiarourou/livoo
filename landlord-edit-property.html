@@ -86,9 +86,13 @@ nav {
 .photo-zone p { font-size: 0.9rem; color: var(--muted-dark); margin-bottom: 8px; }
 .photo-zone span { font-size: 0.8rem; color: var(--green-light); }
 .photo-preview { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
-.photo-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-dark); }
-.photo-preview .remove { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: #ef4444; color: white; border: none; cursor: pointer; font-size: 12px; line-height: 1; }
-.photo-preview .thumb-wrap { position: relative; }
+.photo-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-dark); pointer-events: none; }
+.photo-preview .remove { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: #ef4444; color: white; border: none; cursor: pointer; font-size: 12px; line-height: 1; z-index: 2; }
+.photo-preview .thumb-wrap { position: relative; cursor: grab; }
+.photo-preview .thumb-wrap:active { cursor: grabbing; }
+.photo-preview .thumb-wrap.dragging { opacity: 0.5; }
+.photo-preview .thumb-wrap.drag-over { box-shadow: 0 0 0 3px var(--green); border-radius: 10px; }
+.photo-preview .thumb-wrap .pos-badge { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.7); color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; min-width: 18px; text-align: center; z-index: 1; }
 .photo-preview .thumb-wrap .main-badge { position: absolute; bottom: 4px; left: 4px; background: var(--green); color: white; font-size: 0.6rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
 .photo-preview .thumb-wrap .set-main { position: absolute; bottom: 4px; left: 4px; background: rgba(0,0,0,0.6); color: white; font-size: 0.65rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; border: none; cursor: pointer; white-space: nowrap; }
 .photo-preview .thumb-wrap .set-main:hover { background: var(--green); }
@@ -137,7 +141,7 @@ nav {
   <!-- Step 1: Photos -->
   <div class="wizard-step active" id="step1">
     <h2>Edit photos</h2>
-    <p class="sub">Add, remove or reorder photos. Choose which one appears first as your main picture.</p>
+    <p class="sub">Add, remove or drag to reorder. Position 1 is the main picture, then 2, 3, 4… You can drag any photo to change the order.</p>
     <div class="form-group">
       <div class="photo-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
         <div class="icon">📷</div>
@@ -331,15 +335,37 @@ nav {
   }
   window.setMainPhoto = setMainPhoto;
 
+  function movePhoto(fromIdx, toIdx) {
+    if (fromIdx === toIdx || fromIdx < 0 || toIdx < 0 || fromIdx >= propertyData.photos.length || toIdx >= propertyData.photos.length) return;
+    const url = propertyData.photos[fromIdx];
+    propertyData.photos.splice(fromIdx, 1);
+    propertyData.photos.splice(toIdx, 0, url);
+    renderPhotoPreview();
+  }
+
   function renderPhotoPreview() {
     photoPreview.innerHTML = '';
     propertyData.photos.forEach((url, i) => {
       const wrap = document.createElement('div');
       wrap.className = 'thumb-wrap';
-      wrap.innerHTML = `<img src="${url}" alt=""/>
-        <button class="remove" onclick="removePhoto(this)">×</button>
-        ${i === 0 ? '<span class="main-badge">Main</span>' : '<button class="set-main" onclick="setMainPhoto('+i+')">Set as main</button>'}
+      wrap.draggable = true;
+      wrap.dataset.index = i;
+      wrap.innerHTML = `<span class="pos-badge">${i + 1}</span>
+        <img src="${url}" alt=""/>
+        <button class="remove" onclick="removePhoto(this);event.stopPropagation()">×</button>
+        ${i === 0 ? '<span class="main-badge">Main</span>' : '<button class="set-main" onclick="setMainPhoto('+i+');event.stopPropagation()">Set as main</button>'}
       `;
+      wrap.addEventListener('dragstart', e => { wrap.classList.add('dragging'); e.dataTransfer.setData('text/plain', i); e.dataTransfer.effectAllowed = 'move'; });
+      wrap.addEventListener('dragend', () => { wrap.classList.remove('dragging'); photoPreview.querySelectorAll('.thumb-wrap').forEach(w => w.classList.remove('drag-over')); });
+      wrap.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; wrap.classList.add('drag-over'); });
+      wrap.addEventListener('dragleave', () => wrap.classList.remove('drag-over'));
+      wrap.addEventListener('drop', e => {
+        e.preventDefault();
+        wrap.classList.remove('drag-over');
+        const fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+        const toIdx = parseInt(wrap.dataset.index, 10);
+        if (fromIdx !== toIdx) movePhoto(fromIdx, toIdx);
+      });
       photoPreview.appendChild(wrap);
     });
   }
