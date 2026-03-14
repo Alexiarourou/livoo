@@ -168,9 +168,9 @@ nav {
     <span class="logo-word">li<span>vv</span>o</span>
   </a>
   <div class="nav-links">
-    <a href="landlord-dashboard.html">Dashboard</a>
-    <a href="landlord-dashboard.html#notifications">Notifications <span class="notif-badge" id="notifCount">2</span></a>
-    <a href="landlord-dashboard.html#messages">Messages</a>
+    <a href="landlord-dashboard.html" id="navDashboard" onclick="navToTab(event,'properties')">Dashboard</a>
+    <a href="landlord-dashboard.html#notifications" id="navNotifications" onclick="navToTab(event,'notifications')">Notifications <span class="notif-badge" id="notifCount">2</span></a>
+    <a href="landlord-dashboard.html#messages" id="navMessages" onclick="navToTab(event,'messages')">Messages</a>
     <a href="landlord-list-property.html" class="btn-add">+ List property</a>
     <a href="#" id="logoutLink">Log out</a>
   </div>
@@ -313,6 +313,14 @@ nav {
     document.getElementById('panel-'+id).classList.add('active');
     document.getElementById('backToDashboard').style.display = id === 'properties' ? 'none' : 'inline-flex';
     if (id !== 'messages') closeChat();
+    location.hash = id === 'properties' ? '' : id;
+  }
+
+  function navToTab(e, id) {
+    if (location.pathname.includes('landlord-dashboard') || location.pathname === '/' || location.pathname.endsWith('/')) {
+      e.preventDefault();
+      switchTab(id);
+    }
   }
 
   document.getElementById('backToDashboard').addEventListener('click', function(e) {
@@ -393,9 +401,14 @@ nav {
 
   renderProperties();
 
-  // Hash routing
+  // Hash routing - load correct tab from URL
   if (location.hash === '#notifications') switchTab('notifications');
-  if (location.hash === '#messages') switchTab('messages');
+  else if (location.hash === '#messages') switchTab('messages');
+  window.addEventListener('hashchange', function() {
+    if (location.hash === '#notifications') switchTab('notifications');
+    else if (location.hash === '#messages') switchTab('messages');
+    else if (!location.hash || location.hash === '#') switchTab('properties');
+  });
 
   // Messages / Chat
   const DEMO_CONVERSATIONS = [
