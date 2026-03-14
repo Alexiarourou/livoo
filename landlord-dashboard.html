@@ -342,8 +342,8 @@ nav {
     <h4 id="deleteModalTitle">Delete notification?</h4>
     <p id="deleteModalText">This cannot be undone.</p>
     <div class="delete-modal-btns">
-      <button class="btn-cancel" id="deleteModalCancel">Cancel</button>
-      <button class="btn-delete" id="deleteModalConfirm">Delete</button>
+      <button type="button" class="btn-cancel" id="deleteModalCancel">Cancel</button>
+      <button type="button" class="btn-delete" id="deleteModalConfirm">Delete</button>
     </div>
   </div>
 </div>
@@ -649,12 +649,20 @@ nav {
     deleteModalCallback = null;
   }
   document.getElementById('deleteModalCancel').onclick = closeDeleteModal;
-  document.getElementById('deleteModalConfirm').onclick = function() {
-    if (deleteModalCallback) deleteModalCallback();
+  document.getElementById('deleteModalConfirm').onclick = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (deleteModalCallback) {
+      deleteModalCallback();
+      deleteModalCallback = null;
+    }
     closeDeleteModal();
   };
   document.getElementById('deleteModalOverlay').addEventListener('click', function(e) {
     if (e.target === this) closeDeleteModal();
+  });
+  document.querySelector('#deleteModalOverlay .delete-modal').addEventListener('click', function(e) {
+    e.stopPropagation();
   });
 
   function deleteNotif(id) {
