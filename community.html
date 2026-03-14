@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<!-- Livvo Community - Paris, Athens, London -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community — Livvo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #059669; --green-light: #10b981; --green-dark: #047857;
+  --bg-dark: #f0f7f2; --surface-dark: #ffffff; --border-dark: #d4e5dc;
+  --text-dark: #1a2e24; --muted-dark: #4a7c5e;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg-dark); color: var(--text-dark); font-family: "DM Sans", sans-serif; overflow-x: hidden; }
+
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; padding: 0 48px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.95); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-dark); }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
+.logo-word span { color: var(--green); }
+.nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-links a { font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; }
+.nav-links a:hover, .nav-links a.active { color: var(--text-dark); }
+.btn-nav { background: var(--green); color: white; padding: 8px 20px; border-radius: 8px; font-size: 0.83rem; font-weight: 600; text-decoration: none; }
+.btn-nav:hover { background: var(--green-dark); }
+
+.hero { padding: 140px 48px 80px; text-align: center; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(5,150,105,0.1) 0%, transparent 70%); pointer-events: none; }
+.hero-tag { display: inline-flex; background: rgba(5,150,105,0.12); border: 1px solid rgba(5,150,105,0.2); padding: 6px 16px; border-radius: 100px; font-size: 0.78rem; font-weight: 600; color: var(--green); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 24px; }
+.hero h1 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 20px; }
+.hero h1 span { color: var(--green); }
+.hero p { font-size: 1.1rem; color: var(--muted-dark); max-width: 520px; margin: 0 auto 40px; line-height: 1.7; }
+.hero-stats { display: flex; justify-content: center; gap: 48px; margin-bottom: 48px; }
+.stat { text-align: center; }
+.stat-number { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.8rem; color: var(--green); }
+.stat-label { font-size: 0.78rem; color: var(--muted-dark); margin-top: 2px; }
+
+.audience { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.audience-pill { display: flex; align-items: center; gap: 8px; background: var(--surface-dark); border: 1px solid var(--border-dark); padding: 10px 20px; border-radius: 100px; font-size: 0.85rem; color: var(--muted-dark); cursor: pointer; transition: all 0.2s; }
+.audience-pill:hover, .audience-pill.active { background: rgba(5,150,105,0.08); border-color: rgba(5,150,105,0.3); color: var(--green); }
+.audience-pill svg { width: 18px; height: 18px; flex-shrink: 0; }
+.audience-pill svg path { stroke: currentColor; }
+
+.section { padding: 80px 48px; max-width: 1200px; margin: 0 auto; }
+.section-header { margin-bottom: 48px; }
+.section-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
+.section-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.03em; }
+.section-sub { color: var(--muted-dark); font-size: 0.95rem; margin-top: 8px; line-height: 1.6; }
+
+.cities-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.city-card { background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 20px; overflow: hidden; transition: all 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
+.city-card:hover { border-color: var(--green); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(5,150,105,0.15); }
+.city-cover { height: 180px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 20px; }
+.city-cover-paris { background: linear-gradient(160deg, #e8f0ed 0%, #d4e5dc 40%, #c5dbd0 100%); }
+.city-cover-london { background: linear-gradient(160deg, #e4ece8 0%, #d0e0d8 40%, #bed8ce 100%); }
+.city-cover-athens { background: linear-gradient(160deg, #e8f0ed 0%, #d8e8e0 40%, #c8e0d4 100%); }
+.city-icon { position: absolute; top: 20px; right: 20px; width: 48px; height: 48px; border-radius: 12px; background: rgba(5,150,105,0.12); display: flex; align-items: center; justify-content: center; }
+.city-icon svg { width: 24px; height: 24px; }
+.city-icon svg path { stroke: var(--green); }
+.city-name-big { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2rem; letter-spacing: -0.04em; color: var(--text-dark); }
+.city-body { padding: 24px; }
+.city-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.city-members { font-size: 0.8rem; color: var(--muted-dark); }
+.city-members strong { color: var(--green); font-weight: 700; }
+.city-status { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 600; color: var(--muted-dark); }
+.dot-active { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.dot-soon { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; }
+.city-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.city-tag { background: rgba(5,150,105,0.08); border: 1px solid var(--border-dark); padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; color: var(--muted-dark); }
+.city-groups { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.group-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-dark); border: 1px solid var(--border-dark); border-radius: 10px; transition: all 0.2s; }
+.group-row:hover { background: rgba(5,150,105,0.06); border-color: rgba(5,150,105,0.2); }
+.group-name { font-size: 0.82rem; font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 8px; }
+.group-name svg { width: 16px; height: 16px; flex-shrink: 0; }
+.group-name svg path { stroke: var(--muted-dark); }
+.group-join { font-size: 0.72rem; font-weight: 700; color: var(--green); }
+.btn-city { width: 100%; padding: 12px; background: transparent; border: 1px solid rgba(5,150,105,0.3); border-radius: 10px; color: var(--green); font-family: "DM Sans", sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; text-decoration: none; display: block; }
+.btn-city:hover { background: rgba(5,150,105,0.08); border-color: var(--green); }
+.btn-city-active { background: var(--green); border-color: var(--green); color: white; }
+.btn-city-active:hover { background: var(--green-dark); }
+
+.join-section { margin: 0 48px 80px; background: linear-gradient(135deg, rgba(5,150,105,0.08) 0%, rgba(5,150,105,0.04) 100%); border: 1px solid rgba(5,150,105,0.2); border-radius: 24px; padding: 64px 48px; text-align: center; position: relative; overflow: hidden; }
+.join-section::before { content: ''; position: absolute; top: -50%; left: 50%; transform: translateX(-50%); width: 400px; height: 400px; background: radial-gradient(circle, rgba(5,150,105,0.06) 0%, transparent 70%); }
+.join-section h2 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2.2rem; letter-spacing: -0.03em; margin-bottom: 16px; color: var(--text-dark); }
+.join-section h2 span { color: var(--green); }
+.join-section p { color: var(--muted-dark); font-size: 1rem; max-width: 480px; margin: 0 auto 36px; line-height: 1.7; }
+.join-form { display: flex; gap: 12px; max-width: 440px; margin: 0 auto; }
+.join-input { flex: 1; background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 10px; padding: 14px 18px; font-family: "DM Sans", sans-serif; font-size: 0.95rem; color: var(--text-dark); outline: none; transition: border-color 0.2s; }
+.join-input::placeholder { color: var(--muted-dark); opacity: 0.7; }
+.join-input:focus { border-color: var(--green); }
+.btn-join { background: var(--green); color: white; border: none; border-radius: 10px; padding: 14px 24px; font-family: "DM Sans", sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+.btn-join:hover { background: var(--green-dark); }
+
+.avatars { display: flex; justify-content: center; align-items: center; gap: 0; margin-bottom: 20px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--bg-dark); margin-left: -10px; background: linear-gradient(135deg, rgba(5,150,105,0.2), rgba(16,185,129,0.15)); display: flex; align-items: center; justify-content: center; }
+.avatar:first-child { margin-left: 0; }
+.avatar svg { width: 18px; height: 18px; }
+.avatar svg path { stroke: var(--green); stroke-width: 2; fill: none; }
+.avatar-count { margin-left: 12px; font-size: 0.85rem; color: var(--muted-dark); }
+
+@media (max-width: 900px) { .cities-grid { grid-template-columns: 1fr; } nav { padding: 0 20px; } .hero { padding: 100px 24px 60px; } .section { padding: 48px 24px; } .join-section { margin: 0 24px 60px; padding: 40px 24px; } .hero-stats { gap: 24px; } .join-form { flex-direction: column; } .nav-links { display: none; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">
+    <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="logo-word">li<span>vv</span>o</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="search-athens.html">Find a Home</a>
+    <a href="community.html" class="active">Community</a>
+  </div>
+  <a href="landlord-signup.html" class="btn-nav">List your property</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-tag">Free for everyone, always</div>
+  <h1>Find your people<br>in a <span>new city</span></h1>
+  <p>Join city groups, find flatmates, and connect with students, interns and nomads moving to the same place as you.</p>
+  <div class="audience">
+    <div class="audience-pill active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus Students</div>
+    <div class="audience-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns</div>
+    <div class="audience-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Digital Nomads</div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-number">3</div><div class="stat-label">Cities</div></div>
+    <div class="stat"><div class="stat-number">Free</div><div class="stat-label">Forever</div></div>
+    <div class="stat"><div class="stat-number">&#8734;</div><div class="stat-label">Connections</div></div>
+  </div>
+</section>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-label">City Communities</div>
+    <h2 class="section-title">Choose your city</h2>
+    <p class="section-sub">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
+  </div>
+  <div class="cities-grid">
+    <div class="city-card">
+      <div class="city-cover city-cover-paris">
+        <div class="city-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div class="city-name-big">Paris</div>
+      </div>
+      <div class="city-body">
+        <div class="city-meta"><div class="city-members"><strong>Coming soon</strong></div><div class="city-status"><span class="dot-soon"></span> Launching 2025</div></div>
+        <div class="city-tags"><span class="city-tag">Erasmus</span><span class="city-tag">Interns</span><span class="city-tag">Nomads</span><span class="city-tag">Students</span></div>
+        <div class="city-groups">
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus Paris</span><span class="group-join">Join waitlist</span></div>
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns in Paris</span><span class="group-join">Join waitlist</span></div>
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads Paris</span><span class="group-join">Join waitlist</span></div>
+        </div>
+        <a href="#join" class="btn-city">Join Paris waitlist</a>
+      </div>
+    </div>
+    <div class="city-card">
+      <div class="city-cover city-cover-athens">
+        <div class="city-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div class="city-name-big">Athens</div>
+      </div>
+      <div class="city-body">
+        <div class="city-meta"><div class="city-members"><strong>Now open</strong></div><div class="city-status"><span class="dot-active"></span> Active</div></div>
+        <div class="city-tags"><span class="city-tag">Erasmus</span><span class="city-tag">Interns</span><span class="city-tag">Nomads</span><span class="city-tag">Beach life</span></div>
+        <div class="city-groups">
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus Athens</span><span class="group-join">Join &#8594;</span></div>
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns in Athens</span><span class="group-join">Join &#8594;</span></div>
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads Athens</span><span class="group-join">Join &#8594;</span></div>
+        </div>
+        <a href="#join" class="btn-city btn-city-active">Join Athens community</a>
+      </div>
+    </div>
+    <div class="city-card">
+      <div class="city-cover city-cover-london">
+        <div class="city-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div class="city-name-big">London</div>
+      </div>
+      <div class="city-body">
+        <div class="city-meta"><div class="city-members"><strong>Coming soon</strong></div><div class="city-status"><span class="dot-soon"></span> Launching 2025</div></div>
+        <div class="city-tags"><span class="city-tag">Interns</span><span class="city-tag">Students</span><span class="city-tag">Nomads</span><span class="city-tag">Finance</span></div>
+        <div class="city-groups">
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Students in London</span><span class="group-join">Join waitlist</span></div>
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns in London</span><span class="group-join">Join waitlist</span></div>
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads London</span><span class="group-join">Join waitlist</span></div>
+        </div>
+        <a href="#join" class="btn-city">Join London waitlist</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="join-section" id="join">
+  <h2>Ready to find <span>your people?</span></h2>
+  <p>Join the Livvo community — it's completely free. Connect with people moving to the same city as you.</p>
+  <div class="avatars">
+    <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <span class="avatar-count">Join the community</span>
+  </div>
+  <form class="join-form" action="https://formspree.io/f/mbdzykvg" method="POST">
+    <input class="join-input" type="email" name="email" placeholder="Your email address" required />
+    <input type="hidden" name="source" value="community page" />
+    <button type="submit" class="btn-join">Join free &#8594;</button>
+  </form>
+</div>
+
+<script>
+document.querySelectorAll('.audience-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.audience-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
