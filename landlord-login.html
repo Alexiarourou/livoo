@@ -41,6 +41,9 @@ nav {
 }
 .auth-card h1 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.03em; margin-bottom: 8px; }
 .auth-card .sub { font-size: 0.88rem; color: var(--muted-dark); margin-bottom: 28px; }
+.forgot-link { display: block; text-align: right; font-size: 0.82rem; margin-top: -8px; margin-bottom: 16px; }
+.forgot-link a { color: var(--green); text-decoration: none; }
+.forgot-link a:hover { text-decoration: underline; }
 
 .form-group { margin-bottom: 20px; }
 .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted-dark); margin-bottom: 8px; }
@@ -80,6 +83,7 @@ nav {
   <div class="auth-card">
     <h1>Log in to your account</h1>
     <p class="sub">Manage your properties and bookings.</p>
+    <div id="authMsg" style="display:none;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:0.9rem"></div>
     <form id="loginForm">
       <div class="form-group">
         <label>Email</label>
@@ -88,25 +92,70 @@ nav {
       <div class="form-group">
         <label>Password</label>
         <input type="password" name="password" placeholder="Your password" required />
+        <div class="forgot-link"><a href="landlord-forgot-password.html">Forgot password?</a></div>
       </div>
-      <button type="submit" class="btn-primary">Log in</button>
+      <button type="submit" class="btn-primary" id="btnSubmit">Log in</button>
     </form>
   </div>
   <p class="auth-footer">Don't have an account? <a href="landlord-signup.html">Sign up to list a property</a></p>
 </div>
 
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script>
-  document.getElementById('loginForm').addEventListener('submit', function(e) {
+  const form = document.getElementById('loginForm');
+  const authMsg = document.getElementById('authMsg');
+  const btn = document.getElementById('btnSubmit');
+
+  function showMsg(text, type) {
+    authMsg.textContent = text;
+    authMsg.style.display = 'block';
+    authMsg.style.background = type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(5,150,105,0.1)';
+    authMsg.style.border = type === 'error' ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(5,150,105,0.2)';
+    authMsg.style.color = type === 'error' ? '#b91c1c' : 'var(--green-dark)';
+  }
+
+  let auth = null;
+  if (isFirebaseConfigured()) {
+    try {
+      firebase.initializeApp(LIVVO_FIREBASE_CONFIG);
+      auth = firebase.auth();
+    } catch (e) {
+      showMsg('Firebase error. Check firebase-config.js', 'error');
+    }
+  }
+
+  form.addEventListener('submit', async function(e) {
     e.preventDefault();
-    const email = this.email.value;
+    const email = this.email.value.trim();
     const password = this.password.value;
-    const savedEmail = localStorage.getItem('livvo_landlord_email');
-    const savedPass = localStorage.getItem('livvo_landlord_password');
-    if (email === savedEmail && password === savedPass) {
-      localStorage.setItem('livvo_landlord_logged_in', '1');
-      window.location.href = 'landlord-dashboard.html';
+    authMsg.style.display = 'none';
+
+    if (auth) {
+      btn.disabled = true;
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        localStorage.setItem('livvo_landlord_email', email);
+        localStorage.setItem('livvo_landlord_logged_in', '1');
+        window.location.href = 'landlord-dashboard.html';
+      } catch (err) {
+        btn.disabled = false;
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+          showMsg('Invalid email or password. Sign up first or use Forgot password.', 'error');
+        } else {
+          showMsg(err.message || 'Login failed. Try again.', 'error');
+        }
+      }
     } else {
-      alert('Invalid email or password.\n\nDemo: sign up first at landlord-signup.html or use the email/password you registered with.');
+      const savedEmail = localStorage.getItem('livvo_landlord_email');
+      const savedPass = localStorage.getItem('livvo_landlord_password');
+      if (email === savedEmail && password === savedPass) {
+        localStorage.setItem('livvo_landlord_logged_in', '1');
+        window.location.href = 'landlord-dashboard.html';
+      } else {
+        showMsg('Invalid email or password. Add Firebase config for real auth, or sign up first for demo.', 'error');
+      }
     }
   });
 </script>

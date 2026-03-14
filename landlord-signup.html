@@ -77,7 +77,7 @@ nav {
 .verify-note strong { color: var(--green-light); }
 
 .auth-footer { margin-top: 24px; text-align: center; font-size: 0.85rem; color: var(--muted-dark); }
-.auth-footer a { color: var(--green-light); text-decoration: none; font-weight: 600; }
+.auth-footer a { color: var(--green); text-decoration: none; font-weight: 600; }
 .auth-footer a:hover { text-decoration: underline; }
 
 .step-indicator { display: flex; gap: 8px; margin-bottom: 24px; }
@@ -153,16 +153,51 @@ nav {
   <p class="auth-footer">Already have an account? <a href="landlord-login.html">Log in</a></p>
 </div>
 
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script>
   let pendingEmail = '';
+  let auth = null;
+  if (isFirebaseConfigured()) {
+    try {
+      firebase.initializeApp(LIVVO_FIREBASE_CONFIG);
+      auth = firebase.auth();
+    } catch (e) {}
+  }
 
-  document.getElementById('signupForm').addEventListener('submit', function(e) {
+  document.getElementById('signupForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const email = this.email.value;
+    const email = this.email.value.trim();
     const password = this.password.value;
     pendingEmail = email;
+    const btn = this.querySelector('button[type="submit"]');
+
+    if (auth) {
+      btn.disabled = true;
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        localStorage.setItem('livvo_landlord_email', email);
+        localStorage.setItem('livvo_landlord_verified', '1');
+        localStorage.setItem('livvo_landlord_logged_in', '1');
+        document.getElementById('form-signup').style.display = 'none';
+        document.getElementById('success').classList.add('show');
+        setTimeout(() => window.location.href = 'landlord-list-property.html', 1500);
+      } catch (err) {
+        btn.disabled = false;
+        if (err.code === 'auth/email-already-in-use') {
+          alert('An account with this email already exists. Log in or use Forgot password.');
+        } else if (err.code === 'auth/weak-password') {
+          alert('Password should be at least 6 characters.');
+        } else {
+          alert(err.message || 'Sign up failed. Please try again.');
+        }
+      }
+      return;
+    }
+
     localStorage.setItem('livvo_landlord_email', email);
-    localStorage.setItem('livvo_landlord_password', password); // In real app: never store plain password
+    localStorage.setItem('livvo_landlord_password', password);
     document.getElementById('form-signup').style.display = 'none';
     document.getElementById('form-verify').style.display = 'block';
     document.getElementById('verify-email').textContent = email;
@@ -176,6 +211,7 @@ nav {
     const code = this.code.value;
     if (code.length === 6) {
       localStorage.setItem('livvo_landlord_verified', '1');
+      localStorage.setItem('livvo_landlord_logged_in', '1');
       document.getElementById('form-verify').style.display = 'none';
       document.getElementById('success').classList.add('show');
       setTimeout(() => window.location.href = 'landlord-list-property.html', 1500);
@@ -183,7 +219,7 @@ nav {
   });
 
   function resendCode() {
-    alert('Verification code resent to ' + pendingEmail + '\n\n(Demo: use any 6 digits to continue)');
+    alert('Verification code resent to ' + pendingEmail + '\n\n(Demo: use any 6 digits to continue. Add Firebase for real verification.)');
   }
 </script>
 </body>

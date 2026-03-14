@@ -102,15 +102,48 @@ nav {
   <p class="auth-footer">Already have an account? <a href="flatmate-login.html">Log in</a></p>
 </div>
 
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script>
-  document.getElementById('signupForm').addEventListener('submit', function(e) {
+  const form = document.getElementById('signupForm');
+  let auth = null;
+  if (isFirebaseConfigured()) {
+    try {
+      firebase.initializeApp(LIVVO_FIREBASE_CONFIG);
+      auth = firebase.auth();
+    } catch (e) { /* ignore */ }
+  }
+
+  form.addEventListener('submit', async function(e) {
     e.preventDefault();
-    const email = this.email.value;
+    const email = this.email.value.trim();
     const password = this.password.value;
-    localStorage.setItem('livvo_flatmate_email', email);
-    localStorage.setItem('livvo_flatmate_password', password);
-    localStorage.setItem('livvo_flatmate_logged_in', '1');
-    window.location.href = 'flatmate-profile.html';
+    const btn = this.querySelector('button[type="submit"]');
+
+    if (auth) {
+      btn.disabled = true;
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        localStorage.setItem('livvo_flatmate_email', email);
+        localStorage.setItem('livvo_flatmate_logged_in', '1');
+        window.location.href = 'flatmate-profile.html';
+      } catch (err) {
+        btn.disabled = false;
+        if (err.code === 'auth/email-already-in-use') {
+          alert('An account with this email already exists. Log in or use Forgot password.');
+        } else if (err.code === 'auth/weak-password') {
+          alert('Password should be at least 6 characters.');
+        } else {
+          alert(err.message || 'Sign up failed. Please try again.');
+        }
+      }
+    } else {
+      localStorage.setItem('livvo_flatmate_email', email);
+      localStorage.setItem('livvo_flatmate_password', password);
+      localStorage.setItem('livvo_flatmate_logged_in', '1');
+      window.location.href = 'flatmate-profile.html';
+    }
   });
 </script>
 </body>
