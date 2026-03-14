@@ -1,0 +1,30 @@
+# Netlify config for Livvo static site
+[build]
+  publish = "."
+  # No build command - deploy HTML files as-is
+
+# Clean URLs: /community -> community.html (if someone visits without .html)
+[[redirects]]
+  from = "/community"
+  to = "/community.html"
+  status = 301
+
+[[redirects]]
+  from = "/community-join"
+  to = "/community-join.html"
+  status = 301
+
+[[redirects]]
+  from = "/community-feed"
+  to = "/community-feed.html"
+  status = 301
+
+[[redirects]]
+  from = "/community-post"
+  to = "/community-post.html"
+  status = 301
+
+[[redirects]]
+  from = "/community-new-post"
+  to = "/community-new-post.html"
+  status = 301
