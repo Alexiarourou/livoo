@@ -41,7 +41,7 @@ nav {
 }
 .auth-card h1 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.03em; margin-bottom: 8px; }
 .auth-card .sub { font-size: 0.88rem; color: var(--muted-dark); margin-bottom: 28px; }
-.forgot-link { display: block; text-align: right; font-size: 0.82rem; margin-top: -8px; margin-bottom: 16px; }
+.forgot-link { display: block; text-align: right; font-size: 0.82rem; margin-top: 8px; margin-bottom: 0; }
 .forgot-link a { color: var(--green); text-decoration: none; }
 .forgot-link a:hover { text-decoration: underline; }
 
@@ -109,7 +109,7 @@ nav {
   const btn = document.getElementById('btnSubmit');
 
   function showMsg(text, type) {
-    authMsg.textContent = text;
+    authMsg.innerHTML = text;
     authMsg.style.display = 'block';
     authMsg.style.background = type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(5,150,105,0.1)';
     authMsg.style.border = type === 'error' ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(5,150,105,0.2)';
@@ -154,7 +154,7 @@ nav {
         localStorage.setItem('livvo_landlord_logged_in', '1');
         window.location.href = 'landlord-dashboard.html';
       } else {
-        showMsg('Invalid email or password. Add Firebase config for real auth, or sign up first for demo.', 'error');
+        showMsg('Invalid email or password. Don\'t have an account? <a href="landlord-welcome.html" style="color:inherit;font-weight:600;text-decoration:underline">Sign up first</a>.', 'error');
       }
     }
   });
