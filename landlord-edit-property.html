@@ -89,6 +89,9 @@ nav {
 .photo-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-dark); }
 .photo-preview .remove { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: #ef4444; color: white; border: none; cursor: pointer; font-size: 12px; line-height: 1; }
 .photo-preview .thumb-wrap { position: relative; }
+.photo-preview .thumb-wrap .main-badge { position: absolute; bottom: 4px; left: 4px; background: var(--green); color: white; font-size: 0.6rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+.photo-preview .thumb-wrap .set-main { position: absolute; bottom: 4px; left: 4px; background: rgba(0,0,0,0.6); color: white; font-size: 0.65rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; border: none; cursor: pointer; white-space: nowrap; }
+.photo-preview .thumb-wrap .set-main:hover { background: var(--green); }
 
 .amenities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 20px; }
 .amenity-check { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-dark); border-radius: 10px; cursor: pointer; transition: all 0.2s; }
@@ -134,7 +137,7 @@ nav {
   <!-- Step 1: Photos -->
   <div class="wizard-step active" id="step1">
     <h2>Edit photos</h2>
-    <p class="sub">Add, remove or reorder your property photos.</p>
+    <p class="sub">Add, remove or reorder photos. Choose which one appears first as your main picture.</p>
     <div class="form-group">
       <div class="photo-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
         <div class="icon">📷</div>
@@ -319,22 +322,41 @@ nav {
   });
   photoInput.addEventListener('change', () => addPhotos(Array.from(photoInput.files)));
 
+  function setMainPhoto(idx) {
+    if (idx <= 0 || idx >= propertyData.photos.length) return;
+    const url = propertyData.photos[idx];
+    propertyData.photos.splice(idx, 1);
+    propertyData.photos.unshift(url);
+    renderPhotoPreview();
+  }
+  window.setMainPhoto = setMainPhoto;
+
+  function renderPhotoPreview() {
+    photoPreview.innerHTML = '';
+    propertyData.photos.forEach((url, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'thumb-wrap';
+      wrap.innerHTML = `<img src="${url}" alt=""/>
+        <button class="remove" onclick="removePhoto(this)">×</button>
+        ${i === 0 ? '<span class="main-badge">Main</span>' : '<button class="set-main" onclick="setMainPhoto('+i+')">Set as main</button>'}
+      `;
+      photoPreview.appendChild(wrap);
+    });
+  }
+
   function addPhotos(files) {
     files.forEach(f => {
       const url = URL.createObjectURL(f);
       propertyData.photos.push(url);
-      const wrap = document.createElement('div');
-      wrap.className = 'thumb-wrap';
-      wrap.innerHTML = `<img src="${url}" alt=""/><button class="remove" onclick="removePhoto(this)">×</button>`;
-      photoPreview.appendChild(wrap);
     });
     photoInput.value = '';
+    renderPhotoPreview();
   }
   function removePhoto(btn) {
     const wrap = btn.closest('.thumb-wrap');
     const idx = Array.from(photoPreview.children).indexOf(wrap);
     propertyData.photos.splice(idx, 1);
-    wrap.remove();
+    renderPhotoPreview();
   }
   window.removePhoto = removePhoto;
 
@@ -353,12 +375,7 @@ nav {
       const cb = document.getElementById('a_'+a);
       if (cb) cb.checked = true;
     });
-    propertyData.photos.forEach(url => {
-      const wrap = document.createElement('div');
-      wrap.className = 'thumb-wrap';
-      wrap.innerHTML = `<img src="${url}" alt=""/><button class="remove" onclick="removePhoto(this)">×</button>`;
-      photoPreview.appendChild(wrap);
-    });
+    renderPhotoPreview();
   }
   loadProperty();
 
