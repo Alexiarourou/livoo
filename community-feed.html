@@ -40,19 +40,24 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
 .post-title a:hover { color: var(--green); }
 .post-excerpt { font-size: 0.88rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
 .post-actions { display: flex; gap: 16px; font-size: 0.78rem; }
-.post-actions a { color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px; }
-.post-actions a:hover { color: var(--green); }
+.post-actions a, .post-actions button { color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; padding: 0; }
+.post-actions a:hover, .post-actions button:hover { color: var(--green); }
 .new-post { background: var(--green); color: white; padding: 10px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; }
 .new-post:hover { background: var(--green-dark); }
+.post-comments { display: none; padding: 16px 20px; background: var(--bg); border-top: 1px solid var(--border); }
+.post-comments.open { display: block; }
+.comment { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.comment:last-child { border-bottom: none; }
+.comment-meta { font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; }
+.comment-meta strong { color: var(--text); font-weight: 600; }
+.comment-body { font-size: 0.88rem; line-height: 1.55; color: var(--text); }
+.comment-reply { margin-left: 20px; margin-top: 8px; padding-left: 16px; border-left: 2px solid var(--border); }
 @media (max-width: 900px) { .sidebar { display: none; } .feed-layout { flex-direction: column; } }
 </style>
 </head>
 <body>
 <nav>
-  <a href="index.html" class="logo">
-    <div class="logo-icon"></div>
-    <span class="logo-word">li<span>vv</span>o</span>
-  </a>
+  <a href="index.html" class="logo"><div class="logo-icon"></div><span class="logo-word">li<span>vv</span>o</span></a>
   <div class="nav-center">
     <a href="community.html" class="nav-tab">Cities</a>
     <a href="#" class="nav-tab active" id="cityTab">Athens</a>
@@ -75,46 +80,96 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
     <div class="post">
       <div class="post-vote"><button>&#9650;</button><span>24</span><button>&#9660;</button></div>
       <div class="post-body">
-        <div class="post-meta"><span>u/maria_k</span><span>2h ago</span></div>
-        <h3 class="post-title"><a href="#">Looking for a flatmate in Exarchia - 2BR from September</a></h3>
-        <p class="post-excerpt">Hi! I found a nice flat in Exarchia, 2 bedrooms, 650 total. Looking for someone chill, move-in Sept 1. Message me if interested!</p>
-        <div class="post-actions"><a href="#">12 comments</a><a href="#">Share</a></div>
+        <div class="post-meta"><span>Maria K. (Erasmus, Universitat Barcelona)</span><span>2h ago</span></div>
+        <h3 class="post-title"><a href="#">Looking for a flatmate in Exarchia — 2BR, 650€ total, move-in Sept 1</a></h3>
+        <p class="post-excerpt">Found a great flat on Zoodochou Pigis, 5 min walk from Exarchia square. Two bedrooms, shared kitchen and bathroom. Landlord is super chill. I'm coming for Erasmus at NKUA. Looking for a female flatmate, non-smoker. Deposit is 1 month rent. Message me if you want to video call and see the place!</p>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">12 comments</button><a href="#">Share</a></div>
+        <div class="post-comments">
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 1h ago</div>
+            <div class="comment-body">Hi Maria! I'm also doing Erasmus at NKUA from September. The area sounds perfect — I've heard Exarchia has a really cool vibe. Is the flat still available? Would love to organise a call this week.</div>
+          </div>
+          <div class="comment comment-reply">
+            <div class="comment-meta"><strong>Maria K.</strong> · 45m ago</div>
+            <div class="comment-body">Yes still available! Sent you a DM with my WhatsApp. Let's chat tomorrow?</div>
+          </div>
+          <div class="comment">
+            <div class="comment-meta"><strong>Sophie M.</strong> · 30m ago</div>
+            <div class="comment-body">Exarchia is amazing, lived there last year. Pro tip: the weekly market on Friday morning has the best cheap fruit & veg. Good luck with the search!</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="post">
       <div class="post-vote"><button>&#9650;</button><span>18</span><button>&#9660;</button></div>
       <div class="post-body">
-        <div class="post-meta"><span>u/alex_from_de</span><span>5h ago</span></div>
-        <h3 class="post-title"><a href="#">Best coworking spots in Athens?</a></h3>
-        <p class="post-excerpt">Digital nomad here, just arrived. Any recommendations for good WiFi and coffee? Preferably near Monastiraki.</p>
-        <div class="post-actions"><a href="#">8 comments</a><a href="#">Share</a></div>
+        <div class="post-meta"><span>Alex K.</span><span>5h ago</span></div>
+        <h3 class="post-title"><a href="#">Best coworking spots in Athens? Good WiFi + coffee near Monastiraki</a></h3>
+        <p class="post-excerpt">Just landed in Athens for 2 months. Working remotely for a German startup. Need somewhere reliable with fast internet for video calls. Prefer cafes or shared spaces — not a fan of silent offices. Any nomads here with tips?</p>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">8 comments</button><a href="#">Share</a></div>
+        <div class="post-comments">
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 4h ago</div>
+            <div class="comment-body">Taf Coffee in Psiri has solid WiFi and great coffee. They're used to people working there. Another option is The Works in Metaxourgeio — it's a proper coworking but has a chill vibe, day pass is 12€.</div>
+          </div>
+          <div class="comment">
+            <div class="comment-meta"><strong>Nikolas</strong> · 3h ago</div>
+            <div class="comment-body">+1 for Taf. Also try Communitism in Kerameikos — it's a creative space, free WiFi, you can sit with a coffee for hours. Very nomad-friendly.</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="post">
       <div class="post-vote"><button>&#9650;</button><span>31</span><button>&#9660;</button></div>
       <div class="post-body">
-        <div class="post-meta"><span>u/erasmus_sophie</span><span>1d ago</span></div>
-        <h3 class="post-title"><a href="#">Erasmus Athens meetup - this Saturday at a bar in Psiri</a></h3>
-        <p class="post-excerpt">Organising a casual meetup for anyone new in town. 7pm at the place we discussed. See you there!</p>
-        <div class="post-actions"><a href="#">24 comments</a><a href="#">Share</a></div>
+        <div class="post-meta"><span>Sophie L.</span><span>1d ago</span></div>
+        <h3 class="post-title"><a href="#">Erasmus Athens meetup — Saturday 7pm at Six d.o.g.s (Psiri)</a></h3>
+        <p class="post-excerpt">Hey everyone! A few of us from the Erasmus group are organising a casual meetup this Saturday. Six d.o.g.s is a bar/cafe with a nice courtyard — easy to find, good for groups. Come say hi if you're new in Athens or want to meet other students. No pressure, just vibes. DM me if you need the exact address or have questions.</p>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">24 comments</button><a href="#">Share</a></div>
+        <div class="post-comments">
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 20h ago</div>
+            <div class="comment-body">I'll be there! Really looking forward to meeting everyone. I arrive in Athens on Thursday so perfect timing.</div>
+          </div>
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 18h ago</div>
+            <div class="comment-body">For anyone wondering — Six d.o.g.s is on Avramiotou 6, right by Monastiraki metro. The courtyard is at the back, we'll probably be there. Look for the Livvo crowd!</div>
+          </div>
+          <div class="comment">
+            <div class="comment-meta"><strong>Lucas</strong> · 12h ago</div>
+            <div class="comment-body">Count me in! First week here, need to make some friends haha</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="post">
       <div class="post-vote"><button>&#9650;</button><span>15</span><button>&#9660;</button></div>
       <div class="post-body">
-        <div class="post-meta"><span>u/intern_lucas</span><span>2d ago</span></div>
-        <h3 class="post-title"><a href="#">Internship at PWC - where to live? Budget 500-600</a></h3>
-        <p class="post-excerpt">Starting a 6-month internship in September. Office is near Syntagma. Any neighbourhood recommendations that are safe and not too far?</p>
-        <div class="post-actions"><a href="#">11 comments</a><a href="#">Share</a></div>
+        <div class="post-meta"><span>Lucas T.</span><span>2d ago</span></div>
+        <h3 class="post-title"><a href="#">PWC Athens internship — where to live? Budget 500–600€, office near Syntagma</a></h3>
+        <p class="post-excerpt">Starting a 6-month audit internship in September. Office is on Stadiou street. Looking for a room in a shared flat — budget around 500–600 all in. Prefer somewhere safe and max 30 min commute. Kolonaki? Pagrati? Any interns who've been through this with tips?</p>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">11 comments</button><a href="#">Share</a></div>
+        <div class="post-comments">
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 1d ago</div>
+            <div class="comment-body">Pagrati and Kypseli are both within your budget and on the metro line to Syntagma. Kypseli is cheaper and has a lot of young people. Avoid living too far north — the commute can get long. Good luck with the internship!</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="post">
       <div class="post-vote"><button>&#9650;</button><span>9</span><button>&#9660;</button></div>
       <div class="post-body">
-        <div class="post-meta"><span>u/nomad_julia</span><span>3d ago</span></div>
-        <h3 class="post-title"><a href="#">Best beaches near Athens for a weekend trip?</a></h3>
-        <p class="post-excerpt">Want to escape the city for a couple of days. Easy to reach by bus or train. Suggestions?</p>
-        <div class="post-actions"><a href="#">6 comments</a><a href="#">Share</a></div>
+        <div class="post-meta"><span>Julia M.</span><span>3d ago</span></div>
+        <h3 class="post-title"><a href="#">Weekend beach trip from Athens — best spots by bus/train?</a></h3>
+        <p class="post-excerpt">In Athens for a few weeks, want to get out to the coast for a weekend. Looking for somewhere easy to reach without a car — KTEL bus or train. Clean water, maybe a few cafes. Heard about Sounio and Rafina — any comparisons? Or other suggestions?</p>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">6 comments</button><a href="#">Share</a></div>
+        <div class="post-comments">
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 2d ago</div>
+            <div class="comment-body">Sounio is stunning — the temple at sunset is worth it. Beach is ok, a bit rocky. For proper swimming I'd recommend taking the ferry from Rafina to Andros or Evia. Rafina port is 45 min by bus from Athens. Hydra is also doable as a day trip if you leave early.</div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -127,6 +182,13 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
   document.getElementById('cityTab').textContent = cityName;
   document.getElementById('sidebarCity').textContent = cityName;
   document.querySelectorAll('.new-post').forEach(a => a.href = 'community-join.html?city=' + city);
+  function toggleComments(btn) {
+    const post = btn.closest('.post-body');
+    const comments = post.querySelector('.post-comments');
+    const count = comments ? comments.querySelectorAll('.comment').length : 0;
+    const isOpen = comments.classList.toggle('open');
+    btn.textContent = isOpen ? 'Hide comments' : (count + ' comments');
+  }
 </script>
 </body>
 </html>
