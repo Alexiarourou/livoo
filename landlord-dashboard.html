@@ -198,6 +198,8 @@ nav {
 .booking-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: rgba(5,150,105,0.08); border: 1px solid rgba(52,211,153,0.2); border-radius: 12px; margin-top: 16px; }
 .booking-row .dates { font-size: 0.9rem; font-weight: 600; }
 .booking-row .tenant { font-size: 0.83rem; color: var(--muted-dark); }
+.prop-detail .btn-save { background: var(--green); color: white; border: none; border-radius: 10px; padding: 14px 28px; font-family: "DM Sans", sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.prop-detail .btn-save:hover { background: var(--green-dark); transform: translateY(-1px); }
 </style>
 </head>
 <body>
@@ -252,8 +254,8 @@ nav {
         </div>
       </div>
       <div id="bookingInfo" style="margin-top:20px"></div>
-      <div style="margin-top:20px">
-        <button class="card-actions btn btn-primary" onclick="savePrice()">Save changes</button>
+      <div style="margin-top:24px">
+        <button type="button" class="btn-save" onclick="savePrice()">Save changes</button>
       </div>
     </div>
   </div>
