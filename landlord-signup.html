@@ -85,6 +85,20 @@ nav {
 .step-dot.active { background: var(--green-light); }
 .step-dot.done { background: var(--green); }
 
+.profile-photo-zone {
+  width: 120px; height: 120px; margin: 0 auto 20px;
+  border: 2px dashed var(--border-dark); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; overflow: hidden; transition: all 0.2s;
+  background: var(--surface-light);
+}
+.profile-photo-zone:hover { border-color: var(--green); background: rgba(5,150,105,0.06); }
+.profile-photo-zone img { width: 100%; height: 100%; object-fit: cover; }
+.profile-photo-zone .placeholder { font-size: 2.5rem; opacity: 0.5; }
+.robot-check { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--surface-light); border: 1px solid var(--border-dark); border-radius: 10px; margin: 20px 0; cursor: pointer; }
+.robot-check input { accent-color: var(--green); width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
+.robot-check span { font-size: 0.9rem; }
+
 .success-msg { display: none; text-align: center; padding: 24px; }
 .success-msg.show { display: block; }
 .success-msg .icon { width: 48px; height: 48px; margin: 0 auto 16px; background: rgba(5,150,105,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--green-light); font-size: 1.5rem; }
@@ -107,12 +121,35 @@ nav {
 <div class="page">
   <div class="auth-card">
     <div class="step-indicator">
-      <span class="step-dot active" id="step1"></span>
+      <span class="step-dot active" id="step0"></span>
+      <span class="step-dot" id="step1"></span>
       <span class="step-dot" id="step2"></span>
     </div>
 
+    <!-- Step 0: Profile with picture + not a robot -->
+    <div id="form-profile">
+      <h1>Create your profile</h1>
+      <p class="sub">Add a photo and verify you're human to get started.</p>
+      <form id="profileForm">
+        <div class="profile-photo-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
+          <span class="placeholder" id="photoPlaceholder">📷</span>
+          <img id="photoPreview" src="" alt="" style="display:none" />
+        </div>
+        <input type="file" id="photoInput" accept="image/*" style="display:none" />
+        <div class="form-group">
+          <label>Full name</label>
+          <input type="text" name="name" placeholder="e.g. Alex Thompson" required />
+        </div>
+        <label class="robot-check">
+          <input type="checkbox" name="notRobot" id="notRobot" required />
+          <span>I'm not a robot</span>
+        </label>
+        <button type="submit" class="btn-primary">Continue</button>
+      </form>
+    </div>
+
     <!-- Step 1: Email + Password -->
-    <div id="form-signup">
+    <div id="form-signup" style="display: none;">
       <h1>Create your landlord account</h1>
       <p class="sub">List your property and reach thousands of verified tenants.</p>
       <form id="signupForm">
@@ -158,6 +195,7 @@ nav {
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script>
   let pendingEmail = '';
+  let profilePhoto = null;
   let auth = null;
   if (isFirebaseConfigured()) {
     try {
@@ -165,6 +203,32 @@ nav {
       auth = firebase.auth();
     } catch (e) {}
   }
+
+  document.getElementById('photoInput').addEventListener('change', function() {
+    const f = this.files[0];
+    if (f && f.type.startsWith('image/')) {
+      profilePhoto = URL.createObjectURL(f);
+      document.getElementById('photoPreview').src = profilePhoto;
+      document.getElementById('photoPreview').style.display = 'block';
+      document.getElementById('photoPlaceholder').style.display = 'none';
+    }
+  });
+
+  document.getElementById('profileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = this.name.value.trim();
+    if (!document.getElementById('notRobot').checked) {
+      alert('Please confirm you\'re not a robot.');
+      return;
+    }
+    localStorage.setItem('livvo_landlord_name', name);
+    if (profilePhoto) localStorage.setItem('livvo_landlord_photo', profilePhoto);
+    document.getElementById('form-profile').style.display = 'none';
+    document.getElementById('form-signup').style.display = 'block';
+    document.getElementById('step0').classList.remove('active');
+    document.getElementById('step0').classList.add('done');
+    document.getElementById('step1').classList.add('active');
+  });
 
   document.getElementById('signupForm').addEventListener('submit', async function(e) {
     e.preventDefault();
