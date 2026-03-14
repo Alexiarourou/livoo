@@ -226,6 +226,12 @@ nav {
 .profile-name { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; margin-bottom: 4px; }
 .profile-email { font-size: 0.88rem; color: var(--muted-dark); }
 .profile-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 6px 12px; background: rgba(5,150,105,0.1); border: 1px solid rgba(5,150,105,0.2); border-radius: 100px; font-size: 0.78rem; font-weight: 600; color: var(--green); }
+.profile-edit-btn { margin-left: auto; font-size: 0.83rem; color: var(--green); background: none; border: 1px solid var(--green); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
+.profile-edit-btn:hover { background: var(--green); color: white; }
+.profile-edit-preview { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: #e5e7eb; margin: 0 auto 16px; display: block; }
+.profile-edit-zone { border: 2px dashed var(--border-dark); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+.profile-edit-zone:hover { border-color: var(--green); background: rgba(5,150,105,0.06); }
+.profile-edit-zone input { display: none; }
 
 /* Property stats */
 .card-stats { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
@@ -277,6 +283,7 @@ nav {
         <div class="profile-email" id="profileEmail">—</div>
         <span class="profile-badge">Livvo verified landlord</span>
       </div>
+      <button type="button" class="profile-edit-btn" onclick="openEditProfile()">Edit profile</button>
     </div>
     <div class="cards-grid" id="propertiesGrid">
       <!-- Filled by JS -->
@@ -337,6 +344,26 @@ nav {
     <div class="delete-modal-btns">
       <button class="btn-cancel" id="deleteModalCancel">Cancel</button>
       <button class="btn-delete" id="deleteModalConfirm">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="delete-modal-overlay" id="profileEditOverlay">
+  <div class="delete-modal" style="max-width: 420px;">
+    <h4>Edit profile</h4>
+    <p style="font-size: 0.9rem; color: var(--muted-dark); margin-bottom: 20px;">Update your name and profile picture.</p>
+    <div class="profile-edit-zone" id="profilePhotoZone" onclick="document.getElementById('profilePhotoInput').click()">
+      <img class="profile-edit-preview" id="profilePhotoPreview" src="" alt="" style="display:none" />
+      <span id="profilePhotoPlaceholder" style="font-size: 0.9rem; color: var(--muted-dark);">Click to change photo</span>
+    </div>
+    <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" />
+    <div class="detail-field" style="margin-bottom: 20px;">
+      <label>Name</label>
+      <input type="text" id="profileEditName" placeholder="Your name" style="width: 100%;" />
+    </div>
+    <div class="delete-modal-btns" style="margin-top: 24px;">
+      <button class="btn-cancel" onclick="closeEditProfile()">Cancel</button>
+      <button class="btn-primary" style="background: var(--green); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer;" onclick="saveProfile()">Save</button>
     </div>
   </div>
 </div>
@@ -431,6 +458,52 @@ nav {
     document.getElementById('profileEmail').textContent = email || '—';
   }
   renderProfile();
+
+  let profileEditPhotoData = null;
+  function openEditProfile() {
+    const name = localStorage.getItem('livvo_landlord_name') || (localStorage.getItem('livvo_landlord_email') || '').split('@')[0] || '';
+    const photo = localStorage.getItem('livvo_landlord_photo');
+    document.getElementById('profileEditName').value = name;
+    profileEditPhotoData = null;
+    const preview = document.getElementById('profilePhotoPreview');
+    const placeholder = document.getElementById('profilePhotoPlaceholder');
+    if (photo) {
+      preview.src = photo;
+      preview.style.display = 'block';
+      placeholder.style.display = 'none';
+    } else {
+      preview.style.display = 'none';
+      placeholder.style.display = 'inline';
+    }
+    document.getElementById('profilePhotoInput').value = '';
+    document.getElementById('profileEditOverlay').classList.add('open');
+  }
+  function closeEditProfile() {
+    document.getElementById('profileEditOverlay').classList.remove('open');
+  }
+  function saveProfile() {
+    const name = document.getElementById('profileEditName').value.trim();
+    if (name) localStorage.setItem('livvo_landlord_name', name);
+    if (profileEditPhotoData) localStorage.setItem('livvo_landlord_photo', profileEditPhotoData);
+    else if (!profileEditPhotoData && document.getElementById('profilePhotoInput').files.length === 0) { /* keep existing */ }
+    renderProfile();
+    closeEditProfile();
+  }
+  document.getElementById('profilePhotoInput').addEventListener('change', function() {
+    const f = this.files[0];
+    if (!f || !f.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = function() {
+      profileEditPhotoData = reader.result;
+      document.getElementById('profilePhotoPreview').src = profileEditPhotoData;
+      document.getElementById('profilePhotoPreview').style.display = 'block';
+      document.getElementById('profilePhotoPlaceholder').style.display = 'none';
+    };
+    reader.readAsDataURL(f);
+  });
+  document.getElementById('profileEditOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeEditProfile();
+  });
 
   const grid = document.getElementById('propertiesGrid');
   const detail = document.getElementById('propDetail');
