@@ -119,6 +119,18 @@ nav {
 .empty-state { text-align: center; padding: 64px 24px; color: var(--muted-dark); }
 .empty-state h3 { font-family: "Outfit", sans-serif; font-size: 1.1rem; color: var(--text-dark); margin-bottom: 8px; }
 
+/* Delete confirmation modal */
+.delete-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 24px; }
+.delete-modal-overlay.open { display: flex; }
+.delete-modal { background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 16px; padding: 28px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+.delete-modal h4 { font-family: "Outfit", sans-serif; font-size: 1.15rem; margin-bottom: 10px; color: var(--text-dark); }
+.delete-modal p { font-size: 0.9rem; color: var(--muted-dark); margin-bottom: 24px; line-height: 1.5; }
+.delete-modal-btns { display: flex; gap: 12px; justify-content: flex-end; }
+.delete-modal-btns .btn-cancel { background: transparent; color: var(--muted-dark); border: 1px solid var(--border-dark); padding: 10px 20px; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.delete-modal-btns .btn-cancel:hover { border-color: var(--green); color: var(--text-dark); }
+.delete-modal-btns .btn-delete { background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.delete-modal-btns .btn-delete:hover { background: #dc2626; }
+
 /* Messages */
 .msg-panel { display: flex; gap: 0; min-height: 480px; border: 1px solid var(--border-dark); border-radius: 16px; overflow: hidden; background: var(--surface-dark); }
 .msg-list-wrap { width: 300px; flex-shrink: 0; border-right: 1px solid var(--border-dark); display: flex; flex-direction: column; }
@@ -271,6 +283,17 @@ nav {
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="delete-modal-overlay" id="deleteModalOverlay">
+  <div class="delete-modal">
+    <h4 id="deleteModalTitle">Delete notification?</h4>
+    <p id="deleteModalText">This cannot be undone.</p>
+    <div class="delete-modal-btns">
+      <button class="btn-cancel" id="deleteModalCancel">Cancel</button>
+      <button class="btn-delete" id="deleteModalConfirm">Delete</button>
     </div>
   </div>
 </div>
@@ -432,14 +455,36 @@ nav {
   }
   window.markAsReadNotif = markAsReadNotif;
 
+  let deleteModalCallback = null;
+
+  function openDeleteModal(title, text, onConfirm) {
+    document.getElementById('deleteModalTitle').textContent = title;
+    document.getElementById('deleteModalText').textContent = text;
+    deleteModalCallback = onConfirm;
+    document.getElementById('deleteModalOverlay').classList.add('open');
+  }
+  function closeDeleteModal() {
+    document.getElementById('deleteModalOverlay').classList.remove('open');
+    deleteModalCallback = null;
+  }
+  document.getElementById('deleteModalCancel').onclick = closeDeleteModal;
+  document.getElementById('deleteModalConfirm').onclick = function() {
+    if (deleteModalCallback) deleteModalCallback();
+    closeDeleteModal();
+  };
+  document.getElementById('deleteModalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteModal();
+  });
+
   function deleteNotif(id) {
-    if (!confirm('Delete this notification?')) return;
-    notifications = notifications.filter(n => n.id !== id);
-    starredIds = starredIds.filter(s => s !== id);
-    localStorage.setItem('livvo_landlord_notifications', JSON.stringify(notifications));
-    localStorage.setItem('livvo_landlord_starred_notifications', JSON.stringify(starredIds));
-    renderNotifications();
-    updateNotifBadge();
+    openDeleteModal('Delete notification?', 'This notification will be removed. This cannot be undone.', function() {
+      notifications = notifications.filter(n => n.id !== id);
+      starredIds = starredIds.filter(s => s !== id);
+      localStorage.setItem('livvo_landlord_notifications', JSON.stringify(notifications));
+      localStorage.setItem('livvo_landlord_starred_notifications', JSON.stringify(starredIds));
+      renderNotifications();
+      updateNotifBadge();
+    });
   }
   window.deleteNotif = deleteNotif;
 
@@ -517,13 +562,16 @@ nav {
   }
 
   function deleteChat(id) {
-    if (!confirm('Delete this conversation?')) return;
-    const wasActive = activeChatId === id;
-    conversations = conversations.filter(c => c.id !== id);
-    delete chatMessages[id];
-    if (wasActive) closeChat();
-    saveChatData();
-    renderConversationList();
+    const conv = conversations.find(c => c.id === id);
+    const name = conv ? conv.name : 'this conversation';
+    openDeleteModal('Delete conversation?', 'Remove your chat with ' + name + '? This cannot be undone.', function() {
+      const wasActive = activeChatId === id;
+      conversations = conversations.filter(c => c.id !== id);
+      delete chatMessages[id];
+      if (wasActive) closeChat();
+      saveChatData();
+      renderConversationList();
+    });
   }
   window.deleteChat = deleteChat;
 
