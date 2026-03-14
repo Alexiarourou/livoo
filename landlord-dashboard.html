@@ -107,6 +107,9 @@ nav {
 .notif-star:hover { color: #f59e0b; transform: scale(1.1); }
 .notif-star.starred { color: #f59e0b; }
 .notif-star svg { width: 20px; height: 20px; }
+.notif-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.notif-mark-read { font-size: 0.7rem; color: var(--muted-dark); background: none; border: none; cursor: pointer; padding: 6px 10px; border-radius: 8px; transition: all 0.2s; font-family: inherit; }
+.notif-mark-read:hover { color: var(--green); background: rgba(5,150,105,0.08); }
 .notif-body { flex: 1; min-width: 0; }
 .notif-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
 .notif-text { font-size: 0.85rem; color: var(--muted-dark); line-height: 1.5; margin-bottom: 6px; }
@@ -417,6 +420,18 @@ nav {
   }
   window.toggleStarNotif = toggleStarNotif;
 
+  function markAsReadNotif(id) {
+    const n = notifications.find(x => x.id === id);
+    if (n) { n.unread = false; localStorage.setItem('livvo_landlord_notifications', JSON.stringify(notifications)); renderNotifications(); updateNotifBadge(); }
+  }
+  window.markAsReadNotif = markAsReadNotif;
+
+  function updateNotifBadge() {
+    const count = notifications.filter(n => n.unread).length;
+    const el = document.getElementById('notifCount');
+    if (el) { el.textContent = count; el.style.display = count > 0 ? '' : 'none'; }
+  }
+
   function renderNotifications() {
     const list = document.getElementById('notifList');
     list.innerHTML = notifications.map(n => `
@@ -427,11 +442,15 @@ nav {
           <div class="notif-text">${n.text}</div>
           <div class="notif-time">${n.time}</div>
         </div>
-        <button class="notif-star ${starredIds.includes(n.id) ? 'starred' : ''}" onclick="toggleStarNotif('${n.id}')" title="${starredIds.includes(n.id) ? 'Unstar' : 'Star'}">
-          <svg viewBox="0 0 24 24" fill="${starredIds.includes(n.id) ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        </button>
+        <div class="notif-actions">
+          ${n.unread ? '<button class="notif-mark-read" onclick="event.stopPropagation();markAsReadNotif(\''+n.id+'\')">Mark as read</button>' : ''}
+          <button class="notif-star ${starredIds.includes(n.id) ? 'starred' : ''}" onclick="event.stopPropagation();toggleStarNotif(\''+n.id+'\')" title="${starredIds.includes(n.id) ? 'Unstar' : 'Star'}">
+            <svg viewBox="0 0 24 24" fill="${starredIds.includes(n.id) ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </button>
+        </div>
       </div>
     `).join('');
+    updateNotifBadge();
   }
   renderNotifications();
 
