@@ -33,10 +33,6 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
 .hero h1 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 20px; }
 .hero h1 span { color: var(--green); }
 .hero p { font-size: 1.1rem; color: var(--muted-dark); max-width: 520px; margin: 0 auto 40px; line-height: 1.7; }
-.hero-stats { display: flex; justify-content: center; gap: 48px; margin-bottom: 48px; }
-.stat { text-align: center; }
-.stat-number { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.8rem; color: var(--green); }
-.stat-label { font-size: 0.78rem; color: var(--muted-dark); margin-top: 2px; }
 
 .audience { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
 .audience-pill { display: flex; align-items: center; gap: 8px; background: var(--surface-dark); border: 1px solid var(--border-dark); padding: 10px 20px; border-radius: 100px; font-size: 0.85rem; color: var(--muted-dark); cursor: pointer; transition: all 0.2s; }
@@ -50,7 +46,14 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
 .section-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.03em; }
 .section-sub { color: var(--muted-dark); font-size: 0.95rem; margin-top: 8px; line-height: 1.6; }
 
-.cities-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.cities-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.city-card-request { background: var(--surface-dark); border: 2px dashed var(--border-dark); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 320px; padding: 24px; text-decoration: none; color: inherit; transition: all 0.3s; }
+.city-card-request:hover { border-color: var(--green); background: rgba(5,150,105,0.04); }
+.city-card-request-icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(5,150,105,0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+.city-card-request-icon svg { width: 28px; height: 28px; }
+.city-card-request-icon svg path { stroke: var(--green); }
+.city-card-request strong { font-family: "Outfit", sans-serif; font-size: 1.1rem; display: block; margin-bottom: 8px; }
+.city-card-request span { font-size: 0.85rem; color: var(--muted-dark); text-align: center; line-height: 1.5; }
 .city-card { background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 20px; overflow: hidden; transition: all 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
 .city-card:hover { border-color: var(--green); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(5,150,105,0.15); }
 .city-cover { height: 200px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 20px; background-size: cover; background-position: center; }
@@ -101,7 +104,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
 .avatar svg path { stroke: var(--green); stroke-width: 2; fill: none; }
 .avatar-count { margin-left: 12px; font-size: 0.85rem; color: var(--muted-dark); }
 
-@media (max-width: 900px) { .cities-grid { grid-template-columns: 1fr; } nav { padding: 0 20px; } .hero { padding: 100px 24px 60px; } .section { padding: 48px 24px; } .join-section { margin: 0 24px 60px; padding: 40px 24px; } .hero-stats { gap: 24px; } .join-form { flex-direction: column; } .nav-links { display: none; } }
+@media (max-width: 900px) { .cities-grid { grid-template-columns: 1fr; } nav { padding: 0 20px; } .hero { padding: 100px 24px 60px; } .section { padding: 48px 24px; } .join-section { margin: 0 24px 60px; padding: 40px 24px; } .join-form { flex-direction: column; } .nav-links { display: none; } }
 </style>
 </head>
 <body>
@@ -127,11 +130,6 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
     <div class="audience-pill active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus Students</div>
     <div class="audience-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns & Professionals</div>
     <div class="audience-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Digital Nomads</div>
-  </div>
-  <div class="hero-stats">
-    <div class="stat"><div class="stat-number">3</div><div class="stat-label">Cities</div></div>
-    <div class="stat"><div class="stat-number">Free</div><div class="stat-label">Forever</div></div>
-    <div class="stat"><div class="stat-number">&#8734;</div><div class="stat-label">Connections</div></div>
   </div>
 </section>
 
@@ -189,6 +187,11 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
         </div>
         <span class="btn-city btn-city-active">Join London community</span>
       </div>
+    </a>
+    <a href="contact.html?subject=Request%20new%20city" class="city-card city-card-request">
+      <div class="city-card-request-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+      <strong>Request your city</strong>
+      <span>Student in Barcelona, Berlin, Amsterdam or elsewhere? Tell us which city you want — we're expanding.</span>
     </a>
   </div>
 </div>
