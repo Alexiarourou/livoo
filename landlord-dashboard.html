@@ -39,7 +39,11 @@ nav {
 .dash-header .btn-add:hover { background: var(--green-dark); }
 
 /* Tabs */
-.dash-tabs { display: flex; gap: 4px; margin-bottom: 32px; border-bottom: 1px solid var(--border-dark); }
+.dash-tabs-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; border-bottom: 1px solid var(--border-dark); flex-wrap: wrap; }
+.back-dash { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; padding: 8px 0; transition: color 0.2s; }
+.back-dash:hover { color: var(--green); }
+.back-dash svg { width: 18px; height: 18px; }
+.dash-tabs { display: flex; gap: 4px; }
 .dash-tab { padding: 12px 20px; font-size: 0.9rem; color: var(--muted-dark); background: none; border: none; font-family: inherit; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
 .dash-tab:hover { color: var(--text-dark); }
 .dash-tab.active { color: var(--green); border-bottom-color: var(--green); font-weight: 600; }
@@ -119,6 +123,8 @@ nav {
 .chat-view { flex: 1; display: none; flex-direction: column; }
 .chat-view.open { display: flex; }
 .chat-header { padding: 16px 24px; border-bottom: 1px solid var(--border-dark); display: flex; align-items: center; gap: 16px; }
+.chat-back { width: 36px; height: 36px; border-radius: 50%; background: rgba(5,150,105,0.1); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--green); flex-shrink: 0; transition: all 0.2s; }
+.chat-back:hover { background: rgba(5,150,105,0.18); }
 .chat-header .msg-avatar { width: 40px; height: 40px; font-size: 0.9rem; }
 .chat-header-info { flex: 1; }
 .chat-header-name { font-weight: 700; font-size: 1rem; }
@@ -176,10 +182,16 @@ nav {
     <a href="landlord-list-property.html" class="btn-add">+ List a property</a>
   </div>
 
-  <div class="dash-tabs">
-    <button class="dash-tab active" onclick="switchTab('properties')">Properties</button>
-    <button class="dash-tab" onclick="switchTab('notifications')">Notifications</button>
-    <button class="dash-tab" onclick="switchTab('messages')">Messages</button>
+  <div class="dash-tabs-wrap">
+    <a href="#" class="back-dash" id="backToDashboard" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Dashboard
+    </a>
+    <div class="dash-tabs">
+      <button class="dash-tab active" onclick="switchTab('properties')">Properties</button>
+      <button class="dash-tab" onclick="switchTab('notifications')">Notifications</button>
+      <button class="dash-tab" onclick="switchTab('messages')">Messages</button>
+    </div>
   </div>
 
   <!-- Panel: Properties -->
@@ -299,7 +311,14 @@ nav {
     document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
     document.querySelector('.dash-tab[onclick*="'+id+'"]').classList.add('active');
     document.getElementById('panel-'+id).classList.add('active');
+    document.getElementById('backToDashboard').style.display = id === 'properties' ? 'none' : 'inline-flex';
+    if (id !== 'messages') closeChat();
   }
+
+  document.getElementById('backToDashboard').addEventListener('click', function(e) {
+    e.preventDefault();
+    switchTab('properties');
+  });
 
   let properties = JSON.parse(localStorage.getItem('livvo_properties') || '[]');
   if (properties.length === 0) {
@@ -430,6 +449,13 @@ nav {
     });
   }
 
+  function closeChat() {
+    activeChatId = null;
+    document.getElementById('chatPlaceholder').style.display = 'flex';
+    document.getElementById('chatView').classList.remove('open');
+    renderConversationList();
+  }
+
   function openChat(id) {
     activeChatId = id;
     const conv = conversations.find(c => c.id === id);
@@ -438,6 +464,9 @@ nav {
     document.getElementById('chatPlaceholder').style.display = 'none';
     document.getElementById('chatView').classList.add('open');
     document.getElementById('chatHeader').innerHTML = `
+      <button class="chat-back" onclick="closeChat()" aria-label="Back to dashboard" title="Back to dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
       <div class="msg-avatar">${conv.initial}</div>
       <div class="chat-header-info">
         <div class="chat-header-name">${conv.name}</div>
