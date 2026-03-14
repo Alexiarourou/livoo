@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Feed — Livvo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --green: #059669; --green-light: #10b981; --green-dark: #047857; --bg: #f0f7f2; --surface: #ffffff; --border: #d4e5dc; --text: #1a2e24; --muted: #4a7c5e; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: "DM Sans", sans-serif; }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.98); border-bottom: 1px solid var(--border); }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, var(--green), var(--green-light)); }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--text); }
+.logo-word span { color: var(--green); }
+.nav-center { display: flex; gap: 8px; }
+.nav-tab { padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; color: var(--muted); text-decoration: none; font-weight: 500; }
+.nav-tab:hover, .nav-tab.active { color: var(--green); background: rgba(5,150,105,0.08); }
+.feed-layout { display: flex; padding-top: 56px; max-width: 1200px; margin: 0 auto; min-height: 100vh; }
+.sidebar { width: 280px; flex-shrink: 0; padding: 24px 16px; border-right: 1px solid var(--border); background: var(--surface); }
+.sidebar h2 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; }
+.sidebar .members { font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; }
+.sidebar .topics { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.sidebar .topic { display: block; padding: 10px 14px; border-radius: 8px; font-size: 0.88rem; color: var(--text); text-decoration: none; margin-bottom: 4px; }
+.sidebar .topic:hover { background: rgba(5,150,105,0.08); color: var(--green); }
+.main { flex: 1; padding: 24px; min-width: 0; }
+.post { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; display: flex; transition: all 0.2s; }
+.post:hover { border-color: var(--green); box-shadow: 0 4px 16px rgba(5,150,105,0.08); }
+.post-vote { width: 48px; flex-shrink: 0; background: rgba(5,150,105,0.04); display: flex; flex-direction: column; align-items: center; padding: 8px 0; }
+.post-vote button { background: none; border: none; cursor: pointer; padding: 4px; color: var(--muted); font-size: 1.2rem; line-height: 1; }
+.post-vote button:hover { color: var(--green); }
+.post-vote span { font-size: 0.75rem; font-weight: 700; color: var(--text); margin: 4px 0; }
+.post-body { flex: 1; padding: 16px 20px; }
+.post-meta { font-size: 0.75rem; color: var(--muted); margin-bottom: 8px; }
+.post-meta span { margin-right: 12px; }
+.post-title { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1rem; line-height: 1.4; margin-bottom: 8px; }
+.post-title a { color: var(--text); text-decoration: none; }
+.post-title a:hover { color: var(--green); }
+.post-excerpt { font-size: 0.88rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+.post-actions { display: flex; gap: 16px; font-size: 0.78rem; }
+.post-actions a { color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px; }
+.post-actions a:hover { color: var(--green); }
+.new-post { background: var(--green); color: white; padding: 10px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+.new-post:hover { background: var(--green-dark); }
+@media (max-width: 900px) { .sidebar { display: none; } .feed-layout { flex-direction: column; } }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">
+    <div class="logo-icon"></div>
+    <span class="logo-word">li<span>vv</span>o</span>
+  </a>
+  <div class="nav-center">
+    <a href="community.html" class="nav-tab">Cities</a>
+    <a href="#" class="nav-tab active" id="cityTab">Athens</a>
+  </div>
+  <a href="community-join.html?city=athens" class="new-post" style="margin:0">+ New post</a>
+</nav>
+<div class="feed-layout">
+  <aside class="sidebar">
+    <h2 id="sidebarCity">Athens</h2>
+    <p class="members">128 members</p>
+    <div class="topics">Topics</div>
+    <a href="#" class="topic">Housing & flatshares</a>
+    <a href="#" class="topic">Flatmate search</a>
+    <a href="#" class="topic">Local tips</a>
+    <a href="#" class="topic">Events & meetups</a>
+    <a href="#" class="topic">Questions & advice</a>
+  </aside>
+  <main class="main">
+    <a href="community-join.html?city=athens" class="new-post">+ New post</a>
+    <div class="post">
+      <div class="post-vote"><button>&#9650;</button><span>24</span><button>&#9660;</button></div>
+      <div class="post-body">
+        <div class="post-meta"><span>u/maria_k</span><span>2h ago</span></div>
+        <h3 class="post-title"><a href="#">Looking for a flatmate in Exarchia - 2BR from September</a></h3>
+        <p class="post-excerpt">Hi! I found a nice flat in Exarchia, 2 bedrooms, 650 total. Looking for someone chill, move-in Sept 1. Message me if interested!</p>
+        <div class="post-actions"><a href="#">12 comments</a><a href="#">Share</a></div>
+      </div>
+    </div>
+    <div class="post">
+      <div class="post-vote"><button>&#9650;</button><span>18</span><button>&#9660;</button></div>
+      <div class="post-body">
+        <div class="post-meta"><span>u/alex_from_de</span><span>5h ago</span></div>
+        <h3 class="post-title"><a href="#">Best coworking spots in Athens?</a></h3>
+        <p class="post-excerpt">Digital nomad here, just arrived. Any recommendations for good WiFi and coffee? Preferably near Monastiraki.</p>
+        <div class="post-actions"><a href="#">8 comments</a><a href="#">Share</a></div>
+      </div>
+    </div>
+    <div class="post">
+      <div class="post-vote"><button>&#9650;</button><span>31</span><button>&#9660;</button></div>
+      <div class="post-body">
+        <div class="post-meta"><span>u/erasmus_sophie</span><span>1d ago</span></div>
+        <h3 class="post-title"><a href="#">Erasmus Athens meetup - this Saturday at a bar in Psiri</a></h3>
+        <p class="post-excerpt">Organising a casual meetup for anyone new in town. 7pm at the place we discussed. See you there!</p>
+        <div class="post-actions"><a href="#">24 comments</a><a href="#">Share</a></div>
+      </div>
+    </div>
+    <div class="post">
+      <div class="post-vote"><button>&#9650;</button><span>15</span><button>&#9660;</button></div>
+      <div class="post-body">
+        <div class="post-meta"><span>u/intern_lucas</span><span>2d ago</span></div>
+        <h3 class="post-title"><a href="#">Internship at PWC - where to live? Budget 500-600</a></h3>
+        <p class="post-excerpt">Starting a 6-month internship in September. Office is near Syntagma. Any neighbourhood recommendations that are safe and not too far?</p>
+        <div class="post-actions"><a href="#">11 comments</a><a href="#">Share</a></div>
+      </div>
+    </div>
+    <div class="post">
+      <div class="post-vote"><button>&#9650;</button><span>9</span><button>&#9660;</button></div>
+      <div class="post-body">
+        <div class="post-meta"><span>u/nomad_julia</span><span>3d ago</span></div>
+        <h3 class="post-title"><a href="#">Best beaches near Athens for a weekend trip?</a></h3>
+        <p class="post-excerpt">Want to escape the city for a couple of days. Easy to reach by bus or train. Suggestions?</p>
+        <div class="post-actions"><a href="#">6 comments</a><a href="#">Share</a></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  const params = new URLSearchParams(location.search);
+  const city = (params.get('city') || 'athens').toLowerCase();
+  const cityNames = { paris: 'Paris', athens: 'Athens', london: 'London' };
+  const cityName = cityNames[city] || city;
+  document.getElementById('cityTab').textContent = cityName;
+  document.getElementById('sidebarCity').textContent = cityName;
+  document.querySelectorAll('.new-post').forEach(a => a.href = 'community-join.html?city=' + city);
+</script>
+</body>
+</html>

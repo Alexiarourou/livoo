@@ -127,7 +127,8 @@ nav {
         await auth.createUserWithEmailAndPassword(email, password);
         localStorage.setItem('livvo_flatmate_email', email);
         localStorage.setItem('livvo_flatmate_logged_in', '1');
-        window.location.href = 'flatmate-profile.html';
+        const redirect = new URLSearchParams(location.search).get('redirect');
+        window.location.href = redirect || 'flatmate-profile.html';
       } catch (err) {
         btn.disabled = false;
         if (err.code === 'auth/email-already-in-use') {
@@ -142,7 +143,8 @@ nav {
       localStorage.setItem('livvo_flatmate_email', email);
       localStorage.setItem('livvo_flatmate_password', password);
       localStorage.setItem('livvo_flatmate_logged_in', '1');
-      window.location.href = 'flatmate-profile.html';
+      const redirect = new URLSearchParams(location.search).get('redirect');
+      window.location.href = redirect || 'flatmate-profile.html';
     }
   });
 </script>
