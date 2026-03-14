@@ -80,13 +80,13 @@ nav {
     <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <span class="logo-word">li<span>vv</span>o</span>
   </a>
-  <a href="index.html" class="nav-back">← Back to home</a>
+  <a href="index.html" class="nav-back" id="navBack">← Back to home</a>
 </nav>
 
 <div class="page">
   <div class="auth-card">
-    <h1>Find your flatmate</h1>
-    <p class="sub">Create a free account to match with compatible people based on budget, lifestyle, nationality and move-in date.</p>
+    <h1 id="authTitle">Find your flatmate</h1>
+    <p class="sub" id="authSub">Create a free account to match with compatible people based on budget, lifestyle, nationality and move-in date.</p>
     <form id="signupForm">
       <div class="form-group">
         <label>Email</label>
@@ -102,6 +102,18 @@ nav {
   <p class="auth-footer">Already have an account? <a href="flatmate-login.html">Log in</a></p>
 </div>
 
+<script>
+  const params = new URLSearchParams(location.search);
+  const redirect = params.get('redirect') || '';
+  const isCommunity = redirect.includes('community-feed') || params.get('source') === 'community';
+  if (isCommunity) {
+    document.title = 'Join the Community — Livvo';
+    document.getElementById('authTitle').textContent = 'Join the community';
+    document.getElementById('authSub').textContent = 'Create a free account to join the forum, chat with others, and connect with people in your city.';
+    document.getElementById('navBack').textContent = '← Back to cities';
+    document.getElementById('navBack').href = params.get('city') ? 'community-join.html?city=' + params.get('city') : 'community.html';
+  }
+</script>
 <script src="firebase-config.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
