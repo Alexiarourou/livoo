@@ -110,6 +110,8 @@ nav {
 .notif-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .notif-mark-read { font-size: 0.7rem; color: var(--muted-dark); background: none; border: none; cursor: pointer; padding: 6px 10px; border-radius: 8px; transition: all 0.2s; font-family: inherit; }
 .notif-mark-read:hover { color: var(--green); background: rgba(5,150,105,0.08); }
+.notif-delete { width: 32px; height: 32px; border-radius: 50%; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted-dark); transition: all 0.2s; }
+.notif-delete:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
 .notif-body { flex: 1; min-width: 0; }
 .notif-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
 .notif-text { font-size: 0.85rem; color: var(--muted-dark); line-height: 1.5; margin-bottom: 6px; }
@@ -131,11 +133,15 @@ nav {
 }
 .msg-item:hover { background: rgba(5,150,105,0.06); }
 .msg-item.active { background: rgba(5,150,105,0.08); }
+.msg-delete { width: 28px; height: 28px; border-radius: 50%; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted-dark); opacity: 0.6; transition: all 0.2s; flex-shrink: 0; }
+.msg-delete:hover { color: #ef4444; opacity: 1; background: rgba(239,68,68,0.1); }
+.chat-delete { width: 36px; height: 36px; border-radius: 50%; background: rgba(239,68,68,0.1); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted-dark); flex-shrink: 0; transition: all 0.2s; }
+.chat-delete:hover { color: #ef4444; background: rgba(239,68,68,0.2); }
 .msg-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; flex-shrink: 0; }
 .msg-body { flex: 1; min-width: 0; }
 .msg-name { font-weight: 600; font-size: 0.92rem; margin-bottom: 2px; }
 .msg-preview { font-size: 0.83rem; color: var(--muted-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.msg-meta { text-align: right; flex-shrink: 0; }
+.msg-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .msg-time { font-size: 0.75rem; color: var(--muted-dark); }
 .msg-unread { width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-left: 8px; display: inline-block; }
 
@@ -426,6 +432,17 @@ nav {
   }
   window.markAsReadNotif = markAsReadNotif;
 
+  function deleteNotif(id) {
+    if (!confirm('Delete this notification?')) return;
+    notifications = notifications.filter(n => n.id !== id);
+    starredIds = starredIds.filter(s => s !== id);
+    localStorage.setItem('livvo_landlord_notifications', JSON.stringify(notifications));
+    localStorage.setItem('livvo_landlord_starred_notifications', JSON.stringify(starredIds));
+    renderNotifications();
+    updateNotifBadge();
+  }
+  window.deleteNotif = deleteNotif;
+
   function updateNotifBadge() {
     const count = notifications.filter(n => n.unread).length;
     const el = document.getElementById('notifCount');
@@ -444,9 +461,10 @@ nav {
         </div>
         <div class="notif-actions">
           ${n.unread ? '<button class="notif-mark-read" onclick="event.stopPropagation();markAsReadNotif(\''+n.id+'\')">Mark as read</button>' : ''}
-          <button class="notif-star ${starredIds.includes(n.id) ? 'starred' : ''}" onclick="event.stopPropagation();toggleStarNotif(\''+n.id+'\')" title="${starredIds.includes(n.id) ? 'Unstar' : 'Star'}">
-            <svg viewBox="0 0 24 24" fill="${starredIds.includes(n.id) ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <button class="notif-star ${starredIds.includes(n.id) ? 'starred' : ''}" onclick="event.stopPropagation();toggleStarNotif(\''+n.id+'\')" title="${starredIds.includes(n.id) ? 'Unstar (remove from favourites)' : 'Star (add to favourites)'}">
+            <svg viewBox="0 0 24 24" fill="${starredIds.includes(n.id) ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="${starredIds.includes(n.id) ? '0' : '2'}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           </button>
+          <button class="notif-delete" onclick="event.stopPropagation();deleteNotif(\''+n.id+'\')" title="Delete notification"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg></button>
         </div>
       </div>
     `).join('');
@@ -498,6 +516,17 @@ nav {
     localStorage.setItem('livvo_landlord_chat_messages', JSON.stringify(chatMessages));
   }
 
+  function deleteChat(id) {
+    if (!confirm('Delete this conversation?')) return;
+    const wasActive = activeChatId === id;
+    conversations = conversations.filter(c => c.id !== id);
+    delete chatMessages[id];
+    if (wasActive) closeChat();
+    saveChatData();
+    renderConversationList();
+  }
+  window.deleteChat = deleteChat;
+
   function renderConversationList() {
     const list = document.getElementById('msgConversationList');
     list.innerHTML = conversations.map(c => `
@@ -507,11 +536,14 @@ nav {
           <div class="msg-name">${c.name} ${c.unread ? '<span class="msg-unread"></span>' : ''}</div>
           <div class="msg-preview">${c.preview || 'No messages yet'}</div>
         </div>
-        <div class="msg-meta"><span class="msg-time">${c.time || ''}</span></div>
+        <div class="msg-meta">
+          <span class="msg-time">${c.time || ''}</span>
+          <button class="msg-delete" onclick="event.stopPropagation();deleteChat('${c.id}')" title="Delete conversation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg></button>
+        </div>
       </div>
     `).join('');
     list.querySelectorAll('.msg-item').forEach(el => {
-      el.addEventListener('click', () => openChat(el.dataset.id));
+      el.addEventListener('click', (e) => { if (!e.target.closest('.msg-delete')) openChat(el.dataset.id); });
     });
   }
 
@@ -538,6 +570,7 @@ nav {
         <div class="chat-header-name">${conv.name}</div>
         <div class="chat-header-meta">${conv.property || 'Potential tenant'}</div>
       </div>
+      <button class="chat-delete" onclick="deleteChat('${conv.id}')" title="Delete conversation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg></button>
     `;
     if (!chatMessages[id]) chatMessages[id] = [];
     renderChatMessages();
