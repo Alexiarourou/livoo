@@ -115,7 +115,7 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; height:64px; padding
 .highlight { display:flex; align-items:flex-start; gap:12px; padding:16px 18px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); }
 .highlight:nth-child(even) { border-right:none; }
 .highlight:nth-last-child(-n+2) { border-bottom:none; }
-.highlight-icon { font-size:1.3rem; flex-shrink:0; margin-top:2px; }
+.highlight-icon { width:8px; height:8px; border-radius:50%; background:var(--green); flex-shrink:0; margin-top:8px; }
 .highlight-title { font-weight:600; font-size:0.85rem; margin-bottom:2px; }
 .highlight-desc { font-size:0.75rem; color:var(--muted); line-height:1.4; }
 
@@ -250,20 +250,20 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; height:64px; padding
         <div class="photo-label">Kitchen</div>
       </div>
     </div>
-    <button class="show-all-btn" onclick="openLightbox(0)">⊞ Show all photos</button>
+    <button class="show-all-btn" onclick="openLightbox(0)">View all photos</button>
   </div>
 
   <!-- LISTING LAYOUT -->
   <div class="listing-layout">
     <div class="listing-left">
-      <div class="listing-badge">⭐ Livvo Verified</div>
+      <div class="listing-badge">Livvo Verified</div>
       <h1 class="listing-title">Stylish 2-Bedroom Apartment with Private Terrace</h1>
       <div class="listing-meta">
-        <span>📍 Platia Viktoria, Athens</span>
-        <span>🛏 2 bedrooms</span>
-        <span>🚿 1 bathroom</span>
-        <span>👥 Up to 5 guests</span>
-        <span style="color:var(--green);font-weight:600;font-size:0.75rem">✦ New listing</span>
+        <span>Platia Viktoria, Athens</span>
+        <span>2 bedrooms</span>
+        <span>1 bathroom</span>
+        <span>Up to 5 guests</span>
+        <span style="color:var(--green);font-weight:600;font-size:0.75rem">New listing</span>
       </div>
 
       <div class="host-row">
@@ -275,10 +275,10 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; height:64px; padding
       </div>
 
       <div class="highlights">
-        <div class="highlight"><div class="highlight-icon">🚇</div><div><div class="highlight-title">2 min from train station</div><div class="highlight-desc">Unbeatable location — top rated by guests</div></div></div>
-        <div class="highlight"><div class="highlight-icon">🔑</div><div><div class="highlight-title">Self check-in</div><div class="highlight-desc">Lockbox access — arrive any time</div></div></div>
-        <div class="highlight"><div class="highlight-icon">🎓</div><div><div class="highlight-title">Near universities</div><div class="highlight-desc">Walking distance to Athens universities</div></div></div>
-        <div class="highlight"><div class="highlight-icon">🌿</div><div><div class="highlight-title">Private terrace</div><div class="highlight-desc">Beautiful outdoor space with city views</div></div></div>
+        <div class="highlight"><div class="highlight-icon"></div><div><div class="highlight-title">2 min from train station</div><div class="highlight-desc">Unbeatable location — top rated by guests</div></div></div>
+        <div class="highlight"><div class="highlight-icon"></div><div><div class="highlight-title">Self check-in</div><div class="highlight-desc">Lockbox access — arrive any time</div></div></div>
+        <div class="highlight"><div class="highlight-icon"></div><div><div class="highlight-title">Near universities</div><div class="highlight-desc">Walking distance to Athens universities</div></div></div>
+        <div class="highlight"><div class="highlight-icon"></div><div><div class="highlight-title">Private terrace</div><div class="highlight-desc">Beautiful outdoor space with city views</div></div></div>
       </div>
 
       <div class="section-title" style="margin-top:0;padding-top:0;border-top:none">About this property</div>
@@ -287,27 +287,27 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; height:64px; padding
 
       <div class="section-title">What this place offers</div>
       <div class="amenities-grid">
-        <div class="amenity-item">📶 High-speed WiFi</div>
-        <div class="amenity-item">❄️ Air conditioning</div>
-        <div class="amenity-item">🍳 Fully equipped kitchen</div>
-        <div class="amenity-item">☕ Espresso machine</div>
-        <div class="amenity-item">🧺 Washing machine</div>
-        <div class="amenity-item">🌿 Private terrace</div>
-        <div class="amenity-item">🚇 Near metro & train</div>
-        <div class="amenity-item">🎓 Near universities</div>
-        <div class="amenity-item">🅿️ Free street parking</div>
-        <div class="amenity-item">🐾 Pets allowed</div>
-        <div class="amenity-item">🔑 Self check-in</div>
-        <div class="amenity-item">🏠 Bills included</div>
+        <div class="amenity-item">High-speed WiFi</div>
+        <div class="amenity-item">Air conditioning</div>
+        <div class="amenity-item">Fully equipped kitchen</div>
+        <div class="amenity-item">Espresso machine</div>
+        <div class="amenity-item">Washing machine</div>
+        <div class="amenity-item">Private terrace</div>
+        <div class="amenity-item">Near metro & train</div>
+        <div class="amenity-item">Near universities</div>
+        <div class="amenity-item">Free street parking</div>
+        <div class="amenity-item">Pets allowed</div>
+        <div class="amenity-item">Self check-in</div>
+        <div class="amenity-item">Bills included</div>
       </div>
 
       <div class="section-title">Where you'll be</div>
       <div id="map"></div>
-      <div class="map-note">📍 Platia Viktoria, Athens 104 38 · <span style="color:var(--green);font-weight:500">Exact address after enquiry</span></div>
+      <div class="map-note">Platia Viktoria, Athens 104 38 · <span style="color:var(--green);font-weight:500">Exact address after enquiry</span></div>
 
       <div class="section-title">Reviews</div>
       <div class="review-empty">
-        <strong>✨ Be the first to review</strong>
+        <strong>Be the first to review</strong>
         <p>Brand new listing on Livvo. Enquire now and be among the first guests!</p>
       </div>
     </div>
@@ -316,7 +316,7 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; height:64px; padding
     <div>
       <div class="booking-card">
         <div class="booking-price"><span class="booking-price-amount">€700</span><span class="booking-price-period">/ month</span></div>
-        <div class="booking-new">✦ New listing · Be the first to stay!</div>
+        <div class="booking-new">New listing · Be the first to stay!</div>
 
         <div class="booking-dates">
           <div class="date-row">
@@ -350,9 +350,9 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; height:64px; padding
 
         <div class="dur-label">I am a</div>
         <div class="iam-options" style="margin-bottom:14px">
-          <button class="iam-btn active" onclick="setIam(this)"><span class="iam-icon">🎓</span>Student</button>
-          <button class="iam-btn" onclick="setIam(this)"><span class="iam-icon">💼</span>Intern</button>
-          <button class="iam-btn" onclick="setIam(this)"><span class="iam-icon">🌍</span>Nomad</button>
+          <button class="iam-btn active" onclick="setIam(this)">Student</button>
+          <button class="iam-btn" onclick="setIam(this)">Intern</button>
+          <button class="iam-btn" onclick="setIam(this)">Nomad</button>
         </div>
 
         <button class="btn-enquire-big" onclick="openModal()">Enquire Now →</button>
@@ -380,9 +380,9 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; height:64px; padding
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
   <div class="modal">
-    <button class="modal-close" onclick="closeModalBtn()">✕</button>
+    <button class="modal-close" onclick="closeModalBtn()">×</button>
     <div id="modalForm">
-      <h3>🏛️ Send enquiry to Alex</h3>
+      <h3>Send enquiry to Alex</h3>
       <p>Tell Alex about yourself — he'll get back within 24 hours.</p>
       <div class="modal-form">
         <input class="modal-input" type="text" placeholder="Your full name" id="eName"/>
@@ -396,7 +396,7 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; height:64px; padding
       </div>
     </div>
     <div class="modal-success" id="modalSuccess">
-      <div class="s-icon">🎉</div>
+      <div class="s-icon">✓</div>
       <h4>Enquiry sent to Alex!</h4>
       <p>Alex will be in touch within 24 hours. Welcome to Livvo!</p>
     </div>
