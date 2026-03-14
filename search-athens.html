@@ -305,7 +305,9 @@ nav {
       .map(p => {
         const am = p.amenities || [];
         const beds = parseInt(p.beds) || 2;
+        const maxGuests = p.guests ? parseInt(p.guests) : null;
         const specs = [beds + ' bed' + (beds > 1 ? 's' : '')].concat(
+          maxGuests ? ['Up to ' + maxGuests + ' guests'] : [],
           am.includes('terrace') ? ['Terrace'] : [],
           am.includes('bills') ? ['Bills included'] : [],
           am.includes('wifi') ? ['WiFi'] : []

@@ -207,6 +207,10 @@ nav {
           <option value="4">4+</option>
         </select>
       </div>
+      <div class="form-group">
+        <label>Max guests</label>
+        <input type="number" id="propGuests" placeholder="e.g. 4" min="1" max="20" />
+      </div>
     </div>
     <div class="form-group">
       <label>Amenities</label>
@@ -417,6 +421,7 @@ nav {
       lat: propertyData.lat, lng: propertyData.lng,
       type: document.getElementById('propType').value || 'apartment',
       beds: document.getElementById('propBeds').value || '2',
+      guests: document.getElementById('propGuests').value ? parseInt(document.getElementById('propGuests').value, 10) : null,
       minStay: document.getElementById('propMinStay').value,
       maxStay: document.getElementById('propMaxStay').value,
       amenities: ['wifi','terrace','bills','ac','washing','dishwasher','parking','elevator','kitchen','workspace','pets'].filter(a => document.getElementById('a_'+a)?.checked),
