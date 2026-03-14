@@ -155,7 +155,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
   function renderComments() {
     commentsList.innerHTML = allComments.map(c => `
       <div class="comment" ${c.reply ? 'style="margin-left:20px;padding-left:16px;border-left:2px solid var(--border)"' : ''}>
-        <div class="comment-meta"><strong>${c.author}</strong>${c.email ? ' (' + c.email + ')' : ''} · ${c.time}</div>
+        <div class="comment-meta"><strong>${esc(c.author)}</strong> · ${esc(c.time)}</div>
         <div class="comment-body">${c.body}</div>
       </div>
     `).join('');

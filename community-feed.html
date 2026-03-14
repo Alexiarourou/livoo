@@ -193,7 +193,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
       let allC = [...(p.comments || [])];
       try { const pc = localStorage.getItem('livvo_comments_' + p.id); if (pc) allC = allC.concat(JSON.parse(pc)); } catch(e) {}
       const commentCount = allC.length;
-      const commentsHtml = allC.map(c => `<div class="comment"><div class="comment-meta"><strong>${esc(c.author)}</strong>${c.email ? ' (' + esc(c.email) + ')' : ''} · ${esc(c.time)}</div><div class="comment-body">${esc(c.body)}</div></div>`).join('');
+      const commentsHtml = allC.map(c => `<div class="comment"><div class="comment-meta"><strong>${esc(c.author)}</strong> · ${esc(c.time)}</div><div class="comment-body">${esc(c.body)}</div></div>`).join('');
       const postDiv = document.createElement('div');
       postDiv.className = 'post';
       postDiv.innerHTML = `

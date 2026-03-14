@@ -89,7 +89,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
     try {
       await fetch('https://formspree.io/f/mbdzykvg', { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } });
     } catch(err) {}
-    const post = { id: postId, city, title, body, topic, author: author + ' (' + email + ')', time: 'Just now', votes: 0, comments: [] };
+    const post = { id: postId, city, title, body, topic, author: author, time: 'Just now', votes: 0, comments: [] };
     const stored = localStorage.getItem('livvo_posts') || '[]';
     const arr = JSON.parse(stored);
     arr.unshift(post);
