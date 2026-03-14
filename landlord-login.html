@@ -148,9 +148,15 @@ nav {
         }
       }
     } else {
+      // Demo mode: hardcoded demo account + localStorage signups
+      const DEMO_EMAIL = 'alexiaroumpou@gmail.com';
+      const DEMO_PASS = 'Valeria123!';
       const savedEmail = localStorage.getItem('livvo_landlord_email');
       const savedPass = localStorage.getItem('livvo_landlord_password');
-      if (email === savedEmail && password === savedPass) {
+      const isDemo = (email === DEMO_EMAIL && password === DEMO_PASS);
+      const isSignedUp = (email === savedEmail && password === savedPass);
+      if (isDemo || isSignedUp) {
+        localStorage.setItem('livvo_landlord_email', email);
         localStorage.setItem('livvo_landlord_logged_in', '1');
         window.location.href = 'landlord-dashboard.html';
       } else {
