@@ -225,7 +225,7 @@ nav {
   </div>
 
   <div class="dash-tabs-wrap">
-    <a href="#" class="back-dash" id="backToDashboard" style="display:none">
+    <a href="#" class="back-dash" id="backToDashboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Dashboard
     </a>
@@ -341,7 +341,6 @@ nav {
     document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
     document.querySelector('.dash-tab[onclick*="'+id+'"]').classList.add('active');
     document.getElementById('panel-'+id).classList.add('active');
-    document.getElementById('backToDashboard').style.display = id === 'properties' ? 'none' : 'inline-flex';
     if (id !== 'messages') closeChat();
     location.hash = id === 'properties' ? '' : id;
   }
