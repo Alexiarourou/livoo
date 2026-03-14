@@ -561,12 +561,11 @@ nav {
   function deleteProperty(id) {
     const p = properties.find(x => x.id === id);
     if (!p) return;
-    openDeleteModal('Delete listing?', 'This will permanently remove "' + (p.title || 'this property') + '" from your dashboard. This cannot be undone.', function() {
-      properties = properties.filter(x => x.id !== id);
-      localStorage.setItem('livvo_properties', JSON.stringify(properties));
-      renderProperties();
-      if (editingId === id) { detail.style.display = 'none'; editingId = null; }
-    });
+    if (!confirm('Delete listing? This will permanently remove "' + (p.title || 'this property') + '" from your dashboard. This cannot be undone.')) return;
+    properties = properties.filter(x => x.id !== id);
+    localStorage.setItem('livvo_properties', JSON.stringify(properties));
+    renderProperties();
+    if (editingId === id) { detail.style.display = 'none'; editingId = null; }
   }
   window.deleteProperty = deleteProperty;
 
