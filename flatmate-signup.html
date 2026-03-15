@@ -114,51 +114,39 @@ nav {
     document.getElementById('navBack').href = params.get('city') ? 'community-join.html?city=' + params.get('city') : 'community.html';
   }
 </script>
-<script src="firebase-config.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script>
   const form = document.getElementById('signupForm');
-  let auth = null;
-  if (isFirebaseConfigured()) {
-    try {
-      firebase.initializeApp(LIVVO_FIREBASE_CONFIG);
-      auth = firebase.auth();
-    } catch (e) { /* ignore */ }
-  }
 
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
     const email = this.email.value.trim();
     const password = this.password.value;
     const btn = this.querySelector('button[type="submit"]');
-
-    if (auth) {
-      btn.disabled = true;
-      try {
-        const userCred = await auth.createUserWithEmailAndPassword(email, password);
-        await userCred.user.sendEmailVerification();
-        localStorage.setItem('livvo_flatmate_email', email);
-        localStorage.setItem('livvo_flatmate_logged_in', '1');
-        const redirect = new URLSearchParams(location.search).get('redirect');
-        alert('Account created! We sent a verification link to ' + email + '. Check inbox and spam. You can use Livvo now.');
-        window.location.href = redirect || 'flatmate-profile.html';
-      } catch (err) {
-        btn.disabled = false;
-        if (err.code === 'auth/email-already-in-use') {
-          alert('An account with this email already exists. Log in or use Forgot password.');
-        } else if (err.code === 'auth/weak-password') {
-          alert('Password should be at least 6 characters.');
-        } else {
-          alert(err.message || 'Sign up failed. Please try again.');
-        }
-      }
-    } else {
+    const sb = getLivvoSupabase();
+    if (!sb) {
+      alert('Supabase is not configured. Please add your project URL and anon key in supabase-config.js.');
+      return;
+    }
+    btn.disabled = true;
+    try {
+      const redirectTo = window.location.origin + window.location.pathname.replace('flatmate-signup.html', 'flatmate-profile.html');
+      const { error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } });
+      if (error) throw error;
       localStorage.setItem('livvo_flatmate_email', email);
-      localStorage.setItem('livvo_flatmate_password', password);
-      localStorage.setItem('livvo_flatmate_logged_in', '1');
       const redirect = new URLSearchParams(location.search).get('redirect');
+      alert('Account created! Check your email for a verification link. You can use Livvo after verifying.');
       window.location.href = redirect || 'flatmate-profile.html';
+    } catch (err) {
+      btn.disabled = false;
+      if (err.message && err.message.toLowerCase().includes('already')) {
+        alert('An account with this email already exists. Log in or use Forgot password.');
+      } else if (err.message && err.message.toLowerCase().includes('password')) {
+        alert('Password should be at least 6 characters.');
+      } else {
+        alert(err.message || 'Sign up failed. Please try again.');
+      }
     }
   });
 </script>

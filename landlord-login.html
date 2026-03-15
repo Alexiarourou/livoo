@@ -100,9 +100,8 @@ nav {
   <p class="auth-footer">Don't have an account? <a href="landlord-signup.html">Sign up to list a property</a></p>
 </div>
 
-<script src="firebase-config.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script>
   const form = document.getElementById('loginForm');
   const authMsg = document.getElementById('authMsg');
@@ -116,52 +115,31 @@ nav {
     authMsg.style.color = type === 'error' ? '#b91c1c' : 'var(--green-dark)';
   }
 
-  let auth = null;
-  if (isFirebaseConfigured()) {
-    try {
-      firebase.initializeApp(LIVVO_FIREBASE_CONFIG);
-      auth = firebase.auth();
-    } catch (e) {
-      showMsg('Firebase error. Check firebase-config.js', 'error');
-    }
-  }
-
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
     const email = this.email.value.trim();
     const password = this.password.value;
     authMsg.style.display = 'none';
 
-    if (auth) {
+    const sb = getLivvoSupabase();
+    if (sb) {
       btn.disabled = true;
       try {
-        await auth.signInWithEmailAndPassword(email, password);
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) throw error;
         localStorage.setItem('livvo_landlord_email', email);
         localStorage.setItem('livvo_landlord_logged_in', '1');
         window.location.href = 'landlord-dashboard.html';
       } catch (err) {
         btn.disabled = false;
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        if (err.message && (err.message.includes('Invalid') || err.message.includes('invalid') || err.message.includes('Email not confirmed'))) {
           showMsg('Invalid email or password. Sign up first or use Forgot password.', 'error');
         } else {
           showMsg(err.message || 'Login failed. Try again.', 'error');
         }
       }
     } else {
-      // Demo mode: hardcoded demo account + localStorage signups
-      const DEMO_EMAIL = 'alexiaroumpou@gmail.com';
-      const DEMO_PASS = 'Valeria123!';
-      const savedEmail = localStorage.getItem('livvo_landlord_email');
-      const savedPass = localStorage.getItem('livvo_landlord_password');
-      const isDemo = (email === DEMO_EMAIL && password === DEMO_PASS);
-      const isSignedUp = (email === savedEmail && password === savedPass);
-      if (isDemo || isSignedUp) {
-        localStorage.setItem('livvo_landlord_email', email);
-        localStorage.setItem('livvo_landlord_logged_in', '1');
-        window.location.href = 'landlord-dashboard.html';
-      } else {
-        showMsg('Invalid email or password. Don\'t have an account? <a href="landlord-welcome.html" style="color:inherit;font-weight:600;text-decoration:underline">Sign up first</a>.', 'error');
-      }
+      showMsg('Supabase is not configured. Please add your project URL and anon key in supabase-config.js.', 'error');
     }
   });
 </script>
