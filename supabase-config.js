@@ -6,8 +6,14 @@
  * 2. Authentication → Providers → enable "Email"
  * 3. Project Settings → API: use "Project URL" and "Publishable" key only.
  * 4. Paste below. Never put the Secret key in this file (browser-safe only).
- * 5. Authentication → URL Configuration: add your site URL and redirect URLs
- *    (e.g. https://yoursite.com/landlord-confirm-email.html) so email verification works.
+ * 5. Authentication → URL Configuration:
+ *    - Site URL: your live site (e.g. https://livvo.net)
+ *    - Redirect URLs: add every page that receives auth redirects, e.g.:
+ *      https://livvo.net/landlord-login.html
+ *      https://livvo.net/landlord-confirm-email.html
+ *      https://livvo.net/flatmate-login.html
+ *      (and your Vercel preview URL if you use it)
+ *    Without these, password reset and confirm emails may not be sent or may fail.
  */
 
 const LIVVO_SUPABASE_URL = 'https://lzoiburvvbuhdbojwqfl.supabase.co';

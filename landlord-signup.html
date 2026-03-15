@@ -185,7 +185,17 @@ nav {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
+<script>
+  (function() {
+    var u = 'https://lzoiburvvbuhdbojwqfl.supabase.co';
+    var k = 'sb_publishable_7q1InD7Na81Q2sBDrXu7_Q_i79zY2YM';
+    window.getLivvoSupabase = function() {
+      if (typeof supabase === 'undefined') return null;
+      if (!window._livvoSupabase) window._livvoSupabase = supabase.createClient(u, k);
+      return window._livvoSupabase;
+    };
+  })();
+</script>
 <script>
   let pendingEmail = '';
   let profilePhoto = null;
