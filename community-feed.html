@@ -84,7 +84,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
         <div class="post-meta"><span>Maria K. (Erasmus, Universitat Barcelona)</span><span>2h ago</span></div>
         <h3 class="post-title"><a href="community-post.html?id=flatmate-exarchia&city=athens">Looking for a flatmate in Exarchia — 2BR, 650€ total, move-in Sept 1</a></h3>
         <p class="post-excerpt">Found a great flat on Zoodochou Pigis, 5 min walk from Exarchia square. Two bedrooms, shared kitchen and bathroom. Landlord is super chill. I'm coming for Erasmus at NKUA. Looking for a female flatmate, non-smoker. Deposit is 1 month rent. Message me if you want to video call and see the place!</p>
-        <div class="post-actions"><button type="button" onclick="toggleComments(this)">12 comments</button><a href="#">Share</a></div>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">12 comments</button><a href="#" onclick="sharePost('community-post.html?id=flatmate-exarchia&city=athens'); return false;">Share</a></div>
         <div class="post-comments">
           <div class="comment">
             <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 1h ago</div>
@@ -107,7 +107,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
         <div class="post-meta"><span>Alex K.</span><span>5h ago</span></div>
         <h3 class="post-title"><a href="community-post.html?id=coworking-athens&city=athens">Best coworking spots in Athens? Good WiFi + coffee near Monastiraki</a></h3>
         <p class="post-excerpt">Just landed in Athens for 2 months. Working remotely for a German startup. Need somewhere reliable with fast internet for video calls. Prefer cafes or shared spaces — not a fan of silent offices. Any nomads here with tips?</p>
-        <div class="post-actions"><button type="button" onclick="toggleComments(this)">8 comments</button><a href="#">Share</a></div>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">8 comments</button><a href="#" onclick="sharePost('community-post.html?id=coworking-athens&city=athens'); return false;">Share</a></div>
         <div class="post-comments">
           <div class="comment">
             <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 4h ago</div>
@@ -126,7 +126,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
         <div class="post-meta"><span>Sophie L.</span><span>1d ago</span></div>
         <h3 class="post-title"><a href="community-post.html?id=erasmus-meetup&city=athens">Erasmus Athens meetup — Saturday 7pm at Six d.o.g.s (Psiri)</a></h3>
         <p class="post-excerpt">Hey everyone! A few of us from the Erasmus group are organising a casual meetup this Saturday. Six d.o.g.s is a bar/cafe with a nice courtyard — easy to find, good for groups. Come say hi if you're new in Athens or want to meet other students. No pressure, just vibes. DM me if you need the exact address or have questions.</p>
-        <div class="post-actions"><button type="button" onclick="toggleComments(this)">24 comments</button><a href="#">Share</a></div>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">24 comments</button><a href="#" onclick="sharePost('community-post.html?id=erasmus-meetup&city=athens'); return false;">Share</a></div>
         <div class="post-comments">
           <div class="comment">
             <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 20h ago</div>
@@ -164,7 +164,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
         <div class="post-meta"><span>Julia M.</span><span>3d ago</span></div>
         <h3 class="post-title"><a href="community-post.html?id=beaches-weekend&city=athens">Weekend beach trip from Athens — best spots by bus/train?</a></h3>
         <p class="post-excerpt">In Athens for a few weeks, want to get out to the coast for a weekend. Looking for somewhere easy to reach without a car — KTEL bus or train. Clean water, maybe a few cafes. Heard about Sounio and Rafina — any comparisons? Or other suggestions?</p>
-        <div class="post-actions"><button type="button" onclick="toggleComments(this)">6 comments</button><a href="#">Share</a></div>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">6 comments</button><a href="#" onclick="sharePost('community-post.html?id=beaches-weekend&city=athens'); return false;">Share</a></div>
         <div class="post-comments">
           <div class="comment">
             <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 2d ago</div>
@@ -202,13 +202,20 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
           <div class="post-meta"><span>${esc(p.author) || 'Anonymous'}</span><span>${esc(p.time) || 'Just now'}</span></div>
           <h3 class="post-title"><a href="community-post.html?id=${encodeURIComponent(p.id)}&city=${city}">${esc(p.title) || 'Untitled'}</a></h3>
           <p class="post-excerpt">${esc(excerpt) || 'No content'}</p>
-          <div class="post-actions"><button type="button" onclick="toggleComments(this)">${commentCount} comment${commentCount !== 1 ? 's' : ''}</button><a href="#">Share</a></div>
+          <div class="post-actions"><button type="button" onclick="toggleComments(this)">${commentCount} comment${commentCount !== 1 ? 's' : ''}</button><a href="#" onclick="sharePost('community-post.html?id=${encodeURIComponent(p.id)}&city=${city}'); return false;">Share</a></div>
           <div class="post-comments">${commentsHtml}</div>
         </div>
       `;
       userPostsEl.appendChild(postDiv);
     });
   } catch(e) {}
+  function sharePost(path) {
+    const url = new URL(path, location.href).href;
+    if (navigator.share) {
+      navigator.share({ title: 'Livvo Community', url }).catch(() => {});
+    }
+    navigator.clipboard?.writeText(url).then(() => {}).catch(() => {});
+  }
   function toggleComments(btn) {
     const post = btn.closest('.post-body');
     const comments = post.querySelector('.post-comments');

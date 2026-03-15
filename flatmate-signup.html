@@ -136,10 +136,12 @@ nav {
     if (auth) {
       btn.disabled = true;
       try {
-        await auth.createUserWithEmailAndPassword(email, password);
+        const userCred = await auth.createUserWithEmailAndPassword(email, password);
+        await userCred.user.sendEmailVerification();
         localStorage.setItem('livvo_flatmate_email', email);
         localStorage.setItem('livvo_flatmate_logged_in', '1');
         const redirect = new URLSearchParams(location.search).get('redirect');
+        alert('Account created! We sent a verification link to ' + email + '. Check inbox and spam. You can use Livvo now.');
         window.location.href = redirect || 'flatmate-profile.html';
       } catch (err) {
         btn.disabled = false;

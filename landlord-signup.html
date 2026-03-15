@@ -165,44 +165,30 @@ nav {
       </form>
     </div>
 
-    <!-- Step 2: Verification key -->
+    <!-- Step 2: Email verification (Supabase sends link) -->
     <div id="form-verify" style="display: none;">
       <h1>Check your email</h1>
-      <p class="sub">We sent a 6-digit verification code to <strong id="verify-email"></strong></p>
-      <form id="verifyForm">
-        <div class="form-group">
-          <label>Verification code</label>
-          <input type="text" name="code" placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}" required />
-        </div>
-        <button type="submit" class="btn-primary">Verify & continue</button>
-      </form>
-      <div class="verify-note">Didn't receive it? Check spam or <a href="#" onclick="resendCode(); return false;">resend code</a>.</div>
+      <p class="sub">We sent a verification link to <strong id="verify-email"></strong></p>
+      <p class="verify-note" style="margin-top: 12px;">Click the link in the email to verify your account. You’ll then be taken to list your property.</p>
+      <div class="verify-note" style="margin-top: 20px;">Didn’t receive it? Check spam or <a href="#" id="resendLink">resend verification email</a>.</div>
     </div>
 
-    <!-- Success -->
+    <!-- Success (shown after signup when Supabase is used) -->
     <div id="success" class="success-msg">
       <div class="icon">✓</div>
       <h3>Account created!</h3>
-      <p>You're verified. Redirecting to list your property…</p>
+      <p>Check your email and click the verification link to continue.</p>
     </div>
   </div>
 
   <p class="auth-footer">Already have an account? <a href="landlord-login.html">Log in</a></p>
 </div>
 
-<script src="firebase-config.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script>
   let pendingEmail = '';
   let profilePhoto = null;
-  let auth = null;
-  if (isFirebaseConfigured()) {
-    try {
-      firebase.initializeApp(LIVVO_FIREBASE_CONFIG);
-      auth = firebase.auth();
-    } catch (e) {}
-  }
 
   document.getElementById('photoInput').addEventListener('change', function() {
     const f = this.files[0];
@@ -237,54 +223,58 @@ nav {
     pendingEmail = email;
     const btn = this.querySelector('button[type="submit"]');
 
-    if (auth) {
-      btn.disabled = true;
-      try {
-        await auth.createUserWithEmailAndPassword(email, password);
-        localStorage.setItem('livvo_landlord_email', email);
-        localStorage.setItem('livvo_landlord_verified', '1');
-        localStorage.setItem('livvo_landlord_logged_in', '1');
-        document.getElementById('form-signup').style.display = 'none';
-        document.getElementById('success').classList.add('show');
-        setTimeout(() => window.location.href = 'landlord-list-property.html', 1500);
-      } catch (err) {
-        btn.disabled = false;
-        if (err.code === 'auth/email-already-in-use') {
-          alert('An account with this email already exists. Log in or use Forgot password.');
-        } else if (err.code === 'auth/weak-password') {
-          alert('Password should be at least 6 characters.');
-        } else {
-          alert(err.message || 'Sign up failed. Please try again.');
-        }
-      }
+    const sb = getLivvoSupabase();
+    if (!sb) {
+      alert('Supabase is not configured. Please add your project URL and anon key in supabase-config.js.');
       return;
     }
 
-    localStorage.setItem('livvo_landlord_email', email);
-    localStorage.setItem('livvo_landlord_password', password);
-    document.getElementById('form-signup').style.display = 'none';
-    document.getElementById('form-verify').style.display = 'block';
-    document.getElementById('verify-email').textContent = email;
-    document.getElementById('step1').classList.remove('active');
-    document.getElementById('step1').classList.add('done');
-    document.getElementById('step2').classList.add('active');
-  });
-
-  document.getElementById('verifyForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const code = this.code.value;
-    if (code.length === 6) {
-      localStorage.setItem('livvo_landlord_verified', '1');
-      localStorage.setItem('livvo_landlord_logged_in', '1');
-      document.getElementById('form-verify').style.display = 'none';
-      document.getElementById('success').classList.add('show');
-      setTimeout(() => window.location.href = 'landlord-list-property.html', 1500);
+    btn.disabled = true;
+    const redirectTo = window.location.origin + window.location.pathname.replace('landlord-signup.html', 'landlord-confirm-email.html');
+    try {
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectTo
+        }
+      });
+      if (error) throw error;
+      localStorage.setItem('livvo_landlord_email', email);
+      document.getElementById('form-signup').style.display = 'none';
+      document.getElementById('form-verify').style.display = 'block';
+      document.getElementById('verify-email').textContent = email;
+      document.getElementById('step1').classList.remove('active');
+      document.getElementById('step1').classList.add('done');
+      document.getElementById('step2').classList.add('active');
+    } catch (err) {
+      btn.disabled = false;
+      if (err.message && err.message.toLowerCase().includes('already registered')) {
+        alert('An account with this email already exists. Log in or use Forgot password.');
+      } else if (err.message && err.message.toLowerCase().includes('password')) {
+        alert('Password should be at least 6 characters.');
+      } else {
+        alert(err.message || 'Sign up failed. Please try again.');
+      }
     }
   });
 
-  function resendCode() {
-    alert('Verification code resent to ' + pendingEmail + '\n\n(Demo: use any 6 digits to continue. Add Firebase for real verification.)');
-  }
+  document.getElementById('resendLink').addEventListener('click', async function(e) {
+    e.preventDefault();
+    if (!pendingEmail) return;
+    const sb = getLivvoSupabase();
+    if (!sb) return;
+    try {
+      const { error } = await sb.auth.resend({
+        type: 'signup',
+        email: pendingEmail
+      });
+      if (error) throw error;
+      alert('Verification email resent to ' + pendingEmail + '. Check your inbox and spam.');
+    } catch (err) {
+      alert(err.message || 'Could not resend. Try again later.');
+    }
+  });
 </script>
 </body>
 </html>

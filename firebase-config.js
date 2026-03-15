@@ -1,13 +1,29 @@
 /**
  * Livvo Firebase Configuration
- * 
+ *
  * SETUP INSTRUCTIONS:
  * 1. Go to https://console.firebase.google.com
  * 2. Create a new project (or use existing)
- * 3. Click "Authentication" → "Get started" → enable "Email/Password" sign-in
- * 4. In Project settings (gear icon), under "Your apps", add a Web app
- * 5. Copy the firebaseConfig object and paste it below, replacing the placeholder
- * 6. In Authentication → Settings → Authorized domains, add your deployed domain (e.g. yoursite.vercel.app)
+ * 3. Authentication → Get started → enable "Email/Password" sign-in
+ * 4. Firestore Database → Create database → Start in production → Add rules (see below)
+ * 5. Project settings (gear) → Your apps → Add Web app → Copy firebaseConfig below
+ * 6. Authentication → Settings → Authorized domains → Add livvo.net and your deploy URLs
+ *
+ * Firestore rules (Database → Rules):
+ * rules_version = '2';
+ * service cloud.firestore {
+ *   match /databases/{database}/documents {
+ *     match /community_posts/{postId} {
+ *       allow read: if true;
+ *       allow create: if request.auth != null;
+ *       allow update, delete: if request.auth != null && request.auth.uid == resource.data.authorId;
+ *     }
+ *     match /community_comments/{commentId} {
+ *       allow read: if true;
+ *       allow create: if request.auth != null;
+ *     }
+ *   }
+ * }
  */
 
 const LIVVO_FIREBASE_CONFIG = {
