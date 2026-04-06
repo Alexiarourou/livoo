@@ -6,7 +6,9 @@
 <title>Livvo | Find a home and your people abroad</title>
 <meta name="description" content="Furnished flats and flatshares for students abroad, digital nomads, and young pros relocating. Browse rentals in Paris, Athens and London; find a flatmate and join local community.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23059669'/><path d='M8 12l8 12 8-12-4-6H12z' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -16,6 +18,7 @@
 }
 html { scroll-behavior: smooth; }
 body { background: var(--bg-dark); color: var(--text-dark); font-family: "DM Sans", sans-serif; overflow-x: hidden; }
+h1, h2, h3 { font-family: "Sora", sans-serif; }
 
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
@@ -26,7 +29,7 @@ nav {
 }
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
 .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
-.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
+.logo-word { font-family: "Sora", sans-serif; font-weight: 700; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
 .logo-word span { color: var(--green); }
 .nav-links { display: flex; align-items: center; gap: 24px; }
 .nav-links a { font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; }
@@ -34,8 +37,6 @@ nav {
 .btn-nav { background: var(--green); color: white; padding: 8px 20px; border-radius: 8px; font-size: 0.83rem; font-weight: 600; text-decoration: none; }
 .nav-links a.btn-nav { color: white; }
 .nav-links a.btn-nav:hover { color: white; background: var(--green-dark); }
-.nav-cta-secondary { font-size: 0.83rem; font-weight: 600; color: var(--muted-dark); text-decoration: none; }
-.nav-cta-secondary:hover { color: var(--green); }
 
 .hero {
   padding: 140px 48px 28px;
@@ -71,8 +72,7 @@ nav {
   margin-bottom: 24px;
 }
 .hero h1 {
-  font-family: "Outfit", sans-serif;
-  font-weight: 900;
+  font-weight: 700;
   font-size: clamp(2.2rem, 5vw, 3.6rem);
   letter-spacing: -0.04em;
   line-height: 1.15;
@@ -87,6 +87,39 @@ nav {
   line-height: 1.7;
 }
 .hero .cta-row { margin-bottom: 0; }
+.hero-launching {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.hero-launching-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted-dark);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 28rem;
+}
+.hero-pill {
+  display: inline-block;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(5, 150, 105, 0.5);
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.08);
+}
 .cta-row { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
 .cta-row.cta-spaced-sm { margin-top: 36px; margin-bottom: 0; }
 .cta-row a {
@@ -131,7 +164,7 @@ nav {
 .section-how-inner { max-width: 1100px; margin: 0 auto; }
 .section-header { text-align: center; margin-bottom: 48px; }
 .section-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
-.section-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 12px; }
+.section-title { font-weight: 700; font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 12px; }
 .section-sub { color: var(--muted-dark); font-size: 0.95rem; line-height: 1.6; }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
@@ -149,7 +182,7 @@ nav {
 .card-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(5,150,105,0.12); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
 .card-icon svg { width: 24px; height: 24px; }
 .card-icon svg path { stroke: var(--green); }
-.card h3 { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 8px; }
+.card h3 { font-weight: 600; font-size: 1.2rem; margin-bottom: 8px; }
 .card p { font-size: 0.9rem; color: var(--muted-dark); line-height: 1.6; }
 .how-steps {
   display: flex;
@@ -176,8 +209,7 @@ nav {
   align-items: center;
 }
 .how-step-index {
-  font-family: "Outfit", sans-serif;
-  font-weight: 900;
+  font-weight: 700;
   font-size: clamp(2.75rem, 7vw, 3.5rem);
   color: var(--green);
   line-height: 0.85;
@@ -185,8 +217,7 @@ nav {
   margin-bottom: 22px;
 }
 .how-step-title {
-  font-family: "Outfit", sans-serif;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 1.05rem;
   color: var(--text-dark);
   line-height: 1.35;
@@ -214,28 +245,60 @@ nav {
   .how-arrow { display: none; }
 }
 
+.landlord-strip {
+  width: 100%;
+  background: var(--surface-dark);
+  border-top: 1px solid var(--border-dark);
+  border-bottom: 1px solid var(--border-dark);
+  padding: 44px 48px;
+}
+.landlord-strip-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.landlord-strip-text {
+  font-size: 1rem;
+  color: var(--text-dark);
+  line-height: 1.55;
+  max-width: 38rem;
+  margin: 0;
+}
+.landlord-strip-cta {
+  padding: 12px 26px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
 #waitlist {
-  background: var(--bg-dark);
-  border: 1px solid var(--border-dark);
+  background: #edf7f0;
+  border: 1px solid rgba(5, 150, 105, 0.22);
   border-radius: 24px;
   padding: 56px 40px 48px;
   text-align: center;
   margin: 0 auto 80px;
   max-width: 640px;
 }
-#waitlist h2 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 14px; color: var(--text-dark); }
+#waitlist h2 { font-weight: 700; font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 14px; color: var(--text-dark); }
 #waitlist h2 span { color: var(--green); }
-#waitlist .waitlist-lead { color: var(--muted-dark); margin-bottom: 28px; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.65; font-size: 0.98rem; }
+#waitlist .waitlist-lead { color: var(--text-dark); margin-bottom: 28px; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.65; font-size: 0.98rem; opacity: 0.92; }
 #waitlist .waitlist-cta-wrap { margin-bottom: 20px; }
 #waitlist .waitlist-cta-wrap .cta-row { margin-bottom: 0; }
-.waitlist-hint { font-size: 0.85rem; color: var(--muted-dark); margin: 0 auto 20px; max-width: 420px; line-height: 1.55; }
+.waitlist-hint { font-size: 0.85rem; color: var(--text-dark); margin: 0 auto 20px; max-width: 420px; line-height: 1.55; opacity: 0.85; }
 .waitlist-form { display: flex; flex-direction: column; gap: 12px; max-width: 360px; margin: 0 auto; align-items: stretch; }
 .waitlist-form input {
   flex: 1;
   width: 100%;
   min-width: 0;
-  background: var(--surface-dark);
-  border: 1px solid var(--border-dark);
+  background: #ffffff;
+  border: 1px solid rgba(5, 150, 105, 0.35);
   border-radius: 10px;
   padding: 14px 18px;
   font-family: "DM Sans", sans-serif;
@@ -243,8 +306,8 @@ nav {
   color: var(--text-dark);
   outline: none;
 }
-.waitlist-form input:focus { border-color: var(--green); }
-.waitlist-form input::placeholder { color: var(--muted-dark); opacity: 0.7; }
+.waitlist-form input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15); }
+.waitlist-form input::placeholder { color: var(--muted-dark); opacity: 0.75; }
 .waitlist-form button {
   background: var(--green);
   color: white;
@@ -274,7 +337,10 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
 }
 @media (max-width: 600px) {
   nav { padding: 0 20px; }
-  .nav-links { gap: 16px; }
+  .nav-links { gap: 12px; row-gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .landlord-strip { padding: 36px 24px; }
+  .landlord-strip-inner { flex-direction: column; text-align: center; justify-content: center; }
+  .landlord-strip-text { max-width: none; }
   .hero { padding: 120px 24px 24px; }
   .section { padding: 60px 24px; }
   .section-how { padding: 36px 24px 56px; }
@@ -290,11 +356,11 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
     <span class="logo-word">li<span>vv</span>o</span>
   </a>
   <div class="nav-links">
-    <a href="search-athens.html" class="btn-nav">Browse rentals</a>
+    <a href="search-athens.html">Browse rentals</a>
     <a href="community.html">Community</a>
     <a href="flatmate-signup.html">Find a Flatmate</a>
     <a href="landlord-dashboard.html">For Landlords</a>
-    <a href="index.html#waitlist" class="nav-cta-secondary">Get early access</a>
+    <a href="index.html#waitlist" class="btn-nav">Get early access</a>
   </div>
 </nav>
 
@@ -305,6 +371,15 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
   <div class="cta-row">
     <a href="search-athens.html" class="btn-primary btn-cta-main">Browse rentals</a>
     <a href="community.html" class="btn-secondary-cta">Join the community</a>
+  </div>
+  <div class="hero-launching" aria-label="Launch cities">
+    <span class="hero-launching-label">Launching in</span>
+    <div class="hero-pills">
+      <span class="hero-pill">Athens</span>
+      <span class="hero-pill">Paris</span>
+      <span class="hero-pill">London</span>
+      <span class="hero-pill">+ more</span>
+    </div>
   </div>
 </div>
 
@@ -363,6 +438,13 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
   <div class="cta-row cta-spaced-sm">
     <a href="search-athens.html" class="btn-primary btn-cta-main">Browse rentals</a>
     <a href="community.html" class="btn-secondary-cta">Join the community</a>
+  </div>
+</section>
+
+<section class="landlord-strip" aria-labelledby="landlord-strip-heading">
+  <div class="landlord-strip-inner">
+    <p class="landlord-strip-text" id="landlord-strip-heading">Are you a landlord? List your property and reach verified tenants.</p>
+    <a href="landlord-dashboard.html" class="btn-primary landlord-strip-cta">List your property</a>
   </div>
 </section>
 
