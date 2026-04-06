@@ -149,30 +149,57 @@ nav {
   flex-direction: row;
   align-items: stretch;
   justify-content: center;
-  gap: 8px;
-  max-width: 1000px;
+  gap: 12px;
+  max-width: 1040px;
   margin: 0 auto;
   flex-wrap: wrap;
 }
 .how-step {
-  flex: 1 1 220px;
-  min-width: 200px;
+  flex: 1 1 240px;
+  min-width: 220px;
+  min-height: 280px;
   background: var(--surface-dark);
   border: 1px solid var(--border-dark);
-  border-radius: 16px;
-  padding: 28px 22px;
+  border-radius: 18px;
+  border-top: 3px solid rgba(5, 150, 105, 0.55);
+  padding: 40px 28px 36px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.how-step-num { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 0.75rem; color: var(--green); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
-.how-step p { font-size: 0.95rem; color: var(--text-dark); line-height: 1.5; font-weight: 500; }
+.how-step-index {
+  font-family: "Outfit", sans-serif;
+  font-weight: 900;
+  font-size: clamp(2.75rem, 7vw, 3.5rem);
+  color: var(--green);
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  margin-bottom: 22px;
+}
+.how-step-title {
+  font-family: "Outfit", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-dark);
+  line-height: 1.35;
+  margin: 0 0 14px;
+}
+.how-step-desc {
+  font-size: 0.9rem;
+  color: var(--muted-dark);
+  line-height: 1.55;
+  margin: 0;
+  max-width: 17rem;
+  flex-grow: 1;
+}
 .how-arrow {
   flex: 0 0 auto;
   align-self: center;
   color: var(--green);
-  font-size: 1.15rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  opacity: 0.9;
-  padding: 0 6px;
+  padding: 0 10px;
   line-height: 1;
 }
 @media (max-width: 767px) {
@@ -286,18 +313,21 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
   </div>
   <div class="how-steps">
     <div class="how-step">
-      <p class="how-step-num">Step 1</p>
-      <p>Find your city</p>
+      <span class="how-step-index" aria-hidden="true">01</span>
+      <p class="how-step-title">Find your city</p>
+      <p class="how-step-desc">Browse verified rooms in Athens, Paris and London</p>
     </div>
     <span class="how-arrow" aria-hidden="true">→</span>
     <div class="how-step">
-      <p class="how-step-num">Step 2</p>
-      <p>Pick your room or flatmate</p>
+      <span class="how-step-index" aria-hidden="true">02</span>
+      <p class="how-step-title">Pick your room or flatmate</p>
+      <p class="how-step-desc">Choose a room solo or find a compatible flatmate first</p>
     </div>
     <span class="how-arrow" aria-hidden="true">→</span>
     <div class="how-step">
-      <p class="how-step-num">Step 3</p>
-      <p>Move in &amp; connect with your community</p>
+      <span class="how-step-index" aria-hidden="true">03</span>
+      <p class="how-step-title">Move in &amp; connect with your community</p>
+      <p class="how-step-desc">Join city groups, meet people, feel at home instantly</p>
     </div>
   </div>
   <div class="cta-row cta-spaced">
