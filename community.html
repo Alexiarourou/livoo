@@ -72,73 +72,8 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
 }
 .cities-more-select:focus { border-color: var(--green-dark); }
 .cities-more-note { margin-top: 12px; font-size: 0.82rem; text-align: center; line-height: 1.45; color: var(--muted-dark); }
-.cities-more-note.is-hidden { display: none; }
 .cities-more-note a { color: var(--green); font-weight: 600; text-decoration: none; }
 .cities-more-note a:hover { text-decoration: underline; }
-.cities-waitlist-card {
-  display: none;
-  position: relative;
-  max-width: 480px;
-  margin: 16px auto 0;
-  padding: 22px 22px 20px;
-  background: var(--surface-dark);
-  border: 1px solid var(--border-dark);
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 8px 32px rgba(5,150,105,0.08);
-}
-.cities-waitlist-card.is-open {
-  display: block;
-  animation: citiesWaitlistFade 0.4s ease;
-}
-@keyframes citiesWaitlistFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.cities-waitlist-close {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  color: var(--muted-dark);
-  font-size: 1.35rem;
-  line-height: 1;
-  cursor: pointer;
-  border-radius: 8px;
-  font-family: inherit;
-  padding: 0;
-  transition: color 0.2s, background 0.2s;
-}
-.cities-waitlist-close:hover { color: var(--text-dark); background: rgba(5,150,105,0.06); }
-.cities-waitlist-title {
-  font-family: "Outfit", sans-serif;
-  font-weight: 800;
-  font-size: 1.65rem;
-  letter-spacing: -0.03em;
-  color: var(--green-dark);
-  margin: 0 28px 14px 0;
-  line-height: 1.2;
-}
-.cities-waitlist-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #b45309;
-  margin-bottom: 12px;
-}
-.dot-waitlist { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; flex-shrink: 0; }
-.cities-waitlist-teaser {
-  font-size: 0.9rem;
-  color: var(--muted-dark);
-  line-height: 1.55;
-  margin: 0 0 18px;
-}
-.cities-waitlist-card .cities-waitlist-cta { margin-top: 0; }
 .cities-request-wrap { display: flex; justify-content: center; width: 100%; }
 .cities-request-wrap .city-card-request { width: 100%; max-width: 282px; }
 .cities-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; align-items: stretch; }
@@ -305,14 +240,7 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
       <option value="warsaw">Warsaw</option>
       <option value="zurich">Zurich</option>
     </select>
-    <div id="cities-waitlist-card" class="cities-waitlist-card" hidden>
-      <button type="button" class="cities-waitlist-close" id="cities-waitlist-close" aria-label="Dismiss">×</button>
-      <h3 class="cities-waitlist-title" id="cities-waitlist-city"></h3>
-      <div class="cities-waitlist-status"><span class="dot-waitlist" aria-hidden="true"></span><span>Coming soon • Join waitlist</span></div>
-      <p class="cities-waitlist-teaser" id="cities-waitlist-teaser"></p>
-      <a href="index.html#waitlist" class="btn-city btn-city-active cities-waitlist-cta">Join waitlist</a>
-    </div>
-    <p class="cities-more-note" id="cities-more-contact-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
+    <p class="cities-more-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
   </div>
   <div class="cities-grid">
     <div class="city-card">
@@ -422,33 +350,11 @@ document.querySelectorAll('.audience-pill').forEach(pill => {
     pill.classList.add('active');
   });
 });
-(function () {
-  const select = document.getElementById('browse-more-cities');
-  const card = document.getElementById('cities-waitlist-card');
-  const note = document.getElementById('cities-more-contact-note');
-  const titleEl = document.getElementById('cities-waitlist-city');
-  const teaserEl = document.getElementById('cities-waitlist-teaser');
-  const closeBtn = document.getElementById('cities-waitlist-close');
-
-  function dismissWaitlistCard() {
-    card.classList.remove('is-open');
-    card.setAttribute('hidden', '');
-    note.classList.remove('is-hidden');
-    select.selectedIndex = 0;
-  }
-
-  select.addEventListener('change', function () {
-    if (!this.value) return;
-    const label = this.options[this.selectedIndex].textContent.trim();
-    titleEl.textContent = label;
-    teaserEl.textContent = 'Be the first to know when ' + label + ' launches on Livvo.';
-    card.removeAttribute('hidden');
-    card.classList.add('is-open');
-    note.classList.add('is-hidden');
-  });
-
-  closeBtn.addEventListener('click', dismissWaitlistCard);
-})();
+document.getElementById('browse-more-cities').addEventListener('change', function () {
+  if (!this.value) return;
+  const city = this.value.toLowerCase().trim().replace(/\s+/g, '');
+  window.location.href = 'community-city.html?city=' + encodeURIComponent(city);
+});
 </script>
 </body>
 </html>
