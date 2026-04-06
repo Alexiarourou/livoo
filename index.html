@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Livvo — Find a home and your people abroad</title>
-<meta name="description" content="Verified flatshares and furnished rentals for students, interns and young professionals. Find a place and a flatmate in Paris, Athens and London.">
+<meta name="description" content="Verified flats and flatshares for students abroad, digital nomads, and young pros relocating. Browse rentals in Paris, Athens and London; find a flatmate and join local community.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23059669'/><path d='M8 12l8 12 8-12-4-6H12z' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -32,7 +32,10 @@ nav {
 .nav-links a { font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; }
 .nav-links a:hover { color: var(--text-dark); }
 .btn-nav { background: var(--green); color: white; padding: 8px 20px; border-radius: 8px; font-size: 0.83rem; font-weight: 600; text-decoration: none; }
-.btn-nav:hover { background: var(--green-dark); }
+.nav-links a.btn-nav { color: white; }
+.nav-links a.btn-nav:hover { color: white; background: var(--green-dark); }
+.nav-cta-secondary { font-size: 0.83rem; font-weight: 600; color: var(--muted-dark); text-decoration: none; }
+.nav-cta-secondary:hover { color: var(--green); }
 
 .hero {
   padding: 140px 48px 100px;
@@ -74,12 +77,15 @@ nav {
 .hero p {
   font-size: 1.1rem;
   color: var(--muted-dark);
-  max-width: 520px;
+  max-width: 640px;
   margin: 0 auto 36px;
   line-height: 1.7;
 }
+.hero p strong { color: var(--text-dark); font-weight: 600; }
 
 .cta-row { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.cta-row.cta-spaced { margin-top: 40px; margin-bottom: 0; }
+.cta-row.cta-spaced-sm { margin-top: 36px; margin-bottom: 0; }
 .cta-row a {
   display: inline-flex;
   align-items: center;
@@ -94,8 +100,21 @@ nav {
 }
 .btn-primary { background: var(--green); color: white; border: none; }
 .btn-primary:hover { background: var(--green-dark); transform: translateY(-2px); }
+.btn-primary.btn-cta-main {
+  padding: 16px 36px;
+  font-size: 1.05rem;
+  box-shadow: 0 10px 28px rgba(5, 150, 105, 0.35);
+}
 .btn-outline { background: transparent; color: var(--green); border: 2px solid var(--green); }
 .btn-outline:hover { background: rgba(5,150,105,0.08); }
+.btn-secondary-cta {
+  background: transparent;
+  color: var(--muted-dark);
+  border: 1px solid var(--border-dark);
+  padding: 12px 22px;
+  font-size: 0.9rem;
+}
+.btn-secondary-cta:hover { color: var(--green); border-color: var(--green); background: rgba(5,150,105,0.06); }
 
 .section { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
 .section-header { text-align: center; margin-bottom: 48px; }
@@ -104,6 +123,7 @@ nav {
 .section-sub { color: var(--muted-dark); font-size: 0.95rem; line-height: 1.6; }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.cards-grid-2 { grid-template-columns: repeat(2, 1fr); max-width: 920px; margin-left: auto; margin-right: auto; }
 .card {
   background: var(--surface-dark);
   border: 1px solid var(--border-dark);
@@ -119,6 +139,43 @@ nav {
 .card-icon svg path { stroke: var(--green); }
 .card h3 { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 8px; }
 .card p { font-size: 0.9rem; color: var(--muted-dark); line-height: 1.6; }
+.card-perfect { font-size: 0.8rem; font-weight: 600; color: var(--green); margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-dark); line-height: 1.4; }
+
+.how-steps {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  gap: 8px;
+  max-width: 1000px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+.how-step {
+  flex: 1 1 220px;
+  min-width: 200px;
+  background: var(--surface-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
+  padding: 28px 22px;
+  text-align: center;
+}
+.how-step-num { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 0.75rem; color: var(--green); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+.how-step p { font-size: 0.95rem; color: var(--text-dark); line-height: 1.5; font-weight: 500; }
+.how-arrow {
+  flex: 0 0 auto;
+  align-self: center;
+  color: var(--green);
+  font-size: 1.15rem;
+  font-weight: 700;
+  opacity: 0.9;
+  padding: 0 6px;
+  line-height: 1;
+}
+@media (max-width: 767px) {
+  .how-steps { flex-direction: column; max-width: 420px; }
+  .how-arrow { display: none; }
+}
 
 #waitlist {
   background: linear-gradient(135deg, rgba(5,150,105,0.08) 0%, rgba(5,150,105,0.04) 100%);
@@ -131,6 +188,15 @@ nav {
 #waitlist h2 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 12px; }
 #waitlist h2 span { color: var(--green); }
 #waitlist p { color: var(--muted-dark); margin-bottom: 28px; max-width: 440px; margin-left: auto; margin-right: auto; }
+.waitlist-top-cta { margin-bottom: 24px; }
+.waitlist-top-cta a { display: inline-flex; align-items: center; justify-content: center; }
+.waitlist-divider { font-size: 0.85rem; color: var(--muted-dark); margin: 8px 0 20px; }
+.waitlist-form button.btn-waitlist-secondary {
+  background: transparent;
+  color: var(--green);
+  border: 2px solid var(--green);
+}
+.waitlist-form button.btn-waitlist-secondary:hover { background: rgba(5,150,105,0.12); color: var(--green-dark); border-color: var(--green-dark); }
 .waitlist-form { display: flex; gap: 12px; max-width: 420px; margin: 0 auto; flex-wrap: wrap; justify-content: center; }
 .waitlist-form input {
   flex: 1;
@@ -170,6 +236,9 @@ footer {
 .footer-links a:hover { color: var(--green); }
 footer p { font-size: 0.8rem; color: var(--muted-dark); }
 
+@media (max-width: 720px) {
+  .cards-grid-2 { grid-template-columns: 1fr; }
+}
 @media (max-width: 600px) {
   nav { padding: 0 20px; }
   .nav-links { gap: 16px; }
@@ -187,62 +256,102 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
     <span class="logo-word">li<span>vv</span>o</span>
   </a>
   <div class="nav-links">
-    <a href="search-athens.html">Browse Properties</a>
+    <a href="search-athens.html" class="btn-nav">Browse rentals</a>
     <a href="community.html">Community</a>
     <a href="flatmate-signup.html">Find a Flatmate</a>
     <a href="about-us.html">About</a>
     <a href="faqs.html">FAQs</a>
     <a href="landlord-dashboard.html">For Landlords</a>
-    <a href="index.html#waitlist" class="btn-nav">Get Early Access</a>
+    <a href="index.html#waitlist" class="nav-cta-secondary">Get early access</a>
   </div>
 </nav>
 
 <div class="hero">
-  <p class="hero-tag">Housing &amp; community for students &amp; young professionals</p>
+  <p class="hero-tag">For students abroad, nomads &amp; young professionals on the move</p>
   <h1>Find a home and <span>your people</span> abroad</h1>
-  <p>Verified flatshares and furnished rentals in Paris, Athens and London. No guarantor hassle — just a smoother start to your adventure.</p>
+  <p>Book a <strong>verified flat</strong> or room, match with a <strong>flatmate</strong> if you want company, and plug into a <strong>local community</strong> in your new city — built for people relocating without the usual stress.</p>
   <div class="cta-row">
-    <a href="search-athens.html" class="btn-primary">Browse rentals</a>
-    <a href="community.html" class="btn-outline">Join the community</a>
+    <a href="search-athens.html" class="btn-primary btn-cta-main">Browse rentals</a>
+    <a href="community.html" class="btn-secondary-cta">Join the community</a>
   </div>
 </div>
 
 <section class="section">
   <div class="section-header">
-    <p class="section-label">What we offer</p>
-    <h2 class="section-title">One place for housing and connection</h2>
-    <p class="section-sub">Rent a room, find a flatmate, and join city groups — all in one place.</p>
+    <p class="section-label">How it works</p>
+    <h2 class="section-title">From browsing to belonging</h2>
+    <p class="section-sub">Three simple steps — start with rentals whenever you are ready.</p>
   </div>
-  <div class="cards">
+  <div class="how-steps">
+    <div class="how-step">
+      <p class="how-step-num">Step 1</p>
+      <p>Find your city</p>
+    </div>
+    <span class="how-arrow" aria-hidden="true">→</span>
+    <div class="how-step">
+      <p class="how-step-num">Step 2</p>
+      <p>Pick your room or flatmate</p>
+    </div>
+    <span class="how-arrow" aria-hidden="true">→</span>
+    <div class="how-step">
+      <p class="how-step-num">Step 3</p>
+      <p>Move in &amp; connect with your community</p>
+    </div>
+  </div>
+  <div class="cta-row cta-spaced">
+    <a href="search-athens.html" class="btn-primary btn-cta-main">Browse rentals</a>
+    <a href="community.html" class="btn-secondary-cta">Join the community</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-header">
+    <p class="section-label">What you get</p>
+    <h2 class="section-title">Housing, people, and place — in one flow</h2>
+    <p class="section-sub">Everything we offer points to one first step: finding a place you trust.</p>
+  </div>
+  <div class="cards cards-grid-2">
     <a href="search-athens.html" class="card">
       <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <h3>Verified rentals</h3>
-      <p>Browse furnished rooms and flatshares for 1–12 months. No guarantor required.</p>
+      <p>Furnished rooms and flatshares in Paris, Athens and London — flexible stays from 1–12 months, no guarantor runaround.</p>
+      <p class="card-perfect">Perfect for students &amp; interns</p>
     </a>
     <a href="flatmate-signup.html" class="card">
       <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
       <h3>Find a flatmate</h3>
-      <p>Match with compatible flatmates before you move. Students, interns and nomads welcome.</p>
+      <p>Meet compatible housemates before you sign — so your first week in a new city feels like home.</p>
+      <p class="card-perfect">Perfect for young professionals relocating</p>
     </a>
     <a href="community.html" class="card">
       <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
       <h3>Community</h3>
-      <p>Join city groups in Paris, Athens and London. Events, tips and real connections.</p>
+      <p>City groups, events, and tips from people who already live where you are headed.</p>
+      <p class="card-perfect">Perfect for nomads arriving solo</p>
     </a>
     <a href="landlord-dashboard.html" class="card">
       <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <h3>List your property</h3>
-      <p>Are you a landlord? List your property and reach verified tenants on Livvo.</p>
+      <p>Reach students, nomads, and young professionals who are actively looking to move.</p>
+      <p class="card-perfect">Perfect for landlords &amp; hosts</p>
     </a>
+  </div>
+  <div class="cta-row cta-spaced-sm">
+    <a href="search-athens.html" class="btn-primary btn-cta-main">Browse rentals</a>
+    <a href="community.html" class="btn-secondary-cta">Join the community</a>
   </div>
 </section>
 
 <section id="waitlist">
   <h2>Get <span>early access</span></h2>
   <p>Be the first to know when we launch in your city. No spam, just updates.</p>
+  <div class="waitlist-top-cta">
+    <a href="search-athens.html" class="btn-primary btn-cta-main">Browse rentals</a>
+  </div>
+  <p class="waitlist-divider">Or leave your email and we will notify you:</p>
   <form class="waitlist-form" action="#" method="get" onsubmit="return false;">
     <input type="email" name="email" placeholder="you@example.com" required />
-    <button type="submit">Notify me</button>
+    <button type="submit" class="btn-waitlist-secondary">Notify me</button>
   </form>
 </section>
 
