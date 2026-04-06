@@ -62,10 +62,16 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
   <a href="#" id="btnJoin" class="btn-join" style="pointer-events:none;opacity:0.6">Create account &amp; join</a>
 </div>
 <script>
-  const cityNames = { paris: 'Paris', athens: 'Athens', london: 'London' };
+  const cityNames = {
+    paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milano: 'Milano',
+    barcelona: 'Barcelona', berlin: 'Berlin', amsterdam: 'Amsterdam', lisbon: 'Lisbon',
+    prague: 'Prague', budapest: 'Budapest', vienna: 'Vienna', copenhagen: 'Copenhagen',
+    stockholm: 'Stockholm', dublin: 'Dublin', brussels: 'Brussels', valencia: 'Valencia',
+    seville: 'Seville', porto: 'Porto'
+  };
   const params = new URLSearchParams(location.search);
   const city = (params.get('city') || 'athens').toLowerCase();
-  const cityName = cityNames[city] || city;
+  const cityName = cityNames[city] || (city.charAt(0).toUpperCase() + city.slice(1));
   document.getElementById('pageTitle').textContent = 'Join ' + cityName + ' community';
   document.querySelectorAll('.audience-option').forEach(opt => {
     opt.addEventListener('click', e => { e.preventDefault();
