@@ -72,9 +72,21 @@ nav {
   border: 1px solid rgba(5,150,105,0.2);
   border-radius: 16px;
 }
-.cta-box p { margin-bottom: 16px; color: var(--muted-dark); }
-.cta-box a { display: inline-block; background: var(--green); color: white; padding: 12px 28px; border-radius: 10px; font-weight: 600; text-decoration: none; }
-.cta-box a:hover { background: var(--green-dark); }
+.cta-box .cta-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.35rem; color: var(--text-dark); margin-bottom: 10px; letter-spacing: -0.02em; }
+.cta-box .cta-sub { margin-bottom: 20px; color: var(--muted-dark); font-size: 0.98rem; line-height: 1.6; }
+.cta-box .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.cta-box .cta-row a {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.cta-box .cta-row a.btn-cta-primary { background: var(--green); color: white; border: 2px solid var(--green); }
+.cta-box .cta-row a.btn-cta-primary:hover { background: var(--green-dark); border-color: var(--green-dark); }
+.cta-box .cta-row a.btn-cta-secondary { background: transparent; color: var(--green); border: 2px solid var(--green); }
+.cta-box .cta-row a.btn-cta-secondary:hover { background: rgba(5,150,105,0.08); }
 
 @media (max-width: 600px) { nav { padding: 0 20px; } .nav-links { display: none; } }
 </style>
@@ -96,39 +108,42 @@ nav {
 
 <div class="page">
   <a href="index.html" class="back-link">← Back to home</a>
-  <h1>About Us</h1>
-  <p class="lead">Livvo helps students, interns and young professionals find a home and their people when moving abroad. No guarantor, no hassle — just a smoother start to your adventure.</p>
+  <h1>We exist because moving abroad is hard enough.</h1>
+  <p class="lead">Livvo brings together verified housing, flatmate matching and local community — so your next chapter starts with a home and people in it.</p>
 
   <div class="about-section">
     <h2>Our Mission</h2>
-    <p>Moving to a new city is exciting — but it's also scary. Finding a place to live, a flatmate you gel with, and a community that gets you shouldn't feel impossible. Livvo exists to make that easier.</p>
-    <p>We offer verified flatshares and furnished rentals for 1–12 months, plus tools to match with compatible flatmates before you land. Our goal is simple: help you find a home and find your people.</p>
+    <p>Moving to a new city should feel like an adventure, not a nightmare. Finding a place you trust, a flatmate you actually like, and people who get you — that shouldn't take months of stress and scam listings. We built Livvo to make that first step feel human again.</p>
   </div>
 
   <div class="about-section">
     <h2>Who We Are</h2>
-    <p>Livvo was built for people who've been through it — the stress of flat hunting abroad, the joy of meeting the right roommate, the loneliness of arriving somewhere new without a network. We're here to change that experience for the better.</p>
+    <p>Livvo was built by people who've lived it — the exhausting flat search, the awkward flatmate mismatches, the loneliness of arriving somewhere new with no network. We're not a listing aggregator. We're a community-first platform that happens to have great housing.</p>
   </div>
 
   <div class="founder">
     <div class="founder-avatar">A</div>
     <div class="founder-info">
       <div class="name">Alexia</div>
-      <div class="role">Founder, Livvo</div>
-      <p>Hi, I'm Alexia. I started Livvo because I saw too many friends struggle to find housing and community when moving abroad for studies or work. I wanted to create a place where finding a flat and a flatmate could actually feel simple and human. Livvo is that place — and I'm glad you're here.</p>
+      <div class="role">Founder</div>
+      <p>I started Livvo after watching too many friends arrive abroad lost — no flat, no people, no idea where to start. I wanted to build the thing I wished existed. A place where finding a home and finding your people happen together. That's Livvo.</p>
     </div>
   </div>
 
   <div class="about-section">
-    <h2>What We Offer</h2>
-    <p><strong>Flatshares & rentals</strong> — Furnished rooms for 1–12 months in European cities like Athens, Paris, London, Barcelona and more. No guarantor required — we verify you through your university or work.</p>
-    <p><strong>Find a flatmate</strong> — Match with people based on budget, lifestyle, nationality and move-in date. Connect before you arrive so you're not starting from zero.</p>
-    <p><strong>Community</strong> — Student groups, city guides, events. Because a city feels different when you know people.</p>
+    <h2>What Livvo gives you</h2>
+    <p><strong>Verified rooms &amp; flatshares</strong> — Furnished, flexible stays from 1–12 months in Athens, Paris and London. No guarantor required.</p>
+    <p><strong>Flatmate matching</strong> — Meet compatible housemates before you arrive, based on lifestyle, budget and move-in date. No more strangers.</p>
+    <p><strong>Local community</strong> — City groups, events and real connections. Because a city feels completely different when you know people.</p>
   </div>
 
   <div class="cta-box">
-    <p>Ready to find your home and your people?</p>
-    <a href="index.html#waitlist">Join the waitlist</a>
+    <p class="cta-title">Ready to find your place?</p>
+    <p class="cta-sub">Browse rooms now or join the waitlist for your city.</p>
+    <div class="cta-row">
+      <a href="search-athens.html" class="btn-cta-primary">Browse rentals</a>
+      <a href="index.html#waitlist" class="btn-cta-secondary">Join the waitlist</a>
+    </div>
   </div>
 </div>
 
