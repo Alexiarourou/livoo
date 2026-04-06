@@ -64,7 +64,9 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
 .city-cover { height: 200px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 20px; background-size: cover; background-position: center; }
 .city-cover-paris { background-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%), url(https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800); }
 .city-cover-london { background-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%), url(https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800); }
-.city-cover-athens { background-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%), url(https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=800); }
+.city-cover-athens { background-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%), url(https://images.unsplash.com/photo-1603565816030-6987515c8e7b?w=800&q=80); }
+.city-cover-madrid { background-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%), url(https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=80); }
+.city-cover-milano { background-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%), url(https://images.unsplash.com/photo-1513581166391-887a96ddeafd?w=800&q=80); }
 .city-icon { position: absolute; top: 20px; right: 20px; width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; }
 .city-icon svg { width: 24px; height: 24px; }
 .city-icon svg path { stroke: white; }
@@ -172,20 +174,20 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
     <p class="section-sub">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
   </div>
   <div class="cities-grid">
-    <a href="index.html#waitlist" class="city-card">
+    <a href="community-join.html?city=paris" class="city-card">
       <div class="city-cover city-cover-paris">
         <div class="city-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
         <div class="city-name-big">Paris</div>
       </div>
       <div class="city-body">
-        <div class="city-meta"><div class="city-status city-status-soon"><span class="dot-soon"></span> Coming soon</div></div>
+        <div class="city-meta"><div class="city-status"><span class="dot-active"></span> Now open • Active</div></div>
         <div class="city-tags"><span class="city-tag">Erasmus</span><span class="city-tag">Interns</span><span class="city-tag">Professionals</span><span class="city-tag">Nomads</span></div>
         <div class="city-groups">
           <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus Paris</span><span class="group-join">Join</span></div>
           <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns &amp; Professionals</span><span class="group-join">Join</span></div>
           <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads Paris</span><span class="group-join">Join</span></div>
         </div>
-        <span class="btn-city">Join waitlist</span>
+        <span class="btn-city btn-city-active">Join Paris community</span>
       </div>
     </a>
     <a href="community-join.html?city=athens" class="city-card">
@@ -204,20 +206,52 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
         <span class="btn-city btn-city-active">Join Athens community</span>
       </div>
     </a>
-    <a href="index.html#waitlist" class="city-card">
+    <a href="community-join.html?city=london" class="city-card">
       <div class="city-cover city-cover-london">
         <div class="city-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
         <div class="city-name-big">London</div>
       </div>
       <div class="city-body">
-        <div class="city-meta"><div class="city-status city-status-soon"><span class="dot-soon"></span> Coming soon</div></div>
+        <div class="city-meta"><div class="city-status"><span class="dot-active"></span> Now open • Active</div></div>
         <div class="city-tags"><span class="city-tag">Erasmus</span><span class="city-tag">Interns</span><span class="city-tag">Professionals</span><span class="city-tag">Nomads</span></div>
         <div class="city-groups">
           <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus London</span><span class="group-join">Join</span></div>
           <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns &amp; Professionals</span><span class="group-join">Join</span></div>
           <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads London</span><span class="group-join">Join</span></div>
         </div>
-        <span class="btn-city">Join waitlist</span>
+        <span class="btn-city btn-city-active">Join London community</span>
+      </div>
+    </a>
+    <a href="community-join.html?city=madrid" class="city-card">
+      <div class="city-cover city-cover-madrid">
+        <div class="city-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div class="city-name-big">Madrid</div>
+      </div>
+      <div class="city-body">
+        <div class="city-meta"><div class="city-status"><span class="dot-active"></span> Now open • Active</div></div>
+        <div class="city-tags"><span class="city-tag">Erasmus</span><span class="city-tag">Interns</span><span class="city-tag">Professionals</span><span class="city-tag">Nomads</span></div>
+        <div class="city-groups">
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus Madrid</span><span class="group-join">Join</span></div>
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns &amp; Professionals</span><span class="group-join">Join</span></div>
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads Madrid</span><span class="group-join">Join</span></div>
+        </div>
+        <span class="btn-city btn-city-active">Join Madrid community</span>
+      </div>
+    </a>
+    <a href="community-join.html?city=milano" class="city-card">
+      <div class="city-cover city-cover-milano">
+        <div class="city-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div class="city-name-big">Milano</div>
+      </div>
+      <div class="city-body">
+        <div class="city-meta"><div class="city-status"><span class="dot-active"></span> Now open • Active</div></div>
+        <div class="city-tags"><span class="city-tag">Erasmus</span><span class="city-tag">Interns</span><span class="city-tag">Professionals</span><span class="city-tag">Nomads</span></div>
+        <div class="city-groups">
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus Milano</span><span class="group-join">Join</span></div>
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns &amp; Professionals</span><span class="group-join">Join</span></div>
+          <div class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads Milano</span><span class="group-join">Join</span></div>
+        </div>
+        <span class="btn-city btn-city-active">Join Milano community</span>
       </div>
     </a>
     <a href="contact.html?subject=Request%20new%20city" class="city-card city-card-request">
