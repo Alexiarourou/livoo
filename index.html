@@ -478,13 +478,16 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
   .how-arrow { display: none; }
   .how-step {
     min-height: auto;
-    padding: 24px 22px;
+    padding: 20px 20px 14px;
+    justify-content: flex-start;
   }
-  .how-step-desc { flex-grow: 0; }
+  .how-step-desc { flex-grow: 0; margin-bottom: 0; }
   .how-step-index {
     font-size: 32px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+    line-height: 1;
   }
+  .how-step-title { margin-bottom: 8px; }
 
   section.section .section-title { font-size: 28px; }
 
@@ -497,7 +500,7 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
     margin: 0;
     max-width: none;
   }
-  #waitlist h2 { font-size: 26px; }
+  #waitlist h2 { font-size: 24px; line-height: 1.25; }
   .waitlist-form {
     flex-direction: column;
     flex-wrap: nowrap;
