@@ -38,7 +38,7 @@ nav {
 .nav-cta-secondary:hover { color: var(--green); }
 
 .hero {
-  padding: 140px 48px 100px;
+  padding: 140px 48px 28px;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -83,11 +83,11 @@ nav {
   font-size: 1.1rem;
   color: var(--muted-dark);
   max-width: 640px;
-  margin: 0 auto 36px;
+  margin: 0 auto 22px;
   line-height: 1.7;
 }
+.hero .cta-row { margin-bottom: 0; }
 .cta-row { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-.cta-row.cta-spaced { margin-top: 40px; margin-bottom: 0; }
 .cta-row.cta-spaced-sm { margin-top: 36px; margin-bottom: 0; }
 .cta-row a {
   display: inline-flex;
@@ -120,6 +120,15 @@ nav {
 .btn-secondary-cta:hover { color: var(--green); border-color: var(--green); background: rgba(5,150,105,0.06); }
 
 .section { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
+.section-how {
+  background: var(--surface-dark);
+  border-top: 1px solid var(--border-dark);
+  border-bottom: 1px solid var(--border-dark);
+  padding: 48px 48px 72px;
+  margin: 0;
+  max-width: none;
+}
+.section-how-inner { max-width: 1100px; margin: 0 auto; }
 .section-header { text-align: center; margin-bottom: 48px; }
 .section-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
 .section-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 12px; }
@@ -206,28 +215,25 @@ nav {
 }
 
 #waitlist {
-  background: linear-gradient(135deg, rgba(5,150,105,0.08) 0%, rgba(5,150,105,0.04) 100%);
-  border: 1px solid rgba(5,150,105,0.2);
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
   border-radius: 24px;
-  padding: 64px 48px;
+  padding: 56px 40px 48px;
   text-align: center;
-  margin: 0 24px 80px;
+  margin: 0 auto 80px;
+  max-width: 640px;
 }
-#waitlist h2 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 12px; }
+#waitlist h2 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 14px; color: var(--text-dark); }
 #waitlist h2 span { color: var(--green); }
-#waitlist .waitlist-lead { color: var(--muted-dark); margin-bottom: 24px; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.65; }
-#waitlist p { color: var(--muted-dark); margin-bottom: 28px; max-width: 440px; margin-left: auto; margin-right: auto; }
-.waitlist-divider { font-size: 0.85rem; color: var(--muted-dark); margin: 8px 0 20px; }
-.waitlist-form button.btn-waitlist-secondary {
-  background: transparent;
-  color: var(--green);
-  border: 2px solid var(--green);
-}
-.waitlist-form button.btn-waitlist-secondary:hover { background: rgba(5,150,105,0.12); color: var(--green-dark); border-color: var(--green-dark); }
-.waitlist-form { display: flex; gap: 12px; max-width: 420px; margin: 0 auto; flex-wrap: wrap; justify-content: center; }
+#waitlist .waitlist-lead { color: var(--muted-dark); margin-bottom: 28px; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.65; font-size: 0.98rem; }
+#waitlist .waitlist-cta-wrap { margin-bottom: 20px; }
+#waitlist .waitlist-cta-wrap .cta-row { margin-bottom: 0; }
+.waitlist-hint { font-size: 0.85rem; color: var(--muted-dark); margin: 0 auto 20px; max-width: 420px; line-height: 1.55; }
+.waitlist-form { display: flex; flex-direction: column; gap: 12px; max-width: 360px; margin: 0 auto; align-items: stretch; }
 .waitlist-form input {
   flex: 1;
-  min-width: 200px;
+  width: 100%;
+  min-width: 0;
   background: var(--surface-dark);
   border: 1px solid var(--border-dark);
   border-radius: 10px;
@@ -249,7 +255,7 @@ nav {
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  white-space: nowrap;
+  width: 100%;
 }
 .waitlist-form button:hover { background: var(--green-dark); }
 
@@ -269,9 +275,10 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
 @media (max-width: 600px) {
   nav { padding: 0 20px; }
   .nav-links { gap: 16px; }
-  .hero { padding: 120px 24px 80px; }
+  .hero { padding: 120px 24px 24px; }
   .section { padding: 60px 24px; }
-  #waitlist { padding: 48px 24px; margin: 0 16px 60px; }
+  .section-how { padding: 36px 24px 56px; }
+  #waitlist { padding: 44px 24px 40px; margin: 0 16px 60px; max-width: none; }
 }
 </style>
 </head>
@@ -301,34 +308,32 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
   </div>
 </div>
 
-<section class="section">
-  <div class="section-header">
-    <p class="section-label">How it works</p>
-    <h2 class="section-title">From browsing to belonging</h2>
-    <p class="section-sub">Three steps. Walk in. Feel like a local from day one.</p>
-  </div>
-  <div class="how-steps">
-    <div class="how-step">
-      <span class="how-step-index" aria-hidden="true">1</span>
-      <p class="how-step-title">Find your city</p>
-      <p class="how-step-desc">Explore available properties in your chosen city and find the perfect fit</p>
+<section class="section-how" aria-labelledby="how-heading">
+  <div class="section-how-inner">
+    <div class="section-header">
+      <p class="section-label">How it works</p>
+      <h2 class="section-title" id="how-heading">From browsing to belonging</h2>
+      <p class="section-sub">Three steps. Walk in. Feel like a local from day one.</p>
     </div>
-    <span class="how-arrow" aria-hidden="true">→</span>
-    <div class="how-step">
-      <span class="how-step-index" aria-hidden="true">2</span>
-      <p class="how-step-title">Pick your room or flatmate</p>
-      <p class="how-step-desc">Find your perfect space, or meet your future flatmate first</p>
+    <div class="how-steps">
+      <div class="how-step">
+        <span class="how-step-index" aria-hidden="true">1</span>
+        <p class="how-step-title">Find your city</p>
+        <p class="how-step-desc">Explore available properties in your chosen city and find the perfect fit</p>
+      </div>
+      <span class="how-arrow" aria-hidden="true">→</span>
+      <div class="how-step">
+        <span class="how-step-index" aria-hidden="true">2</span>
+        <p class="how-step-title">Pick your room or flatmate</p>
+        <p class="how-step-desc">Find your perfect space, or meet your future flatmate first</p>
+      </div>
+      <span class="how-arrow" aria-hidden="true">→</span>
+      <div class="how-step">
+        <span class="how-step-index" aria-hidden="true">3</span>
+        <p class="how-step-title">Move in &amp; connect with your community</p>
+        <p class="how-step-desc">Settle in, join local groups and find your people</p>
+      </div>
     </div>
-    <span class="how-arrow" aria-hidden="true">→</span>
-    <div class="how-step">
-      <span class="how-step-index" aria-hidden="true">3</span>
-      <p class="how-step-title">Move in &amp; connect with your community</p>
-      <p class="how-step-desc">Settle in, join local groups and find your people</p>
-    </div>
-  </div>
-  <div class="cta-row cta-spaced">
-    <a href="search-athens.html" class="btn-primary btn-cta-main">Browse rentals</a>
-    <a href="community.html" class="btn-secondary-cta">Join the community</a>
   </div>
 </section>
 
@@ -341,7 +346,7 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
   <div class="cards cards-grid-3">
     <a href="search-athens.html" class="card">
       <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-      <h3>Furnished rentals</h3>
+      <h3>Flexible rentals</h3>
       <p>Rooms, flatshares, studios and full apartments. Flexible stays across European cities.</p>
     </a>
     <a href="flatmate-signup.html" class="card">
@@ -361,16 +366,18 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
   </div>
 </section>
 
-<section id="waitlist">
-  <h2>Ready to find your place?</h2>
-  <p class="waitlist-lead">Browse furnished properties across European cities. Rooms, flatshares, studios and more. New cities added regularly.</p>
-  <div class="cta-row">
-    <a href="search-athens.html" class="btn-primary btn-cta-main">Browse rentals</a>
+<section id="waitlist" aria-labelledby="waitlist-heading">
+  <h2 id="waitlist-heading">Ready to feel at home abroad?</h2>
+  <p class="waitlist-lead">Browse quality properties across European cities. Rooms, flatshares, studios and more. New cities added regularly.</p>
+  <div class="waitlist-cta-wrap">
+    <div class="cta-row">
+      <a href="search-athens.html" class="btn-primary btn-cta-main">Browse rentals</a>
+    </div>
   </div>
-  <p class="waitlist-divider">Don't see your city? Join the waitlist and we will notify you when we launch near you.</p>
+  <p class="waitlist-hint">Don't see your city? Join the waitlist and we will notify you when we launch near you.</p>
   <form class="waitlist-form" action="#" method="get" onsubmit="return false;">
-    <input type="email" name="email" placeholder="you@example.com" required />
-    <button type="submit" class="btn-waitlist-secondary">Notify me</button>
+    <input type="email" name="email" placeholder="you@example.com" required aria-label="Email for waitlist" />
+    <button type="submit">Notify me</button>
   </form>
 </section>
 
