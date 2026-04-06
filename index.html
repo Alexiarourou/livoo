@@ -250,26 +250,58 @@ nav {
   background: #edf7f0;
   border-top: 1px solid #d4eadb;
   border-bottom: 1px solid #d4eadb;
-  padding: 44px 48px;
+  padding: 60px 48px;
 }
 .landlord-strip-inner {
-  max-width: 1100px;
+  max-width: 32rem;
   margin: 0 auto;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
+  text-align: center;
+  gap: 20px;
 }
-.landlord-strip-text {
-  font-size: 1rem;
+.landlord-strip-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(5, 150, 105, 0.14);
+  border: 1px solid rgba(5, 150, 105, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+.landlord-strip-icon svg {
+  width: 26px;
+  height: 26px;
+}
+.landlord-strip-icon svg path,
+.landlord-strip-icon svg polyline {
+  stroke: var(--green);
+}
+.landlord-strip-title {
+  font-weight: 700;
+  font-size: clamp(1.55rem, 4.2vw, 1.95rem);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
   color: var(--text-dark);
-  line-height: 1.55;
-  max-width: 38rem;
   margin: 0;
 }
+.landlord-strip-sub {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--muted-dark);
+  line-height: 1.65;
+  margin: -4px 0 0;
+  max-width: 28rem;
+}
 .landlord-strip-cta {
-  padding: 12px 26px;
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
   border-radius: 12px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -339,9 +371,7 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
 @media (max-width: 600px) {
   nav { padding: 0 20px; }
   .nav-links { gap: 12px; row-gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-  .landlord-strip { padding: 36px 24px; }
-  .landlord-strip-inner { flex-direction: column; text-align: center; justify-content: center; }
-  .landlord-strip-text { max-width: none; }
+  .landlord-strip { padding: 48px 24px; }
   .hero { padding: 120px 24px 24px; }
   .section { padding: 60px 24px; }
   .section-how { padding: 36px 24px 56px; }
@@ -444,7 +474,11 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
 
 <section class="landlord-strip" aria-labelledby="landlord-strip-heading">
   <div class="landlord-strip-inner">
-    <p class="landlord-strip-text" id="landlord-strip-heading">Are you a landlord? List your property and reach verified tenants.</p>
+    <div class="landlord-strip-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <h2 class="landlord-strip-title" id="landlord-strip-heading">Are you a landlord?</h2>
+    <p class="landlord-strip-sub">List your property and reach verified tenants looking for a home in your city.</p>
     <a href="landlord-dashboard.html" class="btn-primary landlord-strip-cta">List your property</a>
   </div>
 </section>
