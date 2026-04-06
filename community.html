@@ -51,6 +51,31 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
 .section-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.03em; }
 .section-sub { color: var(--muted-dark); font-size: 0.95rem; margin-top: 8px; line-height: 1.6; }
 
+.cities-feature-intro { text-align: center; margin-bottom: 40px; max-width: 640px; margin-left: auto; margin-right: auto; }
+.cities-feature-intro-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
+.cities-feature-intro-sub { color: var(--muted-dark); font-size: 0.95rem; line-height: 1.65; margin: 0; }
+.cities-more-wrap { width: 100%; max-width: 282px; margin: 8px auto 32px; }
+.cities-more-label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text-dark); margin-bottom: 10px; text-align: center; }
+.cities-more-select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 2px solid var(--green);
+  background: var(--surface-dark);
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  cursor: pointer;
+  outline: none;
+  appearance: auto;
+  -webkit-appearance: menulist;
+}
+.cities-more-select:focus { border-color: var(--green-dark); }
+.cities-more-note { margin-top: 12px; font-size: 0.82rem; text-align: center; line-height: 1.45; color: var(--muted-dark); }
+.cities-more-note a { color: var(--green); font-weight: 600; text-decoration: none; }
+.cities-more-note a:hover { text-decoration: underline; }
+.cities-request-wrap { display: flex; justify-content: center; width: 100%; }
+.cities-request-wrap .city-card-request { width: 100%; max-width: 282px; }
 .cities-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; align-items: stretch; }
 .city-card-request { background: var(--surface-dark); border: 2px dashed var(--border-dark); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 320px; height: 100%; padding: 24px; text-decoration: none; color: inherit; transition: all 0.3s; }
 .city-card-request:hover { border-color: var(--green); background: rgba(5,150,105,0.04); }
@@ -173,6 +198,10 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
     <h2 class="section-title">Choose your city</h2>
     <p class="section-sub">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
   </div>
+  <div class="cities-feature-intro">
+    <p class="cities-feature-intro-label">MOST POPULAR</p>
+    <p class="cities-feature-intro-sub">The top 5 cities where students, interns and nomads are moving right now — with the most active Livvo communities.</p>
+  </div>
   <div class="cities-grid">
     <a href="community-join.html?city=paris" class="city-card">
       <div class="city-cover city-cover-paris">
@@ -254,6 +283,29 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
         <span class="btn-city btn-city-active">Join Milano community</span>
       </div>
     </a>
+  </div>
+  <div class="cities-more-wrap">
+    <label for="browse-more-cities" class="cities-more-label">Browse more cities →</label>
+    <select id="browse-more-cities" class="cities-more-select" aria-label="Browse more cities">
+      <option value="" selected disabled>Select a city...</option>
+      <option value="barcelona">Barcelona</option>
+      <option value="berlin">Berlin</option>
+      <option value="amsterdam">Amsterdam</option>
+      <option value="lisbon">Lisbon</option>
+      <option value="prague">Prague</option>
+      <option value="budapest">Budapest</option>
+      <option value="vienna">Vienna</option>
+      <option value="copenhagen">Copenhagen</option>
+      <option value="stockholm">Stockholm</option>
+      <option value="dublin">Dublin</option>
+      <option value="brussels">Brussels</option>
+      <option value="valencia">Valencia</option>
+      <option value="seville">Seville</option>
+      <option value="porto">Porto</option>
+    </select>
+    <p class="cities-more-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
+  </div>
+  <div class="cities-request-wrap">
     <a href="contact.html?subject=Request%20new%20city" class="city-card city-card-request">
       <div class="city-card-request-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
       <strong>Request your city</strong>
@@ -286,6 +338,11 @@ document.querySelectorAll('.audience-pill').forEach(pill => {
     document.querySelectorAll('.audience-pill').forEach(p => p.classList.remove('active'));
     pill.classList.add('active');
   });
+});
+document.getElementById('browse-more-cities').addEventListener('change', function () {
+  if (this.value) {
+    window.location.href = 'community-join.html?city=' + encodeURIComponent(this.value);
+  }
 });
 </script>
 </body>
