@@ -406,7 +406,7 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
   .cards-grid-3 { grid-template-columns: 1fr; max-width: 420px; }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   nav {
     flex-direction: column;
     align-items: stretch;
@@ -444,13 +444,17 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
   .hero { padding: 120px 24px 24px; }
   .hero h1 { font-size: 32px; letter-spacing: -0.03em; }
   .hero-tag {
-    font-size: 13px;
-    padding: 6px 14px;
-    max-width: min(100%, 20rem);
+    display: inline-block;
+    width: fit-content;
+    max-width: min(100%, 17rem);
+    font-size: 12px;
+    padding: 5px 12px;
     margin-left: auto;
     margin-right: auto;
     line-height: 1.35;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
+    text-align: center;
+    box-sizing: border-box;
   }
   .hero .cta-row {
     flex-direction: column;
@@ -459,7 +463,7 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
     max-width: 400px;
     margin-left: auto;
     margin-right: auto;
-    gap: 12px;
+    gap: 8px;
   }
   .hero .cta-row a {
     width: 100%;
@@ -471,9 +475,10 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
   .how-steps { flex-direction: column; max-width: 420px; }
   .how-arrow { display: none; }
   .how-step {
-    min-height: 0;
+    min-height: auto;
     padding: 24px 22px;
   }
+  .how-step-desc { flex-grow: 0; }
   .how-step-index {
     font-size: 32px;
     margin-bottom: 16px;
@@ -490,6 +495,7 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
     margin: 0;
     max-width: none;
   }
+  #waitlist h2 { font-size: 26px; }
   .waitlist-form {
     flex-direction: column;
     flex-wrap: nowrap;
