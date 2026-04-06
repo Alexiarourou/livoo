@@ -54,16 +54,16 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
 .cities-feature-intro { text-align: center; margin-bottom: 40px; max-width: 640px; margin-left: auto; margin-right: auto; }
 .cities-feature-intro-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
 .cities-feature-intro-sub { color: var(--muted-dark); font-size: 0.95rem; line-height: 1.65; margin: 0; }
-.cities-more-wrap { width: 100%; max-width: 282px; margin: 8px auto 32px; }
-.cities-more-label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text-dark); margin-bottom: 10px; text-align: center; }
+.cities-more-wrap { width: 100%; max-width: 480px; margin: 0 auto 36px; }
+.cities-more-label { display: block; font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 12px; text-align: center; }
 .cities-more-select {
   width: 100%;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: 10px;
-  border: 2px solid var(--green);
+  border: 3px solid var(--green);
   background: var(--surface-dark);
   font-family: "DM Sans", sans-serif;
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--text-dark);
   cursor: pointer;
   outline: none;
@@ -205,6 +205,43 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
     <p class="cities-feature-intro-label">MOST POPULAR</p>
     <p class="cities-feature-intro-sub">The top four cities where students, interns and nomads are moving right now — with the most active Livvo communities.</p>
   </div>
+  <div class="cities-more-wrap">
+    <label for="browse-more-cities" class="cities-more-label">Not your city? Find yours:</label>
+    <select id="browse-more-cities" class="cities-more-select" aria-label="Find your city">
+      <option value="" selected disabled>Select a city...</option>
+      <option value="amsterdam">Amsterdam</option>
+      <option value="barcelona">Barcelona</option>
+      <option value="berlin">Berlin</option>
+      <option value="bologna">Bologna</option>
+      <option value="brussels">Brussels</option>
+      <option value="budapest">Budapest</option>
+      <option value="copenhagen">Copenhagen</option>
+      <option value="dublin">Dublin</option>
+      <option value="florence">Florence</option>
+      <option value="geneva">Geneva</option>
+      <option value="ghent">Ghent</option>
+      <option value="hamburg">Hamburg</option>
+      <option value="krakow">Krakow</option>
+      <option value="lisbon">Lisbon</option>
+      <option value="milan">Milan</option>
+      <option value="milano">Milano</option>
+      <option value="munich">Munich</option>
+      <option value="porto">Porto</option>
+      <option value="prague">Prague</option>
+      <option value="riga">Riga</option>
+      <option value="rome">Rome</option>
+      <option value="rotterdam">Rotterdam</option>
+      <option value="seville">Seville</option>
+      <option value="stockholm">Stockholm</option>
+      <option value="tallinn">Tallinn</option>
+      <option value="tbilisi">Tbilisi</option>
+      <option value="valencia">Valencia</option>
+      <option value="vienna">Vienna</option>
+      <option value="warsaw">Warsaw</option>
+      <option value="zurich">Zurich</option>
+    </select>
+    <p class="cities-more-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
+  </div>
   <div class="cities-grid">
     <div class="city-card">
       <a href="community-city.html?city=paris" class="city-cover-link">
@@ -278,28 +315,6 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
         <a href="community-city.html?city=madrid" class="btn-city btn-city-active">Join Madrid community</a>
       </div>
     </div>
-  </div>
-  <div class="cities-more-wrap">
-    <label for="browse-more-cities" class="cities-more-label">Browse more cities →</label>
-    <select id="browse-more-cities" class="cities-more-select" aria-label="Browse more cities">
-      <option value="" selected disabled>Select a city...</option>
-      <option value="barcelona">Barcelona</option>
-      <option value="berlin">Berlin</option>
-      <option value="amsterdam">Amsterdam</option>
-      <option value="lisbon">Lisbon</option>
-      <option value="milano">Milano</option>
-      <option value="prague">Prague</option>
-      <option value="budapest">Budapest</option>
-      <option value="vienna">Vienna</option>
-      <option value="copenhagen">Copenhagen</option>
-      <option value="stockholm">Stockholm</option>
-      <option value="dublin">Dublin</option>
-      <option value="brussels">Brussels</option>
-      <option value="valencia">Valencia</option>
-      <option value="seville">Seville</option>
-      <option value="porto">Porto</option>
-    </select>
-    <p class="cities-more-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
   </div>
   <div class="cities-request-wrap">
     <a href="contact.html?subject=Request%20new%20city" class="city-card city-card-request">

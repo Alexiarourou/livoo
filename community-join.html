@@ -63,11 +63,13 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
 </div>
 <script>
   const cityNames = {
-    paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milano: 'Milano',
+    paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milano: 'Milano', milan: 'Milan',
     barcelona: 'Barcelona', berlin: 'Berlin', amsterdam: 'Amsterdam', lisbon: 'Lisbon',
     prague: 'Prague', budapest: 'Budapest', vienna: 'Vienna', copenhagen: 'Copenhagen',
     stockholm: 'Stockholm', dublin: 'Dublin', brussels: 'Brussels', valencia: 'Valencia',
-    seville: 'Seville', porto: 'Porto'
+    seville: 'Seville', porto: 'Porto', rome: 'Rome', florence: 'Florence', bologna: 'Bologna',
+    munich: 'Munich', hamburg: 'Hamburg', zurich: 'Zurich', geneva: 'Geneva', rotterdam: 'Rotterdam',
+    ghent: 'Ghent', krakow: 'Krakow', warsaw: 'Warsaw', tallinn: 'Tallinn', riga: 'Riga', tbilisi: 'Tbilisi'
   };
   const params = new URLSearchParams(location.search);
   const city = (params.get('city') || 'athens').toLowerCase();
