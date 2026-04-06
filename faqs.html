@@ -26,11 +26,14 @@ nav {
 .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
 .logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
 .logo-word span { color: var(--green); }
-.nav-links { display: flex; align-items: center; gap: 20px; }
+.nav-links { display: flex; align-items: center; gap: 24px; }
 .nav-links a { font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; }
 .nav-links a:hover { color: var(--text-dark); }
 .btn-nav { background: var(--green); color: white; padding: 8px 20px; border-radius: 8px; font-size: 0.83rem; font-weight: 600; text-decoration: none; }
-.btn-nav:hover { background: var(--green-dark); }
+.nav-links a.btn-nav { color: white; }
+.nav-links a.btn-nav:hover { color: white; background: var(--green-dark); }
+.nav-cta-secondary { font-size: 0.83rem; font-weight: 600; color: var(--muted-dark); text-decoration: none; }
+.nav-cta-secondary:hover { color: var(--green); }
 
 .page { max-width: 720px; margin: 0 auto; padding: 120px 24px 80px; }
 .page h1 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 12px; }
@@ -55,11 +58,35 @@ nav {
   font-size: 0.95rem; line-height: 1.75; color: var(--muted-dark);
   overflow: hidden; max-height: 0; transition: max-height 0.3s ease;
 }
-.faq-item.open .faq-a { max-height: 800px; }
+.faq-item.open .faq-a { max-height: 2400px; }
 .faq-a-inner { padding-top: 4px; }
 
 .back-link { display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--muted-dark); text-decoration: none; margin-bottom: 32px; transition: color 0.2s; }
 .back-link:hover { color: var(--text-dark); }
+
+.cta-box {
+  margin-top: 56px;
+  text-align: center;
+  padding: 32px;
+  background: rgba(5,150,105,0.06);
+  border: 1px solid rgba(5,150,105,0.2);
+  border-radius: 16px;
+}
+.cta-box .cta-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.35rem; color: var(--text-dark); margin-bottom: 10px; letter-spacing: -0.02em; }
+.cta-box .cta-sub { margin-bottom: 20px; color: var(--muted-dark); font-size: 0.98rem; line-height: 1.6; }
+.cta-box .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.cta-box .cta-row a {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.cta-box .cta-row a.btn-cta-primary { background: var(--green); color: white; border: 2px solid var(--green); }
+.cta-box .cta-row a.btn-cta-primary:hover { background: var(--green-dark); border-color: var(--green-dark); }
+.cta-box .cta-row a.btn-cta-secondary { background: transparent; color: var(--green); border: 2px solid var(--green); }
+.cta-box .cta-row a.btn-cta-secondary:hover { background: rgba(5,150,105,0.08); }
 
 @media (max-width: 600px) { nav { padding: 0 20px; } .nav-links { display: none; } }
 </style>
@@ -72,58 +99,72 @@ nav {
     <span class="logo-word">li<span>vv</span>o</span>
   </a>
   <div class="nav-links">
-    <a href="search-athens.html">Browse Properties</a>
+    <a href="search-athens.html" class="btn-nav">Browse rentals</a>
+    <a href="community.html">Community</a>
     <a href="flatmate-signup.html">Find a Flatmate</a>
-    <a href="about-us.html">About Us</a>
-    <a href="index.html#waitlist" class="btn-nav">Get Early Access</a>
+    <a href="landlord-dashboard.html">For Landlords</a>
+    <a href="index.html#waitlist" class="nav-cta-secondary">Get early access</a>
   </div>
 </nav>
 
 <div class="page">
   <a href="index.html" class="back-link">← Back to home</a>
-  <h1>Frequently asked questions</h1>
-  <p class="lead">Everything you need to know about Livvo — flatshares, community, and moving abroad.</p>
+  <h1>Everything you need to know</h1>
+  <p class="lead">Clear answers about housing, flatmates, community and how Livvo works — no small print.</p>
 
   <div class="faq-list">
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">What is Livvo?<span class="icon">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Livvo is a platform for students, interns and young professionals moving abroad. We help you find flatshares and furnished rentals for 1–12 months — plus a community to connect with flatmates and locals before you arrive. No guarantor, no long lease, no impossible paperwork.</div></div>
+      <button type="button" class="faq-q" onclick="toggleFaq(this)">What is Livvo?<span class="icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Livvo is a housing and community platform built for students, interns, young professionals and digital nomads moving abroad. We offer verified furnished rooms and flatshares for 1–12 months, a flatmate matching tool, and local community groups in each city — all in one place. No guarantor required, no long leases, no endless paperwork.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">Who is Livvo for?<span class="icon">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Erasmus students, exchange students, interns, young professionals on placement, and digital nomads. Anyone moving to a new city for a few months to a year who needs flexible housing and wants to find their people before they land.</div></div>
+      <button type="button" class="faq-q" onclick="toggleFaq(this)">Who is Livvo for?<span class="icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Anyone moving to a new city for a few months to a year. Erasmus and exchange students, interns, young professionals on placement, remote workers and digital nomads. If you need flexible housing and want to arrive somewhere with people already around you — Livvo is for you.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">Do I need a guarantor?<span class="icon">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">No. Livvo landlords understand that students and interns often can't provide a local guarantor. You verify through your university email or work placement letter instead. We make it simple so you can focus on your experience abroad.</div></div>
+      <button type="button" class="faq-q" onclick="toggleFaq(this)">Do I need a guarantor?<span class="icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">No. All Livvo landlords are briefed to work with international tenants who cannot provide a local guarantor. Instead, you verify your stay through your university acceptance letter, student ID, or work placement confirmation. Simple, fair and designed for people on the move.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">How long can I rent for?<span class="icon">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Each landlord sets their own minimum and maximum stay. You can find properties for 1 month, 3 months, 6 months, 9 months, 12 months or more. Duration is always agreed directly between you and the landlord — Livvo just makes the connection.</div></div>
+      <button type="button" class="faq-q" onclick="toggleFaq(this)">How long can I rent for?<span class="icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Stays on Livvo range from 1 to 12 months. Each landlord sets their own minimum stay, which is clearly listed on every property. All duration terms are agreed directly between you and the landlord — Livvo makes the connection and keeps things transparent.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">What's the difference between a flatshare and a rental?<span class="icon">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">A flatshare means you rent a room in a shared apartment with other tenants. A rental can be a whole apartment, studio or house. On Livvo you'll find both — filter by "Flatshare" if you want to live with others, or browse studios and apartments for more privacy.</div></div>
+      <button type="button" class="faq-q" onclick="toggleFaq(this)">What is the difference between a flatshare and a rental?<span class="icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">A flatshare means renting a private room in a shared apartment with other tenants — great if you want company and lower costs. A rental is a full apartment or studio for sole use — better if you want privacy. Livvo lists both. Use the filters to find what suits you.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">Is the community free?<span class="icon">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Yes. The Livvo community is free for everyone — whether or not you rent through us. Create a profile, join student groups, find flatmates, get city tips and meet people. You don't need to book a property to be part of the community.</div></div>
+      <button type="button" class="faq-q" onclick="toggleFaq(this)">How does flatmate matching work?<span class="icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Create a free profile with your budget, lifestyle, move-in date and personality. Livvo suggests compatible matches based on your preferences. You can message potential flatmates before you arrive, so you're not meeting strangers on move-in day. It's like dating apps — but for housemates.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">Which cities is Livvo in?<span class="icon">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">We're live in Athens. Paris, London, Barcelona, Berlin, Amsterdam and more European cities are coming soon. Join the waitlist and we'll notify you when we launch in your city.</div></div>
+      <button type="button" class="faq-q" onclick="toggleFaq(this)">Is the community free?<span class="icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Yes, completely. The Livvo community is free for everyone — whether or not you rent through us. Join city groups, connect with other arrivals, get local tips and attend events. You don't need to book a property to be part of it.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">I'm a landlord — how do I list my property?<span class="icon">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Create a landlord account, verify your identity, then add your property with photos, amenities, price and duration. You'll reach thousands of vetted students, interns and nomads. You set the terms — Livvo handles the connection.</div></div>
+      <button type="button" class="faq-q" onclick="toggleFaq(this)">Which cities is Livvo available in?<span class="icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">We are currently live in Athens. Paris and London are launching soon. Join the waitlist and we will notify you as soon as your city goes live.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">Is there a fee to use Livvo?<span class="icon">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Browsing and joining the community is free. There are no hidden fees to create an account or search for properties. Any fees for bookings or listings are clearly communicated before you commit.</div></div>
+      <button type="button" class="faq-q" onclick="toggleFaq(this)">I am a landlord — how do I list my property?<span class="icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Create a landlord account, verify your identity and add your property with photos, description, price and available dates. You will reach thousands of vetted students, interns and young professionals actively looking for flexible housing. You set the terms — Livvo handles the connection.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">How do I get in touch?<span class="icon">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">For general questions, email us at hello@livvo.net. For landlords, you can sign up at the List Property page. We're building Livvo for people like you — we'd love to hear from you.</div></div>
+      <button type="button" class="faq-q" onclick="toggleFaq(this)">Are there any fees?<span class="icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Browsing properties and joining the community is completely free. There are no hidden charges to create an account or search listings. Any applicable fees for bookings or property listings are clearly shown before you commit — no surprises.</div></div>
+    </div>
+    <div class="faq-item">
+      <button type="button" class="faq-q" onclick="toggleFaq(this)">How do I contact Livvo?<span class="icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Email us at hello@livvo.net — we read and respond to every message. You can also reach us through the contact page. We are a small team building something we believe in, and we genuinely love hearing from our community.</div></div>
+    </div>
+  </div>
+
+  <div class="cta-box">
+    <p class="cta-title">Still have questions?</p>
+    <p class="cta-sub">We're happy to help. Reach out directly or browse what's available now.</p>
+    <div class="cta-row">
+      <a href="search-athens.html" class="btn-cta-primary">Browse rentals</a>
+      <a href="contact.html" class="btn-cta-secondary">Contact us</a>
     </div>
   </div>
 </div>
