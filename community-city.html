@@ -43,11 +43,18 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
   background-size: cover;
   background-position: center;
 }
-.city-icon { position: absolute; top: 20px; right: 20px; width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; }
+.city-hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; display: block; }
+.city-hero-gradient { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%); pointer-events: none; }
+.city-icon { position: absolute; top: 20px; right: 20px; width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; z-index: 2; }
 .city-icon svg { width: 24px; height: 24px; }
 .city-icon svg path { stroke: white; }
-.city-name-big { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2rem; letter-spacing: -0.04em; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+.city-name-big { position: relative; z-index: 2; width: 100%; font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2rem; letter-spacing: -0.04em; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
 .city-cover { height: 200px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 20px; background-size: cover; background-position: center; }
+.city-cover.city-hero-fallback { background-color: #1a3a2a; background-image: none; align-items: center; justify-content: center; }
+.city-cover.city-hero-fallback .city-hero-photo,
+.city-cover.city-hero-fallback .city-hero-gradient { display: none; }
+.city-cover.city-hero-fallback .city-icon { display: none; }
+.city-cover.city-hero-fallback .city-name-big { text-align: center; text-shadow: none; font-weight: 800; font-size: 2.35rem; }
 
 .section { padding: 0 48px 80px; max-width: 1200px; margin: 0 auto; }
 .city-body { padding: 24px; flex: 1; display: flex; flex-direction: column; min-height: 0; }
@@ -133,6 +140,8 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
 
 <div class="city-hero-wrap">
   <div id="cityHero" class="city-cover" role="img" aria-label="">
+    <img id="cityHeroImg" class="city-hero-photo" alt="" decoding="async" />
+    <div class="city-hero-gradient" aria-hidden="true"></div>
     <div class="city-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
     <div id="cityNameOverlay" class="city-name-big"></div>
   </div>
@@ -165,30 +174,30 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
     amsterdam: { name: 'Amsterdam', image: 'https://images.unsplash.com/photo-1576924542622-772281b13aa8?w=1200&q=80&fit=crop' },
     lisbon: { name: 'Lisbon', image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=1200&q=80&fit=crop' },
     prague: { name: 'Prague', image: 'https://images.unsplash.com/photo-1541849546-216549ae216d?w=1200&q=80&fit=crop' },
-    budapest: { name: 'Budapest', image: 'https://images.unsplash.com/photo-1549592738-d04b769c9f46?w=1200&q=80&fit=crop' },
+    budapest: { name: 'Budapest', image: '' },
     vienna: { name: 'Vienna', image: 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=1200&q=80&fit=crop' },
     copenhagen: { name: 'Copenhagen', image: 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?w=1200&q=80&fit=crop' },
     stockholm: { name: 'Stockholm', image: 'https://images.unsplash.com/photo-1509356843151-3e7d96241e11?w=1200&q=80&fit=crop' },
     dublin: { name: 'Dublin', image: 'https://images.unsplash.com/photo-1549918864-48ac978761a4?w=1200&q=80&fit=crop' },
-    brussels: { name: 'Brussels', image: 'https://images.unsplash.com/photo-1546354114-035bc5f57fef?w=1200&q=80&fit=crop' },
+    brussels: { name: 'Brussels', image: '' },
     valencia: { name: 'Valencia', image: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=1200&q=80&fit=crop' },
-    seville: { name: 'Seville', image: 'https://images.unsplash.com/photo-1559564194-c987c6b49a15?w=1200&q=80&fit=crop' },
+    seville: { name: 'Seville', image: '' },
     porto: { name: 'Porto', image: 'https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=1200&q=80&fit=crop' },
-    milan: { name: 'Milan', image: 'https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?w=1200&q=80&fit=crop' },
+    milan: { name: 'Milan', image: '' },
     rome: { name: 'Rome', image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&q=80&fit=crop' },
-    florence: { name: 'Florence', image: 'https://images.unsplash.com/photo-1543429776-2782fc8e0fe4?w=1200&q=80&fit=crop' },
+    florence: { name: 'Florence', image: '' },
     bologna: { name: 'Bologna', image: 'https://images.unsplash.com/photo-1566438480900-0609be27a4be?w=1200&q=80&fit=crop' },
     munich: { name: 'Munich', image: 'https://images.unsplash.com/photo-1595867818082-083862f3d630?w=1200&q=80&fit=crop' },
     hamburg: { name: 'Hamburg', image: 'https://images.unsplash.com/photo-1587330979470-3595ac045ab0?w=1200&q=80&fit=crop' },
     zurich: { name: 'Zurich', image: 'https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=1200&q=80&fit=crop' },
-    geneva: { name: 'Geneva', image: 'https://images.unsplash.com/photo-1527644088-a5a5c5a2a7a2?w=1200&q=80&fit=crop' },
+    geneva: { name: 'Geneva', image: '' },
     rotterdam: { name: 'Rotterdam', image: 'https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?w=1200&q=80&fit=crop' },
-    ghent: { name: 'Ghent', image: 'https://images.unsplash.com/photo-1575434195799-dc4db5d3c223?w=1200&q=80&fit=crop' },
-    krakow: { name: 'Krakow', image: 'https://images.unsplash.com/photo-1574623452334-1e0ac2b3ccb4?w=1200&q=80&fit=crop' },
-    warsaw: { name: 'Warsaw', image: 'https://images.unsplash.com/photo-1607427293702-036707dc2945?w=1200&q=80&fit=crop' },
+    ghent: { name: 'Ghent', image: '' },
+    krakow: { name: 'Krakow', image: '' },
+    warsaw: { name: 'Warsaw', image: '' },
     tallinn: { name: 'Tallinn', image: 'https://images.unsplash.com/photo-1579003593419-98f949b9398f?w=1200&q=80&fit=crop' },
-    riga: { name: 'Riga', image: 'https://images.unsplash.com/photo-1577720580450-43e4a9a77b69?w=1200&q=80&fit=crop' },
-    tbilisi: { name: 'Tbilisi', image: 'https://images.unsplash.com/photo-1565008576549-57569a49c072?w=1200&q=80&fit=crop' }
+    riga: { name: 'Riga', image: '' },
+    tbilisi: { name: 'Tbilisi', image: '' }
   };
 
   const params = new URLSearchParams(location.search);
@@ -202,11 +211,33 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
 
   const joinBase = 'community-join.html?city=' + encodeURIComponent(slug);
   const heroEl = document.getElementById('cityHero');
-  const gradient = 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)';
-  function setHeroBg(url) {
-    heroEl.style.backgroundImage = gradient + ', url(' + url + ')';
+  const heroImg = document.getElementById('cityHeroImg');
+  function applyHeroFallback() {
+    heroEl.classList.add('city-hero-fallback');
+    heroEl.style.backgroundImage = '';
+    heroImg.removeAttribute('src');
+    heroImg.style.display = 'none';
   }
-  setHeroBg(data.image);
+  function clearHeroFallback() {
+    heroEl.classList.remove('city-hero-fallback');
+    heroImg.style.display = '';
+  }
+  function setupHeroImage(url) {
+    heroImg.onerror = function () {
+      applyHeroFallback();
+    };
+    heroImg.onload = function () {
+      clearHeroFallback();
+    };
+    const trimmed = (url || '').trim();
+    if (!trimmed) {
+      applyHeroFallback();
+      return;
+    }
+    clearHeroFallback();
+    heroImg.src = trimmed;
+  }
+  setupHeroImage(data.image);
   heroEl.setAttribute('aria-label', data.name + ' city');
 
   document.getElementById('cityNameOverlay').textContent = data.name;
