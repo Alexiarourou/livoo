@@ -157,39 +157,39 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
 (function () {
   const CITY_DATA = {
     paris: { name: 'Paris', image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=90' },
-    athens: { name: 'Athens', image: 'https://images.unsplash.com/photo-1603565816030-6987515c8e7b?w=1200&q=90', imageFallback: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=90' },
+    athens: { name: 'Athens', image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=90' },
     london: { name: 'London', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=90' },
     madrid: { name: 'Madrid', image: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=1200&q=90' },
-    milano: { name: 'Milano', image: 'https://images.unsplash.com/photo-1513581166391-887a96ddeafd?w=1200&q=90' },
+    milano: { name: 'Milano', image: 'https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?w=1200&q=90' },
     barcelona: { name: 'Barcelona', image: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=1200&q=90' },
     berlin: { name: 'Berlin', image: 'https://images.unsplash.com/photo-1560969184-10fe8719e047?w=1200&q=90' },
     amsterdam: { name: 'Amsterdam', image: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=1200&q=90' },
-    lisbon: { name: 'Lisbon', image: 'https://images.unsplash.com/photo-1585208798177-6e98b9976f47?w=1200&q=90' },
+    lisbon: { name: 'Lisbon', image: 'https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=1200&q=90' },
     prague: { name: 'Prague', image: 'https://images.unsplash.com/photo-1541849546-216549ae216d?w=1200&q=90' },
-    budapest: { name: 'Budapest', image: 'https://images.unsplash.com/photo-1541343672888-9be949e4b1b8?w=1200&q=90' },
-    vienna: { name: 'Vienna', image: 'https://images.unsplash.com/photo-1516550893923-42e28d2cf888?w=1200&q=90' },
-    copenhagen: { name: 'Copenhagen', image: 'https://images.unsplash.com/photo-1513622470522-26cea3c4582d?w=1200&q=90' },
+    budapest: { name: 'Budapest', image: 'https://images.unsplash.com/photo-1565426873118-a17ed65d74b9?w=1200&q=90' },
+    vienna: { name: 'Vienna', image: 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=1200&q=90' },
+    copenhagen: { name: 'Copenhagen', image: 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?w=1200&q=90' },
     stockholm: { name: 'Stockholm', image: 'https://images.unsplash.com/photo-1509356843151-3e7d96241e11?w=1200&q=90' },
-    dublin: { name: 'Dublin', image: 'https://images.unsplash.com/photo-1581431884609-196a55b44faa?w=1200&q=90' },
-    brussels: { name: 'Brussels', image: 'https://images.unsplash.com/photo-1559564484-835530d20f8f?w=1200&q=90' },
-    valencia: { name: 'Valencia', image: 'https://images.unsplash.com/photo-1552911084-79db7458cd6e?w=1200&q=90' },
-    seville: { name: 'Seville', image: 'https://images.unsplash.com/photo-1551189014-fe516aed2e8e?w=1200&q=90' },
+    dublin: { name: 'Dublin', image: 'https://images.unsplash.com/photo-1549918864-48ac978761a4?w=1200&q=90' },
+    brussels: { name: 'Brussels', image: 'https://images.unsplash.com/photo-1559113202-c916b8e44373?w=1200&q=90' },
+    valencia: { name: 'Valencia', image: 'https://images.unsplash.com/photo-1565274936423-58a2e5a65e0f?w=1200&q=90' },
+    seville: { name: 'Seville', image: 'https://images.unsplash.com/photo-1559564194-c987c6b49a15?w=1200&q=90' },
     porto: { name: 'Porto', image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=1200&q=90' },
-    milan: { name: 'Milan', image: 'https://images.unsplash.com/photo-1513581166391-887a96ddeafd?w=1200&q=90' },
-    rome: { name: 'Rome', image: 'https://images.unsplash.com/photo-1529267236327-42d6d484f381?w=1200&q=90' },
-    florence: { name: 'Florence', image: 'https://images.unsplash.com/photo-1548717262-740b27c2a850?w=1200&q=90' },
-    bologna: { name: 'Bologna', image: 'https://images.unsplash.com/photo-1552832230-c0197dd711b5?w=1200&q=90' },
-    munich: { name: 'Munich', image: 'https://images.unsplash.com/photo-1595865052384-d968f3d77b1f?w=1200&q=90' },
-    hamburg: { name: 'Hamburg', image: 'https://images.unsplash.com/photo-1566404797226-995ea39084dd?w=1200&q=90' },
-    zurich: { name: 'Zurich', image: 'https://images.unsplash.com/photo-1516483607511-62aad861b0a6?w=1200&q=90' },
-    geneva: { name: 'Geneva', image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=1200&q=90' },
-    rotterdam: { name: 'Rotterdam', image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=90' },
-    ghent: { name: 'Ghent', image: 'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=1200&q=90' },
-    krakow: { name: 'Krakow', image: 'https://images.unsplash.com/photo-1590418606746-018840f9cd0a?w=1200&q=90' },
-    warsaw: { name: 'Warsaw', image: 'https://images.unsplash.com/photo-1519195044834-085cd8d90521?w=1200&q=90' },
-    tallinn: { name: 'Tallinn', image: 'https://images.unsplash.com/photo-1539874754764-5a96559165b8?w=1200&q=90' },
-    riga: { name: 'Riga', image: 'https://images.unsplash.com/photo-1565007742839-6b02c3deea1a?w=1200&q=90' },
-    tbilisi: { name: 'Tbilisi', image: 'https://images.unsplash.com/photo-1577083552431-6e5fd01988a5?w=1200&q=90' }
+    milan: { name: 'Milan', image: 'https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?w=1200&q=90' },
+    rome: { name: 'Rome', image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&q=90' },
+    florence: { name: 'Florence', image: 'https://images.unsplash.com/photo-1543429776-2782fc8e0fe4?w=1200&q=90' },
+    bologna: { name: 'Bologna', image: 'https://images.unsplash.com/photo-1598430820440-a412d5c7571d?w=1200&q=90' },
+    munich: { name: 'Munich', image: 'https://images.unsplash.com/photo-1595867818082-083862f3d630?w=1200&q=90' },
+    hamburg: { name: 'Hamburg', image: 'https://images.unsplash.com/photo-1558618047-f4e80e93bc7f?w=1200&q=90' },
+    zurich: { name: 'Zurich', image: 'https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=1200&q=90' },
+    geneva: { name: 'Geneva', image: 'https://images.unsplash.com/photo-1573108724029-4c46571d6490?w=1200&q=90' },
+    rotterdam: { name: 'Rotterdam', image: 'https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?w=1200&q=90' },
+    ghent: { name: 'Ghent', image: 'https://images.unsplash.com/photo-1575434195799-dc4db5d3c223?w=1200&q=90' },
+    krakow: { name: 'Krakow', image: 'https://images.unsplash.com/photo-1574623452334-1e0ac2b3ccb4?w=1200&q=90' },
+    warsaw: { name: 'Warsaw', image: 'https://images.unsplash.com/photo-1607427293702-036707dc2945?w=1200&q=90' },
+    tallinn: { name: 'Tallinn', image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1200&q=90' },
+    riga: { name: 'Riga', image: 'https://images.unsplash.com/photo-1577720580450-43e4a9a77b69?w=1200&q=90' },
+    tbilisi: { name: 'Tbilisi', image: 'https://images.unsplash.com/photo-1565008576549-57569a49c072?w=1200&q=90' }
   };
 
   const params = new URLSearchParams(location.search);
@@ -207,11 +207,6 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
     heroEl.style.backgroundImage = gradient + ', url(' + url + ')';
   }
   setHeroBg(data.image);
-  if (slug === 'athens' && data.imageFallback) {
-    const probe = new Image();
-    probe.onerror = function () { setHeroBg(data.imageFallback); };
-    probe.src = data.image;
-  }
   heroEl.setAttribute('aria-label', data.name + ' city');
 
   document.getElementById('cityNameOverlay').textContent = data.name;
