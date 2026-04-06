@@ -38,7 +38,7 @@ nav {
 .nav-cta-secondary:hover { color: var(--green); }
 
 .hero {
-  padding: 140px 48px 88px;
+  padding: 140px 48px 100px;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -54,81 +54,21 @@ nav {
 }
 .hero-tag {
   display: inline-flex;
+  justify-content: center;
+  text-align: center;
+  flex-wrap: wrap;
+  max-width: min(100%, 22rem);
+  line-height: 1.35;
   background: rgba(5,150,105,0.12);
   border: 1px solid rgba(5,150,105,0.2);
-  padding: 6px 16px;
+  padding: 8px 18px;
   border-radius: 100px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--green);
   letter-spacing: 0.04em;
   text-transform: none;
   margin-bottom: 24px;
-}
-.hero-social-proof {
-  font-size: 0.85rem;
-  color: var(--muted-dark);
-  text-align: center;
-  max-width: 560px;
-  margin: 8px auto 16px;
-  line-height: 1.5;
-}
-.city-picker {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: stretch;
-  gap: 16px;
-  flex-wrap: wrap;
-  max-width: 960px;
-  margin: 0 auto;
-}
-.city-card {
-  flex: 1 1 260px;
-  max-width: 300px;
-  background: var(--surface-dark);
-  border: 1px solid var(--border-dark);
-  border-radius: 16px;
-  padding: 22px 20px;
-  text-align: left;
-  text-decoration: none;
-  color: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-}
-.city-card:hover {
-  border-color: var(--green);
-  box-shadow: 0 12px 32px rgba(5,150,105,0.12);
-  transform: translateY(-3px);
-}
-.city-card-top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-.city-card-name {
-  font-family: "Outfit", sans-serif;
-  font-weight: 700;
-  font-size: 1.15rem;
-  color: var(--text-dark);
-}
-.city-card-status {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted-dark);
-  white-space: nowrap;
-}
-.city-card-status.open { color: var(--green-dark); }
-.city-card-status.soon { color: var(--muted-dark); }
-.city-card-desc {
-  font-size: 0.88rem;
-  color: var(--muted-dark);
-  line-height: 1.45;
-  margin: 0;
 }
 .hero h1 {
   font-family: "Outfit", sans-serif;
@@ -329,36 +269,12 @@ footer p { font-size: 0.8rem; color: var(--muted-dark); }
 </nav>
 
 <div class="hero">
-  <p class="hero-tag">Paris · Athens · London</p>
+  <p class="hero-tag">Find your flat. Feel at home. From day one.</p>
   <h1>Find a home and <span>your people</span> abroad</h1>
   <p>Find a verified flat or room, connect with your community, or match with a flatmate however you want to start your new city, Livvo makes it easier.</p>
   <div class="cta-row">
     <a href="search-athens.html" class="btn-primary btn-cta-main">Browse rentals</a>
     <a href="community.html" class="btn-secondary-cta">Join the community</a>
-  </div>
-  <p class="hero-social-proof">Already helping students, nomads and young professionals find home abroad.</p>
-  <div class="city-picker">
-    <a href="search-athens.html" class="city-card">
-      <div class="city-card-top">
-        <span class="city-card-name">Athens</span>
-        <span class="city-card-status open">🟢 Now open</span>
-      </div>
-      <p class="city-card-desc">Verified rooms from €400/mo</p>
-    </a>
-    <a href="#waitlist" class="city-card">
-      <div class="city-card-top">
-        <span class="city-card-name">Paris</span>
-        <span class="city-card-status soon">🟡 Coming soon</span>
-      </div>
-      <p class="city-card-desc">Join the waitlist</p>
-    </a>
-    <a href="#waitlist" class="city-card">
-      <div class="city-card-top">
-        <span class="city-card-name">London</span>
-        <span class="city-card-status soon">🟡 Coming soon</span>
-      </div>
-      <p class="city-card-desc">Join the waitlist</p>
-    </a>
   </div>
 </div>
 
