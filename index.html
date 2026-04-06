@@ -321,15 +321,23 @@ nav {
 #waitlist h2 { font-weight: 700; font-size: 2rem; letter-spacing: -0.03em; margin-bottom: 14px; color: var(--text-dark); }
 #waitlist h2 span { color: var(--green); }
 #waitlist .waitlist-lead { color: var(--text-dark); margin-bottom: 24px; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.65; font-size: 0.98rem; opacity: 0.92; }
-.waitlist-form { display: flex; flex-direction: column; gap: 12px; max-width: 360px; margin: 0 auto; align-items: stretch; }
-.waitlist-form input {
-  flex: 1;
+.waitlist-form {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 10px;
+  max-width: 480px;
   width: 100%;
+  margin: 0 auto;
+}
+.waitlist-form input {
+  flex: 1 1 auto;
   min-width: 0;
   background: #ffffff;
   border: 1px solid rgba(5, 150, 105, 0.35);
   border-radius: 10px;
-  padding: 14px 18px;
+  padding: 14px 16px;
   font-family: "DM Sans", sans-serif;
   font-size: 0.95rem;
   color: var(--text-dark);
@@ -338,16 +346,17 @@ nav {
 .waitlist-form input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15); }
 .waitlist-form input::placeholder { color: var(--muted-dark); opacity: 0.75; }
 .waitlist-form button {
+  flex: 0 0 auto;
+  width: 132px;
   background: var(--green);
   color: white;
   border: none;
   border-radius: 10px;
-  padding: 14px 28px;
+  padding: 14px 12px;
   font-family: "DM Sans", sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  width: 100%;
 }
 .waitlist-form button:hover { background: var(--green-dark); }
 
