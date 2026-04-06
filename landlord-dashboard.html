@@ -368,33 +368,18 @@ nav {
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
 <script>
-  (async function checkAuth() {
+  (function checkAuth() {
     if (localStorage.getItem('livvo_landlord_verified') || localStorage.getItem('livvo_landlord_logged_in')) return;
-    const sb = getLivvoSupabase();
-    if (sb) {
-      try {
-        const { data: { session } } = await sb.auth.getSession();
-        if (session && session.user) {
-          localStorage.setItem('livvo_landlord_email', session.user.email || '');
-          localStorage.setItem('livvo_landlord_logged_in', '1');
-          return;
-        }
-      } catch (e) {}
-    }
     window.location.href = 'landlord-login.html';
   })();
 
-  document.getElementById('logoutLink').addEventListener('click', async function(e) {
+  document.getElementById('logoutLink').addEventListener('click', function(e) {
     e.preventDefault();
     localStorage.removeItem('livvo_landlord_logged_in');
     localStorage.removeItem('livvo_landlord_email');
     localStorage.removeItem('livvo_landlord_password');
     localStorage.removeItem('livvo_landlord_verified');
-    const sb = getLivvoSupabase();
-    if (sb) try { await sb.auth.signOut(); } catch (e) {}
     window.location.href = 'landlord-login.html';
   });
 

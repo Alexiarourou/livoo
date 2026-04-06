@@ -191,22 +191,9 @@ nav {
   </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
 <script>
-  (async function checkAuth() {
+  (function checkAuth() {
     if (localStorage.getItem('livvo_flatmate_logged_in')) return;
-    const sb = getLivvoSupabase();
-    if (sb) {
-      try {
-        const { data: { session } } = await sb.auth.getSession();
-        if (session && session.user) {
-          localStorage.setItem('livvo_flatmate_email', session.user.email || '');
-          localStorage.setItem('livvo_flatmate_logged_in', '1');
-          return;
-        }
-      } catch (e) {}
-    }
     window.location.href = 'flatmate-signup.html';
   })();
 

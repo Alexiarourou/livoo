@@ -85,13 +85,14 @@ nav {
     <p class="sub">Manage your properties and bookings.</p>
     <div id="authMsg" style="display:none;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:0.9rem"></div>
     <form id="loginForm">
+      <input type="hidden" name="_subject" value="Landlord login — Livvo" />
       <div class="form-group">
         <label>Email</label>
-        <input type="email" name="email" placeholder="you@example.com" required />
+        <input type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" name="password" placeholder="Your password" required />
+        <input type="password" name="password" placeholder="Your password" required autocomplete="current-password" />
         <div class="forgot-link"><a href="landlord-forgot-password.html">Forgot password?</a></div>
       </div>
       <button type="submit" class="btn-primary" id="btnSubmit">Log in</button>
@@ -100,57 +101,46 @@ nav {
   <p class="auth-footer">Don't have an account? <a href="landlord-signup.html">Sign up to list a property</a></p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  (function() {
-    var u = 'https://lzoiburvvbuhdbojwqfl.supabase.co';
-    var k = 'sb_publishable_7q1InD7Na81Q2sBDrXu7_Q_i79zY2YM';
-    window.getLivvoSupabase = function() {
-      if (typeof supabase === 'undefined') return null;
-      if (!window._livvoSupabase) window._livvoSupabase = supabase.createClient(u, k);
-      return window._livvoSupabase;
-    };
-  })();
-</script>
-<script>
+  const FS = 'https://formspree.io/f/mbdzykvg';
   const form = document.getElementById('loginForm');
   const authMsg = document.getElementById('authMsg');
   const btn = document.getElementById('btnSubmit');
 
-  function showMsg(text, type) {
-    authMsg.innerHTML = text;
+  function showThanks() {
+    var email = (form.querySelector('[name="email"]') || {}).value;
+    if (email) {
+      localStorage.setItem('livvo_landlord_email', email.trim());
+      localStorage.setItem('livvo_landlord_logged_in', '1');
+    }
+    form.style.display = 'none';
+    authMsg.textContent = 'Thanks! We\'ll be in touch shortly to complete your account setup.';
     authMsg.style.display = 'block';
-    authMsg.style.background = type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(5,150,105,0.1)';
-    authMsg.style.border = type === 'error' ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(5,150,105,0.2)';
-    authMsg.style.color = type === 'error' ? '#b91c1c' : 'var(--green-dark)';
+    authMsg.style.background = 'rgba(5,150,105,0.1)';
+    authMsg.style.border = '1px solid rgba(5,150,105,0.2)';
+    authMsg.style.color = 'var(--green-dark)';
   }
 
-  form.addEventListener('submit', async function(e) {
+  form.addEventListener('submit', function (e) {
     e.preventDefault();
-    const email = this.email.value.trim();
-    const password = this.password.value;
     authMsg.style.display = 'none';
-
-    const sb = getLivvoSupabase();
-    if (sb) {
-      btn.disabled = true;
-      try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        localStorage.setItem('livvo_landlord_email', email);
-        localStorage.setItem('livvo_landlord_logged_in', '1');
-        window.location.href = 'landlord-dashboard.html';
-      } catch (err) {
-        btn.disabled = false;
-        if (err.message && (err.message.includes('Invalid') || err.message.includes('invalid') || err.message.includes('Email not confirmed'))) {
-          showMsg('Invalid email or password. Sign up first or use Forgot password.', 'error');
-        } else {
-          showMsg(err.message || 'Login failed. Try again.', 'error');
-        }
-      }
-    } else {
-      showMsg('Supabase is not configured. Please add your project URL and anon key in supabase-config.js.', 'error');
-    }
+    const fd = new FormData(form);
+    fd.delete('password');
+    btn.disabled = true;
+    fetch(FS, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
+      .then(function (res) { return res.json().then(function (data) { return { res: res, data: data }; }); })
+      .then(function (_ref) {
+        if (!_ref.res.ok) throw new Error((_ref.data && _ref.data.error) || 'Submit failed');
+        showThanks();
+      })
+      .catch(function () {
+        authMsg.textContent = 'Something went wrong. Please try again.';
+        authMsg.style.display = 'block';
+        authMsg.style.background = 'rgba(239,68,68,0.1)';
+        authMsg.style.border = '1px solid rgba(239,68,68,0.2)';
+        authMsg.style.color = '#b91c1c';
+      })
+      .finally(function () { btn.disabled = false; });
   });
 </script>
 </body>

@@ -45,10 +45,11 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
     <p style="font-size:0.88rem;color:var(--muted-dark);margin-bottom:24px">Continue to find your flatmate.</p>
     <div id="authMsg" style="display:none;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:0.9rem"></div>
     <form id="loginForm">
-      <div class="form-group"><label>Email</label><input type="email" name="email" placeholder="you@example.com" required /></div>
+      <input type="hidden" name="_subject" value="Flatmate login — Livvo" />
+      <div class="form-group"><label>Email</label><input type="email" name="email" placeholder="you@example.com" required autocomplete="email" /></div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" name="password" placeholder="Your password" required />
+        <input type="password" name="password" placeholder="Your password" required autocomplete="current-password" />
         <div class="forgot-link"><a href="flatmate-forgot-password.html">Forgot password?</a></div>
       </div>
       <button type="submit" class="btn-primary" id="btnSubmit">Log in</button>
@@ -56,47 +57,46 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
   </div>
   <p class="auth-footer">Don't have an account? <a href="flatmate-signup.html">Sign up</a></p>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
 <script>
+  const FS = 'https://formspree.io/f/mbdzykvg';
   const form = document.getElementById('loginForm');
   const authMsg = document.getElementById('authMsg');
   const btn = document.getElementById('btnSubmit');
 
-  function showMsg(text, type) {
-    authMsg.textContent = text;
+  function showThanks() {
+    var email = (form.querySelector('[name="email"]') || {}).value;
+    if (email) {
+      localStorage.setItem('livvo_flatmate_email', email.trim());
+      localStorage.setItem('livvo_flatmate_logged_in', '1');
+    }
+    form.style.display = 'none';
+    authMsg.textContent = 'Thanks! We\'ll be in touch shortly to complete your account setup.';
     authMsg.style.display = 'block';
-    authMsg.style.background = type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(5,150,105,0.1)';
-    authMsg.style.border = type === 'error' ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(5,150,105,0.2)';
-    authMsg.style.color = type === 'error' ? '#b91c1c' : 'var(--green-dark)';
+    authMsg.style.background = 'rgba(5,150,105,0.1)';
+    authMsg.style.border = '1px solid rgba(5,150,105,0.2)';
+    authMsg.style.color = 'var(--green-dark)';
   }
 
-  form.addEventListener('submit', async function(e) {
+  form.addEventListener('submit', function (e) {
     e.preventDefault();
-    const email = this.email.value.trim();
-    const password = this.password.value;
     authMsg.style.display = 'none';
-
-    const sb = getLivvoSupabase();
-    if (sb) {
-      btn.disabled = true;
-      try {
-        const { error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        localStorage.setItem('livvo_flatmate_email', email);
-        localStorage.setItem('livvo_flatmate_logged_in', '1');
-        window.location.href = 'flatmate-connect.html';
-      } catch (err) {
-        btn.disabled = false;
-        if (err.message && (err.message.includes('Invalid') || err.message.includes('invalid'))) {
-          showMsg('Invalid email or password. Sign up first or use Forgot password.', 'error');
-        } else {
-          showMsg(err.message || 'Login failed. Try again.', 'error');
-        }
-      }
-    } else {
-      showMsg('Supabase is not configured. Please add your project URL and anon key in supabase-config.js.', 'error');
-    }
+    const fd = new FormData(form);
+    fd.delete('password');
+    btn.disabled = true;
+    fetch(FS, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
+      .then(function (res) { return res.json().then(function (data) { return { res: res, data: data }; }); })
+      .then(function (_ref) {
+        if (!_ref.res.ok) throw new Error((_ref.data && _ref.data.error) || 'Submit failed');
+        showThanks();
+      })
+      .catch(function () {
+        authMsg.textContent = 'Something went wrong. Please try again.';
+        authMsg.style.display = 'block';
+        authMsg.style.background = 'rgba(239,68,68,0.1)';
+        authMsg.style.border = '1px solid rgba(239,68,68,0.2)';
+        authMsg.style.color = '#b91c1c';
+      })
+      .finally(function () { btn.disabled = false; });
   });
 </script>
 </body>

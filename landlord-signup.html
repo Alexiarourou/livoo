@@ -120,171 +120,55 @@ nav {
 
 <div class="page">
   <div class="auth-card">
-    <div class="step-indicator">
-      <span class="step-dot active" id="step0"></span>
-      <span class="step-dot" id="step1"></span>
-      <span class="step-dot" id="step2"></span>
-    </div>
-
-    <!-- Step 0: Profile with picture + not a robot -->
-    <div id="form-profile">
-      <h1>Create your profile</h1>
-      <p class="sub">Add a photo and verify you're human to get started.</p>
-      <form id="profileForm">
-        <div class="profile-photo-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
-          <span class="placeholder" id="photoPlaceholder">📷</span>
-          <img id="photoPreview" src="" alt="" style="display:none" />
-        </div>
-        <input type="file" id="photoInput" accept="image/*" style="display:none" />
-        <div class="form-group">
-          <label>Full name</label>
-          <input type="text" name="name" placeholder="e.g. Alex Thompson" required />
-        </div>
-        <label class="robot-check">
-          <input type="checkbox" name="notRobot" id="notRobot" required />
-          <span>I'm not a robot</span>
-        </label>
-        <button type="submit" class="btn-primary">Continue</button>
-      </form>
-    </div>
-
-    <!-- Step 1: Email + Password -->
-    <div id="form-signup" style="display: none;">
-      <h1>Create your landlord account</h1>
-      <p class="sub">List your property and reach thousands of verified tenants.</p>
-      <form id="signupForm">
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" name="email" placeholder="you@example.com" required />
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" name="password" placeholder="Min. 8 characters" required minlength="8" />
-        </div>
-        <button type="submit" class="btn-primary">Create account</button>
-      </form>
-    </div>
-
-    <!-- Step 2: Email verification (Supabase sends link) -->
-    <div id="form-verify" style="display: none;">
-      <h1>Check your email</h1>
-      <p class="sub">We sent a verification link to <strong id="verify-email"></strong></p>
-      <p class="verify-note" style="margin-top: 12px;">Click the link in the email to verify your account. You’ll then be taken to list your property.</p>
-      <div class="verify-note" style="margin-top: 20px;">Didn’t receive it? Check spam or <a href="#" id="resendLink">resend verification email</a>.</div>
-    </div>
-
-    <!-- Success (shown after signup when Supabase is used) -->
-    <div id="success" class="success-msg">
-      <div class="icon">✓</div>
-      <h3>Account created!</h3>
-      <p>Check your email and click the verification link to continue.</p>
-    </div>
+    <h1>Create your landlord account</h1>
+    <p class="sub">List your property and reach thousands of verified tenants.</p>
+    <form id="signupForm">
+      <input type="hidden" name="_subject" value="Landlord signup — Livvo" />
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password" />
+      </div>
+      <button type="submit" class="btn-primary">Create account</button>
+    </form>
+    <p id="formSuccess" style="display:none;margin-top:20px;padding:16px;border-radius:10px;background:rgba(5,150,105,0.1);border:1px solid rgba(52,211,153,0.2);color:var(--green-dark);font-size:0.9rem;line-height:1.5;text-align:center;">Thanks! We&apos;ll be in touch shortly to complete your account setup.</p>
   </div>
 
   <p class="auth-footer">Already have an account? <a href="landlord-login.html">Log in</a></p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  (function() {
-    var u = 'https://lzoiburvvbuhdbojwqfl.supabase.co';
-    var k = 'sb_publishable_7q1InD7Na81Q2sBDrXu7_Q_i79zY2YM';
-    window.getLivvoSupabase = function() {
-      if (typeof supabase === 'undefined') return null;
-      if (!window._livvoSupabase) window._livvoSupabase = supabase.createClient(u, k);
-      return window._livvoSupabase;
-    };
+  (function () {
+    const FS = 'https://formspree.io/f/mbdzykvg';
+    const form = document.getElementById('signupForm');
+    const successEl = document.getElementById('formSuccess');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      const fd = new FormData(form);
+      fd.delete('password');
+      btn.disabled = true;
+      fetch(FS, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
+        .then(function (res) { return res.json().then(function (data) { return { res: res, data: data }; }); })
+        .then(function (_ref) {
+          if (!_ref.res.ok) throw new Error((_ref.data && _ref.data.error) || 'Submit failed');
+          var email = (form.querySelector('[name="email"]') || {}).value;
+          if (email) {
+            localStorage.setItem('livvo_landlord_email', email.trim());
+            localStorage.setItem('livvo_landlord_logged_in', '1');
+          }
+          form.style.display = 'none';
+          successEl.style.display = 'block';
+        })
+        .catch(function () {
+          alert('Something went wrong. Please try again.');
+        })
+        .finally(function () { btn.disabled = false; });
+    });
   })();
-</script>
-<script>
-  let pendingEmail = '';
-  let profilePhoto = null;
-
-  document.getElementById('photoInput').addEventListener('change', function() {
-    const f = this.files[0];
-    if (f && f.type.startsWith('image/')) {
-      profilePhoto = URL.createObjectURL(f);
-      document.getElementById('photoPreview').src = profilePhoto;
-      document.getElementById('photoPreview').style.display = 'block';
-      document.getElementById('photoPlaceholder').style.display = 'none';
-    }
-  });
-
-  document.getElementById('profileForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const name = this.name.value.trim();
-    if (!document.getElementById('notRobot').checked) {
-      alert('Please confirm you\'re not a robot.');
-      return;
-    }
-    localStorage.setItem('livvo_landlord_name', name);
-    if (profilePhoto) localStorage.setItem('livvo_landlord_photo', profilePhoto);
-    document.getElementById('form-profile').style.display = 'none';
-    document.getElementById('form-signup').style.display = 'block';
-    document.getElementById('step0').classList.remove('active');
-    document.getElementById('step0').classList.add('done');
-    document.getElementById('step1').classList.add('active');
-  });
-
-  document.getElementById('signupForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const email = this.email.value.trim();
-    const password = this.password.value;
-    pendingEmail = email;
-    const btn = this.querySelector('button[type="submit"]');
-
-    const sb = getLivvoSupabase();
-    if (!sb) {
-      alert('Supabase is not configured. Please add your project URL and anon key in supabase-config.js.');
-      return;
-    }
-
-    btn.disabled = true;
-    const redirectTo = window.location.origin + window.location.pathname.replace('landlord-signup.html', 'landlord-confirm-email.html');
-    try {
-      const { data, error } = await sb.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectTo
-        }
-      });
-      if (error) throw error;
-      localStorage.setItem('livvo_landlord_email', email);
-      document.getElementById('form-signup').style.display = 'none';
-      document.getElementById('form-verify').style.display = 'block';
-      document.getElementById('verify-email').textContent = email;
-      document.getElementById('step1').classList.remove('active');
-      document.getElementById('step1').classList.add('done');
-      document.getElementById('step2').classList.add('active');
-    } catch (err) {
-      btn.disabled = false;
-      if (err.message && err.message.toLowerCase().includes('already registered')) {
-        alert('An account with this email already exists. Log in or use Forgot password.');
-      } else if (err.message && err.message.toLowerCase().includes('password')) {
-        alert('Password should be at least 6 characters.');
-      } else {
-        alert(err.message || 'Sign up failed. Please try again.');
-      }
-    }
-  });
-
-  document.getElementById('resendLink').addEventListener('click', async function(e) {
-    e.preventDefault();
-    if (!pendingEmail) return;
-    const sb = getLivvoSupabase();
-    if (!sb) return;
-    try {
-      const { error } = await sb.auth.resend({
-        type: 'signup',
-        email: pendingEmail
-      });
-      if (error) throw error;
-      alert('Verification email resent to ' + pendingEmail + '. Check your inbox and spam.');
-    } catch (err) {
-      alert(err.message || 'Could not resend. Try again later.');
-    }
-  });
 </script>
 </body>
 </html>

@@ -28,9 +28,20 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
 .audience-option.selected svg path { stroke: var(--green); }
 .audience-option strong { display: block; font-size: 1rem; margin-bottom: 2px; }
 .audience-option span { font-size: 0.82rem; color: var(--muted-dark); }
-.btn-join { width: 100%; margin-top: 24px; padding: 16px; background: var(--green); color: white; border: none; border-radius: 12px; font-family: "DM Sans", sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: block; text-align: center; text-decoration: none; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted-dark); margin-bottom: 8px; }
+.form-group input {
+  width: 100%; background: #ffffff; border: 1px solid var(--border-dark); border-radius: 10px;
+  padding: 14px 16px; font-family: "DM Sans", sans-serif; font-size: 0.95rem; color: var(--text-dark); outline: none; transition: border-color 0.2s;
+}
+.form-group input:focus { border-color: var(--green); }
+.join-form-block { display: none; margin-top: 24px; }
+.join-form-block.show { display: block; }
+.btn-join { width: 100%; margin-top: 8px; padding: 16px; background: var(--green); color: white; border: none; border-radius: 12px; font-family: "DM Sans", sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: block; text-align: center; text-decoration: none; }
 .btn-join:hover { background: var(--green-dark); transform: translateY(-1px); }
 .btn-join:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.join-thanks { display: none; margin-top: 24px; padding: 20px; background: rgba(5,150,105,0.1); border: 1px solid rgba(5,150,105,0.2); border-radius: 12px; font-size: 0.95rem; color: var(--green-dark); line-height: 1.5; text-align: center; }
+.join-thanks.show { display: block; }
 @media (max-width: 600px) { nav { padding: 0 20px; } }
 </style>
 </head>
@@ -59,7 +70,23 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
       <div><strong>Digital Nomads</strong><span>Remote workers and location-independent</span></div>
     </a>
   </div>
-  <a href="#" id="btnJoin" class="btn-join" style="pointer-events:none;opacity:0.6">Create account &amp; join</a>
+  <div id="joinFormBlock" class="join-form-block">
+    <form id="joinForm">
+      <input type="hidden" name="_subject" value="Community join — Livvo" />
+      <input type="hidden" name="city" id="joinCityField" value="" />
+      <input type="hidden" name="audience" id="joinAudienceField" value="" />
+      <div class="form-group">
+        <label for="joinEmail">Email</label>
+        <input id="joinEmail" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="joinPassword">Password</label>
+        <input id="joinPassword" type="password" name="password" placeholder="Choose a password" required autocomplete="new-password" />
+      </div>
+      <button type="submit" class="btn-join" id="joinSubmitBtn">Create account &amp; join</button>
+    </form>
+  </div>
+  <div id="joinThanks" class="join-thanks" role="status">Thanks! We&apos;ll be in touch shortly to complete your account setup.</div>
 </div>
 <script>
   const cityNames = {
@@ -75,17 +102,39 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; p
   const city = (params.get('city') || 'athens').toLowerCase();
   const cityName = cityNames[city] || (city.charAt(0).toUpperCase() + city.slice(1));
   document.getElementById('pageTitle').textContent = 'Join ' + cityName + ' community';
+  const joinFormBlock = document.getElementById('joinFormBlock');
+  const joinForm = document.getElementById('joinForm');
+  const joinThanks = document.getElementById('joinThanks');
+  const FS = 'https://formspree.io/f/mbdzykvg';
+
   document.querySelectorAll('.audience-option').forEach(opt => {
     opt.addEventListener('click', e => { e.preventDefault();
       document.querySelectorAll('.audience-option').forEach(o => o.classList.remove('selected'));
       opt.classList.add('selected');
       const audience = opt.dataset.audience;
-      const signupUrl = 'flatmate-signup.html?city=' + city + '&audience=' + audience + '&redirect=community-feed.html%3Fcity%3D' + city;
-      const btn = document.getElementById('btnJoin');
-      btn.href = signupUrl;
-      btn.style.pointerEvents = 'auto';
-      btn.style.opacity = '1';
+      document.getElementById('joinCityField').value = city;
+      document.getElementById('joinAudienceField').value = audience;
+      joinFormBlock.classList.add('show');
     });
+  });
+
+  joinForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const btn = document.getElementById('joinSubmitBtn');
+    const fd = new FormData(joinForm);
+    fd.delete('password');
+    btn.disabled = true;
+    fetch(FS, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
+      .then(function (res) { return res.json().then(function (data) { return { res: res, data: data }; }); })
+      .then(function (_ref) {
+        if (!_ref.res.ok) throw new Error((_ref.data && _ref.data.error) || 'Submit failed');
+        joinFormBlock.style.display = 'none';
+        joinThanks.classList.add('show');
+      })
+      .catch(function () {
+        alert('Something went wrong. Please try again.');
+      })
+      .finally(function () { btn.disabled = false; });
   });
 </script>
 </body>
