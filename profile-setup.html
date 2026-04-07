@@ -373,46 +373,29 @@ textarea { min-height: 88px; resize: vertical; }
       }
 
       const form = document.getElementById('profile-form');
-      const btnSubmit = document.getElementById('btn-submit');
-      const usernameEl = document.getElementById('username');
-      const roleEl = document.getElementById('role');
 
       if (form.dataset.bound === '1') return;
       form.dataset.bound = '1';
 
-      function syncProfileSubmitState() {
-        const username = (usernameEl.value || '').trim();
-        const role = roleEl.value || '';
-        /* Enable once both fields have a value; submit handler still enforces username min 3. */
-        const ok = username.length >= 1 && role !== '';
-        btnSubmit.disabled = !ok;
-      }
-
-      usernameEl.addEventListener('input', syncProfileSubmitState);
-      roleEl.addEventListener('change', syncProfileSubmitState);
-      roleEl.addEventListener('input', syncProfileSubmitState);
-      syncProfileSubmitState();
+      const submitBtn = document.getElementById('btn-submit');
+      if (submitBtn) submitBtn.disabled = false;
 
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
         hideFormError();
 
-        const username = (usernameEl.value || '').trim();
-        const role = roleEl.value;
+        const username = (document.getElementById('username').value || '').trim();
+        const role = document.getElementById('role').value;
         const bioText = (bio.value || '').trim();
 
         if (username.length < 3) {
           showFormError('Username must be at least 3 characters.');
-          syncProfileSubmitState();
           return;
         }
         if (!role) {
           showFormError('Please choose how you describe yourself.');
-          syncProfileSubmitState();
           return;
         }
-
-        btnSubmit.disabled = true;
 
         let photoURL = '';
 
@@ -448,9 +431,6 @@ textarea { min-height: 88px; resize: vertical; }
         } catch (err) {
           console.error(err);
           showFormError(err.message || 'Could not save profile. Check Firestore and Storage rules.');
-        } finally {
-          btnSubmit.disabled = false;
-          syncProfileSubmitState();
         }
       });
     });
