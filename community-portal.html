@@ -517,6 +517,10 @@ nav {
       <button type="button" class="cat-tab" data-category="events" role="tab" aria-selected="false">Events</button>
       <button type="button" class="cat-tab" data-category="flatmate" role="tab" aria-selected="false">Flatmate Search</button>
       <button type="button" class="cat-tab" data-category="general" role="tab" aria-selected="false">General</button>
+      <button type="button" class="cat-tab" data-category="recommendations" role="tab" aria-selected="false" title="Restaurants, cafes, gyms, and more">Recommendations</button>
+      <button type="button" class="cat-tab" data-category="visa_admin" role="tab" aria-selected="false">Visa &amp; Admin</button>
+      <button type="button" class="cat-tab" data-category="jobs_remote" role="tab" aria-selected="false">Jobs &amp; Remote Work</button>
+      <button type="button" class="cat-tab" data-category="things_to_do" role="tab" aria-selected="false">Things to Do</button>
     </div>
     <button type="button" class="btn-new-post" id="btn-new-post">New post</button>
   </div>
@@ -540,6 +544,10 @@ nav {
         <option value="events">Events</option>
         <option value="flatmate">Flatmate Search</option>
         <option value="general">General</option>
+        <option value="recommendations">Recommendations (restaurants, cafes, gyms etc)</option>
+        <option value="visa_admin">Visa &amp; Admin</option>
+        <option value="jobs_remote">Jobs &amp; Remote Work</option>
+        <option value="things_to_do">Things to Do</option>
       </select>
     </div>
     <div class="form-row">
@@ -549,10 +557,6 @@ nav {
     <div class="form-row">
       <label for="post-link">Link (optional)</label>
       <input type="url" id="post-link" placeholder="https://" />
-    </div>
-    <div class="form-row">
-      <label for="post-image">Image (optional)</label>
-      <input type="file" id="post-image" accept="image/*" />
     </div>
     <div class="modal-actions">
       <button type="button" class="btn-secondary" data-close="modal-new-post">Cancel</button>
@@ -600,13 +604,15 @@ nav {
     getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, doc, getDoc,
     serverTimestamp, runTransaction, increment, writeBatch, limit
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-
   const CATEGORY_LABELS = {
     housing: 'Housing Tips',
     events: 'Events',
     flatmate: 'Flatmate Search',
-    general: 'General'
+    general: 'General',
+    recommendations: 'Recommendations',
+    visa_admin: 'Visa & Admin',
+    jobs_remote: 'Jobs & Remote Work',
+    things_to_do: 'Things to Do'
   };
 
   const cityNames = {
@@ -679,7 +685,6 @@ nav {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     const portalContent = document.getElementById('portal-content');
     const welcomeEl = document.getElementById('portal-welcome');
@@ -765,7 +770,7 @@ nav {
       const q = query(
         collection(db, 'communityPosts'),
         where('city', '==', cityDisplay),
-        limit(120)
+        limit(240)
       );
       feedUnsub = onSnapshot(q, function (snap) {
         renderFeed(feedDocsForCategory(snap.docs, activeCategory));
@@ -1032,7 +1037,6 @@ nav {
       document.getElementById('new-post-error').hidden = true;
       document.getElementById('post-title').value = '';
       document.getElementById('post-link').value = '';
-      document.getElementById('post-image').value = '';
       document.getElementById('post-category-select').value = activeCategory;
       openModal('modal-new-post');
       requestAnimationFrame(function () {
@@ -1092,7 +1096,6 @@ nav {
       const title = (document.getElementById('post-title').value || '').trim();
       const category = document.getElementById('post-category-select').value;
       let linkUrl = (document.getElementById('post-link').value || '').trim();
-      const fileInput = document.getElementById('post-image');
       const bodyHtml = quillEditor ? quillEditor.root.innerHTML : '';
 
       if (!title) {
@@ -1110,24 +1113,14 @@ nav {
       const btn = document.getElementById('post-submit');
       btn.disabled = true;
 
-      let imageUrl = '';
       try {
-        if (fileInput.files && fileInput.files[0]) {
-          const f = fileInput.files[0];
-          const safe = f.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-          const path = 'community-post-images/' + currentUser.uid + '/' + Date.now() + '_' + safe;
-          const sref = ref(storage, path);
-          await uploadBytes(sref, f);
-          imageUrl = await getDownloadURL(sref);
-        }
-
         await addDoc(collection(db, 'communityPosts'), {
           city: cityDisplay,
           category: category,
           title: title,
           bodyHtml: bodyHtml,
           linkUrl: linkUrl,
-          imageUrl: imageUrl,
+          imageUrl: '',
           authorId: currentUser.uid,
           authorEmail: currentUser.email || '',
           authorName: currentUser.displayName || currentUser.email || 'Member',
@@ -1139,7 +1132,7 @@ nav {
         closeModal('modal-new-post');
       } catch (e) {
         console.error(e);
-        errEl.textContent = e.message || 'Could not publish. Check Firestore & Storage rules.';
+        errEl.textContent = e.message || 'Could not publish. Check Firestore rules.';
         errEl.hidden = false;
       } finally {
         btn.disabled = false;
