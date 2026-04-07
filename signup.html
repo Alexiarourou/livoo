@@ -198,6 +198,30 @@ nav {
   text-decoration: none;
 }
 .auth-forgot a:hover { text-decoration: underline; }
+.password-rules {
+  list-style: none;
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.password-rules li {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: #6b7c72;
+}
+.password-rules li.met {
+  color: #1a7a4a;
+}
+.password-rules .pw-tick {
+  flex-shrink: 0;
+  font-weight: 700;
+  opacity: 0.45;
+}
+.password-rules li.met .pw-tick {
+  opacity: 1;
+}
 .auth-error {
   display: none;
   margin-top: 10px;
@@ -277,16 +301,17 @@ nav {
         <input type="hidden" name="_subject" value="Community sign up — Livvo" />
         <input type="hidden" name="city" id="signupCityField" value="" />
         <div class="form-group">
-          <label for="signupName">Full name</label>
-          <input id="signupName" type="text" name="name" placeholder="Your full name" required autocomplete="name" />
-        </div>
-        <div class="form-group">
           <label for="signup-email">Email</label>
           <input id="signup-email" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
         </div>
         <div class="form-group">
           <label for="signup-password">Password</label>
-          <input id="signup-password" type="password" name="password" placeholder="Choose a password" required autocomplete="new-password" />
+          <input id="signup-password" type="password" name="password" placeholder="Choose a password" required autocomplete="new-password" minlength="8" />
+          <ul class="password-rules" id="signup-password-rules" aria-live="polite">
+            <li id="pw-rule-len" data-rule="len"><span class="pw-tick" aria-hidden="true">✓</span><span>At least 8 characters</span></li>
+            <li id="pw-rule-upper" data-rule="upper"><span class="pw-tick" aria-hidden="true">✓</span><span>At least 1 uppercase letter</span></li>
+            <li id="pw-rule-special" data-rule="special"><span class="pw-tick" aria-hidden="true">✓</span><span>At least 1 special character (!@#$%^&*)</span></li>
+          </ul>
         </div>
         <div id="signup-error" class="auth-error" role="alert"></div>
         <button type="button" class="btn-auth-primary" id="signup-btn">Create account</button>
@@ -422,11 +447,13 @@ nav {
   document.getElementById('linkToSignin').addEventListener('click', showSignin);
   document.getElementById('linkToSignup').addEventListener('click', showSignup);
 
+  const signupPasswordMsg = 'Password must be at least 8 characters with 1 uppercase letter and 1 special character.';
+
   function getFriendlyError(code) {
     const errors = {
       'auth/email-already-in-use': 'An account with this email already exists. Try signing in instead.',
       'auth/invalid-email': 'Please enter a valid email address.',
-      'auth/weak-password': 'Password must be at least 6 characters.',
+      'auth/weak-password': signupPasswordMsg,
       'auth/user-not-found': 'No account found with this email.',
       'auth/wrong-password': 'Incorrect password. Please try again.',
       'auth/too-many-requests': 'Too many attempts. Please try again later.',
@@ -444,10 +471,35 @@ nav {
     el.style.display = 'block';
   }
 
+  function signupPasswordChecks(pw) {
+    return {
+      len: (pw || '').length >= 8,
+      upper: /[A-Z]/.test(pw || ''),
+      special: /[!@#$%^&*]/.test(pw || '')
+    };
+  }
+
+  function signupPasswordIsValid(pw) {
+    var c = signupPasswordChecks(pw);
+    return c.len && c.upper && c.special;
+  }
+
+  function updateSignupPasswordRules() {
+    var pw = document.getElementById('signup-password').value;
+    var c = signupPasswordChecks(pw);
+    document.getElementById('pw-rule-len').classList.toggle('met', c.len);
+    document.getElementById('pw-rule-upper').classList.toggle('met', c.upper);
+    document.getElementById('pw-rule-special').classList.toggle('met', c.special);
+  }
+
   const signupErrorEl = document.getElementById('signup-error');
   const signinErrorEl = document.getElementById('signin-error');
   document.getElementById('signup-email').addEventListener('input', function () { hideError(signupErrorEl); });
-  document.getElementById('signup-password').addEventListener('input', function () { hideError(signupErrorEl); });
+  document.getElementById('signup-password').addEventListener('input', function () {
+    hideError(signupErrorEl);
+    updateSignupPasswordRules();
+  });
+  updateSignupPasswordRules();
   document.getElementById('signin-email').addEventListener('input', function () { hideError(signinErrorEl); });
   document.getElementById('signin-password').addEventListener('input', function () { hideError(signinErrorEl); });
 
@@ -461,6 +513,10 @@ nav {
     const password = document.getElementById('signup-password').value;
     const errorDiv = document.getElementById('signup-error');
     hideError(errorDiv);
+    if (!signupPasswordIsValid(password)) {
+      showError(errorDiv, signupPasswordMsg);
+      return;
+    }
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       await redirectNewAccountAfterAuth(cred.user.uid);
