@@ -185,6 +185,15 @@ textarea { min-height: 88px; resize: vertical; }
 }
 .form-error.show { display: block; }
 
+.field-error {
+  display: block;
+  font-size: 0.8rem;
+  color: #b91c1c;
+  margin-top: 8px;
+  line-height: 1.4;
+}
+.field-error[hidden] { display: none !important; }
+
 .back-link {
   display: block;
   text-align: center;
@@ -213,7 +222,8 @@ textarea { min-height: 88px; resize: vertical; }
             <span>Add photo</span>
           </span>
         </label>
-        <p class="photo-hint">Click to upload (optional)</p>
+        <p class="photo-hint">Click to upload your profile photo — required</p>
+        <p id="photo-error" class="field-error" role="alert" hidden></p>
       </div>
 
       <div class="city-pill-row">
@@ -223,6 +233,7 @@ textarea { min-height: 88px; resize: vertical; }
       <div class="form-row">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" maxlength="40" autocomplete="username" placeholder="How you want to appear" />
+        <p id="username-error" class="field-error" role="alert" hidden></p>
       </div>
 
       <div class="form-row">
@@ -236,6 +247,7 @@ textarea { min-height: 88px; resize: vertical; }
           <option value="Just exploring">Just exploring</option>
           <option value="Other">Other</option>
         </select>
+        <p id="role-error" class="field-error" role="alert" hidden></p>
       </div>
 
       <div class="form-row">
@@ -327,11 +339,30 @@ textarea { min-height: 88px; resize: vertical; }
       formError.classList.remove('show');
     }
 
+    const photoErrorEl = document.getElementById('photo-error');
+    const usernameErrorEl = document.getElementById('username-error');
+    const roleErrorEl = document.getElementById('role-error');
+
+    function hideFieldErrors() {
+      photoErrorEl.textContent = '';
+      photoErrorEl.hidden = true;
+      usernameErrorEl.textContent = '';
+      usernameErrorEl.hidden = true;
+      roleErrorEl.textContent = '';
+      roleErrorEl.hidden = true;
+    }
+
+    function showFieldError(el, msg) {
+      el.textContent = msg;
+      el.hidden = false;
+    }
+
     function isUserProfileComplete(d) {
       if (!d || typeof d !== 'object') return false;
       var name = String(d.username || d.displayName || '').trim();
       var cityVal = String(d.city || '').trim();
-      return name.length > 0 && cityVal.length > 0;
+      var photo = String(d.photoURL || '').trim();
+      return name.length > 0 && cityVal.length > 0 && photo.length > 0;
     }
 
     photoInput.addEventListener('change', function () {
@@ -341,6 +372,8 @@ textarea { min-height: 88px; resize: vertical; }
       photoPreview.src = url;
       photoPreview.hidden = false;
       photoLabel.classList.add('has-image');
+      photoErrorEl.textContent = '';
+      photoErrorEl.hidden = true;
     });
 
     function updateBioCount() {
@@ -350,6 +383,15 @@ textarea { min-height: 88px; resize: vertical; }
     }
     bio.addEventListener('input', updateBioCount);
     updateBioCount();
+
+    document.getElementById('username').addEventListener('input', function () {
+      usernameErrorEl.textContent = '';
+      usernameErrorEl.hidden = true;
+    });
+    document.getElementById('role').addEventListener('change', function () {
+      roleErrorEl.textContent = '';
+      roleErrorEl.hidden = true;
+    });
 
     onAuthStateChanged(auth, async function (user) {
       if (!user) {
@@ -375,30 +417,38 @@ textarea { min-height: 88px; resize: vertical; }
 
       document.getElementById('btn-submit').addEventListener('click', async function () {
         hideFormError();
+        hideFieldErrors();
 
+        const file = photoInput.files && photoInput.files[0];
+        const hasPhoto = file && file.type.startsWith('image/');
         const username = (document.getElementById('username').value || '').trim();
-        const role = (document.getElementById('role').value || '').trim();
+        const role = document.getElementById('role').value;
 
-        if (!username || !role) {
-          showFormError('Please enter a username and choose an option under “I am…”.');
-          return;
+        var invalid = false;
+        if (!hasPhoto) {
+          showFieldError(photoErrorEl, 'Please add a profile photo');
+          invalid = true;
         }
-
-        let photoURL = '';
+        if (!username) {
+          showFieldError(usernameErrorEl, 'Please enter a username');
+          invalid = true;
+        }
+        if (!role) {
+          showFieldError(roleErrorEl, 'Please select what describes you');
+          invalid = true;
+        }
+        if (invalid) return;
 
         try {
-          if (photoInput.files && photoInput.files[0]) {
-            const f = photoInput.files[0];
-            const ext = (f.name.split('.').pop() || 'jpg').replace(/[^a-zA-Z0-9]/g, '');
-            const path = 'profile-photos/' + user.uid + '/avatar_' + Date.now() + '.' + ext;
-            const sref = ref(storage, path);
-            await uploadBytes(sref, f);
-            photoURL = await getDownloadURL(sref);
-          }
+          const ext = (file.name.split('.').pop() || 'jpg').replace(/[^a-zA-Z0-9]/g, '');
+          const path = 'profile-photos/' + user.uid + '/avatar_' + Date.now() + '.' + ext;
+          const sref = ref(storage, path);
+          await uploadBytes(sref, file);
+          const photoURL = await getDownloadURL(sref);
 
           const payload = {
             username: username,
-            photoURL: photoURL || '',
+            photoURL: photoURL,
             role: role,
             bio: (bio.value || '').trim(),
             city: cityDisplay,
@@ -407,9 +457,7 @@ textarea { min-height: 88px; resize: vertical; }
 
           await setDoc(userDocRef, payload, { merge: true });
 
-          const authUpdates = { displayName: username };
-          if (photoURL) authUpdates.photoURL = photoURL;
-          await updateProfile(user, authUpdates).catch(function () {});
+          await updateProfile(user, { displayName: username, photoURL: photoURL }).catch(function () {});
 
           localStorage.setItem('livvo_city', cityDisplay);
           window.location.href = 'community/?city=' + encodeURIComponent(cityDisplay);
