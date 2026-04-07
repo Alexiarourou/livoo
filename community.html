@@ -233,6 +233,66 @@ nav {
   opacity: 0.85;
   font-size: 16px;
 }
+.cities-search-combo {
+  position: relative;
+  width: 100%;
+}
+.cities-search-dropdown {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 40;
+  background: #ffffff;
+  border: 1px solid #d4eadb;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(13, 43, 26, 0.08);
+  max-height: min(320px, 50vh);
+  overflow-y: auto;
+  text-align: left;
+}
+.cities-search-dropdown.is-open {
+  display: block;
+}
+.cities-search-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  color: #0d2b1a;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: background 0.15s;
+}
+button.cities-search-dropdown-item {
+  -webkit-tap-highlight-color: transparent;
+}
+.cities-search-dropdown-item:hover,
+.cities-search-dropdown-item:focus {
+  background: #edf7f0;
+  outline: none;
+}
+.cities-search-dropdown-fallback {
+  display: block;
+  padding: 12px 20px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--green);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.cities-search-dropdown-fallback:hover,
+.cities-search-dropdown-fallback:focus {
+  background: #edf7f0;
+  outline: none;
+}
 .cities-quick-pills {
   display: flex;
   flex-wrap: wrap;
@@ -587,11 +647,14 @@ nav {
   <div class="cities-more-wrap">
     <div class="cities-search-card">
       <p class="cities-search-eyebrow" id="cities-search-eyebrow">Find your city</p>
-      <div class="cities-search-bar" role="search" aria-labelledby="cities-search-eyebrow">
-        <span class="cities-search-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </span>
-        <input type="search" id="cities-search-input" class="cities-search-input" placeholder="Search for your city..." autocomplete="off" aria-label="Search for your city" />
+      <div class="cities-search-combo">
+        <div class="cities-search-bar" role="search" aria-labelledby="cities-search-eyebrow">
+          <span class="cities-search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <input type="search" id="cities-search-input" class="cities-search-input" placeholder="Search for your city..." autocomplete="off" aria-label="Search for your city" aria-autocomplete="list" aria-controls="cities-search-dropdown" aria-expanded="false" />
+        </div>
+        <div id="cities-search-dropdown" class="cities-search-dropdown" role="listbox" aria-label="City suggestions" hidden></div>
       </div>
       <div class="cities-quick-pills">
         <a href="signup.html?city=Amsterdam" class="cities-quick-pill">Amsterdam</a>
@@ -657,29 +720,94 @@ nav {
 
 <script>
 (function () {
-  var citySlugs = ['paris', 'athens', 'london', 'madrid', 'amsterdam', 'barcelona', 'berlin', 'lisbon', 'rome', 'copenhagen', 'vienna', 'prague', 'budapest', 'dublin', 'brussels', 'porto', 'valencia', 'milan', 'stockholm'];
-  var cityNames = {
-    paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', amsterdam: 'Amsterdam', barcelona: 'Barcelona', berlin: 'Berlin', lisbon: 'Lisbon', rome: 'Rome', copenhagen: 'Copenhagen', vienna: 'Vienna', prague: 'Prague', budapest: 'Budapest', dublin: 'Dublin', brussels: 'Brussels', porto: 'Porto', valencia: 'Valencia', milan: 'Milan', stockholm: 'Stockholm'
-  };
+  var EUROPEAN_CITIES = [
+    'Paris', 'Athens', 'London', 'Madrid', 'Amsterdam', 'Barcelona',
+    'Berlin', 'Lisbon', 'Rome', 'Copenhagen', 'Prague', 'Dublin',
+    'Brussels', 'Porto', 'Valencia', 'Milan', 'Stockholm', 'Vienna',
+    'Budapest', 'Krakow', 'Warsaw', 'Bucharest', 'Sofia', 'Zagreb'
+  ];
+  var REQUEST_CITY_HREF = 'contact.html?subject=' + encodeURIComponent('Request new city');
+
   var input = document.getElementById('cities-search-input');
-  if (!input) return;
+  var dropdown = document.getElementById('cities-search-dropdown');
+  var combo = input && input.closest('.cities-search-combo');
+  if (!input || !dropdown || !combo) return;
+
+  function normalizeQuery(q) {
+    return q.trim().toLowerCase();
+  }
+
+  function filterCities(query) {
+    var n = normalizeQuery(query);
+    if (!n) return [];
+    return EUROPEAN_CITIES.filter(function (city) {
+      return city.toLowerCase().indexOf(n) !== -1;
+    });
+  }
+
+  function hideDropdown() {
+    dropdown.classList.remove('is-open');
+    dropdown.hidden = true;
+    dropdown.innerHTML = '';
+    input.setAttribute('aria-expanded', 'false');
+  }
+
+  function showDropdown() {
+    dropdown.classList.add('is-open');
+    dropdown.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+  }
+
+  function renderDropdown(matches) {
+    dropdown.innerHTML = '';
+    if (matches.length > 0) {
+      matches.forEach(function (city) {
+        var row = document.createElement('a');
+        row.href = 'signup.html?city=' + encodeURIComponent(city);
+        row.className = 'cities-search-dropdown-item';
+        row.setAttribute('role', 'option');
+        row.textContent = city;
+        dropdown.appendChild(row);
+      });
+    } else {
+      var fallback = document.createElement('a');
+      fallback.href = REQUEST_CITY_HREF;
+      fallback.className = 'cities-search-dropdown-fallback';
+      fallback.textContent = "Can't find your city? Tell us where you're headed →";
+      dropdown.appendChild(fallback);
+    }
+    showDropdown();
+  }
+
+  function syncFromInput() {
+    var q = input.value;
+    if (normalizeQuery(q) === '') {
+      hideDropdown();
+      return;
+    }
+    renderDropdown(filterCities(q));
+  }
+
+  input.addEventListener('input', syncFromInput);
+  input.addEventListener('focus', function () {
+    if (normalizeQuery(input.value) !== '') syncFromInput();
+  });
+
   input.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter') return;
+    var q = normalizeQuery(input.value);
+    if (!q) return;
     e.preventDefault();
-    var raw = input.value.trim().toLowerCase().replace(/\s+/g, '');
-    if (raw.length < 2) return;
-    var slug = null;
-    for (var i = 0; i < citySlugs.length; i++) {
-      var s = citySlugs[i];
-      if (s === raw || s.indexOf(raw) === 0 || raw.indexOf(s) === 0) {
-        slug = s;
-        break;
-      }
+    var matches = filterCities(input.value);
+    if (matches.length > 0) {
+      window.location.href = 'signup.html?city=' + encodeURIComponent(matches[0]);
+    } else {
+      window.location.href = REQUEST_CITY_HREF;
     }
-    if (slug) {
-      var displayName = cityNames[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
-      window.location.href = 'signup.html?city=' + encodeURIComponent(displayName);
-    }
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!combo.contains(e.target)) hideDropdown();
   });
 })();
 </script>
