@@ -372,31 +372,36 @@ textarea { min-height: 88px; resize: vertical; }
   bio.addEventListener('input', updateBioCount);
   updateBioCount();
 
-  document.getElementById('complete-btn').addEventListener('click', async () => {
-    console.log("Button clicked");
-
-    const username = document.getElementById('username').value.trim();
-    const profession = document.getElementById('profession').value;
-
-    if (!username) { alert("Please enter a username"); return; }
-    if (!profession) { alert("Please select what describes you"); return; }
-
-    const user = firebase.auth().currentUser;
-    if (!user) { alert("Not logged in"); return; }
-
+  document.getElementById('complete-btn').addEventListener('click', async function () {
     try {
+      alert("Step 1: button clicked");
+
+      var username = document.getElementById('username').value.trim();
+      var profession = document.getElementById('profession').value;
+      alert("Step 2: username = " + username);
+
+      if (!username) { alert("Please enter a username"); return; }
+      if (!profession) { alert("Please select what describes you"); return; }
+
+      var user = firebase.auth().currentUser;
+      if (!user) { alert("Not logged in"); return; }
+
+      alert("Step 3: user logged in as " + user.uid);
+
+      alert("Step 4: saving to Firestore...");
       await firebase.firestore().collection('users').doc(user.uid).set({
-        username,
-        profession,
+        username: username,
+        profession: profession,
         city: localStorage.getItem('livvo_city') || 'Athens',
         email: user.email,
         createdAt: new Date()
       });
-      console.log("Profile saved, redirecting...");
+
+      alert("Step 5: saved! redirecting...");
       window.location.href = 'community-portal.html';
     } catch (err) {
-      console.error("Firestore error:", err);
-      alert("Error saving profile: " + err.message);
+      console.error(err);
+      alert("ERROR: " + err.message);
     }
   });
 })();
