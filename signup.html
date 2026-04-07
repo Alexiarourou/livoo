@@ -415,7 +415,13 @@ nav {
   async function routeAfterCommunityAuth(uid) {
     const userSnap = await getDoc(doc(db, 'users', uid));
     const data = userSnap.exists ? userSnap.data() : null;
-    if (isUserProfileComplete(data)) {
+    const complete = isUserProfileComplete(data);
+    console.log('[routeAfterCommunityAuth] uid:', uid);
+    console.log('[routeAfterCommunityAuth] Firestore users doc exists:', userSnap.exists);
+    console.log('[routeAfterCommunityAuth] user doc data:', data);
+    console.log('[routeAfterCommunityAuth] isUserProfileComplete:', complete);
+    console.log('[routeAfterCommunityAuth] route →', complete ? 'community' : 'setup-profile');
+    if (complete) {
       goToCommunity();
     } else {
       goToProfileSetup();
