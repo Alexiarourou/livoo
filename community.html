@@ -80,10 +80,39 @@ nav {
 .hero-tag { display: inline-flex; background: rgba(5,150,105,0.12); border: 1px solid rgba(5,150,105,0.2); padding: 6px 16px; border-radius: 100px; font-size: 0.78rem; font-weight: 600; color: var(--green); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 24px; }
 .hero h1 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 20px; }
 .hero h1 span { color: var(--green); }
-.hero p { font-size: 1.1rem; color: var(--muted-dark); max-width: 34rem; margin: 0 auto 24px; line-height: 1.7; }
+.hero p { font-size: 1.1rem; color: var(--muted-dark); max-width: 34rem; margin: 0 auto 22px; line-height: 1.7; }
+.hero .cta-row { margin-bottom: 0; }
+.cta-row { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.cta-row a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-primary { background: var(--green); color: white; border: none; }
+.btn-primary:hover { background: var(--green-dark); transform: translateY(-2px); }
+.btn-primary.btn-cta-main {
+  padding: 16px 36px;
+  font-size: 1.05rem;
+  box-shadow: 0 10px 28px rgba(5, 150, 105, 0.35);
+}
+.btn-secondary-cta {
+  background: transparent;
+  color: var(--muted-dark);
+  border: 1px solid var(--border-dark);
+  padding: 12px 22px;
+  font-size: 0.9rem;
+}
+.btn-secondary-cta:hover { color: var(--green); border-color: var(--green); background: rgba(5,150,105,0.06); }
 
 .section { padding: 80px 48px; max-width: 1200px; margin: 0 auto; }
-#community { padding-top: 48px; }
+#community { padding-top: 48px; scroll-margin-top: 72px; }
 .section-header { margin-bottom: 48px; }
 .section-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
 .section-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.03em; }
@@ -177,6 +206,7 @@ nav {
   max-width: none;
   width: 100%;
   text-align: center;
+  scroll-margin-top: 72px;
 }
 .join-section h2 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2.2rem; letter-spacing: -0.03em; margin-bottom: 14px; color: var(--text-dark); }
 .join-section h2 span { color: var(--green); }
@@ -244,6 +274,21 @@ nav {
   .nav-links a:last-child { border-bottom: none; }
   .nav-links a.btn-nav { display: none; }
   #nav-toggle:checked ~ .nav-links { display: flex; }
+  .hero .cta-row {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 8px;
+  }
+  .hero .cta-row a {
+    width: 100%;
+    max-width: none;
+    justify-content: center;
+    box-sizing: border-box;
+  }
 }
 </style>
 </head>
@@ -271,6 +316,10 @@ nav {
   <div class="hero-tag">Where your next chapter begins.</div>
   <h1>Find your people<br>in a <span>new city</span></h1>
   <p>Join city groups, connect with people moving to the same place as you, and feel at home before you even arrive.</p>
+  <div class="cta-row">
+    <a href="#join" class="btn-primary btn-cta-main">Join the community</a>
+    <a href="#community" class="btn-secondary-cta">Browse cities</a>
+  </div>
 </section>
 
 <section class="section" aria-label="What you get from the community">
