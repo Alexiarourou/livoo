@@ -330,6 +330,7 @@ nav {
   import { getAuth, createUserWithEmailAndPassword,
     signInWithEmailAndPassword, GoogleAuthProvider,
     signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
@@ -342,7 +343,21 @@ nav {
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
   const provider = new GoogleAuthProvider();
+
+  async function userHasProfile(uid) {
+    const userSnap = await getDoc(doc(db, 'users', uid));
+    return userSnap.exists;
+  }
+
+  async function redirectNewAccountAfterAuth(uid) {
+    if (await userHasProfile(uid)) {
+      goToCityPortal();
+    } else {
+      goToProfileSetup();
+    }
+  }
 
   const cityNames = {
     paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milan: 'Milan',
@@ -447,8 +462,8 @@ nav {
     const errorDiv = document.getElementById('signup-error');
     hideError(errorDiv);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      goToProfileSetup();
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await redirectNewAccountAfterAuth(cred.user.uid);
     } catch (error) {
       showError(errorDiv, getFriendlyError(error.code));
     }
@@ -478,11 +493,7 @@ nav {
       hideError(document.getElementById('signin-error'));
       try {
         const cred = await signInWithPopup(auth, provider);
-        if (cred.additionalUserInfo && cred.additionalUserInfo.isNewUser) {
-          goToProfileSetup();
-        } else {
-          goToCityPortal();
-        }
+        await redirectNewAccountAfterAuth(cred.user.uid);
       } catch (error) {
         const msg = getFriendlyError(error.code);
         console.error(msg);

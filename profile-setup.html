@@ -253,7 +253,7 @@ textarea { min-height: 88px; resize: vertical; }
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
   const PROFILE_DOC_ID = 'main';
@@ -352,10 +352,12 @@ textarea { min-height: 88px; resize: vertical; }
         return;
       }
 
+      const userDocRef = doc(db, 'users', user.uid);
       const profileRef = doc(db, 'users', user.uid, 'profile', PROFILE_DOC_ID);
       try {
-        const snap = await getDoc(profileRef);
-        if (snap.exists) {
+        const userSnap = await getDoc(userDocRef);
+        const profileSnap = await getDoc(profileRef);
+        if (userSnap.exists || profileSnap.exists) {
           localStorage.setItem('livvo_city', cityDisplay);
           window.location.replace('community-portal.html?city=' + encodeURIComponent(cityDisplay));
           return;
@@ -400,14 +402,18 @@ textarea { min-height: 88px; resize: vertical; }
             photoURL = await getDownloadURL(sref);
           }
 
-          await setDoc(profileRef, {
+          const payload = {
             username: username,
             photoURL: photoURL || '',
             role: role,
             bio: bioText || '',
             city: cityDisplay,
             createdAt: serverTimestamp()
-          });
+          };
+          const batch = writeBatch(db);
+          batch.set(userDocRef, payload, { merge: true });
+          batch.set(profileRef, payload, { merge: true });
+          await batch.commit();
 
           const authUpdates = { displayName: username };
           if (photoURL) authUpdates.photoURL = photoURL;
