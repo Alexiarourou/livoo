@@ -375,6 +375,11 @@ nav {
     window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityName);
   }
 
+  function goToProfileSetup() {
+    localStorage.setItem('livvo_city', cityName);
+    window.location.href = 'profile-setup.html?city=' + encodeURIComponent(cityName);
+  }
+
   const tabSignup = document.getElementById('tab-signup');
   const tabSignin = document.getElementById('tab-signin');
   const panelSignup = document.getElementById('panel-signup');
@@ -443,7 +448,7 @@ nav {
     hideError(errorDiv);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      goToCityPortal();
+      goToProfileSetup();
     } catch (error) {
       showError(errorDiv, getFriendlyError(error.code));
     }
@@ -472,8 +477,12 @@ nav {
       hideError(document.getElementById('signup-error'));
       hideError(document.getElementById('signin-error'));
       try {
-        await signInWithPopup(auth, provider);
-        goToCityPortal();
+        const cred = await signInWithPopup(auth, provider);
+        if (cred.additionalUserInfo && cred.additionalUserInfo.isNewUser) {
+          goToProfileSetup();
+        } else {
+          goToCityPortal();
+        }
       } catch (error) {
         const msg = getFriendlyError(error.code);
         console.error(msg);

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set up your profile | Livvo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23059669'/><path d='M8 12l8 12 8-12-4-6H12z' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #059669;
+  --green-light: #10b981;
+  --green-dark: #047857;
+  --btn-green: #1a7a4a;
+  --btn-green-hover: #156b42;
+  --bg: #edf7f0;
+  --surface: #ffffff;
+  --border: #d4e5dc;
+  --text: #1a2e24;
+  --muted: #4a7c5e;
+}
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px 48px;
+}
+.setup-wrap { width: 100%; max-width: 440px; }
+.setup-card {
+  background: var(--surface);
+  border: 1px solid #d4eadb;
+  border-radius: 18px;
+  padding: 36px 32px 40px;
+  box-shadow: 0 12px 40px rgba(26, 46, 36, 0.08);
+}
+.setup-card h1 {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+  text-align: center;
+  margin-bottom: 8px;
+}
+.setup-sub {
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.55;
+  margin-bottom: 28px;
+}
+.form-row { margin-bottom: 20px; }
+.form-row label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.photo-block { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; }
+.photo-upload-wrap {
+  position: relative;
+  display: block;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px dashed var(--border);
+  background: #f8fcfa;
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s;
+}
+.photo-upload-wrap:hover {
+  border-color: var(--btn-green);
+  background: rgba(26, 122, 74, 0.06);
+}
+.photo-upload-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 1;
+}
+.photo-upload-wrap .photo-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 12px;
+  pointer-events: none;
+}
+.photo-upload-wrap.has-image .photo-placeholder { display: none; }
+.photo-hint {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+#photo-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 0;
+  z-index: 2;
+}
+
+.city-pill-row { display: flex; justify-content: center; margin-bottom: 8px; }
+.city-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--btn-green);
+  background: rgba(26, 122, 74, 0.12);
+  border: 1px solid rgba(26, 122, 74, 0.35);
+  padding: 8px 16px;
+  border-radius: 999px;
+}
+
+input[type="text"],
+select,
+textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--btn-green);
+}
+textarea { min-height: 88px; resize: vertical; }
+.char-count {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: right;
+  margin-top: 6px;
+}
+.char-count.at-limit { color: var(--btn-green); font-weight: 600; }
+
+.btn-complete {
+  width: 100%;
+  margin-top: 8px;
+  padding: 15px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--btn-green);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-complete:hover { background: var(--btn-green-hover); }
+.btn-complete:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.form-error {
+  display: none;
+  font-size: 0.85rem;
+  color: #b91c1c;
+  margin-bottom: 16px;
+  text-align: center;
+  line-height: 1.45;
+}
+.form-error.show { display: block; }
+
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.back-link a { color: var(--btn-green); font-weight: 600; text-decoration: none; }
+.back-link a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="setup-wrap">
+  <div class="setup-card">
+    <h1>Complete your profile</h1>
+    <p class="setup-sub">A quick intro so people in your city know who you are.</p>
+    <div id="form-error" class="form-error" role="alert"></div>
+    <form id="profile-form" novalidate>
+      <div class="photo-block">
+        <label class="photo-upload-wrap" id="photo-label" for="photo-input">
+          <input type="file" id="photo-input" accept="image/*" />
+          <img id="photo-preview" alt="" hidden />
+          <span class="photo-placeholder" id="photo-placeholder">
+            <span style="font-size:1.5rem;line-height:1;">+</span>
+            <span>Add photo</span>
+          </span>
+        </label>
+        <p class="photo-hint">Click to upload (optional)</p>
+      </div>
+
+      <div class="city-pill-row">
+        <span class="city-pill" id="city-pill">My city</span>
+      </div>
+
+      <div class="form-row">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required minlength="3" maxlength="40" autocomplete="username" placeholder="How you want to appear" />
+      </div>
+
+      <div class="form-row">
+        <label for="role">I am…</label>
+        <select id="role" name="role" required>
+          <option value="" disabled selected>Select one</option>
+          <option value="A student">A student</option>
+          <option value="A young professional">A young professional</option>
+          <option value="A remote worker">A remote worker</option>
+          <option value="An expat">An expat</option>
+          <option value="Just exploring">Just exploring</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label for="bio">About me <span style="font-weight:400;color:var(--muted);">(optional)</span></label>
+        <textarea id="bio" name="bio" maxlength="150" placeholder="Tell people a little about you…"></textarea>
+        <div class="char-count" id="bio-count"><span id="bio-count-num">0</span> / 150</div>
+      </div>
+
+      <button type="submit" class="btn-complete" id="btn-submit">Complete my profile</button>
+    </form>
+    <p class="back-link"><a href="community.html">← Back to cities</a></p>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+  const PROFILE_DOC_ID = 'main';
+
+  const cityNames = {
+    paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milan: 'Milan',
+    barcelona: 'Barcelona', berlin: 'Berlin', amsterdam: 'Amsterdam', lisbon: 'Lisbon',
+    prague: 'Prague', budapest: 'Budapest', vienna: 'Vienna', copenhagen: 'Copenhagen',
+    stockholm: 'Stockholm', dublin: 'Dublin', brussels: 'Brussels', valencia: 'Valencia',
+    seville: 'Seville', porto: 'Porto', rome: 'Rome', florence: 'Florence', bologna: 'Bologna',
+    munich: 'Munich', hamburg: 'Hamburg', zurich: 'Zurich', geneva: 'Geneva', rotterdam: 'Rotterdam',
+    ghent: 'Ghent', krakow: 'Krakow', warsaw: 'Warsaw', tallinn: 'Tallinn', riga: 'Riga', tbilisi: 'Tbilisi',
+    bucharest: 'Bucharest', sofia: 'Sofia', zagreb: 'Zagreb'
+  };
+
+  function titleCaseFromRaw(str) {
+    if (!str || !str.trim()) return '';
+    return str.trim().replace(/\s+/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+  }
+
+  function displayNameFromParam(rawCity) {
+    const slug = rawCity.toLowerCase().trim().replace(/[\s_-]+/g, '');
+    return cityNames[slug] || titleCaseFromRaw(rawCity);
+  }
+
+  const params = new URLSearchParams(location.search);
+  let rawCity = params.get('city');
+  const hasUrlCity = rawCity && String(rawCity).trim();
+
+  if (!hasUrlCity) {
+    const stored = localStorage.getItem('livvo_city');
+    if (stored && stored.trim()) {
+      window.location.replace('profile-setup.html?city=' + encodeURIComponent(stored.trim()));
+    } else {
+      window.location.replace('signup.html');
+    }
+  }
+
+  if (!hasUrlCity) {
+    /* redirect */
+  } else {
+    const cityDisplay = displayNameFromParam(rawCity);
+    document.getElementById('city-pill').textContent = 'My city: ' + cityDisplay;
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
+      authDomain: "livvo-573e1.firebaseapp.com",
+      projectId: "livvo-573e1",
+      storageBucket: "livvo-573e1.firebasestorage.app",
+      messagingSenderId: "438563892670",
+      appId: "1:438563892670:web:c038316d9d3fcbee065def"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    const photoInput = document.getElementById('photo-input');
+    const photoPreview = document.getElementById('photo-preview');
+    const photoLabel = document.getElementById('photo-label');
+    const bio = document.getElementById('bio');
+    const bioCountNum = document.getElementById('bio-count-num');
+    const bioCountRow = document.getElementById('bio-count');
+    const formError = document.getElementById('form-error');
+
+    function showFormError(msg) {
+      formError.textContent = msg;
+      formError.classList.add('show');
+    }
+    function hideFormError() {
+      formError.textContent = '';
+      formError.classList.remove('show');
+    }
+
+    photoInput.addEventListener('change', function () {
+      const f = photoInput.files && photoInput.files[0];
+      if (!f || !f.type.startsWith('image/')) return;
+      const url = URL.createObjectURL(f);
+      photoPreview.src = url;
+      photoPreview.hidden = false;
+      photoLabel.classList.add('has-image');
+    });
+
+    function updateBioCount() {
+      const n = (bio.value || '').length;
+      bioCountNum.textContent = String(n);
+      bioCountRow.classList.toggle('at-limit', n >= 150);
+    }
+    bio.addEventListener('input', updateBioCount);
+    updateBioCount();
+
+    onAuthStateChanged(auth, async function (user) {
+      if (!user) {
+        window.location.href = 'signup.html?city=' + encodeURIComponent(cityDisplay);
+        return;
+      }
+
+      const profileRef = doc(db, 'users', user.uid, 'profile', PROFILE_DOC_ID);
+      try {
+        const snap = await getDoc(profileRef);
+        if (snap.exists) {
+          localStorage.setItem('livvo_city', cityDisplay);
+          window.location.replace('community-portal.html?city=' + encodeURIComponent(cityDisplay));
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      const form = document.getElementById('profile-form');
+      if (form.dataset.bound === '1') return;
+      form.dataset.bound = '1';
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        hideFormError();
+
+        const username = (document.getElementById('username').value || '').trim();
+        const role = document.getElementById('role').value;
+        const bioText = (bio.value || '').trim();
+
+        if (username.length < 3) {
+          showFormError('Username must be at least 3 characters.');
+          return;
+        }
+        if (!role) {
+          showFormError('Please choose how you describe yourself.');
+          return;
+        }
+
+        const btn = document.getElementById('btn-submit');
+        btn.disabled = true;
+
+        let photoURL = '';
+
+        try {
+          if (photoInput.files && photoInput.files[0]) {
+            const f = photoInput.files[0];
+            const ext = (f.name.split('.').pop() || 'jpg').replace(/[^a-zA-Z0-9]/g, '');
+            const path = 'profile-photos/' + user.uid + '/avatar_' + Date.now() + '.' + ext;
+            const sref = ref(storage, path);
+            await uploadBytes(sref, f);
+            photoURL = await getDownloadURL(sref);
+          }
+
+          await setDoc(profileRef, {
+            username: username,
+            photoURL: photoURL || '',
+            role: role,
+            bio: bioText || '',
+            city: cityDisplay,
+            createdAt: serverTimestamp()
+          });
+
+          const authUpdates = { displayName: username };
+          if (photoURL) authUpdates.photoURL = photoURL;
+          await updateProfile(user, authUpdates).catch(function () {});
+
+          localStorage.setItem('livvo_city', cityDisplay);
+          window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityDisplay);
+        } catch (err) {
+          console.error(err);
+          showFormError(err.message || 'Could not save profile. Check Firestore and Storage rules.');
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    });
+  }
+</script>
+</body>
+</html>
