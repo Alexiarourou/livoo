@@ -340,10 +340,98 @@ nav {
   color: var(--text);
 }
 .form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--btn-green); }
-#post-body {
+
+.post-editor-wrap {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+.post-editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #f8fcfa;
+  border-bottom: 1px solid var(--border);
+}
+.post-editor-toolbar .rte-btn {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  min-width: 36px;
+  padding: 7px 12px;
+  border: 1px solid #d4eadb;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.post-editor-toolbar .rte-btn:hover {
+  border-color: var(--btn-green);
+  color: var(--btn-green);
+}
+.post-editor-toolbar .rte-btn[aria-pressed="true"] {
+  background: rgba(26, 122, 74, 0.12);
+  border-color: var(--btn-green);
+  color: var(--btn-green);
+}
+.post-link-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #f0faf4;
+  border-bottom: 1px solid var(--border);
+}
+.post-link-bar[hidden] { display: none !important; }
+.post-link-bar-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.post-link-url-input {
+  flex: 1;
+  min-width: 140px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.88rem;
+}
+.post-link-url-input:focus {
+  outline: none;
+  border-color: var(--btn-green);
+}
+.post-link-url-input.post-link-url-invalid {
+  border-color: #b91c1c;
+}
+.post-link-bar .btn-tiny {
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  border-radius: 8px;
+}
+.post-body-editor {
   min-height: 160px;
-  resize: vertical;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 12px 14px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
   line-height: 1.55;
+  color: var(--text);
+}
+.post-body-editor:focus {
+  outline: none;
+}
+.post-body-editor.is-empty:before {
+  content: attr(data-placeholder);
+  color: var(--muted);
+  pointer-events: none;
 }
 .modal-actions {
   display: flex;
@@ -539,8 +627,21 @@ nav {
       </select>
     </div>
     <div class="form-row">
-      <label for="post-body">Body</label>
-      <textarea id="post-body" name="body" rows="8" maxlength="20000" placeholder="Write your post…"></textarea>
+      <label for="post-body-editor">Body</label>
+      <div class="post-editor-wrap">
+        <div class="post-editor-toolbar" role="toolbar" aria-label="Text formatting">
+          <button type="button" class="rte-btn" id="rte-bold" title="Bold" aria-pressed="false"><strong>B</strong></button>
+          <button type="button" class="rte-btn" id="rte-italic" title="Italic" aria-pressed="false"><em>I</em></button>
+          <button type="button" class="rte-btn" id="rte-link" title="Add link" aria-pressed="false">Link</button>
+        </div>
+        <div id="post-link-bar" class="post-link-bar" hidden>
+          <span class="post-link-bar-label" id="post-link-bar-label">Link URL</span>
+          <input type="url" id="post-link-url-input" class="post-link-url-input" placeholder="https://example.com" autocomplete="off" />
+          <button type="button" class="btn-primary btn-tiny" id="post-link-apply">Apply</button>
+          <button type="button" class="btn-secondary btn-tiny" id="post-link-cancel">Cancel</button>
+        </div>
+        <div id="post-body-editor" class="post-body-editor is-empty" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Write your post…" spellcheck="true"></div>
+      </div>
     </div>
     <div class="form-row">
       <label for="post-link">Link (optional)</label>
@@ -643,6 +744,29 @@ nav {
     return '<p>' + esc.replace(/\r\n|\r|\n/g, '<br>') + '</p>';
   }
 
+  function sanitizePostBodyHtml(html) {
+    if (typeof window.Purify !== 'undefined' && window.Purify.sanitize) {
+      return window.Purify.sanitize(html || '', {
+        ALLOWED_TAGS: ['b', 'strong', 'i', 'em', 'a', 'br', 'p', 'div', 'span'],
+        ALLOWED_ATTR: ['href', 'target', 'rel']
+      });
+    }
+    return plainTextToSafeHtml(stripHtml(html));
+  }
+
+  function normalizeEditorLinkUrl(raw) {
+    let u = String(raw || '').trim();
+    if (!u) return null;
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    try {
+      const parsed = new URL(u);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
+      return parsed.href;
+    } catch (e) {
+      return null;
+    }
+  }
+
   function formatTime(ts) {
     if (!ts || typeof ts.toDate !== 'function') return '';
     try {
@@ -707,6 +831,17 @@ nav {
       document.body.style.overflow = 'hidden';
     }
     function closeModal(id) {
+      if (id === 'modal-new-post') {
+        const bar = document.getElementById('post-link-bar');
+        const inp = document.getElementById('post-link-url-input');
+        const rte = document.getElementById('rte-link');
+        if (bar) bar.hidden = true;
+        if (inp) {
+          inp.value = '';
+          inp.classList.remove('post-link-url-invalid');
+        }
+        if (rte) rte.setAttribute('aria-pressed', 'false');
+      }
       document.getElementById(id).hidden = true;
       document.body.style.overflow = '';
     }
@@ -714,6 +849,112 @@ nav {
       el.addEventListener('click', function () {
         closeModal(el.getAttribute('data-close'));
       });
+    });
+
+    const postBodyEditor = document.getElementById('post-body-editor');
+    const postLinkBar = document.getElementById('post-link-bar');
+    const postLinkUrlInput = document.getElementById('post-link-url-input');
+    const postEditorToolbar = document.querySelector('.post-editor-toolbar');
+
+    function syncPostEditorEmptyClass() {
+      if (!postBodyEditor) return;
+      const t = (postBodyEditor.textContent || '').replace(/\u00a0/g, ' ').trim();
+      postBodyEditor.classList.toggle('is-empty', !t);
+    }
+
+    function focusPostBodyEditor() {
+      if (postBodyEditor) postBodyEditor.focus();
+    }
+
+    function hidePostLinkBar() {
+      if (postLinkBar) postLinkBar.hidden = true;
+      if (postLinkUrlInput) {
+        postLinkUrlInput.value = '';
+        postLinkUrlInput.classList.remove('post-link-url-invalid');
+      }
+      const rte = document.getElementById('rte-link');
+      if (rte) rte.setAttribute('aria-pressed', 'false');
+    }
+
+    function showPostLinkBar() {
+      if (postLinkBar) postLinkBar.hidden = false;
+      if (postLinkUrlInput) postLinkUrlInput.classList.remove('post-link-url-invalid');
+      document.getElementById('rte-link').setAttribute('aria-pressed', 'true');
+      requestAnimationFrame(function () {
+        if (postLinkUrlInput) postLinkUrlInput.focus();
+      });
+    }
+
+    if (postEditorToolbar) {
+      postEditorToolbar.addEventListener('mousedown', function (e) {
+        if (e.target.closest('button')) e.preventDefault();
+      });
+    }
+
+    if (postBodyEditor) {
+      postBodyEditor.addEventListener('input', syncPostEditorEmptyClass);
+      postBodyEditor.addEventListener('paste', function (e) {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+        document.execCommand('insertText', false, text);
+        syncPostEditorEmptyClass();
+      });
+      postBodyEditor.addEventListener('keydown', function (e) {
+        if (e.ctrlKey || e.metaKey) {
+          if (e.key === 'b' || e.key === 'B') {
+            e.preventDefault();
+            document.execCommand('bold');
+          } else if (e.key === 'i' || e.key === 'I') {
+            e.preventDefault();
+            document.execCommand('italic');
+          }
+        }
+      });
+    }
+
+    document.getElementById('rte-bold').addEventListener('click', function () {
+      focusPostBodyEditor();
+      document.execCommand('bold');
+    });
+    document.getElementById('rte-italic').addEventListener('click', function () {
+      focusPostBodyEditor();
+      document.execCommand('italic');
+    });
+    document.getElementById('rte-link').addEventListener('click', function () {
+      focusPostBodyEditor();
+      if (!postLinkBar || postLinkBar.hidden) {
+        showPostLinkBar();
+      } else {
+        hidePostLinkBar();
+      }
+    });
+    if (postLinkUrlInput) {
+      postLinkUrlInput.addEventListener('input', function () {
+        postLinkUrlInput.classList.remove('post-link-url-invalid');
+      });
+    }
+    document.getElementById('post-link-apply').addEventListener('click', function () {
+      if (!postLinkUrlInput) return;
+      const href = normalizeEditorLinkUrl(postLinkUrlInput.value);
+      if (!href) {
+        postLinkUrlInput.classList.add('post-link-url-invalid');
+        return;
+      }
+      postLinkUrlInput.classList.remove('post-link-url-invalid');
+      focusPostBodyEditor();
+      document.execCommand('createLink', false, href);
+      if (postBodyEditor) {
+        postBodyEditor.querySelectorAll('a[href]').forEach(function (a) {
+          a.setAttribute('target', '_blank');
+          a.setAttribute('rel', 'noopener noreferrer');
+        });
+      }
+      hidePostLinkBar();
+      syncPostEditorEmptyClass();
+    });
+    document.getElementById('post-link-cancel').addEventListener('click', function () {
+      hidePostLinkBar();
+      focusPostBodyEditor();
     });
 
     tabButtons.forEach(function (btn) {
@@ -1022,7 +1263,10 @@ nav {
       document.getElementById('post-title').value = '';
       document.getElementById('post-link').value = '';
       document.getElementById('post-category-select').value = activeCategory;
-      document.getElementById('post-body').value = '';
+      postBodyEditor.innerHTML = '';
+      postBodyEditor.classList.add('is-empty');
+      hidePostLinkBar();
+      syncPostEditorEmptyClass();
       openModal('modal-new-post');
     });
 
@@ -1064,20 +1308,26 @@ nav {
       const title = (document.getElementById('post-title').value || '').trim();
       const category = document.getElementById('post-category-select').value;
       let linkUrl = (document.getElementById('post-link').value || '').trim();
-      const bodyText = (document.getElementById('post-body').value || '').trim();
+      const rawBodyHtml = postBodyEditor ? postBodyEditor.innerHTML : '';
+      const bodyHtml = sanitizePostBodyHtml(rawBodyHtml);
+      const bodyPlain = stripHtml(bodyHtml).trim();
 
       if (!title) {
         errEl.textContent = 'Please enter a title.';
         errEl.hidden = false;
         return;
       }
-      if (!bodyText) {
+      if (!bodyPlain) {
         errEl.textContent = 'Please write something in the body.';
         errEl.hidden = false;
         return;
       }
-
-      const bodyHtml = plainTextToSafeHtml(bodyText);
+      const bodyCharLen = postBodyEditor ? (postBodyEditor.textContent || '').length : bodyPlain.length;
+      if (bodyCharLen > 20000) {
+        errEl.textContent = 'Body is too long (max 20,000 characters).';
+        errEl.hidden = false;
+        return;
+      }
       const btn = document.getElementById('post-submit');
       btn.disabled = true;
 
