@@ -16,7 +16,8 @@
   --green-dark: #047857;
   --btn-green: #1a7a4a;
   --btn-green-hover: #156b42;
-  --bg-dark: #f0f7f2;
+  --input-border: #c0deca;
+  --focus-green: #1a7a4a;
   --surface-dark: #ffffff;
   --border-dark: #d4e5dc;
   --text-dark: #1a2e24;
@@ -78,31 +79,66 @@ nav {
   outline-offset: 2px;
 }
 
-.page { min-height: 100vh; padding: 120px 24px 80px; max-width: 560px; margin: 0 auto; }
-.page h1 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 1.8rem; letter-spacing: -0.03em; margin-bottom: 8px; }
-.page .sub { font-size: 0.95rem; color: var(--muted-dark); margin-bottom: 32px; line-height: 1.6; }
-.form-group { margin-bottom: 20px; }
+.page {
+  min-height: 100vh;
+  padding: 88px 24px 48px;
+  max-width: 440px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.join-back {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--green);
+  text-decoration: none;
+  margin-bottom: 20px;
+  align-self: flex-start;
+}
+.join-back:hover { text-decoration: underline; }
+.join-card {
+  background: #ffffff;
+  border: 1px solid #d4eadb;
+  border-radius: 16px;
+  padding: 32px 28px 28px;
+  box-shadow: 0 4px 24px rgba(26, 46, 36, 0.06);
+}
+.join-card h1 {
+  font-family: "Outfit", sans-serif;
+  font-weight: 900;
+  font-size: 1.65rem;
+  letter-spacing: -0.03em;
+  margin-bottom: 10px;
+  text-align: center;
+  line-height: 1.25;
+}
+.join-card .sub {
+  font-size: 0.95rem;
+  color: var(--muted-dark);
+  margin-bottom: 28px;
+  line-height: 1.6;
+  text-align: center;
+}
+.form-group { margin-bottom: 18px; }
 .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted-dark); margin-bottom: 8px; }
 .form-group input {
   width: 100%;
   background: #ffffff;
-  border: 1px solid var(--border-dark);
-  border-radius: 12px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
   padding: 14px 16px;
   font-family: "DM Sans", sans-serif;
   font-size: 0.95rem;
   color: var(--text-dark);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s;
 }
-.form-group input:focus {
-  border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
-}
+.form-group input:focus { border-color: var(--focus-green); }
 .form-group input::placeholder { color: var(--muted-dark); opacity: 0.75; }
 .btn-join {
   width: 100%;
-  margin-top: 8px;
+  margin-top: 10px;
   padding: 16px;
   background: var(--btn-green);
   color: white;
@@ -119,8 +155,43 @@ nav {
 }
 .btn-join:hover { background: var(--btn-green-hover); transform: translateY(-1px); }
 .btn-join:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0 18px;
+  color: var(--muted-dark);
+  font-size: 0.85rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-dark);
+}
+.auth-divider span { flex-shrink: 0; font-weight: 500; }
+.btn-google {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid var(--green);
+  border-radius: 12px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.btn-google:hover { background: rgba(5, 150, 105, 0.06); border-color: var(--green-dark); }
+.btn-google svg { flex-shrink: 0; }
 .auth-switch {
-  margin-top: 20px;
+  margin-top: 22px;
   text-align: center;
   font-size: 0.875rem;
 }
@@ -130,7 +201,19 @@ nav {
   text-decoration: none;
 }
 .auth-switch a:hover { text-decoration: underline; }
-.join-thanks { display: none; margin-top: 24px; padding: 20px; background: rgba(5,150,105,0.1); border: 1px solid rgba(5,150,105,0.2); border-radius: 12px; font-size: 0.95rem; color: var(--green-dark); line-height: 1.5; text-align: center; }
+.join-thanks {
+  display: none;
+  margin-top: 24px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #d4eadb;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  color: var(--green-dark);
+  line-height: 1.5;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(26, 46, 36, 0.06);
+}
 .join-thanks.show { display: block; }
 
 @media (max-width: 768px) {
@@ -167,6 +250,7 @@ nav {
   .nav-links a:last-child { border-bottom: none; }
   .nav-links a.btn-nav { display: none; }
   #nav-toggle:checked ~ .nav-links { display: flex; }
+  .join-card { padding: 28px 22px 24px; }
 }
 </style>
 </head>
@@ -189,12 +273,17 @@ nav {
   </div>
 </nav>
 <div class="page">
-  <h1 id="pageTitle">Join the community</h1>
-  <p class="sub" id="pageSub">Create a free account to connect with people moving to your city, find flatmates and get local tips.</p>
-  <div id="joinFormBlock">
+  <a href="#" class="join-back" id="joinBackLink">← Back to city</a>
+  <div class="join-card" id="joinCard">
+    <h1 id="pageTitle">Join the community</h1>
+    <p class="sub" id="pageSub">Free to join. Connect with people moving to your city, find flatmates and get local tips.</p>
     <form id="joinForm">
       <input type="hidden" name="_subject" value="Community join — Livvo" />
       <input type="hidden" name="city" id="joinCityField" value="" />
+      <div class="form-group">
+        <label for="joinName">Full name</label>
+        <input id="joinName" type="text" name="name" placeholder="Your full name" required autocomplete="name" />
+      </div>
       <div class="form-group">
         <label for="joinEmail">Email</label>
         <input id="joinEmail" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
@@ -204,6 +293,11 @@ nav {
         <input id="joinPassword" type="password" name="password" placeholder="Choose a password" required autocomplete="new-password" />
       </div>
       <button type="submit" class="btn-join" id="joinSubmitBtn">Create account &amp; join</button>
+      <div class="auth-divider" role="presentation"><span>or</span></div>
+      <button type="button" class="btn-google" id="btnGoogle" aria-label="Continue with Google">
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.785 9.093c0-.638-.057-1.251-.164-1.84H9v3.478h4.938a4.17 4.17 0 0 1-1.8 2.736v2.272h2.914a8.837 8.837 0 0 0 2.733-6.646z"/><path fill="#34A853" d="M9.003 18c2.43 0 4.467-.806 5.956-2.18l-2.909-2.27c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.44 15.983 5.485 18 9.003 18z"/><path fill="#FBBC05" d="M3.964 10.712c-.18-.563-.29-1.164-.29-1.79s.11-1.227.29-1.79L.96 4.408A8.094 8.094 0 0 0 0 8.922c0 1.322.318 2.62.96 3.742l3.004-2.952z"/><path fill="#EA4335" d="M9.003 3.58c1.322 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.426 0 9.003 0 5.485 0 2.44 2.017.96 4.977l3.005 2.458c.707-2.127 2.692-3.855 5.038-3.855z"/></svg>
+        Continue with Google
+      </button>
       <p class="auth-switch"><a href="flatmate-login.html">Already have an account? Sign in →</a></p>
     </form>
   </div>
@@ -222,15 +316,22 @@ nav {
   const params = new URLSearchParams(location.search);
   const city = (params.get('city') || 'athens').toLowerCase();
   const cityName = cityNames[city] || (city.charAt(0).toUpperCase() + city.slice(1));
-  document.getElementById('pageTitle').textContent = 'Join ' + cityName + ' community';
+  document.getElementById('pageTitle').textContent = 'Join the ' + cityName + ' community';
   document.getElementById('pageSub').textContent =
-    'Create a free account to connect with people moving to ' + cityName + ', find flatmates and get local tips.';
+    'Free to join. Connect with people moving to ' + cityName + ', find flatmates and get local tips.';
   document.getElementById('joinCityField').value = city;
+  const back = document.getElementById('joinBackLink');
+  back.textContent = '← Back to ' + cityName;
+  back.href = 'community-city.html?city=' + encodeURIComponent(city);
 
-  const joinFormBlock = document.getElementById('joinFormBlock');
+  const joinCard = document.getElementById('joinCard');
   const joinForm = document.getElementById('joinForm');
   const joinThanks = document.getElementById('joinThanks');
   const FS = 'https://formspree.io/f/mbdzykvg';
+
+  document.getElementById('btnGoogle').addEventListener('click', function () {
+    alert('Google sign-in will be available soon.');
+  });
 
   joinForm.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -242,7 +343,7 @@ nav {
       .then(function (res) { return res.json().then(function (data) { return { res: res, data: data }; }); })
       .then(function (_ref) {
         if (!_ref.res.ok) throw new Error((_ref.data && _ref.data.error) || 'Submit failed');
-        joinFormBlock.style.display = 'none';
+        joinCard.style.display = 'none';
         joinThanks.classList.add('show');
       })
       .catch(function () {
