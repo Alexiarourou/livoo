@@ -75,7 +75,7 @@ nav {
   outline-offset: 2px;
 }
 
-.hero { padding: 140px 48px 80px; text-align: center; position: relative; overflow: hidden; }
+.hero { padding: 140px 48px 28px; text-align: center; position: relative; overflow: hidden; }
 .hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(5,150,105,0.1) 0%, transparent 70%); pointer-events: none; }
 .hero-tag { display: inline-flex; background: rgba(5,150,105,0.12); border: 1px solid rgba(5,150,105,0.2); padding: 6px 16px; border-radius: 100px; font-size: 0.78rem; font-weight: 600; color: var(--green); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 24px; }
 .hero h1 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 20px; }
@@ -89,6 +89,7 @@ nav {
 .audience-pill svg path { stroke: currentColor; }
 
 .section { padding: 80px 48px; max-width: 1200px; margin: 0 auto; }
+#community { padding-top: 48px; }
 .section-header { margin-bottom: 48px; }
 .section-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
 .section-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.03em; }
@@ -210,8 +211,9 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
 
 @media (max-width: 900px) {
   .cities-grid { grid-template-columns: 1fr; }
-  .hero { padding: 100px 24px 60px; }
+  .hero { padding: 100px 24px 24px; }
   .section { padding: 48px 24px; }
+  #community { padding-top: 32px; }
   .join-section { margin: 0 24px 60px; padding: 40px 24px; }
   .join-form { flex-direction: column; }
 }
