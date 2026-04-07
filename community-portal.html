@@ -760,6 +760,7 @@ nav {
     }
 
     function renderFeed(docs) {
+      window.alert('Rendering ' + docs.length + ' posts');
       feedEl.innerHTML = '';
       if (!docs.length) {
         var emptyMsg = activeCategory === 'all'
@@ -773,80 +774,97 @@ nav {
         if (!uid) return Promise.resolve({ id: d.id, voted: false });
         return getDoc(doc(db, 'communityPosts', d.id, 'upvotes', uid)).then(function (vs) {
           return { id: d.id, voted: vs.exists };
+        }).catch(function (err) {
+          console.warn('Upvote doc read failed for post ' + d.id, err);
+          return { id: d.id, voted: false };
         });
       });
       Promise.all(votePromises).then(function (voteInfo) {
         const voteMap = {};
         voteInfo.forEach(function (v) { voteMap[v.id] = v.voted; });
         docs.forEach(function (d) {
-          const data = d.data();
-          const card = document.createElement('article');
-          card.className = 'feed-card';
-          card.setAttribute('role', 'button');
-          card.tabIndex = 0;
-          card.dataset.postId = d.id;
-
-          const title = document.createElement('div');
-          title.className = 'feed-card-title';
-          title.textContent = data.title || 'Untitled';
-
-          const meta = document.createElement('div');
-          meta.className = 'feed-card-meta';
-          const tag = document.createElement('span');
-          tag.className = 'feed-card-tag';
-          tag.textContent = CATEGORY_LABELS[data.category] || data.category;
-          const author = document.createElement('span');
-          author.textContent = (data.authorName || data.authorEmail || 'Member');
-          const time = document.createElement('span');
-          time.textContent = formatTime(data.createdAt);
-          meta.appendChild(tag);
-          meta.appendChild(author);
-          meta.appendChild(time);
-
-          const excerpt = document.createElement('p');
-          excerpt.className = 'feed-card-excerpt';
-          excerpt.textContent = (stripHtml(data.bodyHtml || '') || String(data.body || '').replace(/\s+/g, ' ').trim());
-
-          const actions = document.createElement('div');
-          actions.className = 'feed-card-actions';
-
-          const upBtn = document.createElement('button');
-          upBtn.type = 'button';
-          upBtn.className = 'btn-upvote' + (voteMap[d.id] ? ' is-on' : '');
-          upBtn.dataset.postId = d.id;
-          upBtn.innerHTML = '<span aria-hidden="true">▲</span> <span>' + (voteMap[d.id] ? 'Upvoted' : 'Upvote') + '</span> <span class="up-count">' + (data.upvoteCount || 0) + '</span>';
-          upBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleUpvote(d.id, upBtn);
-          });
-
-          const cc = document.createElement('span');
-          cc.className = 'meta-pill';
-          cc.textContent = (data.commentCount || 0) + ' comment' + ((data.commentCount || 0) === 1 ? '' : 's');
-
-          actions.appendChild(upBtn);
-          actions.appendChild(cc);
-
-          card.appendChild(title);
-          card.appendChild(meta);
-          card.appendChild(excerpt);
-          card.appendChild(actions);
-
-          function openThread() {
-            openThreadModal(d.id, data);
+          appendFeedCard(d, d.data(), voteMap);
+        });
+      }).catch(function (err) {
+        console.error('renderFeed vote batch failed', err);
+        var fallbackMap = {};
+        docs.forEach(function (d) { fallbackMap[d.id] = false; });
+        docs.forEach(function (d) {
+          try {
+            appendFeedCard(d, d.data(), fallbackMap);
+          } catch (e) {
+            console.error('appendFeedCard failed', d.id, e);
           }
-          card.addEventListener('click', openThread);
-          card.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              openThread();
-            }
-          });
-
-          feedEl.appendChild(card);
         });
       });
+    }
+
+    function appendFeedCard(d, data, voteMap) {
+      const card = document.createElement('article');
+      card.className = 'feed-card';
+      card.setAttribute('role', 'button');
+      card.tabIndex = 0;
+      card.dataset.postId = d.id;
+
+      const title = document.createElement('div');
+      title.className = 'feed-card-title';
+      title.textContent = data.title || 'Untitled';
+
+      const meta = document.createElement('div');
+      meta.className = 'feed-card-meta';
+      const tag = document.createElement('span');
+      tag.className = 'feed-card-tag';
+      tag.textContent = CATEGORY_LABELS[data.category] || data.category;
+      const author = document.createElement('span');
+      author.textContent = (data.authorName || data.authorEmail || 'Member');
+      const time = document.createElement('span');
+      time.textContent = formatTime(data.createdAt);
+      meta.appendChild(tag);
+      meta.appendChild(author);
+      meta.appendChild(time);
+
+      const excerpt = document.createElement('p');
+      excerpt.className = 'feed-card-excerpt';
+      excerpt.textContent = (stripHtml(data.bodyHtml || '') || String(data.body || '').replace(/\s+/g, ' ').trim());
+
+      const actions = document.createElement('div');
+      actions.className = 'feed-card-actions';
+
+      const upBtn = document.createElement('button');
+      upBtn.type = 'button';
+      upBtn.className = 'btn-upvote' + (voteMap[d.id] ? ' is-on' : '');
+      upBtn.dataset.postId = d.id;
+      upBtn.innerHTML = '<span aria-hidden="true">▲</span> <span>' + (voteMap[d.id] ? 'Upvoted' : 'Upvote') + '</span> <span class="up-count">' + (data.upvoteCount || 0) + '</span>';
+      upBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleUpvote(d.id, upBtn);
+      });
+
+      const cc = document.createElement('span');
+      cc.className = 'meta-pill';
+      cc.textContent = (data.commentCount || 0) + ' comment' + ((data.commentCount || 0) === 1 ? '' : 's');
+
+      actions.appendChild(upBtn);
+      actions.appendChild(cc);
+
+      card.appendChild(title);
+      card.appendChild(meta);
+      card.appendChild(excerpt);
+      card.appendChild(actions);
+
+      function openThread() {
+        openThreadModal(d.id, data);
+      }
+      card.addEventListener('click', openThread);
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openThread();
+        }
+      });
+
+      feedEl.appendChild(card);
     }
 
     async function toggleUpvote(postId, btnEl) {
