@@ -177,23 +177,79 @@ nav {
 .card p { font-size: 0.9rem; color: var(--muted-dark); line-height: 1.6; margin: 0; }
 
 .cities-more-wrap { width: 100%; max-width: 480px; margin: 0 auto 40px; }
-.cities-more-label { display: block; font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 12px; text-align: center; }
-.cities-more-select {
+.cities-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
-  padding: 14px 16px;
-  border-radius: 10px;
-  border: 3px solid var(--green);
-  background: var(--surface-dark);
-  font-family: "DM Sans", sans-serif;
-  font-size: 1rem;
-  color: var(--text-dark);
-  cursor: pointer;
-  outline: none;
-  appearance: auto;
-  -webkit-appearance: menulist;
+  max-width: 480px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #c0deca;
+  border-radius: 100px;
+  padding: 14px 24px;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.cities-more-select:focus { border-color: var(--green-dark); }
-.cities-more-note { margin-top: 12px; font-size: 0.82rem; text-align: center; line-height: 1.45; color: var(--muted-dark); }
+.cities-search-bar:focus-within {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+}
+.cities-search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--muted-dark);
+}
+.cities-search-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.cities-search-icon svg circle,
+.cities-search-icon svg line {
+  stroke: currentColor;
+  fill: none;
+}
+.cities-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  color: var(--text-dark);
+  outline: none;
+}
+.cities-search-input::placeholder { color: var(--muted-dark); opacity: 0.8; }
+.cities-quick-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 480px;
+  margin: 18px auto 0;
+}
+.cities-quick-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(5, 150, 105, 0.5);
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.08);
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+.cities-quick-pill:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--green);
+  transform: translateY(-1px);
+}
+.cities-more-note { margin-top: 18px; font-size: 0.82rem; text-align: center; line-height: 1.45; color: var(--muted-dark); }
 .cities-more-note a { color: var(--green); font-weight: 600; text-decoration: none; }
 .cities-more-note a:hover { text-decoration: underline; }
 
@@ -454,25 +510,22 @@ nav {
     <p class="section-sub">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
   </div>
   <div class="cities-more-wrap">
-    <label for="browse-more-cities" class="cities-more-label">Not your city? Find yours:</label>
-    <select id="browse-more-cities" class="cities-more-select" aria-label="Find your city">
-      <option value="" selected disabled>Select a city...</option>
-      <option value="amsterdam">Amsterdam</option>
-      <option value="barcelona">Barcelona</option>
-      <option value="berlin">Berlin</option>
-      <option value="lisbon">Lisbon</option>
-      <option value="rome">Rome</option>
-      <option value="copenhagen">Copenhagen</option>
-      <option value="vienna">Vienna</option>
-      <option value="prague">Prague</option>
-      <option value="budapest">Budapest</option>
-      <option value="dublin">Dublin</option>
-      <option value="brussels">Brussels</option>
-      <option value="porto">Porto</option>
-      <option value="valencia">Valencia</option>
-      <option value="milan">Milan</option>
-      <option value="stockholm">Stockholm</option>
-    </select>
+    <div class="cities-search-bar" role="search">
+      <span class="cities-search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </span>
+      <input type="search" id="cities-search-input" class="cities-search-input" placeholder="Search for your city..." autocomplete="off" aria-label="Search for your city" />
+    </div>
+    <div class="cities-quick-pills">
+      <a href="community-city.html?city=amsterdam" class="cities-quick-pill">Amsterdam</a>
+      <a href="community-city.html?city=barcelona" class="cities-quick-pill">Barcelona</a>
+      <a href="community-city.html?city=berlin" class="cities-quick-pill">Berlin</a>
+      <a href="community-city.html?city=lisbon" class="cities-quick-pill">Lisbon</a>
+      <a href="community-city.html?city=rome" class="cities-quick-pill">Rome</a>
+      <a href="community-city.html?city=copenhagen" class="cities-quick-pill">Copenhagen</a>
+      <a href="community-city.html?city=prague" class="cities-quick-pill">Prague</a>
+      <a href="community-city.html?city=dublin" class="cities-quick-pill">Dublin</a>
+    </div>
     <p class="cities-more-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
   </div>
   <div class="cities-grid">
@@ -545,11 +598,26 @@ nav {
 </div>
 
 <script>
-document.getElementById('browse-more-cities').addEventListener('change', function () {
-  if (!this.value) return;
-  const city = this.value.toLowerCase().trim().replace(/\s+/g, '');
-  window.location.href = 'community-city.html?city=' + encodeURIComponent(city);
-});
+(function () {
+  var citySlugs = ['paris', 'athens', 'london', 'madrid', 'amsterdam', 'barcelona', 'berlin', 'lisbon', 'rome', 'copenhagen', 'vienna', 'prague', 'budapest', 'dublin', 'brussels', 'porto', 'valencia', 'milan', 'stockholm'];
+  var input = document.getElementById('cities-search-input');
+  if (!input) return;
+  input.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    var raw = input.value.trim().toLowerCase().replace(/\s+/g, '');
+    if (raw.length < 2) return;
+    var slug = null;
+    for (var i = 0; i < citySlugs.length; i++) {
+      var s = citySlugs[i];
+      if (s === raw || s.indexOf(raw) === 0 || raw.indexOf(s) === 0) {
+        slug = s;
+        break;
+      }
+    }
+    if (slug) window.location.href = 'community-city.html?city=' + encodeURIComponent(slug);
+  });
+})();
 </script>
 </body>
 </html>
