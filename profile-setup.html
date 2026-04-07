@@ -171,9 +171,14 @@ textarea { min-height: 88px; resize: vertical; }
   border-radius: 12px;
   cursor: pointer;
   transition: background 0.2s;
+  text-align: center;
+  box-sizing: border-box;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .btn-complete:hover { background: var(--btn-green-hover); }
-.btn-complete:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-complete:disabled,
+.btn-complete[aria-busy="true"] { opacity: 0.65; cursor: not-allowed; }
 
 .field-error {
   display: block;
@@ -262,6 +267,7 @@ textarea { min-height: 88px; resize: vertical; }
       </div>
 
       <button type="button" class="btn-complete" id="complete-btn">Complete my profile</button>
+      <p id="complete-error" class="field-error" role="alert" style="text-align:center;margin-top:10px;" hidden></p>
     </form>
     <p class="back-link"><a href="community.html">← Back to cities</a></p>
   </div>
@@ -269,6 +275,14 @@ textarea { min-height: 88px; resize: vertical; }
 
 <script>
 (function () {
+  function whenReady(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn);
+    } else {
+      fn();
+    }
+  }
+  whenReady(function () {
   var cityNames = {
     paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milan: 'Milan',
     barcelona: 'Barcelona', berlin: 'Berlin', amsterdam: 'Amsterdam', lisbon: 'Lisbon',
@@ -303,6 +317,7 @@ textarea { min-height: 88px; resize: vertical; }
   document.getElementById('city-pill').textContent = 'My city: ' + cityDisplay;
   localStorage.setItem('livvo_city', cityDisplay);
   window.__livvoCityDisplay = cityDisplay;
+  });
 })();
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -310,7 +325,17 @@ textarea { min-height: 88px; resize: vertical; }
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script>
 (function () {
-  if (!window.__livvoCityDisplay) return;
+  function whenReady(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn);
+    } else {
+      fn();
+    }
+  }
+  whenReady(function () {
+  if (!window.__livvoCityDisplay) {
+    return;
+  }
   var cityDisplay = window.__livvoCityDisplay;
 
   var firebaseConfig = {
@@ -372,23 +397,72 @@ textarea { min-height: 88px; resize: vertical; }
   bio.addEventListener('input', updateBioCount);
   updateBioCount();
 
-  document.getElementById('complete-btn').addEventListener('click', async function () {
+  var completeBtn = document.getElementById('complete-btn');
+  var completeErrorEl = document.getElementById('complete-error');
+  var usernameErrorEl = document.getElementById('username-error');
+  var roleErrorEl = document.getElementById('role-error');
+  var usernameInputEl = document.getElementById('username');
+  var professionSelectEl = document.getElementById('profession');
+
+  function hideCompleteError() {
+    completeErrorEl.textContent = '';
+    completeErrorEl.hidden = true;
+  }
+  function showFieldErr(el, msg) {
+    el.textContent = msg;
+    el.hidden = false;
+  }
+  function clearProfileFieldErrors() {
+    usernameErrorEl.textContent = '';
+    usernameErrorEl.hidden = true;
+    roleErrorEl.textContent = '';
+    roleErrorEl.hidden = true;
+  }
+
+  if (!completeBtn) {
+    console.error('complete-btn element not found');
+    return;
+  }
+
+  usernameInputEl.addEventListener('input', function () {
+    usernameErrorEl.textContent = '';
+    usernameErrorEl.hidden = true;
+  });
+  professionSelectEl.addEventListener('change', function () {
+    roleErrorEl.textContent = '';
+    roleErrorEl.hidden = true;
+  });
+
+  var completeBtnDefaultText = completeBtn.textContent;
+
+  completeBtn.addEventListener('click', async function () {
+    hideCompleteError();
+    clearProfileFieldErrors();
+
+    var username = usernameInputEl.value.trim();
+    var profession = professionSelectEl.value;
+
+    if (!username) {
+      showFieldErr(usernameErrorEl, 'Please enter a username');
+      return;
+    }
+    if (!profession) {
+      showFieldErr(roleErrorEl, 'Please select what describes you');
+      return;
+    }
+
+    var user = firebase.auth().currentUser;
+    if (!user) {
+      completeErrorEl.textContent = 'Session expired. Please sign in again.';
+      completeErrorEl.hidden = false;
+      return;
+    }
+
+    completeBtn.disabled = true;
+    completeBtn.setAttribute('aria-busy', 'true');
+    completeBtn.textContent = 'Saving...';
+
     try {
-      alert("Step 1: button clicked");
-
-      var username = document.getElementById('username').value.trim();
-      var profession = document.getElementById('profession').value;
-      alert("Step 2: username = " + username);
-
-      if (!username) { alert("Please enter a username"); return; }
-      if (!profession) { alert("Please select what describes you"); return; }
-
-      var user = firebase.auth().currentUser;
-      if (!user) { alert("Not logged in"); return; }
-
-      alert("Step 3: user logged in as " + user.uid);
-
-      alert("Step 4: saving to Firestore...");
       await firebase.firestore().collection('users').doc(user.uid).set({
         username: username,
         profession: profession,
@@ -396,13 +470,16 @@ textarea { min-height: 88px; resize: vertical; }
         email: user.email,
         createdAt: new Date()
       });
-
-      alert("Step 5: saved! redirecting...");
       window.location.href = 'community-portal.html';
     } catch (err) {
       console.error(err);
-      alert("ERROR: " + err.message);
+      completeErrorEl.textContent = 'Something went wrong. Please try again.';
+      completeErrorEl.hidden = false;
+      completeBtn.disabled = false;
+      completeBtn.removeAttribute('aria-busy');
+      completeBtn.textContent = completeBtnDefaultText;
     }
+  });
   });
 })();
 </script>

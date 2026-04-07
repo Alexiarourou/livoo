@@ -2,18 +2,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow create, update, delete: if request.auth != null && request.auth.uid == userId;
-
-      match /profile/{docId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
-        allow create, update: if request.auth != null
-          && request.auth.uid == userId
-          && docId == 'main';
-        allow delete: if request.auth != null && request.auth.uid == userId && docId == 'main';
-      }
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /posts/{postId} {
+      allow read: if true;
+      allow write: if request.auth != null;
     }
 
+    // Used by community-portal.html (modular Firestore client)
     match /communityPosts/{postId} {
       allow read: if request.auth != null;
 
