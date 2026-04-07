@@ -293,7 +293,7 @@ textarea { min-height: 88px; resize: vertical; }
   if (!hasUrlCity) {
     var stored = localStorage.getItem('livvo_city');
     if (stored && stored.trim()) {
-      window.location.replace('setup-profile.html?city=' + encodeURIComponent(stored.trim()));
+      window.location.replace('profile-setup.html?city=' + encodeURIComponent(stored.trim()));
     } else {
       window.location.replace('signup.html');
     }

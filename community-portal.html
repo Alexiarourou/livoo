@@ -1116,7 +1116,7 @@ nav {
         const pdata = profileDoc.exists ? profileDoc.data() : null;
 
         if (!isUserProfileComplete(pdata)) {
-          window.location.href = 'setup-profile.html?city=' + encodeURIComponent(city);
+          window.location.href = 'profile-setup.html?city=' + encodeURIComponent(city);
           return;
         }
 
@@ -1124,7 +1124,7 @@ nav {
       } catch (error) {
         console.error('Portal error:', error);
         if (user) {
-          window.location.href = 'setup-profile.html?city=' + encodeURIComponent(city);
+          window.location.href = 'profile-setup.html?city=' + encodeURIComponent(city);
         }
       }
     });
@@ -1146,10 +1146,10 @@ nav {
         if (isUserProfileComplete(pdata)) {
           showPortal(u, pdata);
         } else {
-          window.location.href = 'setup-profile.html?city=' + encodeURIComponent(city);
+          window.location.href = 'profile-setup.html?city=' + encodeURIComponent(city);
         }
       } catch (e) {
-        window.location.href = 'setup-profile.html?city=' + encodeURIComponent(city);
+        window.location.href = 'profile-setup.html?city=' + encodeURIComponent(city);
       }
     }, 3000);
 

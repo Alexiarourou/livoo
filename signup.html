@@ -409,7 +409,7 @@ nav {
 
   function goToProfileSetup() {
     localStorage.setItem('livvo_city', cityName);
-    window.location.href = 'setup-profile.html?city=' + encodeURIComponent(cityName);
+    window.location.href = 'profile-setup.html?city=' + encodeURIComponent(cityName);
   }
 
   async function routeAfterCommunityAuth(uid) {
@@ -420,7 +420,7 @@ nav {
     console.log('[routeAfterCommunityAuth] Firestore users doc exists:', userSnap.exists);
     console.log('[routeAfterCommunityAuth] user doc data:', data);
     console.log('[routeAfterCommunityAuth] isUserProfileComplete:', complete);
-    console.log('[routeAfterCommunityAuth] route →', complete ? 'community' : 'setup-profile');
+    console.log('[routeAfterCommunityAuth] route →', complete ? 'community' : 'profile-setup');
     if (complete) {
       goToCommunity();
     } else {
