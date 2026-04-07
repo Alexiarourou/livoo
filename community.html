@@ -166,31 +166,44 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
 .btn-city-active { background: var(--green); border-color: var(--green); color: white; }
 .btn-city-active:hover { background: var(--green-dark); }
 
-.join-section { margin: 0 48px 80px; background: linear-gradient(135deg, rgba(5,150,105,0.08) 0%, rgba(5,150,105,0.04) 100%); border: 1px solid rgba(5,150,105,0.2); border-radius: 24px; padding: 64px 48px; text-align: center; position: relative; overflow: hidden; }
-.join-section::before { content: ''; position: absolute; top: -50%; left: 50%; transform: translateX(-50%); width: 400px; height: 400px; background: radial-gradient(circle, rgba(5,150,105,0.06) 0%, transparent 70%); }
-.join-section h2 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2.2rem; letter-spacing: -0.03em; margin-bottom: 16px; color: var(--text-dark); }
+.join-section {
+  background: var(--bg-dark);
+  border: none;
+  border-radius: 0;
+  padding: 56px 48px 80px;
+  margin: 0;
+  max-width: none;
+  width: 100%;
+  text-align: center;
+}
+.join-section h2 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2.2rem; letter-spacing: -0.03em; margin-bottom: 14px; color: var(--text-dark); }
 .join-section h2 span { color: var(--green); }
-.join-section p { color: var(--muted-dark); font-size: 1rem; max-width: 480px; margin: 0 auto 36px; line-height: 1.7; }
-.join-form { display: flex; gap: 12px; max-width: 440px; margin: 0 auto; }
-.join-input { flex: 1; background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 10px; padding: 14px 18px; font-family: "DM Sans", sans-serif; font-size: 0.95rem; color: var(--text-dark); outline: none; transition: border-color 0.2s; }
-.join-input::placeholder { color: var(--muted-dark); opacity: 0.7; }
-.join-input:focus { border-color: var(--green); }
-.btn-join { background: var(--green); color: white; border: none; border-radius: 10px; padding: 14px 24px; font-family: "DM Sans", sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+.join-section p { color: var(--muted-dark); font-size: 1rem; max-width: 480px; margin: 0 auto 24px; line-height: 1.7; }
+.join-form { display: flex; gap: 12px; max-width: 440px; margin: 0 auto; align-items: stretch; }
+.join-input {
+  flex: 1;
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid rgba(5, 150, 105, 0.35);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.join-input::placeholder { color: var(--muted-dark); opacity: 0.75; }
+.join-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15); }
+.btn-join { background: var(--green); color: white; border: none; border-radius: 10px; padding: 14px 24px; font-family: "DM Sans", sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
 .btn-join:hover { background: var(--green-dark); }
-
-.avatars { display: flex; justify-content: center; align-items: center; gap: 0; margin-bottom: 20px; }
-.avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--bg-dark); margin-left: -10px; background: linear-gradient(135deg, rgba(5,150,105,0.2), rgba(16,185,129,0.15)); display: flex; align-items: center; justify-content: center; }
-.avatar:first-child { margin-left: 0; }
-.avatar svg { width: 18px; height: 18px; }
-.avatar svg path { stroke: var(--green); stroke-width: 2; fill: none; }
-.avatar-count { margin-left: 12px; font-size: 0.85rem; color: var(--muted-dark); }
 
 @media (max-width: 900px) {
   .cities-grid { grid-template-columns: 1fr; }
   .hero { padding: 100px 24px 24px; }
   .section { padding: 48px 24px; }
   #community { padding-top: 32px; }
-  .join-section { margin: 0 24px 60px; padding: 40px 24px; }
+  .join-section { margin: 0; padding: 44px 24px 60px; }
   .join-form { flex-direction: column; }
 }
 
@@ -346,14 +359,6 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
 <div class="join-section" id="join">
   <h2>Ready to find <span>your people?</span></h2>
   <p>Join the Livvo community. It is completely free. Connect with people moving to the same city as you.</p>
-  <div class="avatars">
-    <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-    <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-    <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-    <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-    <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-    <span class="avatar-count">Join the community</span>
-  </div>
   <form class="join-form" action="https://formspree.io/f/mbdzykvg" method="POST">
     <input class="join-input" type="email" name="email" placeholder="Your email address" required />
     <input type="hidden" name="source" value="community page" />
