@@ -354,7 +354,7 @@ nav {
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword,
     signInWithEmailAndPassword, GoogleAuthProvider,
-    signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -543,24 +543,29 @@ nav {
     }
   });
 
-  document.querySelectorAll('.google-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      hideError(document.getElementById('signup-error'));
-      hideError(document.getElementById('signin-error'));
-      try {
-        const cred = await signInWithPopup(auth, provider);
-        await redirectNewAccountAfterAuth(cred.user.uid);
-      } catch (error) {
-        const msg = getFriendlyError(error.code);
-        console.error(msg);
-        if (panelSignin.classList.contains('active')) {
-          showError(signinErrorEl, msg);
-        } else {
-          showError(signupErrorEl, msg);
-        }
-      }
+  document.querySelectorAll('.google-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      hideError(signupErrorEl);
+      hideError(signinErrorEl);
+      localStorage.setItem('livvo_city', cityName);
+      signInWithRedirect(auth, provider);
     });
   });
+
+  getRedirectResult(auth)
+    .then(async function (result) {
+      if (!result || !result.user) return;
+      await redirectNewAccountAfterAuth(result.user.uid);
+    })
+    .catch(function (error) {
+      var msg = getFriendlyError(error.code);
+      console.error(msg);
+      if (panelSignin.classList.contains('active')) {
+        showError(signinErrorEl, msg);
+      } else {
+        showError(signupErrorEl, msg);
+      }
+    });
 </script>
 </body>
 </html>
