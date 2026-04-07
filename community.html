@@ -75,7 +75,7 @@ nav {
   outline-offset: 2px;
 }
 
-.hero { padding: 140px 48px 28px; text-align: center; position: relative; overflow: hidden; }
+.hero { padding: 140px 48px 24px; text-align: center; position: relative; overflow: hidden; }
 .hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(5,150,105,0.1) 0%, transparent 70%); pointer-events: none; }
 .hero-tag {
   display: inline-flex;
@@ -131,14 +131,15 @@ nav {
 .btn-secondary-cta:hover { color: var(--green); border-color: var(--green); background: rgba(5,150,105,0.06); }
 
 .section { padding: 80px 48px; max-width: 1200px; margin: 0 auto; }
-#community { padding-top: 48px; scroll-margin-top: 72px; }
+#cities { padding: 32px 48px 48px; max-width: 1200px; margin: 0 auto; scroll-margin-top: 72px; }
+#cities .section-header { margin-bottom: 24px; }
 .section-header { margin-bottom: 48px; }
 .section-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
 .section-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.03em; }
 .section-sub { color: var(--muted-dark); font-size: 0.95rem; margin-top: 8px; line-height: 1.6; }
 
-#community .section-header { text-align: center; margin-bottom: 40px; }
-#community .section-sub {
+#cities .section-header { text-align: center; }
+#cities .section-sub {
   max-width: 36rem;
   margin: 14px auto 0;
   font-size: 1rem;
@@ -168,7 +169,7 @@ nav {
 .card h3 { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 8px; color: var(--text-dark); }
 .card p { font-size: 0.9rem; color: var(--muted-dark); line-height: 1.6; margin: 0; }
 
-.cities-more-wrap { width: 100%; max-width: 600px; margin: 0 auto 40px; }
+.cities-more-wrap { width: 100%; max-width: 600px; margin: 36px auto 0; }
 .cities-search-card {
   background: #ffffff;
   border: 1px solid #d4eadb;
@@ -329,11 +330,10 @@ nav {
 }
 .cities-request-cta:hover { color: white; }
 .cities-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; align-items: stretch; }
-.city-card { background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 20px; overflow: hidden; transition: all 0.3s; cursor: default; color: inherit; display: flex; flex-direction: column; height: 100%; min-height: 0; }
-.city-card:hover { border-color: var(--green); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(5,150,105,0.15); }
-.city-cover-link { text-decoration: none; color: inherit; display: block; flex-shrink: 0; cursor: pointer; }
-.city-cover-link:hover .city-name-big { opacity: 0.95; }
-.city-cover { height: 200px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 20px; background-size: cover, cover; background-position: center, center; }
+.city-card { background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 20px; overflow: hidden; transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s; cursor: default; color: inherit; display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.city-card:hover { border-color: var(--green); box-shadow: 0 12px 40px rgba(5,150,105,0.12); }
+.city-card.is-expanded { transform: translateY(-4px); border-color: var(--green); box-shadow: 0 18px 52px rgba(5,150,105,0.18); }
+.city-cover { height: 200px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 20px; background-size: cover, cover; background-position: center, center; flex-shrink: 0; }
 .city-cover-milano { background-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%), url(https://images.unsplash.com/photo-1513581166391-887a96ddeafd?w=800&q=80); }
 .city-cover-paris { background-image: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 48%, transparent 72%), url(https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80); }
 .city-cover-athens { background-image: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 48%, transparent 72%), url(./athens.jpg); }
@@ -341,19 +341,61 @@ nav {
 .city-cover-madrid { background-image: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 48%, transparent 72%), url(https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=80); }
 .city-name-big { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2rem; letter-spacing: -0.04em; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
 .city-body { padding: 24px; display: flex; flex-direction: column; flex: 1; min-height: 0; }
-.city-body > .btn-city { margin-top: auto; }
-.city-tagline {
+.city-card-collapsed { margin-top: auto; width: 100%; }
+.city-card-expanded {
+  display: none;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  width: 100%;
+  margin-top: auto;
+}
+.city-card.is-expanded .city-card-collapsed { display: none; }
+.city-card.is-expanded .city-card-expanded { display: flex; }
+.city-expand-summary {
   font-family: "DM Sans", sans-serif;
-  font-size: 0.85rem;
-  line-height: 1.5;
+  font-size: 0.9rem;
+  line-height: 1.45;
   color: var(--muted-dark);
   text-align: center;
-  margin: 0 0 16px;
+  margin: 0;
 }
-.btn-city { width: 100%; padding: 12px; background: transparent; border: 1px solid rgba(5,150,105,0.3); border-radius: 10px; color: var(--green); font-family: "DM Sans", sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; text-decoration: none; display: block; }
+.btn-city-continue {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  background: var(--green);
+  color: white;
+  border: none;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-city-continue:hover { background: var(--green-dark); color: white; transform: translateY(-1px); }
+.btn-city {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid rgba(5,150,105,0.3);
+  border-radius: 10px;
+  color: var(--green);
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+}
 .btn-city:hover { background: rgba(5,150,105,0.08); border-color: var(--green); }
 .btn-city-active { background: var(--green); border-color: var(--green); color: white; }
 .btn-city-active:hover { background: var(--green-dark); }
+.city-expand-btn { border: none; }
 
 .join-section {
   background: var(--bg-dark);
@@ -393,7 +435,7 @@ nav {
   .cards-grid-3 { grid-template-columns: 1fr; max-width: 420px; }
   .hero { padding: 100px 24px 24px; }
   .section { padding: 48px 24px; }
-  #community { padding-top: 32px; }
+  #cities { padding: 28px 24px 40px; }
   .join-section { margin: 0; padding: 44px 24px 60px; }
   .join-form { flex-direction: column; }
 }
@@ -484,12 +526,99 @@ nav {
   <h1>Find your people<br>in a <span>new city</span></h1>
   <p>Join city groups, connect with people moving to the same place as you, and feel at home before you even arrive.</p>
   <div class="cta-row">
-    <a href="#join" class="btn-primary btn-cta-main">Join the community</a>
-    <a href="#community" class="btn-secondary-cta">Browse cities</a>
+    <a href="#cities" class="btn-primary btn-cta-main">Join the community</a>
   </div>
 </section>
 
-<section class="section" aria-label="What you get from the community">
+<div id="cities">
+  <div class="section-header">
+    <div class="section-label">City Communities</div>
+    <h2 class="section-title">Choose your city</h2>
+    <p class="section-sub">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
+  </div>
+  <div class="cities-grid">
+    <div class="city-card">
+      <div class="city-cover city-cover-paris">
+        <div class="city-name-big">Paris</div>
+      </div>
+      <div class="city-body">
+        <div class="city-card-collapsed">
+          <button type="button" class="btn-city btn-city-active city-expand-btn" aria-expanded="false" aria-controls="city-expand-paris" id="city-toggle-paris">Join Paris community</button>
+        </div>
+        <div class="city-card-expanded" id="city-expand-paris" role="region" aria-labelledby="city-toggle-paris">
+          <p class="city-expand-summary">Art, culture and a growing expat scene.</p>
+          <a href="signup.html?city=Paris" class="btn-city-continue">Continue to sign up →</a>
+        </div>
+      </div>
+    </div>
+    <div class="city-card">
+      <div class="city-cover city-cover-athens">
+        <div class="city-name-big">Athens</div>
+      </div>
+      <div class="city-body">
+        <div class="city-card-collapsed">
+          <button type="button" class="btn-city btn-city-active city-expand-btn" aria-expanded="false" aria-controls="city-expand-athens" id="city-toggle-athens">Join Athens community</button>
+        </div>
+        <div class="city-card-expanded" id="city-expand-athens" role="region" aria-labelledby="city-toggle-athens">
+          <p class="city-expand-summary">Sun, history and one of Europe&apos;s most welcoming cities.</p>
+          <a href="signup.html?city=Athens" class="btn-city-continue">Continue to sign up →</a>
+        </div>
+      </div>
+    </div>
+    <div class="city-card">
+      <div class="city-cover city-cover-london">
+        <div class="city-name-big">London</div>
+      </div>
+      <div class="city-body">
+        <div class="city-card-collapsed">
+          <button type="button" class="btn-city btn-city-active city-expand-btn" aria-expanded="false" aria-controls="city-expand-london" id="city-toggle-london">Join London community</button>
+        </div>
+        <div class="city-card-expanded" id="city-expand-london" role="region" aria-labelledby="city-toggle-london">
+          <p class="city-expand-summary">The classic first move abroad.</p>
+          <a href="signup.html?city=London" class="btn-city-continue">Continue to sign up →</a>
+        </div>
+      </div>
+    </div>
+    <div class="city-card">
+      <div class="city-cover city-cover-madrid">
+        <div class="city-name-big">Madrid</div>
+      </div>
+      <div class="city-body">
+        <div class="city-card-collapsed">
+          <button type="button" class="btn-city btn-city-active city-expand-btn" aria-expanded="false" aria-controls="city-expand-madrid" id="city-toggle-madrid">Join Madrid community</button>
+        </div>
+        <div class="city-card-expanded" id="city-expand-madrid" role="region" aria-labelledby="city-toggle-madrid">
+          <p class="city-expand-summary">Warm nights, great food, instant community.</p>
+          <a href="signup.html?city=Madrid" class="btn-city-continue">Continue to sign up →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cities-more-wrap">
+    <div class="cities-search-card">
+      <p class="cities-search-eyebrow" id="cities-search-eyebrow">Find your city</p>
+      <div class="cities-search-bar" role="search" aria-labelledby="cities-search-eyebrow">
+        <span class="cities-search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+        <input type="search" id="cities-search-input" class="cities-search-input" placeholder="Search for your city..." autocomplete="off" aria-label="Search for your city" />
+      </div>
+      <div class="cities-quick-pills">
+        <a href="signup.html?city=Amsterdam" class="cities-quick-pill">Amsterdam</a>
+        <a href="signup.html?city=Barcelona" class="cities-quick-pill">Barcelona</a>
+        <a href="signup.html?city=Berlin" class="cities-quick-pill">Berlin</a>
+        <a href="signup.html?city=Lisbon" class="cities-quick-pill">Lisbon</a>
+        <a href="signup.html?city=Rome" class="cities-quick-pill">Rome</a>
+        <a href="signup.html?city=Copenhagen" class="cities-quick-pill">Copenhagen</a>
+        <a href="signup.html?city=Prague" class="cities-quick-pill">Prague</a>
+        <a href="signup.html?city=Dublin" class="cities-quick-pill">Dublin</a>
+      </div>
+      <p class="cities-more-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
+    </div>
+  </div>
+</div>
+
+<section class="section" id="community-benefits" aria-label="What you get from the community">
   <div class="cards cards-grid-3">
     <div class="card card-static">
       <div class="card-icon" aria-hidden="true">
@@ -514,82 +643,6 @@ nav {
     </div>
   </div>
 </section>
-
-<div class="section" id="community">
-  <div class="section-header">
-    <div class="section-label">City Communities</div>
-    <h2 class="section-title">Choose your city</h2>
-    <p class="section-sub">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
-  </div>
-  <div class="cities-more-wrap">
-    <div class="cities-search-card">
-      <p class="cities-search-eyebrow" id="cities-search-eyebrow">Find your city</p>
-      <div class="cities-search-bar" role="search" aria-labelledby="cities-search-eyebrow">
-        <span class="cities-search-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </span>
-        <input type="search" id="cities-search-input" class="cities-search-input" placeholder="Search for your city..." autocomplete="off" aria-label="Search for your city" />
-      </div>
-      <div class="cities-quick-pills">
-        <a href="signup.html?city=Amsterdam" class="cities-quick-pill">Amsterdam</a>
-        <a href="signup.html?city=Barcelona" class="cities-quick-pill">Barcelona</a>
-        <a href="signup.html?city=Berlin" class="cities-quick-pill">Berlin</a>
-        <a href="signup.html?city=Lisbon" class="cities-quick-pill">Lisbon</a>
-        <a href="signup.html?city=Rome" class="cities-quick-pill">Rome</a>
-        <a href="signup.html?city=Copenhagen" class="cities-quick-pill">Copenhagen</a>
-        <a href="signup.html?city=Prague" class="cities-quick-pill">Prague</a>
-        <a href="signup.html?city=Dublin" class="cities-quick-pill">Dublin</a>
-      </div>
-      <p class="cities-more-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
-    </div>
-  </div>
-  <div class="cities-grid">
-    <div class="city-card">
-      <a href="signup.html?city=Paris" class="city-cover-link">
-        <div class="city-cover city-cover-paris">
-          <div class="city-name-big">Paris</div>
-        </div>
-      </a>
-      <div class="city-body">
-        <p class="city-tagline">Art, culture and a growing expat scene</p>
-        <a href="signup.html?city=Paris" class="btn-city btn-city-active">Join Paris community</a>
-      </div>
-    </div>
-    <div class="city-card">
-      <a href="signup.html?city=Athens" class="city-cover-link">
-        <div class="city-cover city-cover-athens">
-          <div class="city-name-big">Athens</div>
-        </div>
-      </a>
-      <div class="city-body">
-        <p class="city-tagline">Sun, history and one of Europe's most welcoming cities</p>
-        <a href="signup.html?city=Athens" class="btn-city btn-city-active">Join Athens community</a>
-      </div>
-    </div>
-    <div class="city-card">
-      <a href="signup.html?city=London" class="city-cover-link">
-        <div class="city-cover city-cover-london">
-          <div class="city-name-big">London</div>
-        </div>
-      </a>
-      <div class="city-body">
-        <p class="city-tagline">The classic first move abroad</p>
-        <a href="signup.html?city=London" class="btn-city btn-city-active">Join London community</a>
-      </div>
-    </div>
-    <div class="city-card">
-      <a href="signup.html?city=Madrid" class="city-cover-link">
-        <div class="city-cover city-cover-madrid">
-          <div class="city-name-big">Madrid</div>
-        </div>
-      </a>
-      <div class="city-body">
-        <p class="city-tagline">Warm nights, great food, instant community</p>
-        <a href="signup.html?city=Madrid" class="btn-city btn-city-active">Join Madrid community</a>
-      </div>
-    </div>
-  </div>
-</div>
 
 <section class="cities-request-strip" aria-labelledby="cities-request-heading">
   <div class="cities-request-inner">
@@ -637,6 +690,17 @@ nav {
       var displayName = cityNames[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
       window.location.href = 'signup.html?city=' + encodeURIComponent(displayName);
     }
+  });
+})();
+
+(function () {
+  document.querySelectorAll('.city-expand-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var card = btn.closest('.city-card');
+      if (!card) return;
+      var open = card.classList.toggle('is-expanded');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
   });
 })();
 </script>
