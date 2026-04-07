@@ -203,7 +203,7 @@ textarea { min-height: 88px; resize: vertical; }
     <h1>Complete your profile</h1>
     <p class="setup-sub">A quick intro so people in your city know who you are.</p>
     <div id="form-error" class="form-error" role="alert"></div>
-    <form id="profile-form" novalidate>
+    <form id="profile-form" novalidate action="#" onsubmit="return false;">
       <div class="photo-block">
         <label class="photo-upload-wrap" id="photo-label" for="photo-input">
           <input type="file" id="photo-input" accept="image/*" />
@@ -222,12 +222,12 @@ textarea { min-height: 88px; resize: vertical; }
 
       <div class="form-row">
         <label for="username">Username</label>
-        <input type="text" id="username" name="username" required minlength="3" maxlength="40" autocomplete="username" placeholder="How you want to appear" />
+        <input type="text" id="username" name="username" maxlength="40" autocomplete="username" placeholder="How you want to appear" />
       </div>
 
       <div class="form-row">
         <label for="role">I am…</label>
-        <select id="role" name="role" required>
+        <select id="role" name="role">
           <option value="" disabled selected>Select one</option>
           <option value="A student">A student</option>
           <option value="A young professional">A young professional</option>
@@ -244,7 +244,7 @@ textarea { min-height: 88px; resize: vertical; }
         <div class="char-count" id="bio-count"><span id="bio-count-num">0</span> / 150</div>
       </div>
 
-      <button type="submit" class="btn-complete" id="btn-submit">Complete my profile</button>
+      <button type="button" class="btn-complete" id="btn-submit">Complete my profile</button>
     </form>
     <p class="back-link"><a href="community.html">← Back to cities</a></p>
   </div>
@@ -253,10 +253,8 @@ textarea { min-height: 88px; resize: vertical; }
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-
-  const PROFILE_DOC_ID = 'main';
 
   const cityNames = {
     paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milan: 'Milan',
@@ -360,7 +358,6 @@ textarea { min-height: 88px; resize: vertical; }
       }
 
       const userDocRef = doc(db, 'users', user.uid);
-      const profileRef = doc(db, 'users', user.uid, 'profile', PROFILE_DOC_ID);
       try {
         const userSnap = await getDoc(userDocRef);
         if (userSnap.exists && isUserProfileComplete(userSnap.data())) {
@@ -373,27 +370,17 @@ textarea { min-height: 88px; resize: vertical; }
       }
 
       const form = document.getElementById('profile-form');
-
       if (form.dataset.bound === '1') return;
       form.dataset.bound = '1';
 
-      const submitBtn = document.getElementById('btn-submit');
-      if (submitBtn) submitBtn.disabled = false;
-
-      form.addEventListener('submit', async function (e) {
-        e.preventDefault();
+      document.getElementById('btn-submit').addEventListener('click', async function () {
         hideFormError();
 
         const username = (document.getElementById('username').value || '').trim();
-        const role = document.getElementById('role').value;
-        const bioText = (bio.value || '').trim();
+        const role = (document.getElementById('role').value || '').trim();
 
-        if (username.length < 3) {
-          showFormError('Username must be at least 3 characters.');
-          return;
-        }
-        if (!role) {
-          showFormError('Please choose how you describe yourself.');
+        if (!username || !role) {
+          showFormError('Please enter a username and choose an option under “I am…”.');
           return;
         }
 
@@ -413,14 +400,12 @@ textarea { min-height: 88px; resize: vertical; }
             username: username,
             photoURL: photoURL || '',
             role: role,
-            bio: bioText || '',
+            bio: (bio.value || '').trim(),
             city: cityDisplay,
             createdAt: serverTimestamp()
           };
-          const batch = writeBatch(db);
-          batch.set(userDocRef, payload, { merge: true });
-          batch.set(profileRef, payload, { merge: true });
-          await batch.commit();
+
+          await setDoc(userDocRef, payload, { merge: true });
 
           const authUpdates = { displayName: username };
           if (photoURL) authUpdates.photoURL = photoURL;
