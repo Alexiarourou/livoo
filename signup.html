@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Community — Sign up or sign in | Livvo</title>
+<title>Sign up or sign in | Livvo</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23059669'/><path d='M8 12l8 12 8-12-4-6H12z' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -257,7 +257,7 @@ nav {
   </div>
 </nav>
 <div class="page">
-  <a href="#" class="join-back" id="joinBackLink">← Back to city</a>
+  <a href="community.html" class="join-back" id="joinBackLink">← Back to cities</a>
   <div class="join-card" id="authCard">
     <div class="auth-tabs" role="tablist" aria-label="Account">
       <button type="button" class="auth-tab active" id="tab-signup" role="tab" aria-selected="true" aria-controls="panel-signup">Sign up</button>
@@ -328,16 +328,21 @@ nav {
     ghent: 'Ghent', krakow: 'Krakow', warsaw: 'Warsaw', tallinn: 'Tallinn', riga: 'Riga', tbilisi: 'Tbilisi'
   };
   const params = new URLSearchParams(location.search);
-  const city = (params.get('city') || 'athens').toLowerCase();
-  const cityName = cityNames[city] || (city.charAt(0).toUpperCase() + city.slice(1));
+  const rawCity = params.get('city');
+  const slug = rawCity
+    ? rawCity.toLowerCase().trim().replace(/[\s_-]+/g, '')
+    : 'athens';
+  function titleCaseFromRaw(str) {
+    if (!str || !str.trim()) return 'Athens';
+    return str.trim().replace(/\s+/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+  }
+  const cityName = cityNames[slug] || titleCaseFromRaw(rawCity || '');
   document.getElementById('pageTitle').textContent = 'Join the ' + cityName + ' community';
   document.getElementById('pageSub').textContent =
     'Free to join. Connect with people moving to ' + cityName + ', find flatmates and get local tips.';
-  document.getElementById('signupCityField').value = city;
-  document.getElementById('signinCityField').value = city;
-  const back = document.getElementById('joinBackLink');
-  back.textContent = '← Back to ' + cityName;
-  back.href = 'community-city.html?city=' + encodeURIComponent(city);
+  document.getElementById('signupCityField').value = cityName;
+  document.getElementById('signinCityField').value = cityName;
+  document.getElementById('joinBackLink').href = 'community.html';
 
   const tabSignup = document.getElementById('tab-signup');
   const tabSignin = document.getElementById('tab-signin');

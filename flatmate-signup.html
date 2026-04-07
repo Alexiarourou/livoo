@@ -113,7 +113,7 @@ nav {
     document.getElementById('authTitle').textContent = 'Join the community';
     document.getElementById('authSub').textContent = 'Create a free account to join the forum, chat with others, and connect with people in your city.';
     document.getElementById('navBack').textContent = '← Back to cities';
-    document.getElementById('navBack').href = params.get('city') ? 'community-auth.html?city=' + params.get('city') : 'community.html';
+    document.getElementById('navBack').href = params.get('city') ? 'signup.html?city=' + encodeURIComponent(params.get('city')) : 'community.html';
   }
 </script>
 <script>

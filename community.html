@@ -517,60 +517,60 @@ nav {
       <input type="search" id="cities-search-input" class="cities-search-input" placeholder="Search for your city..." autocomplete="off" aria-label="Search for your city" />
     </div>
     <div class="cities-quick-pills">
-      <a href="community-city.html?city=amsterdam" class="cities-quick-pill">Amsterdam</a>
-      <a href="community-city.html?city=barcelona" class="cities-quick-pill">Barcelona</a>
-      <a href="community-city.html?city=berlin" class="cities-quick-pill">Berlin</a>
-      <a href="community-city.html?city=lisbon" class="cities-quick-pill">Lisbon</a>
-      <a href="community-city.html?city=rome" class="cities-quick-pill">Rome</a>
-      <a href="community-city.html?city=copenhagen" class="cities-quick-pill">Copenhagen</a>
-      <a href="community-city.html?city=prague" class="cities-quick-pill">Prague</a>
-      <a href="community-city.html?city=dublin" class="cities-quick-pill">Dublin</a>
+      <a href="signup.html?city=Amsterdam" class="cities-quick-pill">Amsterdam</a>
+      <a href="signup.html?city=Barcelona" class="cities-quick-pill">Barcelona</a>
+      <a href="signup.html?city=Berlin" class="cities-quick-pill">Berlin</a>
+      <a href="signup.html?city=Lisbon" class="cities-quick-pill">Lisbon</a>
+      <a href="signup.html?city=Rome" class="cities-quick-pill">Rome</a>
+      <a href="signup.html?city=Copenhagen" class="cities-quick-pill">Copenhagen</a>
+      <a href="signup.html?city=Prague" class="cities-quick-pill">Prague</a>
+      <a href="signup.html?city=Dublin" class="cities-quick-pill">Dublin</a>
     </div>
     <p class="cities-more-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
   </div>
   <div class="cities-grid">
     <div class="city-card">
-      <a href="community-city.html?city=paris" class="city-cover-link">
+      <a href="signup.html?city=Paris" class="city-cover-link">
         <div class="city-cover city-cover-paris">
           <div class="city-name-big">Paris</div>
         </div>
       </a>
       <div class="city-body">
         <p class="city-tagline">Art, culture and a growing expat scene</p>
-        <a href="community-auth.html?city=paris" class="btn-city btn-city-active">Join Paris community</a>
+        <a href="signup.html?city=Paris" class="btn-city btn-city-active">Join Paris community</a>
       </div>
     </div>
     <div class="city-card">
-      <a href="community-city.html?city=athens" class="city-cover-link">
+      <a href="signup.html?city=Athens" class="city-cover-link">
         <div class="city-cover city-cover-athens">
           <div class="city-name-big">Athens</div>
         </div>
       </a>
       <div class="city-body">
         <p class="city-tagline">Sun, history and one of Europe's most welcoming cities</p>
-        <a href="community-auth.html?city=athens" class="btn-city btn-city-active">Join Athens community</a>
+        <a href="signup.html?city=Athens" class="btn-city btn-city-active">Join Athens community</a>
       </div>
     </div>
     <div class="city-card">
-      <a href="community-city.html?city=london" class="city-cover-link">
+      <a href="signup.html?city=London" class="city-cover-link">
         <div class="city-cover city-cover-london">
           <div class="city-name-big">London</div>
         </div>
       </a>
       <div class="city-body">
         <p class="city-tagline">The classic first move abroad</p>
-        <a href="community-auth.html?city=london" class="btn-city btn-city-active">Join London community</a>
+        <a href="signup.html?city=London" class="btn-city btn-city-active">Join London community</a>
       </div>
     </div>
     <div class="city-card">
-      <a href="community-city.html?city=madrid" class="city-cover-link">
+      <a href="signup.html?city=Madrid" class="city-cover-link">
         <div class="city-cover city-cover-madrid">
           <div class="city-name-big">Madrid</div>
         </div>
       </a>
       <div class="city-body">
         <p class="city-tagline">Warm nights, great food, instant community</p>
-        <a href="community-auth.html?city=madrid" class="btn-city btn-city-active">Join Madrid community</a>
+        <a href="signup.html?city=Madrid" class="btn-city btn-city-active">Join Madrid community</a>
       </div>
     </div>
   </div>
@@ -600,6 +600,9 @@ nav {
 <script>
 (function () {
   var citySlugs = ['paris', 'athens', 'london', 'madrid', 'amsterdam', 'barcelona', 'berlin', 'lisbon', 'rome', 'copenhagen', 'vienna', 'prague', 'budapest', 'dublin', 'brussels', 'porto', 'valencia', 'milan', 'stockholm'];
+  var cityNames = {
+    paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', amsterdam: 'Amsterdam', barcelona: 'Barcelona', berlin: 'Berlin', lisbon: 'Lisbon', rome: 'Rome', copenhagen: 'Copenhagen', vienna: 'Vienna', prague: 'Prague', budapest: 'Budapest', dublin: 'Dublin', brussels: 'Brussels', porto: 'Porto', valencia: 'Valencia', milan: 'Milan', stockholm: 'Stockholm'
+  };
   var input = document.getElementById('cities-search-input');
   if (!input) return;
   input.addEventListener('keydown', function (e) {
@@ -615,7 +618,10 @@ nav {
         break;
       }
     }
-    if (slug) window.location.href = 'community-city.html?city=' + encodeURIComponent(slug);
+    if (slug) {
+      var displayName = cityNames[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
+      window.location.href = 'signup.html?city=' + encodeURIComponent(displayName);
+    }
   });
 })();
 </script>
