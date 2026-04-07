@@ -14,15 +14,18 @@ service cloud.firestore {
       allow read: if request.auth != null;
 
       allow create: if request.auth != null
-        && request.resource.data.authorId == request.auth.uid
+        && (request.resource.data.authorId == request.auth.uid
+            || request.resource.data.author == request.auth.uid)
         && request.resource.data.city is string
         && request.resource.data.category is string;
 
       allow delete: if request.auth != null
-        && resource.data.authorId == request.auth.uid;
+        && (resource.data.authorId == request.auth.uid
+            || resource.data.author == request.auth.uid);
 
       allow update: if request.auth != null && (
         resource.data.authorId == request.auth.uid
+        || resource.data.author == request.auth.uid
         || request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['commentCount', 'upvoteCount'])
       );
