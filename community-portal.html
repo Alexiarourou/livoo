@@ -681,6 +681,8 @@ nav {
     let currentUser = null;
     let cityDisplay = cityDisplayName;
 
+    window.alert("localStorage.getItem('livvo_city'): " + localStorage.getItem('livvo_city'));
+
     let feedUnsub = null;
     let threadCommentsUnsub = null;
     let openThreadId = null;
@@ -738,6 +740,7 @@ nav {
     }
 
     function subscribeFeed() {
+      window.alert('Loading feed for city: ' + cityForFeedQuery());
       if (feedUnsub) {
         feedUnsub();
         feedUnsub = null;
@@ -745,6 +748,7 @@ nav {
       var feedCity = cityForFeedQuery();
       var q = query(collection(db, 'communityPosts'), where('city', '==', feedCity));
       feedUnsub = onSnapshot(q, function (snap) {
+        window.alert('Posts found: ' + snap.docs.length);
         renderFeed(prepareFeedDocs(snap.docs, activeCategory));
       }, function (err) {
         console.error(err);
