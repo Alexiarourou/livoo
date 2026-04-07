@@ -175,16 +175,6 @@ textarea { min-height: 88px; resize: vertical; }
 .btn-complete:hover { background: var(--btn-green-hover); }
 .btn-complete:disabled { opacity: 0.55; cursor: not-allowed; }
 
-.form-error {
-  display: none;
-  font-size: 0.85rem;
-  color: #b91c1c;
-  margin-bottom: 16px;
-  text-align: center;
-  line-height: 1.45;
-}
-.form-error.show { display: block; }
-
 .field-error {
   display: block;
   font-size: 0.8rem;
@@ -193,6 +183,21 @@ textarea { min-height: 88px; resize: vertical; }
   line-height: 1.4;
 }
 .field-error[hidden] { display: none !important; }
+
+.req-star {
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 0.95em;
+  margin-left: 2px;
+}
+.photo-field-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-align: center;
+}
 
 .back-link {
   display: block;
@@ -211,9 +216,9 @@ textarea { min-height: 88px; resize: vertical; }
   <div class="setup-card">
     <h1>Complete your profile</h1>
     <p class="setup-sub">A quick intro so people in your city know who you are.</p>
-    <div id="form-error" class="form-error" role="alert"></div>
     <form id="profile-form" novalidate action="#" onsubmit="return false;">
       <div class="photo-block">
+        <label class="photo-field-label" for="photo-input">Profile photo<span class="req-star" aria-hidden="true">*</span></label>
         <label class="photo-upload-wrap" id="photo-label" for="photo-input">
           <input type="file" id="photo-input" accept="image/*" />
           <img id="photo-preview" alt="" hidden />
@@ -231,14 +236,14 @@ textarea { min-height: 88px; resize: vertical; }
       </div>
 
       <div class="form-row">
-        <label for="username">Username</label>
+        <label for="username">Username <span style="color: red;">*</span></label>
         <input type="text" id="username" name="username" maxlength="40" autocomplete="username" placeholder="How you want to appear" />
         <p id="username-error" class="field-error" role="alert" hidden></p>
       </div>
 
       <div class="form-row">
-        <label for="role">I am…</label>
-        <select id="role" name="role">
+        <label for="profession">I am... <span style="color: red;">*</span></label>
+        <select id="profession" name="profession">
           <option value="" disabled selected>Select one</option>
           <option value="A student">A student</option>
           <option value="A young professional">A young professional</option>
@@ -256,19 +261,15 @@ textarea { min-height: 88px; resize: vertical; }
         <div class="char-count" id="bio-count"><span id="bio-count-num">0</span> / 150</div>
       </div>
 
-      <button type="button" class="btn-complete" id="btn-submit">Complete my profile</button>
+      <button type="button" class="btn-complete" id="complete-btn">Complete my profile</button>
     </form>
     <p class="back-link"><a href="community.html">← Back to cities</a></p>
   </div>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-
-  const cityNames = {
+<script>
+(function () {
+  var cityNames = {
     paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milan: 'Milan',
     barcelona: 'Barcelona', berlin: 'Berlin', amsterdam: 'Amsterdam', lisbon: 'Lisbon',
     prague: 'Prague', budapest: 'Budapest', vienna: 'Vienna', copenhagen: 'Copenhagen',
@@ -278,196 +279,127 @@ textarea { min-height: 88px; resize: vertical; }
     ghent: 'Ghent', krakow: 'Krakow', warsaw: 'Warsaw', tallinn: 'Tallinn', riga: 'Riga', tbilisi: 'Tbilisi',
     bucharest: 'Bucharest', sofia: 'Sofia', zagreb: 'Zagreb'
   };
-
   function titleCaseFromRaw(str) {
     if (!str || !str.trim()) return '';
     return str.trim().replace(/\s+/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
   }
-
   function displayNameFromParam(rawCity) {
-    const slug = rawCity.toLowerCase().trim().replace(/[\s_-]+/g, '');
+    var slug = rawCity.toLowerCase().trim().replace(/[\s_-]+/g, '');
     return cityNames[slug] || titleCaseFromRaw(rawCity);
   }
-
-  const params = new URLSearchParams(location.search);
-  let rawCity = params.get('city');
-  const hasUrlCity = rawCity && String(rawCity).trim();
-
+  var params = new URLSearchParams(location.search);
+  var rawCity = params.get('city');
+  var hasUrlCity = rawCity && String(rawCity).trim();
   if (!hasUrlCity) {
-    const stored = localStorage.getItem('livvo_city');
+    var stored = localStorage.getItem('livvo_city');
     if (stored && stored.trim()) {
       window.location.replace('setup-profile.html?city=' + encodeURIComponent(stored.trim()));
     } else {
       window.location.replace('signup.html');
     }
+    return;
   }
+  var cityDisplay = displayNameFromParam(rawCity);
+  document.getElementById('city-pill').textContent = 'My city: ' + cityDisplay;
+  localStorage.setItem('livvo_city', cityDisplay);
+  window.__livvoCityDisplay = cityDisplay;
+})();
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script>
+(function () {
+  if (!window.__livvoCityDisplay) return;
+  var cityDisplay = window.__livvoCityDisplay;
 
-  if (!hasUrlCity) {
-    /* redirect */
-  } else {
-    const cityDisplay = displayNameFromParam(rawCity);
-    document.getElementById('city-pill').textContent = 'My city: ' + cityDisplay;
+  var firebaseConfig = {
+    apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
+    authDomain: "livvo-573e1.firebaseapp.com",
+    projectId: "livvo-573e1",
+    storageBucket: "livvo-573e1.firebasestorage.app",
+    messagingSenderId: "438563892670",
+    appId: "1:438563892670:web:c038316d9d3fcbee065def"
+  };
+  firebase.initializeApp(firebaseConfig);
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
-      authDomain: "livvo-573e1.firebaseapp.com",
-      projectId: "livvo-573e1",
-      storageBucket: "livvo-573e1.firebasestorage.app",
-      messagingSenderId: "438563892670",
-      appId: "1:438563892670:web:c038316d9d3fcbee065def"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-
-    const photoInput = document.getElementById('photo-input');
-    const photoPreview = document.getElementById('photo-preview');
-    const photoLabel = document.getElementById('photo-label');
-    const bio = document.getElementById('bio');
-    const bioCountNum = document.getElementById('bio-count-num');
-    const bioCountRow = document.getElementById('bio-count');
-    const formError = document.getElementById('form-error');
-
-    function showFormError(msg) {
-      formError.textContent = msg;
-      formError.classList.add('show');
+  firebase.auth().onAuthStateChanged(async function (user) {
+    if (!user) {
+      window.location.href = 'signup.html?city=' + encodeURIComponent(cityDisplay);
+      return;
     }
-    function hideFormError() {
-      formError.textContent = '';
-      formError.classList.remove('show');
-    }
-
-    const photoErrorEl = document.getElementById('photo-error');
-    const usernameErrorEl = document.getElementById('username-error');
-    const roleErrorEl = document.getElementById('role-error');
-
-    function hideFieldErrors() {
-      photoErrorEl.textContent = '';
-      photoErrorEl.hidden = true;
-      usernameErrorEl.textContent = '';
-      usernameErrorEl.hidden = true;
-      roleErrorEl.textContent = '';
-      roleErrorEl.hidden = true;
-    }
-
-    function showFieldError(el, msg) {
-      el.textContent = msg;
-      el.hidden = false;
-    }
-
-    function isUserProfileComplete(d) {
-      if (!d || typeof d !== 'object') return false;
-      var name = String(d.username || d.displayName || '').trim();
-      var cityVal = String(d.city || '').trim();
-      var photo = String(d.photoURL || '').trim();
-      return name.length > 0 && cityVal.length > 0 && photo.length > 0;
-    }
-
-    photoInput.addEventListener('change', function () {
-      const f = photoInput.files && photoInput.files[0];
-      if (!f || !f.type.startsWith('image/')) return;
-      const url = URL.createObjectURL(f);
-      photoPreview.src = url;
-      photoPreview.hidden = false;
-      photoLabel.classList.add('has-image');
-      photoErrorEl.textContent = '';
-      photoErrorEl.hidden = true;
-    });
-
-    function updateBioCount() {
-      const n = (bio.value || '').length;
-      bioCountNum.textContent = String(n);
-      bioCountRow.classList.toggle('at-limit', n >= 150);
-    }
-    bio.addEventListener('input', updateBioCount);
-    updateBioCount();
-
-    document.getElementById('username').addEventListener('input', function () {
-      usernameErrorEl.textContent = '';
-      usernameErrorEl.hidden = true;
-    });
-    document.getElementById('role').addEventListener('change', function () {
-      roleErrorEl.textContent = '';
-      roleErrorEl.hidden = true;
-    });
-
-    onAuthStateChanged(auth, async function (user) {
-      if (!user) {
-        window.location.href = 'signup.html?city=' + encodeURIComponent(cityDisplay);
-        return;
-      }
-
-      const userDocRef = doc(db, 'users', user.uid);
-      try {
-        const userSnap = await getDoc(userDocRef);
-        if (userSnap.exists && isUserProfileComplete(userSnap.data())) {
+    try {
+      var snap = await firebase.firestore().collection('users').doc(user.uid).get();
+      if (snap.exists) {
+        var d = snap.data();
+        var name = String(d.username || d.displayName || '').trim();
+        var cityVal = String(d.city || '').trim();
+        var prof = String(d.profession || d.role || '').trim();
+        if (name && cityVal && prof) {
           localStorage.setItem('livvo_city', cityDisplay);
-          window.location.replace('community/?city=' + encodeURIComponent(cityDisplay));
-          return;
+          window.location.replace('community-portal.html?city=' + encodeURIComponent(cityDisplay));
         }
-      } catch (e) {
-        console.error(e);
       }
+    } catch (e) {
+      console.error(e);
+    }
+  });
 
-      const form = document.getElementById('profile-form');
-      if (form.dataset.bound === '1') return;
-      form.dataset.bound = '1';
+  var photoInput = document.getElementById('photo-input');
+  var photoPreview = document.getElementById('photo-preview');
+  var photoLabel = document.getElementById('photo-label');
+  var photoErrorEl = document.getElementById('photo-error');
+  var bio = document.getElementById('bio');
+  var bioCountNum = document.getElementById('bio-count-num');
+  var bioCountRow = document.getElementById('bio-count');
 
-      document.getElementById('btn-submit').addEventListener('click', async function () {
-        hideFormError();
-        hideFieldErrors();
+  photoInput.addEventListener('change', function () {
+    var f = photoInput.files && photoInput.files[0];
+    if (!f || !f.type.startsWith('image/')) return;
+    var url = URL.createObjectURL(f);
+    photoPreview.src = url;
+    photoPreview.hidden = false;
+    photoLabel.classList.add('has-image');
+    photoErrorEl.textContent = '';
+    photoErrorEl.hidden = true;
+  });
 
-        const file = photoInput.files && photoInput.files[0];
-        const hasPhoto = file && file.type.startsWith('image/');
-        const username = (document.getElementById('username').value || '').trim();
-        const role = document.getElementById('role').value;
+  function updateBioCount() {
+    var n = (bio.value || '').length;
+    bioCountNum.textContent = String(n);
+    bioCountRow.classList.toggle('at-limit', n >= 150);
+  }
+  bio.addEventListener('input', updateBioCount);
+  updateBioCount();
 
-        var invalid = false;
-        if (!hasPhoto) {
-          showFieldError(photoErrorEl, 'Please add a profile photo');
-          invalid = true;
-        }
-        if (!username) {
-          showFieldError(usernameErrorEl, 'Please enter a username');
-          invalid = true;
-        }
-        if (!role) {
-          showFieldError(roleErrorEl, 'Please select what describes you');
-          invalid = true;
-        }
-        if (invalid) return;
+  document.getElementById('complete-btn').addEventListener('click', async () => {
+    console.log("Button clicked");
 
-        try {
-          const ext = (file.name.split('.').pop() || 'jpg').replace(/[^a-zA-Z0-9]/g, '');
-          const path = 'profile-photos/' + user.uid + '/avatar_' + Date.now() + '.' + ext;
-          const sref = ref(storage, path);
-          await uploadBytes(sref, file);
-          const photoURL = await getDownloadURL(sref);
+    const username = document.getElementById('username').value.trim();
+    const profession = document.getElementById('profession').value;
 
-          const payload = {
-            username: username,
-            photoURL: photoURL,
-            role: role,
-            bio: (bio.value || '').trim(),
-            city: cityDisplay,
-            createdAt: serverTimestamp()
-          };
+    if (!username) { alert("Please enter a username"); return; }
+    if (!profession) { alert("Please select what describes you"); return; }
 
-          await setDoc(userDocRef, payload, { merge: true });
+    const user = firebase.auth().currentUser;
+    if (!user) { alert("Not logged in"); return; }
 
-          await updateProfile(user, { displayName: username, photoURL: photoURL }).catch(function () {});
-
-          localStorage.setItem('livvo_city', cityDisplay);
-          window.location.href = 'community/?city=' + encodeURIComponent(cityDisplay);
-        } catch (err) {
-          console.error(err);
-          showFormError(err.message || 'Could not save profile. Check Firestore and Storage rules.');
-        }
+    try {
+      await firebase.firestore().collection('users').doc(user.uid).set({
+        username,
+        profession,
+        city: localStorage.getItem('livvo_city') || 'Athens',
+        email: user.email,
+        createdAt: new Date()
       });
-    });
-  }
+      console.log("Profile saved, redirecting...");
+      window.location.href = 'community-portal.html';
+    } catch (err) {
+      console.error("Firestore error:", err);
+      alert("Error saving profile: " + err.message);
+    }
+  });
+})();
 </script>
 </body>
 </html>
