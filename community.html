@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Community | Livvo</title>
-<meta name="description" content="Join city groups, find flatmates, and connect with students, interns and nomads in Paris, Athens and London. Free for everyone.">
+<meta name="description" content="Join city groups and connect with people in Paris, Athens, London, and more. Free for everyone.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23059669'/><path d='M8 12l8 12 8-12-4-6H12z' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,13 +80,7 @@ nav {
 .hero-tag { display: inline-flex; background: rgba(5,150,105,0.12); border: 1px solid rgba(5,150,105,0.2); padding: 6px 16px; border-radius: 100px; font-size: 0.78rem; font-weight: 600; color: var(--green); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 24px; }
 .hero h1 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 20px; }
 .hero h1 span { color: var(--green); }
-.hero p { font-size: 1.1rem; color: var(--muted-dark); max-width: 520px; margin: 0 auto 40px; line-height: 1.7; }
-
-.audience { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-.audience-pill { display: flex; align-items: center; gap: 8px; background: var(--surface-dark); border: 1px solid var(--border-dark); padding: 10px 20px; border-radius: 100px; font-size: 0.85rem; color: var(--muted-dark); cursor: pointer; transition: all 0.2s; }
-.audience-pill:hover, .audience-pill.active { background: rgba(5,150,105,0.08); border-color: rgba(5,150,105,0.3); color: var(--green); }
-.audience-pill svg { width: 18px; height: 18px; flex-shrink: 0; }
-.audience-pill svg path { stroke: currentColor; }
+.hero p { font-size: 1.1rem; color: var(--muted-dark); max-width: 34rem; margin: 0 auto 24px; line-height: 1.7; }
 
 .section { padding: 80px 48px; max-width: 1200px; margin: 0 auto; }
 #community { padding-top: 48px; }
@@ -113,11 +107,10 @@ nav {
 .city-card-request-icon svg path { stroke: var(--green); }
 .city-card-request strong { font-family: "Outfit", sans-serif; font-size: 1.1rem; display: block; margin-bottom: 8px; }
 .city-card-request span { font-size: 0.85rem; color: var(--muted-dark); text-align: center; line-height: 1.5; }
-.city-card { background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 20px; overflow: hidden; transition: all 0.3s; cursor: default; color: inherit; display: flex; flex-direction: column; height: 100%; min-height: 480px; }
+.city-card { background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 20px; overflow: hidden; transition: all 0.3s; cursor: default; color: inherit; display: flex; flex-direction: column; height: 100%; min-height: 0; }
 .city-card:hover { border-color: var(--green); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(5,150,105,0.15); }
 .city-cover-link { text-decoration: none; color: inherit; display: block; flex-shrink: 0; cursor: pointer; }
 .city-cover-link:hover .city-name-big { opacity: 0.95; }
-a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
 .city-cover { height: 200px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 20px; background-size: cover, cover; background-position: center, center; }
 .city-cover-milano { background-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%), url(https://images.unsplash.com/photo-1513581166391-887a96ddeafd?w=800&q=80); }
 .city-cover-paris { background-image: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 48%, transparent 72%), url(https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80); }
@@ -128,40 +121,8 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
 .city-icon svg { width: 24px; height: 24px; }
 .city-icon svg path { stroke: white; }
 .city-name-big { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2rem; letter-spacing: -0.04em; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
-.city-body { padding: 24px; flex: 1; display: flex; flex-direction: column; min-height: 0; }
-.city-groups { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; flex: 1; }
-.group-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  height: 48px;
-  min-height: 48px;
-  max-height: 48px;
-  padding: 0 14px;
-  background: var(--bg-dark);
-  border: 1px solid var(--border-dark);
-  border-radius: 10px;
-  transition: all 0.2s;
-  box-sizing: border-box;
-}
-.group-row:hover { background: rgba(5,150,105,0.06); border-color: rgba(5,150,105,0.2); }
-.group-name {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.group-name svg { width: 16px; height: 16px; flex-shrink: 0; }
-.group-name svg path { stroke: var(--muted-dark); }
-.group-join { font-size: 0.72rem; font-weight: 700; color: var(--green); flex-shrink: 0; white-space: nowrap; }
-.btn-city { width: 100%; padding: 12px; background: transparent; border: 1px solid rgba(5,150,105,0.3); border-radius: 10px; color: var(--green); font-family: "DM Sans", sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; text-decoration: none; display: block; margin-top: auto; flex-shrink: 0; }
+.city-body { padding: 24px; display: flex; flex-direction: column; }
+.btn-city { width: 100%; padding: 12px; background: transparent; border: 1px solid rgba(5,150,105,0.3); border-radius: 10px; color: var(--green); font-family: "DM Sans", sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; text-decoration: none; display: block; }
 .btn-city:hover { background: rgba(5,150,105,0.08); border-color: var(--green); }
 .btn-city-active { background: var(--green); border-color: var(--green); color: white; }
 .btn-city-active:hover { background: var(--green-dark); }
@@ -267,12 +228,7 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
 <section class="hero">
   <div class="hero-tag">Where your next chapter begins.</div>
   <h1>Find your people<br>in a <span>new city</span></h1>
-  <p>Join city groups, find flatmates, and connect with students, interns, professionals and nomads moving to the same place as you.</p>
-  <div class="audience">
-    <div class="audience-pill active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus Students</div>
-    <div class="audience-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns & Professionals</div>
-    <div class="audience-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Digital Nomads</div>
-  </div>
+  <p>Join city groups, connect with people moving to the same place as you, and feel at home before you even arrive.</p>
 </section>
 
 <div class="section" id="community">
@@ -290,11 +246,6 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
         </div>
       </a>
       <div class="city-body">
-        <div class="city-groups">
-          <a href="community-join.html?city=paris" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus Paris</span><span class="group-join">Join</span></a>
-          <a href="community-join.html?city=paris" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns &amp; Professionals</span><span class="group-join">Join</span></a>
-          <a href="community-join.html?city=paris" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads Paris</span><span class="group-join">Join</span></a>
-        </div>
         <a href="community-city.html?city=paris" class="btn-city btn-city-active">Join Paris community</a>
       </div>
     </div>
@@ -306,11 +257,6 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
         </div>
       </a>
       <div class="city-body">
-        <div class="city-groups">
-          <a href="community-join.html?city=athens" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus Athens</span><span class="group-join">Join</span></a>
-          <a href="community-join.html?city=athens" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns &amp; Professionals</span><span class="group-join">Join</span></a>
-          <a href="community-join.html?city=athens" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads Athens</span><span class="group-join">Join</span></a>
-        </div>
         <a href="community-city.html?city=athens" class="btn-city btn-city-active">Join Athens community</a>
       </div>
     </div>
@@ -322,11 +268,6 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
         </div>
       </a>
       <div class="city-body">
-        <div class="city-groups">
-          <a href="community-join.html?city=london" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus London</span><span class="group-join">Join</span></a>
-          <a href="community-join.html?city=london" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns &amp; Professionals</span><span class="group-join">Join</span></a>
-          <a href="community-join.html?city=london" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads London</span><span class="group-join">Join</span></a>
-        </div>
         <a href="community-city.html?city=london" class="btn-city btn-city-active">Join London community</a>
       </div>
     </div>
@@ -338,11 +279,6 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
         </div>
       </a>
       <div class="city-body">
-        <div class="city-groups">
-          <a href="community-join.html?city=madrid" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/></svg>Erasmus Madrid</span><span class="group-join">Join</span></a>
-          <a href="community-join.html?city=madrid" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Interns &amp; Professionals</span><span class="group-join">Join</span></a>
-          <a href="community-join.html?city=madrid" class="group-row"><span class="group-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Nomads Madrid</span><span class="group-join">Join</span></a>
-        </div>
         <a href="community-city.html?city=madrid" class="btn-city btn-city-active">Join Madrid community</a>
       </div>
     </div>
@@ -351,7 +287,7 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
     <a href="contact.html?subject=Request%20new%20city" class="city-card-request">
       <div class="city-card-request-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
       <strong>Request your city</strong>
-      <span>Student in Barcelona, Berlin, Amsterdam or elsewhere? Tell us which city you want. We're expanding!</span>
+      <span>Heading to Barcelona, Berlin, Amsterdam, or elsewhere? Tell us which city you want next. We're expanding!</span>
     </a>
   </div>
 </div>
@@ -366,13 +302,5 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
   </form>
 </div>
 
-<script>
-document.querySelectorAll('.audience-pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('.audience-pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-  });
-});
-</script>
 </body>
 </html>
