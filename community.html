@@ -176,18 +176,33 @@ nav {
 .card h3 { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 8px; color: var(--text-dark); }
 .card p { font-size: 0.9rem; color: var(--muted-dark); line-height: 1.6; margin: 0; }
 
-.cities-more-wrap { width: 100%; max-width: 480px; margin: 0 auto 40px; }
+.cities-more-wrap { width: 100%; max-width: 600px; margin: 0 auto 40px; }
+.cities-search-card {
+  background: #ffffff;
+  border: 1px solid #d4eadb;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.cities-search-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green);
+  text-align: center;
+  margin: 0 0 16px;
+}
 .cities-search-bar {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
   background: #ffffff;
   border: 1px solid #c0deca;
   border-radius: 100px;
-  padding: 14px 24px;
+  padding: 16px 24px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .cities-search-bar:focus-within {
@@ -216,40 +231,44 @@ nav {
   border: none;
   background: transparent;
   font-family: "DM Sans", sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text-dark);
   outline: none;
 }
-.cities-search-input::placeholder { color: var(--muted-dark); opacity: 0.8; }
+.cities-search-input::placeholder {
+  color: var(--muted-dark);
+  opacity: 0.85;
+  font-size: 16px;
+}
 .cities-quick-pills {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
-  max-width: 480px;
-  margin: 18px auto 0;
+  margin: 20px auto 0;
 }
 .cities-quick-pill {
   display: inline-flex;
   align-items: center;
   font-family: "DM Sans", sans-serif;
-  font-size: 0.8rem;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--green-dark);
-  padding: 8px 16px;
+  color: var(--green);
+  padding: 8px 18px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(5, 150, 105, 0.5);
-  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.08);
+  background: #ffffff;
+  border: 1px solid var(--green);
   text-decoration: none;
-  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s;
 }
 .cities-quick-pill:hover {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: var(--green);
+  background: rgba(5, 150, 105, 0.08);
+  border-color: var(--green-dark);
+  color: var(--green-dark);
   transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
 }
-.cities-more-note { margin-top: 18px; font-size: 0.82rem; text-align: center; line-height: 1.45; color: var(--muted-dark); }
+.cities-more-note { margin-top: 22px; font-size: 0.82rem; text-align: center; line-height: 1.45; color: var(--muted-dark); }
 .cities-more-note a { color: var(--green); font-weight: 600; text-decoration: none; }
 .cities-more-note a:hover { text-decoration: underline; }
 
@@ -444,6 +463,7 @@ nav {
     letter-spacing: 0.02em;
   }
   .cities-request-strip { padding: 48px 24px; }
+  .cities-search-card { padding: 24px 20px; }
 }
 </style>
 </head>
@@ -510,23 +530,26 @@ nav {
     <p class="section-sub">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
   </div>
   <div class="cities-more-wrap">
-    <div class="cities-search-bar" role="search">
-      <span class="cities-search-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </span>
-      <input type="search" id="cities-search-input" class="cities-search-input" placeholder="Search for your city..." autocomplete="off" aria-label="Search for your city" />
+    <div class="cities-search-card">
+      <p class="cities-search-eyebrow" id="cities-search-eyebrow">Find your city</p>
+      <div class="cities-search-bar" role="search" aria-labelledby="cities-search-eyebrow">
+        <span class="cities-search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+        <input type="search" id="cities-search-input" class="cities-search-input" placeholder="Search for your city..." autocomplete="off" aria-label="Search for your city" />
+      </div>
+      <div class="cities-quick-pills">
+        <a href="signup.html?city=Amsterdam" class="cities-quick-pill">Amsterdam</a>
+        <a href="signup.html?city=Barcelona" class="cities-quick-pill">Barcelona</a>
+        <a href="signup.html?city=Berlin" class="cities-quick-pill">Berlin</a>
+        <a href="signup.html?city=Lisbon" class="cities-quick-pill">Lisbon</a>
+        <a href="signup.html?city=Rome" class="cities-quick-pill">Rome</a>
+        <a href="signup.html?city=Copenhagen" class="cities-quick-pill">Copenhagen</a>
+        <a href="signup.html?city=Prague" class="cities-quick-pill">Prague</a>
+        <a href="signup.html?city=Dublin" class="cities-quick-pill">Dublin</a>
+      </div>
+      <p class="cities-more-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
     </div>
-    <div class="cities-quick-pills">
-      <a href="signup.html?city=Amsterdam" class="cities-quick-pill">Amsterdam</a>
-      <a href="signup.html?city=Barcelona" class="cities-quick-pill">Barcelona</a>
-      <a href="signup.html?city=Berlin" class="cities-quick-pill">Berlin</a>
-      <a href="signup.html?city=Lisbon" class="cities-quick-pill">Lisbon</a>
-      <a href="signup.html?city=Rome" class="cities-quick-pill">Rome</a>
-      <a href="signup.html?city=Copenhagen" class="cities-quick-pill">Copenhagen</a>
-      <a href="signup.html?city=Prague" class="cities-quick-pill">Prague</a>
-      <a href="signup.html?city=Dublin" class="cities-quick-pill">Dublin</a>
-    </div>
-    <p class="cities-more-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
   </div>
   <div class="cities-grid">
     <div class="city-card">
