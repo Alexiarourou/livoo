@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Sora:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -35,7 +36,7 @@ nav {
 .portal-nav-end {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
@@ -47,25 +48,35 @@ nav {
   flex: 1;
   min-width: 0;
 }
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; flex-shrink: 0; }
 .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
 .logo-word { font-family: "Sora", sans-serif; font-weight: 700; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text); }
 .logo-word span { color: var(--green); }
-.nav-right {
+.nav-city-email {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  max-width: 280px;
 }
-.nav-user-label {
-  font-size: 0.85rem;
-  color: var(--muted);
-  max-width: 220px;
+.nav-city {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
+.nav-email {
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .nav-signout {
   font-family: "DM Sans", sans-serif;
   font-size: 0.83rem;
@@ -92,67 +103,329 @@ nav {
 }
 .nav-burger:hover { background: rgba(5, 150, 105, 0.08); }
 .nav-links { display: flex; align-items: center; gap: 24px; }
-.nav-links a { font-size: 0.85rem; color: var(--muted); text-decoration: none; }
+.nav-links a { font-size: 0.85rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
 .nav-links a:hover { color: var(--text); }
 
 .page-wrap {
   padding: 96px 48px 80px;
-  max-width: 900px;
+  max-width: 720px;
   margin: 0 auto;
 }
-.portal-hero {
-  text-align: center;
-  margin-bottom: 48px;
-}
+.portal-hero { margin-bottom: 28px; text-align: center; }
 .portal-hero h1 {
   font-family: "Sora", sans-serif;
   font-weight: 700;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-size: clamp(1.5rem, 4vw, 2rem);
   letter-spacing: -0.03em;
   line-height: 1.25;
   color: var(--text);
 }
 .portal-hero p {
-  margin-top: 12px;
-  font-size: 1rem;
+  margin-top: 10px;
+  font-size: 0.95rem;
   color: var(--muted);
   line-height: 1.6;
-  max-width: 32rem;
+  max-width: 28rem;
   margin-left: auto;
   margin-right: auto;
 }
-.portal-sections {
+
+.portal-toolbar {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
 }
-.portal-card {
+.category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cat-tab {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.cat-tab:hover { border-color: var(--green); color: var(--text); }
+.cat-tab.active {
+  background: rgba(26, 122, 74, 0.12);
+  border-color: var(--btn-green);
+  color: var(--btn-green);
+}
+.btn-new-post {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--btn-green);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 22px;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.btn-new-post:hover { background: var(--btn-green-hover); }
+
+.feed { display: flex; flex-direction: column; gap: 14px; }
+.feed-empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+  padding: 40px 20px;
+  background: #fff;
+  border: 1px dashed #d4eadb;
+  border-radius: 16px;
+}
+.feed-card {
   background: var(--surface);
   border: 1px solid #d4eadb;
   border-radius: 16px;
-  padding: 28px 32px;
-  box-shadow: 0 4px 24px rgba(26, 46, 36, 0.06);
+  padding: 20px 22px;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  text-align: left;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  display: block;
 }
-.portal-card h2 {
+.feed-card:hover {
+  border-color: var(--green);
+  box-shadow: 0 8px 28px rgba(26, 122, 74, 0.1);
+}
+.feed-card-title {
   font-family: "Sora", sans-serif;
   font-weight: 700;
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   letter-spacing: -0.02em;
-  color: var(--text);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  line-height: 1.35;
 }
-.portal-card p {
-  font-size: 0.95rem;
-  color: var(--muted);
-  line-height: 1.65;
-  margin: 0;
-}
-.portal-card .badge {
-  display: inline-block;
-  margin-top: 14px;
+.feed-card-meta {
   font-size: 0.8rem;
-  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+}
+.feed-card-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--btn-green);
+  background: rgba(26, 122, 74, 0.1);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.feed-card-excerpt {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.feed-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+}
+.feed-card-actions button {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.btn-upvote {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.btn-upvote:hover { border-color: var(--btn-green); background: rgba(26, 122, 74, 0.06); }
+.btn-upvote.is-on {
+  border-color: var(--btn-green);
+  background: rgba(26, 122, 74, 0.12);
+  color: var(--btn-green);
+}
+.meta-pill {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+.modal[hidden] { display: none !important; }
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 46, 36, 0.45);
+  backdrop-filter: blur(4px);
+}
+.modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid #d4eadb;
+  padding: 28px;
+  box-shadow: 0 24px 64px rgba(13, 43, 26, 0.2);
+  margin-top: auto;
+  margin-bottom: auto;
+}
+.modal-panel h2 {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 1.35rem;
+  margin-bottom: 18px;
+  letter-spacing: -0.02em;
+}
+.form-row { margin-bottom: 16px; }
+.form-row label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.form-row input[type="text"],
+.form-row input[type="url"],
+.form-row select,
+.form-row textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.form-row input:focus, .form-row select:focus { outline: none; border-color: var(--btn-green); }
+#post-editor-wrap {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+#post-editor-wrap .ql-editor {
+  min-height: 160px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+.btn-secondary {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+}
+.btn-secondary:hover { border-color: var(--muted); }
+.btn-primary {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 12px 22px;
+  border-radius: 10px;
+  border: none;
+  background: var(--btn-green);
+  color: #fff;
+  cursor: pointer;
+}
+.btn-primary:hover { background: var(--btn-green-hover); }
+.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.form-error {
+  font-size: 0.85rem;
+  color: #b91c1c;
+  margin-top: 8px;
+}
+
+/* Thread modal (wider) */
+.modal-panel.thread-panel { max-width: 640px; }
+.thread-meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.thread-body {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text);
+  margin-bottom: 18px;
+  word-break: break-word;
+}
+.thread-body img { max-width: 100%; height: auto; border-radius: 10px; }
+.thread-link a { color: var(--btn-green); font-weight: 600; word-break: break-all; }
+.thread-image { margin-bottom: 16px; }
+.thread-image img { max-width: 100%; border-radius: 12px; display: block; }
+
+.thread-comments h3 {
+  font-family: "Sora", sans-serif;
+  font-size: 1rem;
+  margin: 22px 0 12px;
+}
+.comment {
+  padding: 12px 0;
+  border-bottom: 1px solid #eef5f0;
+  font-size: 0.9rem;
+}
+.comment:last-child { border-bottom: none; }
+.comment-meta { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; }
+.comment-body { line-height: 1.5; color: var(--text); }
+.comment-form textarea {
+  width: 100%;
+  min-height: 88px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.9rem;
+  resize: vertical;
 }
 
 @media (max-width: 768px) {
@@ -168,7 +441,7 @@ nav {
     flex-direction: column;
     align-items: stretch;
     width: 100%;
-    gap: 0;
+    gap: 14px;
     padding: 0 0 16px;
     border-top: 1px solid var(--border);
   }
@@ -178,20 +451,20 @@ nav {
     align-items: stretch;
     width: 100%;
     gap: 0;
-    padding: 12px 0 8px;
+    padding: 12px 0 0;
   }
   .nav-links a { padding: 10px 0; font-size: 0.95rem; }
   .nav-right {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    width: 100%;
+    align-items: stretch;
+    gap: 12px;
     padding-top: 8px;
     border-top: 1px solid var(--border);
   }
-  .nav-user-label { max-width: 100%; white-space: normal; }
+  .nav-city-email { max-width: 100%; }
   .page-wrap { padding: 108px 24px 64px; }
-  .portal-card { padding: 22px 20px; }
+  .portal-toolbar { flex-direction: column; align-items: stretch; }
+  .btn-new-post { width: 100%; }
 }
 </style>
 </head>
@@ -212,7 +485,10 @@ nav {
       <a href="search-athens.html">Browse rentals</a>
     </div>
     <div class="nav-right">
-      <span id="nav-user-label" class="nav-user-label" aria-live="polite"></span>
+      <div class="nav-city-email">
+        <span id="nav-city-label" class="nav-city" aria-live="polite"></span>
+        <span id="nav-email" class="nav-email" aria-live="polite"></span>
+      </div>
       <button type="button" class="nav-signout" id="nav-signout">Sign out</button>
     </div>
   </div>
@@ -221,30 +497,106 @@ nav {
 <main id="portal-root" class="page-wrap" hidden>
   <header class="portal-hero">
     <h1 id="portal-welcome">Welcome to the community</h1>
-    <p>You&apos;re in. Meet people, swap tips, and find what&apos;s on in your city — more coming soon.</p>
+    <p id="portal-sub">Share tips, events, and connect with people in your city.</p>
   </header>
-  <div class="portal-sections">
-    <section class="portal-card" aria-labelledby="portal-meet-heading">
-      <h2 id="portal-meet-heading">Meet people</h2>
-      <p>Connect with others who are new in town or have been here a while. Profiles and introductions are on the way.</p>
-      <span class="badge">Coming soon</span>
-    </section>
-    <section class="portal-card" aria-labelledby="portal-tips-heading">
-      <h2 id="portal-tips-heading">Local tips</h2>
-      <p>Neighbourhood guides, transport, and day-to-day advice from people who actually live here.</p>
-      <span class="badge">Coming soon</span>
-    </section>
-    <section class="portal-card" aria-labelledby="portal-events-heading">
-      <h2 id="portal-events-heading">Events</h2>
-      <p>Meetups, socials, and things to do — we&apos;ll surface what&apos;s happening near you.</p>
-      <span class="badge">Coming soon</span>
-    </section>
+
+  <div class="portal-toolbar">
+    <div class="category-tabs" role="tablist" aria-label="Topics">
+      <button type="button" class="cat-tab active" data-category="housing" role="tab" aria-selected="true">Housing Tips</button>
+      <button type="button" class="cat-tab" data-category="events" role="tab" aria-selected="false">Events</button>
+      <button type="button" class="cat-tab" data-category="flatmate" role="tab" aria-selected="false">Flatmate Search</button>
+      <button type="button" class="cat-tab" data-category="general" role="tab" aria-selected="false">General</button>
+    </div>
+    <button type="button" class="btn-new-post" id="btn-new-post">New post</button>
   </div>
+
+  <div id="feed" class="feed" aria-live="polite"></div>
 </main>
+
+<div id="modal-new-post" class="modal" hidden aria-modal="true" role="dialog" aria-labelledby="modal-new-title">
+  <div class="modal-backdrop" data-close="modal-new-post"></div>
+  <div class="modal-panel">
+    <h2 id="modal-new-title">New post</h2>
+    <div id="new-post-error" class="form-error" hidden></div>
+    <div class="form-row">
+      <label for="post-title">Title</label>
+      <input type="text" id="post-title" maxlength="200" autocomplete="off" />
+    </div>
+    <div class="form-row">
+      <label for="post-category-select">Category</label>
+      <select id="post-category-select">
+        <option value="housing">Housing Tips</option>
+        <option value="events">Events</option>
+        <option value="flatmate">Flatmate Search</option>
+        <option value="general">General</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Body</label>
+      <div id="post-editor-wrap"><div id="post-editor"></div></div>
+    </div>
+    <div class="form-row">
+      <label for="post-link">Link (optional)</label>
+      <input type="url" id="post-link" placeholder="https://" />
+    </div>
+    <div class="form-row">
+      <label for="post-image">Image (optional)</label>
+      <input type="file" id="post-image" accept="image/*" />
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" data-close="modal-new-post">Cancel</button>
+      <button type="button" class="btn-primary" id="post-submit">Submit</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-thread" class="modal" hidden aria-modal="true" role="dialog" aria-labelledby="thread-title">
+  <div class="modal-backdrop" data-close="modal-thread"></div>
+  <div class="modal-panel thread-panel">
+    <h2 id="thread-title" style="margin-bottom:10px;"></h2>
+    <div id="thread-meta" class="thread-meta"></div>
+    <div id="thread-image" class="thread-image" hidden></div>
+    <div id="thread-link" class="thread-link" hidden></div>
+    <div id="thread-body" class="thread-body"></div>
+    <div class="thread-actions feed-card-actions" style="margin-bottom:8px;">
+      <button type="button" class="btn-upvote" id="thread-upvote"><span aria-hidden="true">▲</span> <span id="thread-upvote-label">Upvote</span> <span id="thread-upvote-count">0</span></button>
+      <span class="meta-pill" id="thread-comment-total"></span>
+    </div>
+    <div class="thread-comments">
+      <h3>Comments</h3>
+      <div id="thread-comments-list"></div>
+      <div class="comment-form" style="margin-top:14px;">
+        <label for="thread-comment-input" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Your comment</label>
+        <textarea id="thread-comment-input" placeholder="Write a comment…"></textarea>
+        <div class="modal-actions" style="margin-top:12px; justify-content:flex-end;">
+          <button type="button" class="btn-primary" id="thread-comment-submit">Post comment</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:20px;">
+      <button type="button" class="btn-secondary" data-close="modal-thread">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import {
+    getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, doc, getDoc,
+    serverTimestamp, runTransaction, increment, writeBatch, limit
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+  const CATEGORY_LABELS = {
+    housing: 'Housing Tips',
+    events: 'Events',
+    flatmate: 'Flatmate Search',
+    general: 'General'
+  };
 
   const cityNames = {
     paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milan: 'Milan',
@@ -267,6 +619,25 @@ nav {
     return cityNames[slug] || titleCaseFromRaw(rawCity);
   }
 
+  function stripHtml(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html || '';
+    const t = (d.textContent || d.innerText || '').trim();
+    return t.replace(/\s+/g, ' ');
+  }
+
+  function formatTime(ts) {
+    if (!ts || typeof ts.toDate !== 'function') return '';
+    try {
+      return ts.toDate().toLocaleString(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      });
+    } catch (e) {
+      return '';
+    }
+  }
+
   const params = new URLSearchParams(location.search);
   let rawCity = params.get('city');
   const hasUrlCity = rawCity && String(rawCity).trim();
@@ -280,7 +651,9 @@ nav {
     }
   }
 
-  if (hasUrlCity) {
+  if (!hasUrlCity) {
+    /* redirecting */
+  } else {
     const cityDisplayName = displayNameFromParam(rawCity);
 
     const firebaseConfig = {
@@ -294,23 +667,426 @@ nav {
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
     const portalRoot = document.getElementById('portal-root');
     const welcomeEl = document.getElementById('portal-welcome');
-    const navUserLabel = document.getElementById('nav-user-label');
+    const subEl = document.getElementById('portal-sub');
+    const navCity = document.getElementById('nav-city-label');
+    const navEmail = document.getElementById('nav-email');
+    const feedEl = document.getElementById('feed');
+    const tabButtons = document.querySelectorAll('.cat-tab');
 
-    welcomeEl.textContent = 'Welcome to ' + cityDisplayName + ' community';
+    let activeCategory = 'housing';
+    let currentUser = null;
+    let cityDisplay = cityDisplayName;
+
+    welcomeEl.textContent = 'Welcome to ' + cityDisplay + ' community';
+    subEl.textContent = 'Share tips, events, housing advice, and flatmate searches with people here.';
+    navCity.textContent = cityDisplay + ' community';
+
+    let quillEditor = null;
+    let feedUnsub = null;
+    let threadCommentsUnsub = null;
+    let openThreadId = null;
+
+    function openModal(id) {
+      document.getElementById(id).hidden = false;
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+      document.getElementById(id).hidden = true;
+      document.body.style.overflow = '';
+    }
+    document.querySelectorAll('[data-close]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        closeModal(el.getAttribute('data-close'));
+      });
+    });
+
+    function ensureQuill() {
+      if (quillEditor || !window.Quill) return;
+      quillEditor = new window.Quill('#post-editor', {
+        theme: 'snow',
+        placeholder: 'Write your post…',
+        modules: {
+          toolbar: [
+            ['bold', 'italic', 'underline', 'link'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['clean']
+          ]
+        }
+      });
+    }
+
+    tabButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        activeCategory = btn.getAttribute('data-category');
+        tabButtons.forEach(function (b) {
+          const on = b === btn;
+          b.classList.toggle('active', on);
+          b.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        subscribeFeed();
+      });
+    });
+
+    function subscribeFeed() {
+      if (feedUnsub) {
+        feedUnsub();
+        feedUnsub = null;
+      }
+      const q = query(
+        collection(db, 'communityPosts'),
+        where('city', '==', cityDisplay),
+        where('category', '==', activeCategory),
+        orderBy('createdAt', 'desc'),
+        limit(50)
+      );
+      feedUnsub = onSnapshot(q, function (snap) {
+        renderFeed(snap.docs);
+      }, function (err) {
+        console.error(err);
+        feedEl.innerHTML = '<p class="feed-empty">Could not load posts. Check Firestore index and rules.</p>';
+      });
+    }
+
+    function renderFeed(docs) {
+      feedEl.innerHTML = '';
+      if (!docs.length) {
+        feedEl.innerHTML = '<p class="feed-empty">No posts in this topic yet. Be the first.</p>';
+        return;
+      }
+      const uid = currentUser ? currentUser.uid : null;
+      const votePromises = docs.map(function (d) {
+        if (!uid) return Promise.resolve({ id: d.id, voted: false });
+        return getDoc(doc(db, 'communityPosts', d.id, 'upvotes', uid)).then(function (vs) {
+          return { id: d.id, voted: vs.exists };
+        });
+      });
+      Promise.all(votePromises).then(function (voteInfo) {
+        const voteMap = {};
+        voteInfo.forEach(function (v) { voteMap[v.id] = v.voted; });
+        docs.forEach(function (d) {
+          const data = d.data();
+          const card = document.createElement('article');
+          card.className = 'feed-card';
+          card.setAttribute('role', 'button');
+          card.tabIndex = 0;
+          card.dataset.postId = d.id;
+
+          const title = document.createElement('div');
+          title.className = 'feed-card-title';
+          title.textContent = data.title || 'Untitled';
+
+          const meta = document.createElement('div');
+          meta.className = 'feed-card-meta';
+          const tag = document.createElement('span');
+          tag.className = 'feed-card-tag';
+          tag.textContent = CATEGORY_LABELS[data.category] || data.category;
+          const author = document.createElement('span');
+          author.textContent = (data.authorName || data.authorEmail || 'Member');
+          const time = document.createElement('span');
+          time.textContent = formatTime(data.createdAt);
+          meta.appendChild(tag);
+          meta.appendChild(author);
+          meta.appendChild(time);
+
+          const excerpt = document.createElement('p');
+          excerpt.className = 'feed-card-excerpt';
+          excerpt.textContent = stripHtml(data.bodyHtml);
+
+          const actions = document.createElement('div');
+          actions.className = 'feed-card-actions';
+
+          const upBtn = document.createElement('button');
+          upBtn.type = 'button';
+          upBtn.className = 'btn-upvote' + (voteMap[d.id] ? ' is-on' : '');
+          upBtn.dataset.postId = d.id;
+          upBtn.innerHTML = '<span aria-hidden="true">▲</span> <span>' + (voteMap[d.id] ? 'Upvoted' : 'Upvote') + '</span> <span class="up-count">' + (data.upvoteCount || 0) + '</span>';
+          upBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleUpvote(d.id, upBtn);
+          });
+
+          const cc = document.createElement('span');
+          cc.className = 'meta-pill';
+          cc.textContent = (data.commentCount || 0) + ' comment' + ((data.commentCount || 0) === 1 ? '' : 's');
+
+          actions.appendChild(upBtn);
+          actions.appendChild(cc);
+
+          card.appendChild(title);
+          card.appendChild(meta);
+          card.appendChild(excerpt);
+          card.appendChild(actions);
+
+          function openThread() {
+            openThreadModal(d.id, data);
+          }
+          card.addEventListener('click', openThread);
+          card.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              openThread();
+            }
+          });
+
+          feedEl.appendChild(card);
+        });
+      });
+    }
+
+    async function toggleUpvote(postId, btnEl) {
+      if (!currentUser) return;
+      const postRef = doc(db, 'communityPosts', postId);
+      const voteRef = doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid);
+      try {
+        await runTransaction(db, async function (transaction) {
+          const postSnap = await transaction.get(postRef);
+          const voteSnap = await transaction.get(voteRef);
+          if (!postSnap.exists) throw new Error('missing post');
+          const delta = voteSnap.exists ? -1 : 1;
+          if (voteSnap.exists) {
+            transaction.delete(voteRef);
+          } else {
+            transaction.set(voteRef, { createdAt: serverTimestamp() });
+          }
+          transaction.update(postRef, { upvoteCount: increment(delta) });
+        });
+        const voteSnap = await getDoc(voteRef);
+        const on = voteSnap.exists;
+        btnEl.classList.toggle('is-on', on);
+        btnEl.querySelector('span:nth-child(2)').textContent = on ? 'Upvoted' : 'Upvote';
+        const postSnap = await getDoc(postRef);
+        const c = postSnap.exists ? (postSnap.data().upvoteCount || 0) : 0;
+        const cnt = btnEl.querySelector('.up-count');
+        if (cnt) cnt.textContent = String(c);
+        if (openThreadId === postId) {
+          syncThreadUpvoteUI(postId, on, c);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function syncThreadUpvoteUI(postId, voted, count) {
+      const btn = document.getElementById('thread-upvote');
+      const cntEl = document.getElementById('thread-upvote-count');
+      btn.classList.toggle('is-on', voted);
+      document.getElementById('thread-upvote-label').textContent = voted ? 'Upvoted' : 'Upvote';
+      cntEl.textContent = String(count);
+    }
+
+    function openThreadModal(postId, data) {
+      openThreadId = postId;
+        if (threadCommentsUnsub) {
+          threadCommentsUnsub();
+          threadCommentsUnsub = null;
+        }
+      const Purify = window.DOMPurify;
+      document.getElementById('thread-title').textContent = data.title || 'Post';
+      document.getElementById('thread-meta').textContent =
+        (CATEGORY_LABELS[data.category] || data.category) + ' · ' +
+        (data.authorName || data.authorEmail || 'Member') + ' · ' +
+        formatTime(data.createdAt);
+
+      const imgWrap = document.getElementById('thread-image');
+      imgWrap.innerHTML = '';
+      if (data.imageUrl) {
+        imgWrap.hidden = false;
+        const im = document.createElement('img');
+        im.src = data.imageUrl;
+        im.alt = '';
+        imgWrap.appendChild(im);
+      } else {
+        imgWrap.hidden = true;
+      }
+
+      const linkEl = document.getElementById('thread-link');
+      linkEl.textContent = '';
+      const linkStr = data.linkUrl && String(data.linkUrl).trim();
+      if (linkStr) {
+        try {
+          const u = new URL(linkStr);
+          if (u.protocol === 'http:' || u.protocol === 'https:') {
+            linkEl.hidden = false;
+            const a = document.createElement('a');
+            a.href = u.href;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = 'Open link';
+            linkEl.appendChild(a);
+          } else {
+            linkEl.hidden = true;
+          }
+        } catch (e) {
+          linkEl.hidden = true;
+        }
+      } else {
+        linkEl.hidden = true;
+      }
+
+      const bodyEl = document.getElementById('thread-body');
+      bodyEl.innerHTML = Purify ? Purify.sanitize(data.bodyHtml || '', { ADD_ATTR: ['target'] }) : (data.bodyHtml || '');
+
+      document.getElementById('thread-comment-total').textContent =
+        (data.commentCount || 0) + ' comment' + ((data.commentCount || 0) === 1 ? '' : 's');
+
+      getDoc(doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid)).then(function (vs) {
+        syncThreadUpvoteUI(postId, vs.exists, data.upvoteCount || 0);
+      });
+
+      document.getElementById('thread-upvote').onclick = function (e) {
+        e.preventDefault();
+        toggleUpvote(postId, document.getElementById('thread-upvote'));
+      };
+
+      const listEl = document.getElementById('thread-comments-list');
+      listEl.innerHTML = '<p class="meta-pill">Loading…</p>';
+      document.getElementById('thread-comment-input').value = '';
+
+      const cq = query(
+        collection(db, 'communityPosts', postId, 'comments'),
+        orderBy('createdAt', 'asc')
+      );
+      threadCommentsUnsub = onSnapshot(cq, function (csnap) {
+        listEl.innerHTML = '';
+        if (!csnap.docs.length) {
+          listEl.innerHTML = '<p class="meta-pill">No comments yet.</p>';
+          return;
+        }
+        csnap.docs.forEach(function (cd) {
+          const c = cd.data();
+          const div = document.createElement('div');
+          div.className = 'comment';
+          const cm = document.createElement('div');
+          cm.className = 'comment-meta';
+          cm.textContent = (c.authorName || c.authorEmail) + ' · ' + formatTime(c.createdAt);
+          const cb = document.createElement('div');
+          cb.className = 'comment-body';
+          cb.textContent = c.body || '';
+          div.appendChild(cm);
+          div.appendChild(cb);
+          listEl.appendChild(div);
+        });
+      });
+
+      openModal('modal-thread');
+    }
+
+    document.getElementById('thread-comment-submit').addEventListener('click', async function () {
+      if (!currentUser || !openThreadId) return;
+      const input = document.getElementById('thread-comment-input');
+      const text = (input.value || '').trim();
+      if (!text) return;
+      const postRef = doc(db, 'communityPosts', openThreadId);
+      const cref = collection(postRef, 'comments');
+      const batch = writeBatch(db);
+      const newRef = doc(cref);
+      batch.set(newRef, {
+        authorId: currentUser.uid,
+        authorEmail: currentUser.email || '',
+        authorName: currentUser.displayName || currentUser.email || 'Member',
+        body: text,
+        createdAt: serverTimestamp()
+      });
+      batch.update(postRef, { commentCount: increment(1) });
+      try {
+        await batch.commit();
+        input.value = '';
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    document.getElementById('btn-new-post').addEventListener('click', function () {
+      document.getElementById('new-post-error').hidden = true;
+      document.getElementById('post-title').value = '';
+      document.getElementById('post-link').value = '';
+      document.getElementById('post-image').value = '';
+      document.getElementById('post-category-select').value = activeCategory;
+      openModal('modal-new-post');
+      requestAnimationFrame(function () {
+        ensureQuill();
+        if (quillEditor) quillEditor.setContents([]);
+      });
+    });
+
+    document.getElementById('post-submit').addEventListener('click', async function () {
+      const errEl = document.getElementById('new-post-error');
+      errEl.hidden = true;
+      if (!currentUser) return;
+      ensureQuill();
+      const title = (document.getElementById('post-title').value || '').trim();
+      const category = document.getElementById('post-category-select').value;
+      let linkUrl = (document.getElementById('post-link').value || '').trim();
+      const fileInput = document.getElementById('post-image');
+      const bodyHtml = quillEditor ? quillEditor.root.innerHTML : '';
+
+      if (!title) {
+        errEl.textContent = 'Please enter a title.';
+        errEl.hidden = false;
+        return;
+      }
+      const plain = stripHtml(bodyHtml);
+      if (!plain) {
+        errEl.textContent = 'Please write something in the body.';
+        errEl.hidden = false;
+        return;
+      }
+
+      const btn = document.getElementById('post-submit');
+      btn.disabled = true;
+
+      let imageUrl = '';
+      try {
+        if (fileInput.files && fileInput.files[0]) {
+          const f = fileInput.files[0];
+          const safe = f.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+          const path = 'community-post-images/' + currentUser.uid + '/' + Date.now() + '_' + safe;
+          const sref = ref(storage, path);
+          await uploadBytes(sref, f);
+          imageUrl = await getDownloadURL(sref);
+        }
+
+        await addDoc(collection(db, 'communityPosts'), {
+          city: cityDisplay,
+          category: category,
+          title: title,
+          bodyHtml: bodyHtml,
+          linkUrl: linkUrl,
+          imageUrl: imageUrl,
+          authorId: currentUser.uid,
+          authorEmail: currentUser.email || '',
+          authorName: currentUser.displayName || currentUser.email || 'Member',
+          createdAt: serverTimestamp(),
+          commentCount: 0,
+          upvoteCount: 0
+        });
+
+        closeModal('modal-new-post');
+      } catch (e) {
+        console.error(e);
+        errEl.textContent = e.message || 'Could not publish. Check Firestore & Storage rules.';
+        errEl.hidden = false;
+      } finally {
+        btn.disabled = false;
+      }
+    });
 
     onAuthStateChanged(auth, function (user) {
       if (!user) {
-        window.location.href = 'signup.html?city=' + encodeURIComponent(cityDisplayName);
+        window.location.href = 'signup.html?city=' + encodeURIComponent(cityDisplay);
         return;
       }
-      localStorage.setItem('livvo_city', cityDisplayName);
-      navUserLabel.textContent = user.displayName
-        ? user.displayName + ' · ' + user.email
-        : (user.email || '');
+      currentUser = user;
+      localStorage.setItem('livvo_city', cityDisplay);
+      navEmail.textContent = user.email || '';
       portalRoot.hidden = false;
+      subscribeFeed();
     });
 
     document.getElementById('nav-signout').addEventListener('click', function () {
