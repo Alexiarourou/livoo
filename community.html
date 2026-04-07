@@ -103,10 +103,10 @@ nav {
   line-height: 1.65;
 }
 
-.cities-request-wrap { display: flex; justify-content: center; width: 100%; }
+.cities-request-wrap { display: flex; justify-content: center; width: 100%; margin-top: 24px; }
 .cities-request-wrap .city-card-request { width: 100%; max-width: 282px; }
 .cities-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; align-items: stretch; }
-.city-card-request { background: var(--surface-dark); border: 2px dashed var(--border-dark); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 320px; height: 100%; padding: 24px; text-decoration: none; color: inherit; transition: all 0.3s; }
+.city-card-request { background: var(--surface-dark); border: 2px dashed var(--border-dark); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: auto; padding: 32px 28px; text-decoration: none; color: inherit; transition: all 0.3s; }
 .city-card-request:hover { border-color: var(--green); background: rgba(5,150,105,0.04); }
 .city-card-request-icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(5,150,105,0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
 .city-card-request-icon svg { width: 28px; height: 28px; }
@@ -335,7 +335,7 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
     </div>
   </div>
   <div class="cities-request-wrap">
-    <a href="contact.html?subject=Request%20new%20city" class="city-card city-card-request">
+    <a href="contact.html?subject=Request%20new%20city" class="city-card-request">
       <div class="city-card-request-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
       <strong>Request your city</strong>
       <span>Student in Barcelona, Berlin, Amsterdam or elsewhere? Tell us which city you want. We're expanding!</span>
