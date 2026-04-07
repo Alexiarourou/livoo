@@ -51,8 +51,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
   <div class="comments-section">
     <h3 id="commentsTitle">Comments</h3>
     <div id="commentsList"></div>
-    <form class="comment-form" id="commentForm" action="https://formspree.io/f/mbdzykvg" method="POST">
-      <input type="hidden" name="source" value="community post comment" />
+    <form class="comment-form" id="commentForm" onsubmit="return false;">
       <input type="hidden" name="post_id" id="postIdField" value="" />
       <div class="msg-success" id="successMsg">Thanks! Your comment has been submitted.</div>
       <label for="commentName">Your name</label>
@@ -61,7 +60,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
       <input type="email" name="email" id="commentEmail" placeholder="your@email.com" required />
       <label for="commentBody">Your comment</label>
       <textarea name="message" id="commentBody" placeholder="Write your comment..." required></textarea>
-      <button type="submit" class="btn-submit">Post comment</button>
+      <button type="button" class="btn-submit" id="commentPostBtn">Post comment</button>
     </form>
   </div>
 </div>
@@ -162,33 +161,25 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
   }
   renderComments();
 
-  document.getElementById('commentForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    formData.append('post', postId);
-    try {
-      await fetch('https://formspree.io/f/mbdzykvg', { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } });
-      const newComment = { author: formData.get('name'), email: formData.get('email'), time: 'Just now', body: formData.get('message') };
-      allComments.push(newComment);
-      const stored = localStorage.getItem('livvo_comments_' + postId);
-      const arr = stored ? JSON.parse(stored) : [];
-      arr.push(newComment);
-      localStorage.setItem('livvo_comments_' + postId, JSON.stringify(arr));
-      renderComments();
-      document.getElementById('successMsg').style.display = 'block';
-      this.reset();
-    } catch(err) {
-      const newComment = { author: formData.get('name'), email: formData.get('email'), time: 'Just now', body: formData.get('message') };
-      allComments.push(newComment);
-      const stored = localStorage.getItem('livvo_comments_' + postId);
-      const arr = stored ? JSON.parse(stored) : [];
-      arr.push(newComment);
-      localStorage.setItem('livvo_comments_' + postId, JSON.stringify(arr));
-      renderComments();
-      document.getElementById('successMsg').style.display = 'block';
-      this.reset();
+  function postComment() {
+    const form = document.getElementById('commentForm');
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
     }
-  });
+    const formData = new FormData(form);
+    formData.append('post', postId);
+    const newComment = { author: formData.get('name'), email: formData.get('email'), time: 'Just now', body: formData.get('message') };
+    allComments.push(newComment);
+    const stored = localStorage.getItem('livvo_comments_' + postId);
+    const arr = stored ? JSON.parse(stored) : [];
+    arr.push(newComment);
+    localStorage.setItem('livvo_comments_' + postId, JSON.stringify(arr));
+    renderComments();
+    document.getElementById('successMsg').style.display = 'block';
+    form.reset();
+  }
+  document.getElementById('commentPostBtn').addEventListener('click', postComment);
 </script>
 </body>
 </html>

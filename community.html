@@ -711,10 +711,9 @@ button.cities-search-dropdown-item {
 <div class="join-section" id="join">
   <h2>Ready to find <span>your people?</span></h2>
   <p>Join the Livvo community. It is completely free. Connect with people moving to the same city as you.</p>
-  <form class="join-form" action="https://formspree.io/f/mbdzykvg" method="POST">
-    <input class="join-input" type="email" name="email" placeholder="Your email address" required />
-    <input type="hidden" name="source" value="community page" />
-    <button type="submit" class="btn-join">Join free</button>
+  <form class="join-form" id="communityJoinForm" onsubmit="return false;">
+    <input class="join-input" type="email" name="email" id="communityJoinEmail" placeholder="Your email address" required />
+    <button type="button" class="btn-join" id="communityJoinBtn">Join free</button>
   </form>
 </div>
 
@@ -808,6 +807,21 @@ button.cities-search-dropdown-item {
 
   document.addEventListener('click', function (e) {
     if (!combo.contains(e.target)) hideDropdown();
+  });
+})();
+</script>
+<script>
+(function () {
+  var btn = document.getElementById('communityJoinBtn');
+  var form = document.getElementById('communityJoinForm');
+  var input = document.getElementById('communityJoinEmail');
+  if (!btn || !form || !input) return;
+  btn.addEventListener('click', function () {
+    if (!form.checkValidity()) {
+      input.reportValidity();
+      return;
+    }
+    window.location.href = 'signup.html?email=' + encodeURIComponent(input.value.trim());
   });
 })();
 </script>

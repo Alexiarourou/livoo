@@ -426,6 +426,11 @@ nav {
   document.getElementById('signupCityField').value = cityName;
   document.getElementById('signinCityField').value = cityName;
   document.getElementById('joinBackLink').href = 'community.html';
+  var joinEmail = params.get('email');
+  if (joinEmail) {
+    document.getElementById('signup-email').value = joinEmail;
+    document.getElementById('signin-email').value = joinEmail;
+  }
 
   function goToCityPortal() {
     localStorage.setItem('livvo_city', cityName);

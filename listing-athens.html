@@ -467,15 +467,12 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; height:64px; padding
   function closeModalBtn() { document.getElementById("modalOverlay").classList.remove("open"); document.body.style.overflow=""; }
   function closeModal(e) { if(e.target===document.getElementById("modalOverlay")) closeModalBtn(); }
 
-  async function submitEnquiry() {
+  function submitEnquiry() {
     const name=document.getElementById("eName").value, email=document.getElementById("eEmail").value;
     if(!name||!email||!email.includes("@")){alert("Please fill in your name and email!");return;}
     const btn=document.querySelector(".modal-btn"); btn.textContent="Sending..."; btn.disabled=true;
-    try {
-      await fetch("https://formspree.io/f/mbdzykvg",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({type:"Property Enquiry",property:"2-Bed Apartment — Athens, Platia Viktoria",name,email,organisation:document.getElementById("eOrg").value,duration:document.getElementById("eDuration").value,moveIn:document.getElementById("eMoveIn").value,whoAmI:document.querySelector(".iam-btn.active")?.textContent?.trim(),guests,message:document.getElementById("eMsg").value})});
-      document.getElementById("modalForm").style.display="none";
-      document.getElementById("modalSuccess").style.display="block";
-    } catch(e){btn.textContent="Send Enquiry →";btn.disabled=false;}
+    document.getElementById("modalForm").style.display="none";
+    document.getElementById("modalSuccess").style.display="block";
   }
 
   // Map
