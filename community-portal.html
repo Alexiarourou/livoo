@@ -481,7 +481,7 @@ nav {
   <div class="portal-nav-end">
     <div class="nav-links">
       <a href="community.html">Community</a>
-      <a href="search-athens.html">Browse rentals</a>
+      <a href="index.html">Home</a>
     </div>
     <div class="nav-right">
       <div class="nav-city-email">
@@ -645,7 +645,7 @@ nav {
   if (!hasUrlCity) {
     const stored = localStorage.getItem('livvo_city');
     if (stored && stored.trim()) {
-      window.location.replace('community/?city=' + encodeURIComponent(stored.trim()));
+      window.location.replace('community.html?city=' + encodeURIComponent(stored.trim()));
     } else {
       window.location.replace('community.html');
     }
@@ -725,7 +725,7 @@ nav {
     }
 
     function prepareFeedDocs(allDocs, category) {
-      var list = allDocs.slice();
+      var list = Array.from(allDocs || []).slice();
       if (category && category !== 'all') {
         list = list.filter(function (d) {
           return (d.data().category || '') === category;
@@ -745,7 +745,7 @@ nav {
       var feedCity = cityForFeedQuery();
       var q = query(collection(db, 'communityPosts'), where('city', '==', feedCity));
       feedUnsub = onSnapshot(q, function (snap) {
-        renderFeed(prepareFeedDocs(snap.docs, activeCategory));
+        renderFeed(prepareFeedDocs(Array.from(snap.docs), activeCategory));
       }, function (err) {
         console.error(err);
         var hint = (err && err.code === 'permission-denied')
@@ -756,28 +756,43 @@ nav {
     }
 
     function renderFeed(docs) {
-      const feedEl = document.getElementById('feed');
-      if (!docs.length) {
-        feedEl.innerHTML = '<p>No posts yet. Be the first!</p>';
+      var list = Array.from(docs || []);
+      while (feedEl.firstChild) {
+        feedEl.removeChild(feedEl.firstChild);
+      }
+      if (!list.length) {
+        var emptyP = document.createElement('p');
+        emptyP.className = 'feed-empty';
+        emptyP.textContent = 'No posts yet. Be the first!';
+        feedEl.appendChild(emptyP);
         return;
       }
-      feedEl.innerHTML = docs.map(function (snap) {
-        const d = snap.data();
-        const title = String(d.title || 'Untitled').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        const cat = String(d.category || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        const bodyText = (d.body != null && String(d.body).trim())
+      list.forEach(function (snap) {
+        var d = snap.data();
+        var card = document.createElement('div');
+        card.style.cssText = 'background:white;padding:16px;margin-bottom:12px;border-radius:8px;border:1px solid #ddd;color:#1a2e24;text-align:left;';
+        var head = document.createElement('div');
+        var titleEl = document.createElement('strong');
+        titleEl.textContent = d.title || 'Untitled';
+        var catEl = document.createElement('span');
+        catEl.style.cssText = 'color:#666;font-size:12px;margin-left:8px;';
+        catEl.textContent = d.category || '';
+        head.appendChild(titleEl);
+        head.appendChild(catEl);
+        card.appendChild(head);
+        var p = document.createElement('p');
+        p.style.marginTop = '8px';
+        var bodyText = (d.body != null && String(d.body).trim())
           ? String(d.body)
           : stripHtml(d.bodyHtml || '');
-        const body = String(bodyText || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        const who = String(d.authorUsername || d.authorName || d.authorEmail || 'Anonymous')
-          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        return '<div style="background:white;padding:16px;margin-bottom:12px;border-radius:8px;border:1px solid #ddd;">' +
-          '<strong>' + title + '</strong>' +
-          '<span style="color:grey;font-size:12px;margin-left:8px;">' + cat + '</span>' +
-          '<p style="margin-top:8px;">' + body + '</p>' +
-          '<small style="color:grey;">' + who + '</small>' +
-          '</div>';
-      }).join('');
+        p.textContent = bodyText || '';
+        card.appendChild(p);
+        var small = document.createElement('small');
+        small.style.color = '#666';
+        small.textContent = d.authorUsername || d.authorName || d.authorEmail || 'Anonymous';
+        card.appendChild(small);
+        feedEl.appendChild(card);
+      });
     }
 
     async function toggleUpvote(postId, btnEl) {
