@@ -95,29 +95,14 @@ nav {
 .section-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.03em; }
 .section-sub { color: var(--muted-dark); font-size: 0.95rem; margin-top: 8px; line-height: 1.6; }
 
-.cities-feature-intro { text-align: center; margin-bottom: 40px; max-width: 640px; margin-left: auto; margin-right: auto; }
-.cities-feature-intro-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
-.cities-feature-intro-sub { color: var(--muted-dark); font-size: 0.95rem; line-height: 1.65; margin: 0; }
-.cities-more-wrap { width: 100%; max-width: 480px; margin: 0 auto 36px; }
-.cities-more-label { display: block; font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 12px; text-align: center; }
-.cities-more-select {
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 10px;
-  border: 3px solid var(--green);
-  background: var(--surface-dark);
-  font-family: "DM Sans", sans-serif;
+#community .section-header { text-align: center; margin-bottom: 40px; }
+#community .section-sub {
+  max-width: 36rem;
+  margin: 14px auto 0;
   font-size: 1rem;
-  color: var(--text-dark);
-  cursor: pointer;
-  outline: none;
-  appearance: auto;
-  -webkit-appearance: menulist;
+  line-height: 1.65;
 }
-.cities-more-select:focus { border-color: var(--green-dark); }
-.cities-more-note { margin-top: 12px; font-size: 0.82rem; text-align: center; line-height: 1.45; color: var(--muted-dark); }
-.cities-more-note a { color: var(--green); font-weight: 600; text-decoration: none; }
-.cities-more-note a:hover { text-decoration: underline; }
+
 .cities-request-wrap { display: flex; justify-content: center; width: 100%; }
 .cities-request-wrap .city-card-request { width: 100%; max-width: 282px; }
 .cities-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; align-items: stretch; }
@@ -292,46 +277,6 @@ a.group-row { text-decoration: none; color: inherit; cursor: pointer; }
     <h2 class="section-title">Choose your city</h2>
     <p class="section-sub">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
   </div>
-  <div class="cities-feature-intro">
-    <p class="cities-feature-intro-label">MOST POPULAR</p>
-    <p class="cities-feature-intro-sub">The top four cities where students, interns and nomads are moving right now, with the most active Livvo communities.</p>
-  </div>
-  <div class="cities-more-wrap">
-    <label for="browse-more-cities" class="cities-more-label">Not your city? Find yours:</label>
-    <select id="browse-more-cities" class="cities-more-select" aria-label="Find your city">
-      <option value="" selected disabled>Select a city...</option>
-      <option value="amsterdam">Amsterdam</option>
-      <option value="barcelona">Barcelona</option>
-      <option value="berlin">Berlin</option>
-      <option value="bologna">Bologna</option>
-      <option value="brussels">Brussels</option>
-      <option value="budapest">Budapest</option>
-      <option value="copenhagen">Copenhagen</option>
-      <option value="dublin">Dublin</option>
-      <option value="florence">Florence</option>
-      <option value="geneva">Geneva</option>
-      <option value="ghent">Ghent</option>
-      <option value="hamburg">Hamburg</option>
-      <option value="krakow">Krakow</option>
-      <option value="lisbon">Lisbon</option>
-      <option value="milan">Milan</option>
-      <option value="munich">Munich</option>
-      <option value="porto">Porto</option>
-      <option value="prague">Prague</option>
-      <option value="riga">Riga</option>
-      <option value="rome">Rome</option>
-      <option value="rotterdam">Rotterdam</option>
-      <option value="seville">Seville</option>
-      <option value="stockholm">Stockholm</option>
-      <option value="tallinn">Tallinn</option>
-      <option value="tbilisi">Tbilisi</option>
-      <option value="valencia">Valencia</option>
-      <option value="vienna">Vienna</option>
-      <option value="warsaw">Warsaw</option>
-      <option value="zurich">Zurich</option>
-    </select>
-    <p class="cities-more-note"><a href="contact.html">Can't find your city? Tell us where you're headed →</a></p>
-  </div>
   <div class="cities-grid">
     <div class="city-card">
       <a href="community-city.html?city=paris" class="city-cover-link">
@@ -439,11 +384,6 @@ document.querySelectorAll('.audience-pill').forEach(pill => {
     document.querySelectorAll('.audience-pill').forEach(p => p.classList.remove('active'));
     pill.classList.add('active');
   });
-});
-document.getElementById('browse-more-cities').addEventListener('change', function () {
-  if (!this.value) return;
-  const city = this.value.toLowerCase().trim().replace(/\s+/g, '');
-  window.location.href = 'community-city.html?city=' + encodeURIComponent(city);
 });
 </script>
 </body>
