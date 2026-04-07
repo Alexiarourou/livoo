@@ -359,8 +359,7 @@ nav {
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword,
     signInWithEmailAndPassword, GoogleAuthProvider,
-    signInWithRedirect, getRedirectResult,
-    onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -374,19 +373,29 @@ nav {
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const db = getFirestore(app);
 
   const city = new URLSearchParams(window.location.search)
     .get('city') || localStorage.getItem('livvo_city') || '';
 
-  getRedirectResult(auth).then((result) => {
-    if (result && result.user) {
-      window.location.href =
-        `community-portal.html?city=${city}`;
-    }
-  }).catch((error) => {
-    console.error(error);
+  // THIS MUST RUN FIRST — handles Google redirect coming back
+  getRedirectResult(auth)
+    .then((result) => {
+      if (result?.user) {
+        localStorage.setItem('livvo_city', city);
+        window.location.href = `community-portal.html?city=${city}`;
+      }
+    })
+    .catch((err) => console.error('Redirect error:', err.code, err.message));
+
+  // Google button
+  document.querySelectorAll('.google-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      localStorage.setItem('livvo_city', city);
+      signInWithRedirect(auth, new GoogleAuthProvider());
+    });
   });
+
+  const db = getFirestore(app);
 
   async function userHasProfile(uid) {
     const userSnap = await getDoc(doc(db, 'users', uid));
@@ -586,13 +595,6 @@ nav {
     } catch (error) {
       showError(errorDiv, getFriendlyError(error.code));
     }
-  });
-
-  document.querySelectorAll('.google-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      localStorage.setItem('livvo_city', city);
-      signInWithRedirect(auth, new GoogleAuthProvider());
-    });
   });
 </script>
 </body>
