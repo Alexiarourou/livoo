@@ -501,7 +501,8 @@ nav {
 
   <div class="portal-toolbar">
     <div class="category-tabs" role="tablist" aria-label="Topics">
-      <button type="button" class="cat-tab active" data-category="housing" role="tab" aria-selected="true">Housing Tips</button>
+      <button type="button" class="cat-tab active" data-category="all" role="tab" aria-selected="true">All topics</button>
+      <button type="button" class="cat-tab" data-category="housing" role="tab" aria-selected="false">Housing Tips</button>
       <button type="button" class="cat-tab" data-category="events" role="tab" aria-selected="false">Events</button>
       <button type="button" class="cat-tab" data-category="flatmate" role="tab" aria-selected="false">Flatmate Search</button>
       <button type="button" class="cat-tab" data-category="general" role="tab" aria-selected="false">General</button>
@@ -584,7 +585,7 @@ nav {
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
     getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, doc, getDoc,
-    serverTimestamp, runTransaction, increment, writeBatch, limit
+    serverTimestamp, runTransaction, increment, writeBatch
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   const CATEGORY_LABELS = {
     housing: 'Housing Tips',
@@ -676,7 +677,7 @@ nav {
     const feedEl = document.getElementById('feed');
     const tabButtons = document.querySelectorAll('.cat-tab');
 
-    let activeCategory = 'housing';
+    let activeCategory = 'all';
     let currentUser = null;
     let cityDisplay = cityDisplayName;
 
@@ -717,14 +718,23 @@ nav {
       return 0;
     }
 
-    function feedDocsForCategory(allDocs, category) {
-      const filtered = allDocs.filter(function (d) {
-        return (d.data().category || '') === category;
-      });
-      filtered.sort(function (a, b) {
+    function cityForFeedQuery() {
+      var fromLs = (localStorage.getItem('livvo_city') || '').trim();
+      if (fromLs) return fromLs;
+      return (cityDisplay || '').trim() || 'Athens';
+    }
+
+    function prepareFeedDocs(allDocs, category) {
+      var list = allDocs.slice();
+      if (category && category !== 'all') {
+        list = list.filter(function (d) {
+          return (d.data().category || '') === category;
+        });
+      }
+      list.sort(function (a, b) {
         return postDocMillis(b) - postDocMillis(a);
       });
-      return filtered.slice(0, 50);
+      return list.slice(0, 50);
     }
 
     function subscribeFeed() {
@@ -732,14 +742,10 @@ nav {
         feedUnsub();
         feedUnsub = null;
       }
-      // Single-field filter only (no composite index). Category filter + sort happens client-side.
-      const q = query(
-        collection(db, 'communityPosts'),
-        where('city', '==', cityDisplay),
-        limit(240)
-      );
+      var feedCity = cityForFeedQuery();
+      var q = query(collection(db, 'communityPosts'), where('city', '==', feedCity));
       feedUnsub = onSnapshot(q, function (snap) {
-        renderFeed(feedDocsForCategory(snap.docs, activeCategory));
+        renderFeed(prepareFeedDocs(snap.docs, activeCategory));
       }, function (err) {
         console.error(err);
         var hint = (err && err.code === 'permission-denied')
@@ -752,7 +758,10 @@ nav {
     function renderFeed(docs) {
       feedEl.innerHTML = '';
       if (!docs.length) {
-        feedEl.innerHTML = '<p class="feed-empty">No posts in this topic yet. Be the first.</p>';
+        var emptyMsg = activeCategory === 'all'
+          ? 'No posts in your city yet. Be the first.'
+          : 'No posts in this topic yet. Be the first.';
+        feedEl.innerHTML = '<p class="feed-empty">' + emptyMsg + '</p>';
         return;
       }
       const uid = currentUser ? currentUser.uid : null;
@@ -1006,7 +1015,8 @@ nav {
     document.getElementById('btn-new-post').addEventListener('click', function () {
       document.getElementById('post-title').value = '';
       document.getElementById('post-body').value = '';
-      document.getElementById('post-category').value = activeCategory;
+      var cat = activeCategory === 'all' ? 'housing' : activeCategory;
+      document.getElementById('post-category').value = cat;
       openModal('modal-new-post');
     });
 
@@ -1048,7 +1058,7 @@ nav {
         alert('not logged in');
         return;
       }
-      const city = localStorage.getItem('livvo_city') || 'Athens';
+      const city = cityForFeedQuery();
       try {
         await addDoc(collection(db, 'communityPosts'), {
           title: document.getElementById('post-title').value,
