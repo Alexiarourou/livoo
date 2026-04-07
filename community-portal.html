@@ -111,25 +111,20 @@ nav {
   max-width: 720px;
   margin: 0 auto;
 }
-.portal-hero { margin-bottom: 32px; text-align: center; }
+.portal-hero { margin-bottom: 28px; text-align: center; }
 .portal-hero h1.portal-welcome-heading {
-  font-family: "Outfit", "Sora", sans-serif;
-  font-weight: 800;
-  font-size: clamp(1.65rem, 4.5vw, 2.35rem);
-  letter-spacing: -0.035em;
-  line-height: 1.3;
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  letter-spacing: -0.03em;
+  line-height: 1.25;
   color: var(--text);
-  max-width: 22ch;
-  margin-left: auto;
-  margin-right: auto;
 }
-.portal-welcome-city {
-  color: var(--btn-green);
-  font-weight: 800;
-}
-.portal-welcome-name {
-  font-weight: 800;
-  color: var(--text);
+.nav-user-emoji {
+  margin-right: 5px;
+  font-size: 0.88em;
+  opacity: 0.82;
+  vertical-align: -0.05em;
 }
 .portal-hero p {
   margin-top: 10px;
@@ -1047,40 +1042,25 @@ nav {
 
     const navEl = document.querySelector('nav');
 
-    function setWelcomeHero(profileData) {
-      const profileUsername =
-        profileData && String(profileData.username || '').trim();
-      welcomeEl.textContent = '';
-      if (profileUsername) {
-        welcomeEl.appendChild(document.createTextNode('Welcome to '));
-        const citySpan = document.createElement('span');
-        citySpan.className = 'portal-welcome-city';
-        citySpan.textContent = cityDisplay;
-        welcomeEl.appendChild(citySpan);
-        welcomeEl.appendChild(document.createTextNode(', '));
-        const nameStrong = document.createElement('strong');
-        nameStrong.className = 'portal-welcome-name';
-        nameStrong.textContent = profileUsername;
-        welcomeEl.appendChild(nameStrong);
-        welcomeEl.appendChild(document.createTextNode(' \uD83D\uDC4B'));
-      } else {
-        welcomeEl.appendChild(document.createTextNode('Welcome to '));
-        const citySpan = document.createElement('span');
-        citySpan.className = 'portal-welcome-city';
-        citySpan.textContent = cityDisplay;
-        welcomeEl.appendChild(citySpan);
-        welcomeEl.appendChild(document.createTextNode(' \uD83D\uDC4B'));
-      }
+    function setWelcomeAndNav(profileData) {
+      const profileUsername = (profileData && String(profileData.username || '').trim()) || 'Member';
+      welcomeEl.textContent = 'Hi, ' + profileUsername + ' · ' + cityDisplay;
+      navCity.textContent = cityDisplay + ' community /';
+      navEmail.textContent = '';
+      const emojiSpan = document.createElement('span');
+      emojiSpan.className = 'nav-user-emoji';
+      emojiSpan.setAttribute('aria-hidden', 'true');
+      emojiSpan.textContent = '\u{1F33F}';
+      navEmail.appendChild(emojiSpan);
+      navEmail.appendChild(document.createTextNode(profileUsername));
     }
 
     function showPortal(user, profileData) {
       if (!user) return;
       currentUser = user;
       localStorage.setItem('livvo_city', cityDisplay);
-      setWelcomeHero(profileData);
+      setWelcomeAndNav(profileData);
       subEl.textContent = 'Share tips, events, housing advice, and flatmate searches with people here.';
-      navCity.textContent = cityDisplay + ' community';
-      navEmail.textContent = user.email || '';
       navEl.removeAttribute('hidden');
       navEl.style.display = '';
       portalContent.removeAttribute('hidden');
