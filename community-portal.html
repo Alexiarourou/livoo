@@ -470,7 +470,7 @@ nav {
 </head>
 <body>
 
-<nav>
+<nav hidden>
   <input type="checkbox" id="nav-toggle" class="nav-toggle-input" tabindex="-1">
   <div class="portal-nav-start">
     <a class="logo" href="index.html" aria-label="Livvo home">
@@ -681,10 +681,6 @@ nav {
     let activeCategory = 'housing';
     let currentUser = null;
     let cityDisplay = cityDisplayName;
-
-    welcomeEl.textContent = 'Welcome to ' + cityDisplay + ' community';
-    subEl.textContent = 'Share tips, events, housing advice, and flatmate searches with people here.';
-    navCity.textContent = cityDisplay + ' community';
 
     let quillEditor = null;
     let feedUnsub = null;
@@ -1015,6 +1011,26 @@ nav {
       });
     });
 
+    const navEl = document.querySelector('nav');
+
+    function showPortal(user, profileData) {
+      currentUser = user;
+      localStorage.setItem('livvo_city', cityDisplay);
+      const name =
+        (profileData && profileData.username) ||
+        user.displayName ||
+        (user.email ? String(user.email).split('@')[0] : '');
+      welcomeEl.textContent = name
+        ? ('Hi, ' + name + ' · ' + cityDisplay)
+        : ('Welcome to ' + cityDisplay + ' community');
+      subEl.textContent = 'Share tips, events, housing advice, and flatmate searches with people here.';
+      navCity.textContent = cityDisplay + ' community';
+      navEmail.textContent = user.email || '';
+      navEl.hidden = false;
+      portalRoot.hidden = false;
+      subscribeFeed();
+    }
+
     document.getElementById('post-submit').addEventListener('click', async function () {
       const errEl = document.getElementById('new-post-error');
       errEl.hidden = true;
@@ -1077,16 +1093,20 @@ nav {
       }
     });
 
-    onAuthStateChanged(auth, function (user) {
+    onAuthStateChanged(auth, async function (user) {
       if (!user) {
         window.location.href = 'signup.html?city=' + encodeURIComponent(cityDisplay);
         return;
       }
-      currentUser = user;
-      localStorage.setItem('livvo_city', cityDisplay);
-      navEmail.textContent = user.email || '';
-      portalRoot.hidden = false;
-      subscribeFeed();
+
+      const profileDoc = await getDoc(doc(db, 'users', user.uid));
+
+      if (!profileDoc.exists) {
+        window.location.href = 'profile-setup.html?city=' + encodeURIComponent(cityDisplay);
+        return;
+      }
+
+      showPortal(user, profileDoc.data());
     });
 
     document.getElementById('nav-signout').addEventListener('click', function () {

@@ -356,8 +356,7 @@ textarea { min-height: 88px; resize: vertical; }
       const profileRef = doc(db, 'users', user.uid, 'profile', PROFILE_DOC_ID);
       try {
         const userSnap = await getDoc(userDocRef);
-        const profileSnap = await getDoc(profileRef);
-        if (userSnap.exists || profileSnap.exists) {
+        if (userSnap.exists) {
           localStorage.setItem('livvo_city', cityDisplay);
           window.location.replace('community-portal.html?city=' + encodeURIComponent(cityDisplay));
           return;
