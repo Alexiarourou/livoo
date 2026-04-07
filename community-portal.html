@@ -111,13 +111,24 @@ nav {
   max-width: 720px;
   margin: 0 auto;
 }
-.portal-hero { margin-bottom: 28px; text-align: center; }
-.portal-hero h1 {
-  font-family: "Sora", sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  letter-spacing: -0.03em;
-  line-height: 1.25;
+.portal-hero { margin-bottom: 32px; text-align: center; }
+.portal-hero h1.portal-welcome-heading {
+  font-family: "Outfit", "Sora", sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.65rem, 4.5vw, 2.35rem);
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+  color: var(--text);
+  max-width: 22ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+.portal-welcome-city {
+  color: var(--btn-green);
+  font-weight: 800;
+}
+.portal-welcome-name {
+  font-weight: 800;
   color: var(--text);
 }
 .portal-hero p {
@@ -496,7 +507,7 @@ nav {
 
 <main id="portal-content" class="page-wrap" hidden>
   <header class="portal-hero">
-    <h1 id="portal-welcome">Welcome to the community</h1>
+    <h1 id="portal-welcome" class="portal-welcome-heading">Welcome to the community</h1>
     <p id="portal-sub">Share tips, events, and connect with people in your city.</p>
   </header>
 
@@ -728,23 +739,42 @@ nav {
       });
     });
 
+    function postDocMillis(d) {
+      const c = d.data().createdAt;
+      if (c && typeof c.toMillis === 'function') return c.toMillis();
+      if (c && typeof c.seconds === 'number') return c.seconds * 1000;
+      return 0;
+    }
+
+    function feedDocsForCategory(allDocs, category) {
+      const filtered = allDocs.filter(function (d) {
+        return (d.data().category || '') === category;
+      });
+      filtered.sort(function (a, b) {
+        return postDocMillis(b) - postDocMillis(a);
+      });
+      return filtered.slice(0, 50);
+    }
+
     function subscribeFeed() {
       if (feedUnsub) {
         feedUnsub();
         feedUnsub = null;
       }
+      // Single-field filter only (no composite index). Category filter + sort happens client-side.
       const q = query(
         collection(db, 'communityPosts'),
         where('city', '==', cityDisplay),
-        where('category', '==', activeCategory),
-        orderBy('createdAt', 'desc'),
-        limit(50)
+        limit(120)
       );
       feedUnsub = onSnapshot(q, function (snap) {
-        renderFeed(snap.docs);
+        renderFeed(feedDocsForCategory(snap.docs, activeCategory));
       }, function (err) {
         console.error(err);
-        feedEl.innerHTML = '<p class="feed-empty">Could not load posts. Check Firestore index and rules.</p>';
+        var hint = (err && err.code === 'permission-denied')
+          ? 'You do not have permission to read posts.'
+          : 'Could not load posts. Please try again in a moment.';
+        feedEl.innerHTML = '<p class="feed-empty">' + hint + '</p>';
       });
     }
 
@@ -1013,17 +1043,37 @@ nav {
 
     const navEl = document.querySelector('nav');
 
+    function setWelcomeHero(profileData) {
+      const profileUsername =
+        profileData && String(profileData.username || '').trim();
+      welcomeEl.textContent = '';
+      if (profileUsername) {
+        welcomeEl.appendChild(document.createTextNode('Welcome to '));
+        const citySpan = document.createElement('span');
+        citySpan.className = 'portal-welcome-city';
+        citySpan.textContent = cityDisplay;
+        welcomeEl.appendChild(citySpan);
+        welcomeEl.appendChild(document.createTextNode(', '));
+        const nameStrong = document.createElement('strong');
+        nameStrong.className = 'portal-welcome-name';
+        nameStrong.textContent = profileUsername;
+        welcomeEl.appendChild(nameStrong);
+        welcomeEl.appendChild(document.createTextNode(' \uD83D\uDC4B'));
+      } else {
+        welcomeEl.appendChild(document.createTextNode('Welcome to '));
+        const citySpan = document.createElement('span');
+        citySpan.className = 'portal-welcome-city';
+        citySpan.textContent = cityDisplay;
+        welcomeEl.appendChild(citySpan);
+        welcomeEl.appendChild(document.createTextNode(' \uD83D\uDC4B'));
+      }
+    }
+
     function showPortal(user, profileData) {
       if (!user) return;
       currentUser = user;
       localStorage.setItem('livvo_city', cityDisplay);
-      const name =
-        (profileData && profileData.username) ||
-        user.displayName ||
-        (user.email ? String(user.email).split('@')[0] : '');
-      welcomeEl.textContent = name
-        ? ('Hi, ' + name + ' · ' + cityDisplay)
-        : ('Welcome to ' + cityDisplay + ' community');
+      setWelcomeHero(profileData);
       subEl.textContent = 'Share tips, events, housing advice, and flatmate searches with people here.';
       navCity.textContent = cityDisplay + ' community';
       navEmail.textContent = user.email || '';
