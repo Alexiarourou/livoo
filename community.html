@@ -77,7 +77,34 @@ nav {
 
 .hero { padding: 140px 48px 28px; text-align: center; position: relative; overflow: hidden; }
 .hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(5,150,105,0.1) 0%, transparent 70%); pointer-events: none; }
-.hero-tag { display: inline-flex; background: rgba(5,150,105,0.12); border: 1px solid rgba(5,150,105,0.2); padding: 6px 16px; border-radius: 100px; font-size: 0.78rem; font-weight: 600; color: var(--green); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 24px; }
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(100%, 22rem);
+  line-height: 1.35;
+  margin-bottom: 24px;
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(5, 150, 105, 0.5);
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.08);
+}
+.hero-tag::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
 .hero h1 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 20px; }
 .hero h1 span { color: var(--green); }
 .hero p { font-size: 1.1rem; color: var(--muted-dark); max-width: 34rem; margin: 0 auto 22px; line-height: 1.7; }
@@ -289,6 +316,13 @@ nav {
     justify-content: center;
     box-sizing: border-box;
   }
+  .hero-tag {
+    justify-content: center;
+    flex-wrap: wrap;
+    font-size: 12px;
+    padding: 5px 14px;
+    letter-spacing: 0.02em;
+  }
 }
 </style>
 </head>
@@ -313,7 +347,7 @@ nav {
 </nav>
 
 <section class="hero">
-  <div class="hero-tag">Where your next chapter begins.</div>
+  <p class="hero-tag">Free to join · No commitment</p>
   <h1>Find your people<br>in a <span>new city</span></h1>
   <p>Join city groups, connect with people moving to the same place as you, and feel at home before you even arrive.</p>
   <div class="cta-row">
