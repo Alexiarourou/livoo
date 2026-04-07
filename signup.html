@@ -198,6 +198,13 @@ nav {
   text-decoration: none;
 }
 .auth-forgot a:hover { text-decoration: underline; }
+.auth-error {
+  display: none;
+  margin-top: 10px;
+  color: #b91c1c;
+  font-size: 13px;
+  line-height: 1.45;
+}
 .join-thanks {
   display: none;
   margin-top: 24px;
@@ -266,7 +273,7 @@ nav {
     <div class="auth-panel active" id="panel-signup" role="tabpanel" aria-labelledby="tab-signup">
       <h1 id="pageTitle">Join the community</h1>
       <p class="sub" id="pageSub">Free to join. Connect with people moving to your city, find flatmates and get local tips.</p>
-      <form id="signupForm">
+      <form id="signupForm" action="#" method="post" onsubmit="return false;">
         <input type="hidden" name="_subject" value="Community sign up — Livvo" />
         <input type="hidden" name="city" id="signupCityField" value="" />
         <div class="form-group">
@@ -274,16 +281,17 @@ nav {
           <input id="signupName" type="text" name="name" placeholder="Your full name" required autocomplete="name" />
         </div>
         <div class="form-group">
-          <label for="signupEmail">Email</label>
-          <input id="signupEmail" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+          <label for="signup-email">Email</label>
+          <input id="signup-email" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
         </div>
         <div class="form-group">
-          <label for="signupPassword">Password</label>
-          <input id="signupPassword" type="password" name="password" placeholder="Choose a password" required autocomplete="new-password" />
+          <label for="signup-password">Password</label>
+          <input id="signup-password" type="password" name="password" placeholder="Choose a password" required autocomplete="new-password" />
         </div>
-        <button type="submit" class="btn-auth-primary" id="signupSubmitBtn">Create account</button>
+        <div id="signup-error" class="auth-error" role="alert"></div>
+        <button type="button" class="btn-auth-primary" id="signup-btn">Create account</button>
         <div class="auth-divider" role="presentation"><span>or</span></div>
-        <button type="button" class="btn-google" id="btnGoogleSignup" aria-label="Continue with Google">
+        <button type="button" class="btn-google google-btn" id="btnGoogleSignup" aria-label="Continue with Google">
           <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.785 9.093c0-.638-.057-1.251-.164-1.84H9v3.478h4.938a4.17 4.17 0 0 1-1.8 2.736v2.272h2.914a8.837 8.837 0 0 0 2.733-6.646z"/><path fill="#34A853" d="M9.003 18c2.43 0 4.467-.806 5.956-2.18l-2.909-2.27c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.44 15.983 5.485 18 9.003 18z"/><path fill="#FBBC05" d="M3.964 10.712c-.18-.563-.29-1.164-.29-1.79s.11-1.227.29-1.79L.96 4.408A8.094 8.094 0 0 0 0 8.922c0 1.322.318 2.62.96 3.742l3.004-2.952z"/><path fill="#EA4335" d="M9.003 3.58c1.322 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.426 0 9.003 0 5.485 0 2.44 2.017.96 4.977l3.005 2.458c.707-2.127 2.692-3.855 5.038-3.855z"/></svg>
           Continue with Google
         </button>
@@ -292,20 +300,21 @@ nav {
     </div>
     <div class="auth-panel" id="panel-signin" role="tabpanel" aria-labelledby="tab-signin">
       <h2 class="auth-signin-title">Sign in</h2>
-      <form id="signinForm">
+      <form id="signinForm" action="#" method="post" onsubmit="return false;">
         <input type="hidden" name="_subject" value="Community sign in — Livvo" />
         <input type="hidden" name="city" id="signinCityField" value="" />
         <div class="form-group">
-          <label for="signinEmail">Email</label>
-          <input id="signinEmail" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+          <label for="signin-email">Email</label>
+          <input id="signin-email" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
         </div>
         <div class="form-group">
-          <label for="signinPassword">Password</label>
-          <input id="signinPassword" type="password" name="password" placeholder="Your password" required autocomplete="current-password" />
+          <label for="signin-password">Password</label>
+          <input id="signin-password" type="password" name="password" placeholder="Your password" required autocomplete="current-password" />
         </div>
-        <button type="submit" class="btn-auth-primary" id="signinSubmitBtn">Sign in</button>
+        <div id="signin-error" class="auth-error" role="alert"></div>
+        <button type="button" class="btn-auth-primary" id="signin-btn">Sign in</button>
         <div class="auth-divider" role="presentation"><span>or</span></div>
-        <button type="button" class="btn-google" id="btnGoogleSignin" aria-label="Continue with Google">
+        <button type="button" class="btn-google google-btn" id="btnGoogleSignin" aria-label="Continue with Google">
           <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.785 9.093c0-.638-.057-1.251-.164-1.84H9v3.478h4.938a4.17 4.17 0 0 1-1.8 2.736v2.272h2.914a8.837 8.837 0 0 0 2.733-6.646z"/><path fill="#34A853" d="M9.003 18c2.43 0 4.467-.806 5.956-2.18l-2.909-2.27c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.44 15.983 5.485 18 9.003 18z"/><path fill="#FBBC05" d="M3.964 10.712c-.18-.563-.29-1.164-.29-1.79s.11-1.227.29-1.79L.96 4.408A8.094 8.094 0 0 0 0 8.922c0 1.322.318 2.62.96 3.742l3.004-2.952z"/><path fill="#EA4335" d="M9.003 3.58c1.322 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.426 0 9.003 0 5.485 0 2.44 2.017.96 4.977l3.005 2.458c.707-2.127 2.692-3.855 5.038-3.855z"/></svg>
           Continue with Google
         </button>
@@ -316,8 +325,25 @@ nav {
   </div>
   <div id="joinThanks" class="join-thanks" role="status">Thanks! We&apos;ll be in touch shortly to complete your account setup.</div>
 </div>
-<script>
-(function () {
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword,
+    signInWithEmailAndPassword, GoogleAuthProvider,
+    signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
+    authDomain: "livvo-573e1.firebaseapp.com",
+    projectId: "livvo-573e1",
+    storageBucket: "livvo-573e1.firebasestorage.app",
+    messagingSenderId: "438563892670",
+    appId: "1:438563892670:web:c038316d9d3fcbee065def"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
   const cityNames = {
     paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milan: 'Milan',
     barcelona: 'Barcelona', berlin: 'Berlin', amsterdam: 'Amsterdam', lisbon: 'Lisbon',
@@ -371,49 +397,70 @@ nav {
   document.getElementById('linkToSignin').addEventListener('click', showSignin);
   document.getElementById('linkToSignup').addEventListener('click', showSignup);
 
-  const authCard = document.getElementById('authCard');
-  const joinThanks = document.getElementById('joinThanks');
-  const FS = 'https://formspree.io/f/mbdzykvg';
-
-  function stubGoogle() {
-    alert('Google sign-in will be available soon.');
+  function hideError(el) {
+    el.textContent = '';
+    el.style.display = 'none';
   }
-  document.getElementById('btnGoogleSignup').addEventListener('click', stubGoogle);
-  document.getElementById('btnGoogleSignin').addEventListener('click', stubGoogle);
+  function showError(el, msg) {
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
 
-  document.getElementById('signupForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const btn = document.getElementById('signupSubmitBtn');
-    const fd = new FormData(e.target);
-    fd.delete('password');
-    btn.disabled = true;
-    fetch(FS, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
-      .then(function (res) { return res.json().then(function (data) { return { res: res, data: data }; }); })
-      .then(function (ref) {
-        if (!ref.res.ok) throw new Error((ref.data && ref.data.error) || 'Submit failed');
-        authCard.style.display = 'none';
-        joinThanks.classList.add('show');
-      })
-      .catch(function () { alert('Something went wrong. Please try again.'); })
-      .finally(function () { btn.disabled = false; });
+  const signupErrorEl = document.getElementById('signup-error');
+  const signinErrorEl = document.getElementById('signin-error');
+  document.getElementById('signup-email').addEventListener('input', function () { hideError(signupErrorEl); });
+  document.getElementById('signup-password').addEventListener('input', function () { hideError(signupErrorEl); });
+  document.getElementById('signin-email').addEventListener('input', function () { hideError(signinErrorEl); });
+  document.getElementById('signin-password').addEventListener('input', function () { hideError(signinErrorEl); });
+
+  document.getElementById('signup-btn').addEventListener('click', async () => {
+    const signupForm = document.getElementById('signupForm');
+    if (!signupForm.checkValidity()) {
+      signupForm.reportValidity();
+      return;
+    }
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const errorDiv = document.getElementById('signup-error');
+    hideError(errorDiv);
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      window.location.href = 'community.html';
+    } catch (error) {
+      showError(errorDiv, error.message);
+    }
   });
 
-  document.getElementById('signinForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const btn = document.getElementById('signinSubmitBtn');
-    const fd = new FormData(e.target);
-    fd.delete('password');
-    btn.disabled = true;
-    fetch(FS, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
-      .then(function (res) { return res.json().then(function (data) { return { res: res, data: data }; }); })
-      .then(function (ref) {
-        if (!ref.res.ok) throw new Error((ref.data && ref.data.error) || 'Submit failed');
-        alert('Thanks — we\'ll connect your sign-in to your account soon.');
-      })
-      .catch(function () { alert('Something went wrong. Please try again.'); })
-      .finally(function () { btn.disabled = false; });
+  document.getElementById('signin-btn').addEventListener('click', async () => {
+    const signinForm = document.getElementById('signinForm');
+    if (!signinForm.checkValidity()) {
+      signinForm.reportValidity();
+      return;
+    }
+    const email = document.getElementById('signin-email').value;
+    const password = document.getElementById('signin-password').value;
+    const errorDiv = document.getElementById('signin-error');
+    hideError(errorDiv);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = 'community.html';
+    } catch (error) {
+      showError(errorDiv, error.message);
+    }
   });
-})();
+
+  document.querySelectorAll('.google-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      hideError(document.getElementById('signup-error'));
+      hideError(document.getElementById('signin-error'));
+      try {
+        await signInWithPopup(auth, provider);
+        window.location.href = 'community.html';
+      } catch (error) {
+        console.error(error.message);
+      }
+    });
+  });
 </script>
 </body>
 </html>
