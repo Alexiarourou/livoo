@@ -197,16 +197,71 @@ nav {
 .cities-more-note a { color: var(--green); font-weight: 600; text-decoration: none; }
 .cities-more-note a:hover { text-decoration: underline; }
 
-.cities-request-wrap { display: flex; justify-content: center; width: 100%; margin-top: 24px; }
-.cities-request-wrap .city-card-request { width: 100%; max-width: 282px; }
+.cities-request-strip {
+  width: 100%;
+  background: #edf7f0;
+  border-top: 1px solid #d4eadb;
+  border-bottom: 1px solid #d4eadb;
+  padding: 60px 48px;
+}
+.cities-request-inner {
+  max-width: 32rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+}
+.cities-request-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(5, 150, 105, 0.14);
+  border: 1px solid rgba(5, 150, 105, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+.cities-request-icon svg {
+  width: 26px;
+  height: 26px;
+}
+.cities-request-icon svg path {
+  stroke: var(--green);
+}
+.cities-request-title {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.55rem, 4.2vw, 1.95rem);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--text-dark);
+  margin: 0;
+}
+.cities-request-sub {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--muted-dark);
+  line-height: 1.65;
+  margin: -4px 0 0;
+  max-width: 28rem;
+}
+.cities-request-cta {
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.cities-request-cta:hover { color: white; }
 .cities-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; align-items: stretch; }
-.city-card-request { background: var(--surface-dark); border: 2px dashed var(--border-dark); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: auto; padding: 32px 28px; text-decoration: none; color: inherit; transition: all 0.3s; }
-.city-card-request:hover { border-color: var(--green); background: rgba(5,150,105,0.04); }
-.city-card-request-icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(5,150,105,0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
-.city-card-request-icon svg { width: 28px; height: 28px; }
-.city-card-request-icon svg path { stroke: var(--green); }
-.city-card-request strong { font-family: "Outfit", sans-serif; font-size: 1.1rem; display: block; margin-bottom: 8px; }
-.city-card-request span { font-size: 0.85rem; color: var(--muted-dark); text-align: center; line-height: 1.5; }
 .city-card { background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 20px; overflow: hidden; transition: all 0.3s; cursor: default; color: inherit; display: flex; flex-direction: column; height: 100%; min-height: 0; }
 .city-card:hover { border-color: var(--green); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(5,150,105,0.15); }
 .city-cover-link { text-decoration: none; color: inherit; display: block; flex-shrink: 0; cursor: pointer; }
@@ -332,6 +387,7 @@ nav {
     padding: 5px 14px;
     letter-spacing: 0.02em;
   }
+  .cities-request-strip { padding: 48px 24px; }
 }
 </style>
 </head>
@@ -465,14 +521,18 @@ nav {
       </div>
     </div>
   </div>
-  <div class="cities-request-wrap">
-    <a href="contact.html?subject=Request%20new%20city" class="city-card-request">
-      <div class="city-card-request-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
-      <strong>Request your city</strong>
-      <span>Heading to Barcelona, Berlin, Amsterdam, or elsewhere? Tell us which city you want next. We're expanding!</span>
-    </a>
-  </div>
 </div>
+
+<section class="cities-request-strip" aria-labelledby="cities-request-heading">
+  <div class="cities-request-inner">
+    <div class="cities-request-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+    </div>
+    <h2 class="cities-request-title" id="cities-request-heading">Request your city</h2>
+    <p class="cities-request-sub">Heading to Barcelona, Berlin, Amsterdam, or elsewhere? Tell us which city you want next. We're expanding!</p>
+    <a href="contact.html?subject=Request%20new%20city" class="btn-primary cities-request-cta">Request your city</a>
+  </div>
+</section>
 
 <div class="join-section" id="join">
   <h2>Ready to find <span>your people?</span></h2>
