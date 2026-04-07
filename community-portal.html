@@ -1030,8 +1030,11 @@ nav {
 
     function setWelcomeAndNav(profileData) {
       const profileUsername = (profileData && String(profileData.username || '').trim()) || 'Member';
-      welcomeEl.textContent = 'Hi, ' + profileUsername + ' · ' + cityDisplay;
-      navCity.textContent = cityDisplay + ' community /';
+      const cityForUi = String(cityDisplay || '').trim()
+        || String(localStorage.getItem('livvo_city') || '').trim()
+        || String(cityDisplayName || '').trim();
+      welcomeEl.textContent = 'Hi, ' + profileUsername + ' · ' + cityForUi;
+      navCity.textContent = cityForUi + ' community';
       navEmail.textContent = '';
       const emojiSpan = document.createElement('span');
       emojiSpan.className = 'nav-user-emoji';
