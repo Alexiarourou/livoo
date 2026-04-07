@@ -645,7 +645,7 @@ nav {
   if (!hasUrlCity) {
     const stored = localStorage.getItem('livvo_city');
     if (stored && stored.trim()) {
-      window.location.replace('community-portal.html?city=' + encodeURIComponent(stored.trim()));
+      window.location.replace('community/?city=' + encodeURIComponent(stored.trim()));
     } else {
       window.location.replace('community.html');
     }
@@ -1098,6 +1098,13 @@ nav {
 
     const city = cityDisplay;
 
+    function isUserProfileComplete(d) {
+      if (!d || typeof d !== 'object') return false;
+      var name = String(d.username || d.displayName || '').trim();
+      var cityVal = String(d.city || '').trim();
+      return name.length > 0 && cityVal.length > 0;
+    }
+
     onAuthStateChanged(auth, async function (user) {
       try {
         if (!user) {
@@ -1106,22 +1113,23 @@ nav {
         }
 
         const profileDoc = await getDoc(doc(db, 'users', user.uid));
+        const pdata = profileDoc.exists ? profileDoc.data() : null;
 
-        if (!profileDoc.exists) {
-          window.location.href = 'profile-setup.html?city=' + encodeURIComponent(city);
+        if (!isUserProfileComplete(pdata)) {
+          window.location.href = 'setup-profile.html?city=' + encodeURIComponent(city);
           return;
         }
 
-        showPortal(user, profileDoc.data());
+        showPortal(user, pdata);
       } catch (error) {
         console.error('Portal error:', error);
         if (user) {
-          showPortal(user, null);
+          window.location.href = 'setup-profile.html?city=' + encodeURIComponent(city);
         }
       }
     });
 
-    setTimeout(function () {
+    setTimeout(async function () {
       const content = document.getElementById('portal-content');
       if (!content) return;
       var stillHidden =
@@ -1129,18 +1137,19 @@ nav {
         (window.getComputedStyle(content).display === 'none');
       if (!stillHidden) return;
 
-      console.warn('Portal fallback: content still hidden after 3s; forcing visible');
-      if (content.style.display === 'none') {
-        content.style.display = 'block';
-      }
-      content.removeAttribute('hidden');
-      var nav = document.querySelector('nav');
-      if (nav) {
-        nav.removeAttribute('hidden');
-        nav.style.display = '';
-      }
-      if (auth.currentUser) {
-        showPortal(auth.currentUser, null);
+      console.warn('Portal fallback: still hidden after 3s; verifying profile');
+      const u = auth.currentUser;
+      if (!u) return;
+      try {
+        const profileDoc = await getDoc(doc(db, 'users', u.uid));
+        const pdata = profileDoc.exists ? profileDoc.data() : null;
+        if (isUserProfileComplete(pdata)) {
+          showPortal(u, pdata);
+        } else {
+          window.location.href = 'setup-profile.html?city=' + encodeURIComponent(city);
+        }
+      } catch (e) {
+        window.location.href = 'setup-profile.html?city=' + encodeURIComponent(city);
       }
     }, 3000);
 

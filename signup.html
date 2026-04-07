@@ -373,42 +373,7 @@ nav {
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-
-  const city = new URLSearchParams(window.location.search)
-    .get('city') || localStorage.getItem('livvo_city') || '';
-
-  // THIS MUST RUN FIRST — handles Google redirect coming back
-  getRedirectResult(auth)
-    .then((result) => {
-      if (result?.user) {
-        localStorage.setItem('livvo_city', city);
-        window.location.href = `community-portal.html?city=${city}`;
-      }
-    })
-    .catch((err) => console.error('Redirect error:', err.code, err.message));
-
-  // Google button
-  document.querySelectorAll('.google-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      localStorage.setItem('livvo_city', city);
-      signInWithRedirect(auth, new GoogleAuthProvider());
-    });
-  });
-
   const db = getFirestore(app);
-
-  async function userHasProfile(uid) {
-    const userSnap = await getDoc(doc(db, 'users', uid));
-    return userSnap.exists;
-  }
-
-  async function redirectNewAccountAfterAuth(uid) {
-    if (await userHasProfile(uid)) {
-      goToCityPortal();
-    } else {
-      goToProfileSetup();
-    }
-  }
 
   const cityNames = {
     paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milan: 'Milan',
@@ -429,6 +394,60 @@ nav {
     return str.trim().replace(/\s+/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
   }
   const cityName = cityNames[slug] || titleCaseFromRaw(rawCity || '');
+
+  function isUserProfileComplete(d) {
+    if (!d || typeof d !== 'object') return false;
+    var name = String(d.username || d.displayName || '').trim();
+    var cityVal = String(d.city || '').trim();
+    return name.length > 0 && cityVal.length > 0;
+  }
+
+  function goToCommunity() {
+    localStorage.setItem('livvo_city', cityName);
+    window.location.href = 'community/?city=' + encodeURIComponent(cityName);
+  }
+
+  function goToProfileSetup() {
+    localStorage.setItem('livvo_city', cityName);
+    window.location.href = 'setup-profile.html?city=' + encodeURIComponent(cityName);
+  }
+
+  async function routeAfterCommunityAuth(uid) {
+    const userSnap = await getDoc(doc(db, 'users', uid));
+    const data = userSnap.exists ? userSnap.data() : null;
+    if (isUserProfileComplete(data)) {
+      goToCommunity();
+    } else {
+      goToProfileSetup();
+    }
+  }
+
+  async function redirectNewAccountAfterAuth(uid) {
+    await routeAfterCommunityAuth(uid);
+  }
+
+  // THIS MUST RUN FIRST — handles Google redirect coming back
+  getRedirectResult(auth)
+    .then(async (result) => {
+      if (result?.user) {
+        localStorage.setItem('livvo_city', cityName);
+        try {
+          await routeAfterCommunityAuth(result.user.uid);
+        } catch (err) {
+          console.error('Post-Google-login profile route:', err);
+          goToProfileSetup();
+        }
+      }
+    })
+    .catch((err) => console.error('Redirect error:', err.code, err.message));
+
+  // Google button
+  document.querySelectorAll('.google-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      localStorage.setItem('livvo_city', cityName);
+      signInWithRedirect(auth, new GoogleAuthProvider());
+    });
+  });
   document.getElementById('pageTitle').textContent = 'Join the ' + cityName + ' community';
   document.getElementById('pageSub').textContent =
     'Free to join. Connect with people moving to ' + cityName + ', find flatmates and get local tips.';
@@ -439,16 +458,6 @@ nav {
   if (joinEmail) {
     document.getElementById('signup-email').value = joinEmail;
     document.getElementById('signin-email').value = joinEmail;
-  }
-
-  function goToCityPortal() {
-    localStorage.setItem('livvo_city', cityName);
-    window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityName);
-  }
-
-  function goToProfileSetup() {
-    localStorage.setItem('livvo_city', cityName);
-    window.location.href = 'profile-setup.html?city=' + encodeURIComponent(cityName);
   }
 
   const tabSignup = document.getElementById('tab-signup');
@@ -571,11 +580,18 @@ nav {
       showError(errorDiv, signupPasswordMsg);
       return;
     }
+    let cred;
     try {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await redirectNewAccountAfterAuth(cred.user.uid);
+      cred = await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
       showError(errorDiv, getFriendlyError(error.code));
+      return;
+    }
+    try {
+      await redirectNewAccountAfterAuth(cred.user.uid);
+    } catch (err) {
+      console.error('Post-signup profile route:', err);
+      goToProfileSetup();
     }
   });
 
@@ -591,9 +607,15 @@ nav {
     hideError(errorDiv);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      goToCityPortal();
     } catch (error) {
       showError(errorDiv, getFriendlyError(error.code));
+      return;
+    }
+    try {
+      await routeAfterCommunityAuth(auth.currentUser.uid);
+    } catch (err) {
+      console.error('Post-login profile route:', err);
+      goToProfileSetup();
     }
   });
 </script>

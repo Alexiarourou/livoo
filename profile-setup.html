@@ -286,7 +286,7 @@ textarea { min-height: 88px; resize: vertical; }
   if (!hasUrlCity) {
     const stored = localStorage.getItem('livvo_city');
     if (stored && stored.trim()) {
-      window.location.replace('profile-setup.html?city=' + encodeURIComponent(stored.trim()));
+      window.location.replace('setup-profile.html?city=' + encodeURIComponent(stored.trim()));
     } else {
       window.location.replace('signup.html');
     }
@@ -329,6 +329,13 @@ textarea { min-height: 88px; resize: vertical; }
       formError.classList.remove('show');
     }
 
+    function isUserProfileComplete(d) {
+      if (!d || typeof d !== 'object') return false;
+      var name = String(d.username || d.displayName || '').trim();
+      var cityVal = String(d.city || '').trim();
+      return name.length > 0 && cityVal.length > 0;
+    }
+
     photoInput.addEventListener('change', function () {
       const f = photoInput.files && photoInput.files[0];
       if (!f || !f.type.startsWith('image/')) return;
@@ -356,9 +363,9 @@ textarea { min-height: 88px; resize: vertical; }
       const profileRef = doc(db, 'users', user.uid, 'profile', PROFILE_DOC_ID);
       try {
         const userSnap = await getDoc(userDocRef);
-        if (userSnap.exists) {
+        if (userSnap.exists && isUserProfileComplete(userSnap.data())) {
           localStorage.setItem('livvo_city', cityDisplay);
-          window.location.replace('community-portal.html?city=' + encodeURIComponent(cityDisplay));
+          window.location.replace('community/?city=' + encodeURIComponent(cityDisplay));
           return;
         }
       } catch (e) {
@@ -419,7 +426,7 @@ textarea { min-height: 88px; resize: vertical; }
           await updateProfile(user, authUpdates).catch(function () {});
 
           localStorage.setItem('livvo_city', cityDisplay);
-          window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityDisplay);
+          window.location.href = 'community/?city=' + encodeURIComponent(cityDisplay);
         } catch (err) {
           console.error(err);
           showFormError(err.message || 'Could not save profile. Check Firestore and Storage rules.');
