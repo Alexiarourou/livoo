@@ -370,6 +370,11 @@ nav {
   document.getElementById('signinCityField').value = cityName;
   document.getElementById('joinBackLink').href = 'community.html';
 
+  function goToCityPortal() {
+    localStorage.setItem('livvo_city', cityName);
+    window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityName);
+  }
+
   const tabSignup = document.getElementById('tab-signup');
   const tabSignin = document.getElementById('tab-signin');
   const panelSignup = document.getElementById('panel-signup');
@@ -425,7 +430,7 @@ nav {
     hideError(errorDiv);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      window.location.href = 'community.html';
+      goToCityPortal();
     } catch (error) {
       showError(errorDiv, error.message);
     }
@@ -443,7 +448,7 @@ nav {
     hideError(errorDiv);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = 'community.html';
+      goToCityPortal();
     } catch (error) {
       showError(errorDiv, error.message);
     }
@@ -455,7 +460,7 @@ nav {
       hideError(document.getElementById('signin-error'));
       try {
         await signInWithPopup(auth, provider);
-        window.location.href = 'community.html';
+        goToCityPortal();
       } catch (error) {
         console.error(error.message);
       }
