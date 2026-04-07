@@ -402,6 +402,19 @@ nav {
   document.getElementById('linkToSignin').addEventListener('click', showSignin);
   document.getElementById('linkToSignup').addEventListener('click', showSignup);
 
+  function getFriendlyError(code) {
+    const errors = {
+      'auth/email-already-in-use': 'An account with this email already exists. Try signing in instead.',
+      'auth/invalid-email': 'Please enter a valid email address.',
+      'auth/weak-password': 'Password must be at least 6 characters.',
+      'auth/user-not-found': 'No account found with this email.',
+      'auth/wrong-password': 'Incorrect password. Please try again.',
+      'auth/too-many-requests': 'Too many attempts. Please try again later.',
+      'auth/popup-closed-by-user': 'Google sign in was cancelled.'
+    };
+    return errors[code] || 'Something went wrong. Please try again.';
+  }
+
   function hideError(el) {
     el.textContent = '';
     el.style.display = 'none';
@@ -432,7 +445,7 @@ nav {
       await createUserWithEmailAndPassword(auth, email, password);
       goToCityPortal();
     } catch (error) {
-      showError(errorDiv, error.message);
+      showError(errorDiv, getFriendlyError(error.code));
     }
   });
 
@@ -450,7 +463,7 @@ nav {
       await signInWithEmailAndPassword(auth, email, password);
       goToCityPortal();
     } catch (error) {
-      showError(errorDiv, error.message);
+      showError(errorDiv, getFriendlyError(error.code));
     }
   });
 
@@ -462,7 +475,13 @@ nav {
         await signInWithPopup(auth, provider);
         goToCityPortal();
       } catch (error) {
-        console.error(error.message);
+        const msg = getFriendlyError(error.code);
+        console.error(msg);
+        if (panelSignin.classList.contains('active')) {
+          showError(signinErrorEl, msg);
+        } else {
+          showError(signupErrorEl, msg);
+        }
       }
     });
   });
