@@ -1031,6 +1031,19 @@ nav {
     });
 
     const city = cityDisplay;
+    let pendingAuthRedirectTimer = null;
+
+    function scheduleRedirectIfStillSignedOut(url) {
+      if (pendingAuthRedirectTimer) {
+        clearTimeout(pendingAuthRedirectTimer);
+      }
+      pendingAuthRedirectTimer = setTimeout(function () {
+        const latestUser = auth.currentUser;
+        if (!latestUser) {
+          window.location.href = url;
+        }
+      }, 2000);
+    }
 
     function isUserProfileComplete(d) {
       if (!d || typeof d !== 'object') return false;
@@ -1042,8 +1055,12 @@ nav {
     onAuthStateChanged(auth, async function (user) {
       try {
         if (!user) {
-          window.location.href = 'signup.html?city=' + encodeURIComponent(city);
+          scheduleRedirectIfStillSignedOut('signup.html?city=' + encodeURIComponent(city));
           return;
+        }
+        if (pendingAuthRedirectTimer) {
+          clearTimeout(pendingAuthRedirectTimer);
+          pendingAuthRedirectTimer = null;
         }
 
         const profileDoc = await getDoc(doc(db, 'users', user.uid));
