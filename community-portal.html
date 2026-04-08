@@ -419,8 +419,8 @@ nav {
 }
 .feed-card-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px 16px;
+  flex-wrap: nowrap;
+  gap: 16px;
   align-items: center;
 }
 .feed-card-actions button {
@@ -466,9 +466,7 @@ nav {
   color: #5c6f65;
 }
 .reddit-card {
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  gap: 10px;
+  display: block;
 }
 .vote-rail {
   display: flex;
@@ -640,13 +638,19 @@ nav {
 .comment-body { line-height: 1.5; color: var(--text); }
 .comment-form textarea {
   width: 100%;
-  min-height: 88px;
-  padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid #c5e0d0;
+  border-radius: 8px;
   font-family: "DM Sans", sans-serif;
   font-size: 0.9rem;
   resize: vertical;
+}
+.inline-thread .comment-composer-actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 8px;
 }
 
 @media (max-width: 768px) {
@@ -1298,7 +1302,7 @@ nav {
 
         const actions = document.createElement('div');
         actions.className = 'feed-card-actions';
-        actions.style.cssText = 'margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:nowrap;';
+        actions.style.cssText = 'margin-top:10px;display:flex;align-items:center;gap:16px;flex-wrap:nowrap;';
 
         const upBtn = document.createElement('button');
         upBtn.type = 'button';
@@ -1417,6 +1421,7 @@ nav {
       replyInfo.style.marginTop = '6px';
       const actions = document.createElement('div');
       actions.className = 'modal-actions';
+      actions.classList.add('comment-composer-actions');
       actions.style.cssText = 'justify-content:flex-end;display:flex;margin-top:8px;';
       const cancelReplyBtn = document.createElement('button');
       cancelReplyBtn.type = 'button';
@@ -1728,7 +1733,9 @@ nav {
     const navEl = document.querySelector('nav');
 
     function setWelcomeAndNav(profileData) {
-      const profileUsername = (profileData && String(profileData.username || '').trim()) || 'Member';
+      const profileUsername = (profileData && String(profileData.username || '').trim())
+        || (currentUser && (currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : '')))
+        || 'Member';
       const cityForUi = String(cityDisplay || '').trim() || String(cityDisplayName || '').trim();
       welcomeEl.textContent = 'Hi, ' + profileUsername;
       navCity.textContent = cityForUi + ' community';
