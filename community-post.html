@@ -273,7 +273,7 @@
         if (uSnap.exists()) {
           const ud = uSnap.data() || {};
           const un = String(ud.username || ud.displayName || fallbackUsername || 'Anonymous').trim();
-          const ph = String(ud.photoURL || '').trim();
+          const ph = String(ud.photoURL || '').trim() || String(fallbackPhoto || '').trim();
           profile = { username: un || 'Anonymous', photoUrl: ph, initial: String((un || 'A').charAt(0)).toUpperCase() };
         }
       } catch (e) {}
@@ -381,7 +381,7 @@
       docs.forEach(function (cd) {
         const c = cd.data() || {};
         const username = String(c.authorUsername || 'Member').trim() || 'Member';
-        const photo = String(c.authorPhoto || '').trim();
+        const photo = String(c.authorPhotoURL || c.authorPhoto || '').trim();
         const item = document.createElement('div');
         item.className = 'comment-item';
 
@@ -540,9 +540,9 @@
             rav.style.width = '26px';
             rav.style.height = '26px';
             rav.style.fontSize = '11px';
-            if (r.authorPhoto) {
+            if (r.authorPhotoURL || r.authorPhoto) {
               const ri = document.createElement('img');
-              ri.src = r.authorPhoto;
+              ri.src = r.authorPhotoURL || r.authorPhoto;
               ri.alt = rName;
               rav.appendChild(ri);
             } else rav.textContent = rName.charAt(0).toUpperCase();
@@ -590,6 +590,7 @@
               text: replyText,
               authorUid: currentUser.uid,
               authorUsername: authorUsername,
+              authorPhotoURL: authorPhoto || null,
               authorPhoto: authorPhoto,
               createdAt: serverTimestamp()
             });
@@ -674,7 +675,9 @@
         const postRef = doc(db, 'communityPosts', postId);
         const commentRef = doc(collection(db, 'communityPosts', postId, 'comments'));
         batch.set(commentRef, {
-          text, authorUid: currentUser.uid, authorUsername, authorPhoto,
+          text, authorUid: currentUser.uid, authorUsername,
+          authorPhotoURL: authorPhoto || null,
+          authorPhoto: authorPhoto,
           likes: 0, createdAt: serverTimestamp()
         });
         batch.update(postRef, { commentCount: increment(1) });
@@ -695,7 +698,7 @@
       postData = data;
       const authorUid = data.author || data.authorId || '';
       const fallback = data.authorUsername || data.authorName || 'Anonymous';
-      const ap = await getAuthorProfile(authorUid, fallback, data.authorPhoto || '');
+      const ap = await getAuthorProfile(authorUid, fallback, data.authorPhotoURL || data.authorPhoto || '');
 
       viewTitle.textContent = data.title || 'Untitled';
       const catKey = data.category || '';
