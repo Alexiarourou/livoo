@@ -162,37 +162,20 @@ nav {
   width: 100%;
   margin: 0 auto;
 }
-.portal-hero { margin-bottom: 28px; text-align: center; }
-.portal-hero h1.portal-welcome-heading {
-  font-family: "Sora", sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  letter-spacing: -0.03em;
-  line-height: 1.25;
-  color: var(--text);
-}
 .nav-user-emoji {
   margin-right: 5px;
   font-size: 0.88em;
   opacity: 0.82;
   vertical-align: -0.05em;
 }
-.portal-hero p {
-  margin-top: 10px;
-  font-size: 0.95rem;
-  color: var(--muted);
-  line-height: 1.6;
-  max-width: 28rem;
-  margin-left: auto;
-  margin-right: auto;
-}
 
-.portal-toolbar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+.portal-main-toolbar {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  margin-bottom: 22px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 .category-tabs {
   display: flex;
@@ -238,21 +221,6 @@ nav {
   z-index: 40;
 }
 .cat-more-menu[hidden] { display: none; }
-.btn-new-post {
-  font-family: "DM Sans", sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #fff;
-  background: var(--btn-green);
-  border: none;
-  border-radius: 10px;
-  padding: 12px 22px;
-  cursor: pointer;
-  transition: background 0.2s;
-  white-space: nowrap;
-}
-.btn-new-post:hover { background: var(--btn-green-hover); }
-
 .portal-layout {
   display: grid;
   grid-template-columns: 220px 1fr 300px;
@@ -372,38 +340,6 @@ nav {
   cursor: pointer;
 }
 .sidebar-create-post:hover { background: var(--btn-green-hover); }
-
-.sort-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 14px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-}
-.sort-label {
-  font-size: 0.8rem;
-  color: var(--muted);
-  font-weight: 600;
-  white-space: nowrap;
-}
-.sort-btn {
-  border: 1px solid var(--border);
-  background: #fff;
-  color: var(--muted);
-  border-radius: 999px;
-  padding: 7px 12px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-.sort-btn.active {
-  border-color: var(--btn-green);
-  color: var(--btn-green);
-  background: rgba(26, 122, 74, 0.1);
-}
 
 .feed { display: flex; flex-direction: column; gap: 14px; width: 100%; }
 .feed-empty {
@@ -936,8 +872,9 @@ nav {
   .page-wrap { padding: 108px 24px 64px; }
   .portal-layout { grid-template-columns: 1fr; }
   .left-sidebar, .right-sidebar { position: static; top: auto; }
-  .portal-toolbar { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
-  .btn-new-post { width: 100%; }
+  .portal-main-toolbar { flex-direction: column; align-items: stretch; }
+  #new-post-btn { width: 100%; }
+  #sort-select { width: 100%; }
 }
 </style>
 </head>
@@ -1025,36 +962,46 @@ nav {
     </aside>
 
     <section class="main-column">
-      <header class="portal-hero" style="text-align:left;margin-bottom:14px;">
-        <h1 id="portal-welcome" class="portal-welcome-heading">Welcome to the community</h1>
-        <p id="portal-sub">Share tips, events, and connect with people in your city.</p>
-      </header>
+      <!-- Page header -->
+      <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 26px; font-weight: 700; color: #1a2e1a; margin: 0 0 4px 0;">
+          Hi, <span id="header-username">there</span> 👋
+        </h1>
+        <p style="font-size: 14px; color: #5a7a5a; margin: 0;">
+          Share tips, events, housing advice and connect with people in your city.
+        </p>
+      </div>
 
-      <div class="portal-toolbar">
-        <div class="category-tabs" role="tablist" aria-label="Topics">
-          <button type="button" class="cat-tab active" data-category="all" role="tab" aria-selected="true">All topics</button>
-          <button type="button" class="cat-tab" data-category="housing" role="tab" aria-selected="false">Housing Tips</button>
-          <button type="button" class="cat-tab" data-category="events" role="tab" aria-selected="false">Events</button>
-          <button type="button" class="cat-tab" data-category="flatmate" role="tab" aria-selected="false">Flatmate Search</button>
-          <div class="cat-more-wrap">
-            <button type="button" class="cat-tab" id="cat-more-toggle" aria-expanded="false">More ▾</button>
-            <div class="cat-more-menu" id="cat-more-menu" hidden>
-              <button type="button" class="cat-tab" data-category="general" role="tab" aria-selected="false">General</button>
-              <button type="button" class="cat-tab" data-category="recommendations" role="tab" aria-selected="false" title="Restaurants, cafes, gyms, and more">Recommendations</button>
-              <button type="button" class="cat-tab" data-category="visa_admin" role="tab" aria-selected="false">Visa &amp; Admin</button>
-              <button type="button" class="cat-tab" data-category="jobs_remote" role="tab" aria-selected="false">Jobs &amp; Remote Work</button>
-              <button type="button" class="cat-tab" data-category="things_to_do" role="tab" aria-selected="false">Things to Do</button>
+      <!-- Toolbar: tabs + sort + new post all in one row -->
+      <div class="portal-main-toolbar">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;" id="topic-tabs">
+          <div class="category-tabs" role="tablist" aria-label="Topics">
+            <button type="button" class="cat-tab active" data-category="all" role="tab" aria-selected="true">All topics</button>
+            <button type="button" class="cat-tab" data-category="housing" role="tab" aria-selected="false">Housing Tips</button>
+            <button type="button" class="cat-tab" data-category="events" role="tab" aria-selected="false">Events</button>
+            <button type="button" class="cat-tab" data-category="flatmate" role="tab" aria-selected="false">Flatmate Search</button>
+            <div class="cat-more-wrap">
+              <button type="button" class="cat-tab" id="cat-more-toggle" aria-expanded="false">More ▾</button>
+              <div class="cat-more-menu" id="cat-more-menu" hidden>
+                <button type="button" class="cat-tab" data-category="general" role="tab" aria-selected="false">General</button>
+                <button type="button" class="cat-tab" data-category="recommendations" role="tab" aria-selected="false" title="Restaurants, cafes, gyms, and more">Recommendations</button>
+                <button type="button" class="cat-tab" data-category="visa_admin" role="tab" aria-selected="false">Visa &amp; Admin</button>
+                <button type="button" class="cat-tab" data-category="jobs_remote" role="tab" aria-selected="false">Jobs &amp; Remote Work</button>
+                <button type="button" class="cat-tab" data-category="things_to_do" role="tab" aria-selected="false">Things to Do</button>
+              </div>
             </div>
           </div>
         </div>
-        <button type="button" class="btn-new-post" id="btn-new-post">New post</button>
-      </div>
-
-      <div class="sort-toolbar" role="toolbar" aria-label="Sort posts">
-        <span class="sort-label">Sort:</span>
-        <button type="button" class="sort-btn active" data-sort="recent">Most Recent</button>
-        <button type="button" class="sort-btn" data-sort="popular">Most Popular</button>
-        <button type="button" class="sort-btn" data-sort="oldest">Oldest</button>
+        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <select id="sort-select" style="font-size: 13px; font-weight: 500; color: #1a2e1a; background: white; border: 1.5px solid #d4e6d4; border-radius: 20px; padding: 7px 14px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%235a7a5a%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;">
+            <option value="recent">Most Recent</option>
+            <option value="popular">Most Popular</option>
+            <option value="oldest">Oldest</option>
+          </select>
+          <button type="button" id="new-post-btn" style="font-size: 13px; font-weight: 600; background: #2d6a2d; color: white; border: none; border-radius: 20px; padding: 8px 18px; cursor: pointer; white-space: nowrap;">
+            + New post
+          </button>
+        </div>
       </div>
 
       <div id="feed" class="feed" aria-live="polite"></div>
@@ -1250,8 +1197,7 @@ nav {
     const db = getFirestore(app);
 
     const portalContent = document.getElementById('portal-content');
-    const welcomeEl = document.getElementById('portal-welcome');
-    const subEl = document.getElementById('portal-sub');
+    const headerUsernameEl = document.getElementById('header-username');
     const navCity = document.getElementById('nav-city-label');
     const navEmail = document.getElementById('nav-email');
     const navProfileTrigger = document.getElementById('nav-profile-trigger');
@@ -1263,6 +1209,11 @@ nav {
 
     let activeCategory = 'all';
     let activeSort = 'recent';
+
+    function syncSortSelect() {
+      var sel = document.getElementById('sort-select');
+      if (sel) sel.value = activeSort;
+    }
     let currentUser = null;
     let currentProfileData = null;
     let cityDisplay = cityDisplayName;
@@ -1323,15 +1274,13 @@ nav {
       });
     }
 
-    document.querySelectorAll('.sort-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        activeSort = btn.getAttribute('data-sort') || 'recent';
-        document.querySelectorAll('.sort-btn').forEach(function (b) {
-          b.classList.toggle('active', b === btn);
-        });
+    var sortSelectEl = document.getElementById('sort-select');
+    if (sortSelectEl) {
+      sortSelectEl.addEventListener('change', function () {
+        activeSort = sortSelectEl.value || 'recent';
         subscribeFeed();
       });
-    });
+    }
 
     document.querySelectorAll('.city-switch-link').forEach(function (el) {
       el.addEventListener('click', function (e) {
@@ -1355,9 +1304,7 @@ nav {
       activeCategory = 'all';
       activeSort = 'recent';
       setActiveCategoryUI('all');
-      document.querySelectorAll('.sort-btn').forEach(function (b) {
-        b.classList.toggle('active', b.getAttribute('data-sort') === 'recent');
-      });
+      syncSortSelect();
       subscribeFeed();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
@@ -1366,9 +1313,7 @@ nav {
       activeCategory = 'all';
       activeSort = 'popular';
       setActiveCategoryUI('all');
-      document.querySelectorAll('.sort-btn').forEach(function (b) {
-        b.classList.toggle('active', b.getAttribute('data-sort') === 'popular');
-      });
+      syncSortSelect();
       subscribeFeed();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
@@ -1402,9 +1347,7 @@ nav {
         activeCategory = cat;
         activeSort = 'recent';
         setActiveCategoryUI(cat);
-        document.querySelectorAll('.sort-btn').forEach(function (b) {
-          b.classList.toggle('active', b.getAttribute('data-sort') === 'recent');
-        });
+        syncSortSelect();
         if (moreMenu) {
           moreMenu.hidden = true;
           if (moreToggle) moreToggle.setAttribute('aria-expanded', 'false');
@@ -1740,7 +1683,7 @@ nav {
       });
     }
 
-    document.getElementById('btn-new-post').addEventListener('click', function () {
+    document.getElementById('new-post-btn').addEventListener('click', function () {
       document.getElementById('post-title').value = '';
       document.getElementById('post-body').value = '';
       var cat = activeCategory === 'all' ? 'housing' : activeCategory;
@@ -1748,7 +1691,7 @@ nav {
       openModal('modal-new-post');
     });
     document.getElementById('btn-create-post-sidebar').addEventListener('click', function () {
-      document.getElementById('btn-new-post').click();
+      document.getElementById('new-post-btn').click();
     });
 
     document.getElementById('confirm-delete-post').addEventListener('click', async function () {
@@ -1784,7 +1727,7 @@ nav {
         || (currentUser && (currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : '')))
         || 'Member';
       const cityForUi = String(cityDisplay || '').trim() || String(cityDisplayName || '').trim();
-      welcomeEl.textContent = 'Hi, ' + profileUsername;
+      if (headerUsernameEl) headerUsernameEl.textContent = profileUsername;
       navCity.textContent = cityForUi + ' community';
       navEmail.textContent = '';
       if (navProfileTrigger) {
@@ -1803,7 +1746,6 @@ nav {
       currentUser = user;
       currentProfileData = profileData || null;
       setWelcomeAndNav(profileData);
-      subEl.textContent = 'Share tips, events, housing advice, and flatmate searches with people here.';
       navEl.removeAttribute('hidden');
       navEl.style.display = '';
       portalContent.removeAttribute('hidden');
