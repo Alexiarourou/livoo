@@ -1046,10 +1046,7 @@ nav {
     }
 
     function isUserProfileComplete(d) {
-      if (!d || typeof d !== 'object') return false;
-      var name = String(d.username || d.displayName || '').trim();
-      var cityVal = String(d.city || '').trim();
-      return name.length > 0 && cityVal.length > 0;
+      return true;
     }
 
     onAuthStateChanged(auth, async function (user) {
