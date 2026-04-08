@@ -371,6 +371,7 @@
       }
     }
 
+    /** Optimistic UI + Firestore upvotes only — no renderComments/hydratePost/reload here. */
     async function likePostImpl() {
       if (!currentUser) return;
       const btn = document.getElementById('post-like-btn');
@@ -576,6 +577,7 @@
       menu.hidden = !menu.hidden;
     };
 
+    /** Optimistic UI + Firestore only — full list re-render is skipped when snapshot is like-only (see onSnapshot). */
     window.likeComment = async function (commentId) {
       if (!currentUser) return;
       const btn = document.getElementById('clb-' + commentId);
@@ -654,7 +656,20 @@
 
     listEl.addEventListener('click', closeAllCommentMenus);
 
+    /** True when snapshot only changed metadata (e.g. likes) — same comments, same text. Avoids full DOM rebuild on like. */
+    function commentDocsCompatibleForPatch(prev, next) {
+      if (!prev || !next || prev.length !== next.length) return false;
+      for (var i = 0; i < prev.length; i++) {
+        if (prev[i].id !== next[i].id) return false;
+        var a = prev[i].data() || {};
+        var b = next[i].data() || {};
+        if (String(a.text || '') !== String(b.text || '')) return false;
+      }
+      return true;
+    }
+
     function renderComments() {
+      var scrollY = window.scrollY;
       closeAllCommentMenus();
       listEl.innerHTML = '';
       threadRepliesUnsubs.forEach(function (u) { try { u(); } catch (e) {} });
@@ -676,6 +691,9 @@
 
       if (!docs.length) {
         listEl.innerHTML = '<p class="meta-pill">No comments yet.</p>';
+        requestAnimationFrame(function () {
+          window.scrollTo(0, scrollY);
+        });
         return;
       }
 
@@ -872,6 +890,9 @@
         item.appendChild(right);
         listEl.appendChild(item);
       });
+      requestAnimationFrame(function () {
+        window.scrollTo(0, scrollY);
+      });
     }
 
     async function submitThreadComment() {
@@ -1014,7 +1035,18 @@
       }
       const cq = query(collection(db, 'communityPosts', postId, 'comments'), orderBy('createdAt', 'asc'));
       commentsUnsub = onSnapshot(cq, function (csnap) {
-        latestComments = csnap.docs.slice();
+        var next = csnap.docs.slice();
+        if (commentDocsCompatibleForPatch(latestComments, next)) {
+          latestComments = next;
+          next.forEach(function (cd) {
+            var d = cd.data() || {};
+            var n = Math.max(0, Number(d.likes || d.likeCount || 0));
+            var el = document.getElementById('clc-' + cd.id);
+            if (el) el.textContent = String(n);
+          });
+          return;
+        }
+        latestComments = next;
         renderComments();
       }, function () {
         listEl.innerHTML = '<p class="meta-pill">Could not load comments.</p>';
@@ -1048,7 +1080,10 @@
           const cc = document.getElementById('post-comment-count');
           if (cc) cc.textContent = String(Number(pdata.commentCount || 0));
           const lc = document.getElementById('post-like-count');
-          if (lc) lc.textContent = String(Number(pdata.upvoteCount || 0));
+          if (lc) {
+            var srv = String(Number(pdata.upvoteCount || 0));
+            if (lc.textContent !== srv) lc.textContent = srv;
+          }
           updateCommentCountLabel();
         }
       }, function () {
