@@ -470,7 +470,7 @@ textarea { min-height: 88px; resize: vertical; }
         email: user.email,
         createdAt: new Date()
       });
-      window.location.href = 'community-portal.html';
+      window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityDisplay);
     } catch (err) {
       console.error(err);
       completeErrorEl.textContent = 'Something went wrong. Please try again.';
