@@ -1389,9 +1389,15 @@ nav {
     };
 
     function showPortalToast(msg) {
+      showToast(msg);
+    }
+    function showToast(msg) {
+      var existing = document.getElementById('toast');
+      if (existing) existing.remove();
       var t = document.createElement('div');
+      t.id = 'toast';
       t.textContent = msg;
-      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2e1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:10000;opacity:0;transition:opacity 0.2s;';
+      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2e1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:10000;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;';
       document.body.appendChild(t);
       setTimeout(function () { t.style.opacity = '1'; }, 10);
       setTimeout(function () {
@@ -1399,6 +1405,7 @@ nav {
         setTimeout(function () { t.remove(); }, 200);
       }, 2500);
     }
+    window.showToast = showToast;
 
     window.deletePost = async function (postId) {
       if (!confirm('Delete this post?')) return;
@@ -1418,7 +1425,7 @@ nav {
 
     window.reportPost = function (postId) {
       var menu = document.getElementById('post-menu-' + postId);
-      if (menu) menu.hidden = true;
+      if (menu) menu.style.display = 'none';
       showPortalToast('Post reported — thank you');
     };
 
@@ -1475,11 +1482,13 @@ nav {
         event.stopPropagation();
         event.preventDefault();
       }
-      document.querySelectorAll('.post-card-more-menu').forEach(function (m) {
-        if (m.id !== 'post-menu-' + postId) m.hidden = true;
+      document.querySelectorAll('[id^="post-menu-"]').forEach(function (m) {
+        if (m.id !== 'post-menu-' + postId) m.style.display = 'none';
       });
-      const menu = document.getElementById('post-menu-' + postId);
-      if (menu) menu.hidden = !menu.hidden;
+      var menu = document.getElementById('post-menu-' + postId);
+      if (menu) {
+        menu.style.display = menu.style.display === 'none' || menu.style.display === '' ? 'block' : 'none';
+      }
     };
     window.likePost = async function (event, postId) {
       if (event) {
@@ -1524,8 +1533,8 @@ nav {
     };
 
     document.addEventListener('click', function (e) {
-      if (e.target.closest('.post-card-more-menu') || e.target.closest('.post-card-more-trigger')) return;
-      document.querySelectorAll('.post-card-more-menu').forEach(function (m) { m.hidden = true; });
+      if (e.target.closest('[id^="post-menu-"]') || e.target.closest('.post-card-more-trigger')) return;
+      document.querySelectorAll('[id^="post-menu-"]').forEach(function (m) { m.style.display = 'none'; });
     });
 
     async function getAuthorProfile(authorUid, fallbackUsername, fallbackPhotoUrl) {
@@ -1753,7 +1762,7 @@ nav {
           card.style.boxShadow = 'none';
         });
         card.addEventListener('click', function (ev) {
-          if (ev.target.closest('button') || ev.target.closest('.post-card-more-menu')) return;
+          if (ev.target.closest('button') || ev.target.closest('[id^="post-menu-"]') || ev.target.closest('.post-card-more-trigger')) return;
           window.location.href = threadPageUrl(postId);
         });
 
@@ -1852,14 +1861,14 @@ nav {
         });
 
         const menuHost = document.createElement('div');
-        menuHost.style.cssText = 'margin-left:auto;display:flex;align-items:center;position:relative;';
+        menuHost.style.cssText = 'position:relative;margin-left:auto;';
         const canDelete = currentUser && authorUid && authorUid === currentUser.uid;
         const menuBtn = document.createElement('button');
         menuBtn.type = 'button';
         menuBtn.className = 'post-card-more-trigger';
-        menuBtn.style.cssText = 'border:none;background:none;padding:4px 8px;cursor:pointer;color:#c0d4c0;font-size:18px;border-radius:6px;line-height:1;display:flex;align-items:center;justify-content:center;';
+        menuBtn.style.cssText = 'border:none;background:none;padding:4px 8px;cursor:pointer;color:#c0d4c0;font-size:20px;border-radius:6px;line-height:1;transition:background 0.1s;display:flex;align-items:center;justify-content:center;';
         menuBtn.innerHTML = '···';
-        menuBtn.addEventListener('mouseenter', function () { menuBtn.style.background = '#f5f5f5'; });
+        menuBtn.addEventListener('mouseenter', function () { menuBtn.style.background = '#f0f5f0'; });
         menuBtn.addEventListener('mouseleave', function () { menuBtn.style.background = 'none'; });
         menuBtn.addEventListener('click', function (e) {
           window.togglePostMenu(e, postId);
@@ -1869,8 +1878,7 @@ nav {
         const menuPop = document.createElement('div');
         menuPop.id = 'post-menu-' + postId;
         menuPop.className = 'post-card-more-menu';
-        menuPop.hidden = true;
-        menuPop.style.cssText = 'position:absolute;right:0;top:28px;background:#fff;border:1px solid #e8f0e8;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1);z-index:100;min-width:140px;overflow:hidden;padding:0;';
+        menuPop.style.cssText = 'display:none;position:absolute;right:0;top:28px;background:#fff;border:1px solid #e8f0e8;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1);z-index:100;min-width:140px;overflow:hidden;padding:0;';
         menuPop.addEventListener('click', function (e) { e.stopPropagation(); });
         if (canDelete) {
           const delBtn = document.createElement('button');
@@ -1881,7 +1889,7 @@ nav {
           delBtn.addEventListener('mouseleave', function () { delBtn.style.background = 'none'; });
           delBtn.addEventListener('click', function (e) {
             e.stopPropagation();
-            menuPop.hidden = true;
+            menuPop.style.display = 'none';
             window.deletePost(postId);
           });
           menuPop.appendChild(delBtn);

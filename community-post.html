@@ -571,10 +571,36 @@
       }
       var menu = document.getElementById('comment-menu-' + commentId);
       if (!menu) return;
-      listEl.querySelectorAll('.comment-more-menu').forEach(function (m) {
-        if (m.id !== 'comment-menu-' + commentId) m.hidden = true;
+      document.querySelectorAll('[id^="comment-menu-"]').forEach(function (m) {
+        if (m.id !== 'comment-menu-' + commentId) m.style.display = 'none';
       });
-      menu.hidden = !menu.hidden;
+      menu.style.display = menu.style.display === 'none' || menu.style.display === '' ? 'block' : 'none';
+    };
+
+    window.deleteComment = async function (commentId) {
+      if (!confirm('Delete this comment?')) return;
+      try {
+        await deleteDoc(doc(db, 'communityPosts', postId, 'comments', commentId));
+        await runTransaction(db, async function (transaction) {
+          const postSnap = await transaction.get(doc(db, 'communityPosts', postId));
+          if (!postSnap.exists()) return;
+          const cur = Number((postSnap.data() || {}).commentCount || 0);
+          transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
+        });
+        var row = document.getElementById('comment-' + commentId);
+        if (row) row.remove();
+        bumpThreadCommentCount(-1);
+        showToast('Comment deleted');
+      } catch (err) {
+        console.error(err);
+        showToast('Could not delete comment');
+      }
+    };
+
+    window.reportComment = function (commentId) {
+      var m = document.getElementById('comment-menu-' + commentId);
+      if (m) m.style.display = 'none';
+      showToast('Comment reported — thank you');
     };
 
     /** Optimistic UI + Firestore only — full list re-render is skipped when snapshot is like-only (see onSnapshot). */
@@ -651,10 +677,12 @@
     const heartStrokeSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
 
     function closeAllCommentMenus() {
-      listEl.querySelectorAll('.comment-more-menu').forEach(function (m) { m.hidden = true; });
+      document.querySelectorAll('[id^="comment-menu-"]').forEach(function (m) { m.style.display = 'none'; });
     }
 
-    listEl.addEventListener('click', closeAllCommentMenus);
+    document.addEventListener('click', function () {
+      document.querySelectorAll('[id^="comment-menu-"]').forEach(function (m) { m.style.display = 'none'; });
+    });
 
     /** True when snapshot only changed metadata (e.g. likes) — same comments, same text. Avoids full DOM rebuild on like. */
     function commentDocsCompatibleForPatch(prev, next) {
@@ -702,6 +730,7 @@
         const username = String(c.authorUsername || 'Member').trim() || 'Member';
         const photo = String(c.authorPhotoURL || c.authorPhoto || '').trim();
         const item = document.createElement('div');
+        item.id = 'comment-' + cd.id;
         item.style.cssText = 'display:flex;gap:10px;margin-bottom:20px;align-items:flex-start;';
 
         const av = document.createElement('div');
@@ -731,7 +760,7 @@
         textEl.innerHTML = linkify(c.text || '');
 
         const actionRow = document.createElement('div');
-        actionRow.style.cssText = 'display:flex;align-items:center;gap:14px;';
+        actionRow.style.cssText = 'display:flex;align-items:center;gap:14px;flex-wrap:wrap;';
         const initialCommentLikes = Number(c.likes || c.likeCount || 0);
         const likeBtn = document.createElement('button');
         likeBtn.type = 'button';
@@ -751,48 +780,55 @@
           window.toggleReplyBox(cd.id);
         });
 
-        const moreWrap = document.createElement('span');
+        const moreWrap = document.createElement('div');
         moreWrap.className = 'comment-more-wrap';
+        moreWrap.style.cssText = 'position:relative;margin-left:auto;';
         const moreMenu = document.createElement('div');
         moreMenu.id = 'comment-menu-' + cd.id;
         moreMenu.className = 'comment-more-menu';
-        moreMenu.hidden = true;
+        moreMenu.style.cssText = 'display:none;position:absolute;right:0;top:28px;background:#fff;border:1px solid #e8f0e8;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1);z-index:100;min-width:140px;overflow:hidden;';
         moreMenu.addEventListener('click', function (e) { e.stopPropagation(); });
         const moreBtn = document.createElement('button');
         moreBtn.type = 'button';
-        moreBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:14px;color:#c0d4c0;';
+        moreBtn.style.cssText = 'border:none;background:none;padding:4px 8px;cursor:pointer;color:#c0d4c0;font-size:20px;border-radius:6px;line-height:1;transition:background 0.1s;';
         moreBtn.textContent = '···';
+        moreBtn.addEventListener('mouseenter', function () { moreBtn.style.background = '#f0f5f0'; });
+        moreBtn.addEventListener('mouseleave', function () { moreBtn.style.background = 'none'; });
         moreBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
           window.toggleCommentMenu(e, cd.id);
         });
         if (currentUser && c.authorUid && c.authorUid === currentUser.uid) {
-          const delOpt = document.createElement('button');
-          delOpt.type = 'button';
-          delOpt.textContent = 'Delete';
-          delOpt.addEventListener('click', async function (e) {
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.style.cssText = 'width:100%;border:none;background:none;padding:10px 16px;text-align:left;font-size:13px;color:#e53e3e;cursor:pointer;display:flex;align-items:center;gap:8px;font:inherit;';
+          delBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><span>Delete</span>';
+          delBtn.addEventListener('mouseenter', function () { delBtn.style.background = '#fff5f5'; });
+          delBtn.addEventListener('mouseleave', function () { delBtn.style.background = 'none'; });
+          delBtn.addEventListener('click', function (e) {
             e.stopPropagation();
-            moreMenu.hidden = true;
-            try {
-              await deleteDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
-              await runTransaction(db, async function (transaction) {
-                const postSnap = await transaction.get(doc(db, 'communityPosts', postId));
-                if (!postSnap.exists()) return;
-                const cur = Number((postSnap.data() || {}).commentCount || 0);
-                transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
-              });
-              bumpThreadCommentCount(-1);
-            } catch (err) {
-              console.error('Delete comment failed:', err);
-            }
+            moreMenu.style.display = 'none';
+            window.deleteComment(cd.id);
           });
-          moreMenu.appendChild(delOpt);
+          moreMenu.appendChild(delBtn);
         }
+        const reportBtn = document.createElement('button');
+        reportBtn.type = 'button';
+        reportBtn.style.cssText = 'width:100%;border:none;background:none;padding:10px 16px;text-align:left;font-size:13px;color:#5a7a5a;cursor:pointer;display:flex;align-items:center;gap:8px;font:inherit;';
+        reportBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg><span>Report</span>';
+        reportBtn.addEventListener('mouseenter', function () { reportBtn.style.background = '#f8f8f8'; });
+        reportBtn.addEventListener('mouseleave', function () { reportBtn.style.background = 'none'; });
+        reportBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          window.reportComment(cd.id);
+        });
+        moreMenu.appendChild(reportBtn);
         moreWrap.appendChild(moreBtn);
         moreWrap.appendChild(moreMenu);
 
         actionRow.appendChild(likeBtn);
         actionRow.appendChild(replyBtn);
-        if (moreMenu.firstChild) actionRow.appendChild(moreWrap);
+        actionRow.appendChild(moreWrap);
 
         if (currentUser) {
           getDoc(doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid)).then(function (ls) {
