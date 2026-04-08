@@ -449,18 +449,21 @@ nav {
   font-size: 0.8rem;
   color: var(--muted);
 }
-.post-delete-icon {
+.post-more-trigger {
   border: none;
   background: transparent;
   color: #9aa8a0;
-  width: 28px;
-  height: 28px;
+  min-width: 32px;
+  height: 32px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 700;
   line-height: 1;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
 }
-.post-delete-icon:hover {
+.post-more-trigger:hover {
   background: #f3f6f4;
   color: #5c6f65;
 }
@@ -1427,6 +1430,12 @@ nav {
         const card = document.createElement('div');
         card.className = 'feed-card reddit-card';
         card.style.cssText = 'padding:16px;color:#1a2e24;text-align:left;cursor:default;';
+        card.addEventListener('click', function () {
+          card.querySelectorAll('.comment-more-menu').forEach(function (m) { m.hidden = true; });
+          card.querySelectorAll('.post-more-trigger').forEach(function (b) {
+            b.setAttribute('aria-expanded', 'false');
+          });
+        });
 
         const contentCol = document.createElement('div');
 
@@ -1455,20 +1464,39 @@ nav {
 
           const canDelete = currentUser && authorUid && authorUid === currentUser.uid;
         if (canDelete) {
-          const delBtn = document.createElement('button');
-          delBtn.type = 'button';
-          delBtn.className = 'post-delete-icon';
-          delBtn.title = 'Delete post';
-          delBtn.setAttribute('aria-label', 'Delete post');
-          delBtn.textContent = '🗑';
-          delBtn.addEventListener('click', function () {
+          const moreWrap = document.createElement('span');
+          moreWrap.className = 'comment-more-wrap';
+          moreWrap.style.flexShrink = '0';
+          const moreMenu = document.createElement('div');
+          moreMenu.className = 'comment-more-menu';
+          moreMenu.hidden = true;
+          moreMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+          const moreBtn = document.createElement('button');
+          moreBtn.type = 'button';
+          moreBtn.className = 'post-more-trigger';
+          moreBtn.title = 'Post options';
+          moreBtn.setAttribute('aria-label', 'Post options');
+          moreBtn.setAttribute('aria-expanded', 'false');
+          moreBtn.textContent = '···';
+          moreBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            moreMenu.hidden = !moreMenu.hidden;
+            moreBtn.setAttribute('aria-expanded', moreMenu.hidden ? 'false' : 'true');
+          });
+          const delOpt = document.createElement('button');
+          delOpt.type = 'button';
+          delOpt.textContent = 'Delete';
+          delOpt.addEventListener('click', function (e) {
+            e.stopPropagation();
+            moreMenu.hidden = true;
+            moreBtn.setAttribute('aria-expanded', 'false');
             pendingDelete = { postId: snap.id, card: card };
             openModal('modal-delete-post');
           });
-          delBtn.addEventListener('keydown', function (e) {
-            e.stopPropagation();
-          });
-          topRow.appendChild(delBtn);
+          moreMenu.appendChild(delOpt);
+          moreWrap.appendChild(moreBtn);
+          moreWrap.appendChild(moreMenu);
+          topRow.appendChild(moreWrap);
         }
         contentCol.appendChild(topRow);
 
