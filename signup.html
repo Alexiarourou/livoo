@@ -62,7 +62,7 @@ nav {
 .page {
   min-height: 100vh;
   padding: 88px 24px 48px;
-  max-width: 440px;
+  max-width: 480px;
   margin: 0 auto;
   display: flex; flex-direction: column; align-items: stretch;
 }
@@ -76,7 +76,7 @@ nav {
   border: 1px solid #d4eadb;
   border-radius: 16px;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 4px 24px rgba(26, 46, 36, 0.06);
 }
 .auth-tabs {
@@ -121,6 +121,7 @@ nav {
 .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted-dark); margin-bottom: 8px; }
 .form-group input {
   width: 100%;
+  box-sizing: border-box;
   background: #ffffff;
   border: 1px solid var(--input-border);
   border-radius: 8px;
@@ -133,6 +134,30 @@ nav {
 }
 .form-group input:focus { border-color: var(--focus-green); }
 .form-group input::placeholder { color: var(--muted-dark); opacity: 0.75; }
+.remember-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.remember-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted-dark);
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer;
+}
+.remember-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--green);
+}
 .btn-auth-primary {
   width: 100%;
   margin-top: 10px;
@@ -344,13 +369,11 @@ nav {
             <li id="signin-pw-rule-special"><span class="pw-tick" aria-hidden="true">✓</span><span>At least 1 special character (!@#$%^&*)</span></li>
           </ul>
         </div>
-        <div id="signin-error" class="auth-error" role="alert"></div>
-        <div class="form-group" style="margin-top:4px;">
-          <label for="remember-me" style="display:flex;align-items:center;gap:8px;font-size:0.86rem;color:var(--muted-dark);font-weight:500;">
-            <input id="remember-me" type="checkbox" checked />
-            Remember me
-          </label>
+        <div style="display: flex; align-items: center; gap: 8px; margin: 12px 0;">
+          <input type="checkbox" id="remember-me" checked style="width: 16px; height: 16px; accent-color: #059669;">
+          <label for="remember-me" style="font-size: 14px; color: #3d6b55; cursor: pointer;">Remember me</label>
         </div>
+        <div id="signin-error" class="auth-error" role="alert"></div>
         <button type="button" class="btn-auth-primary" id="signin-btn">Log in</button>
         <div class="auth-divider" role="presentation"><span>or</span></div>
         <button type="button" class="btn-google google-btn" id="btnGoogleSignin" aria-label="Continue with Google">
@@ -631,10 +654,10 @@ nav {
     const errorDiv = document.getElementById('signin-error');
     hideError(errorDiv);
     try {
-      await setPersistence(
-        auth,
-        (rememberMeEl && rememberMeEl.checked) ? browserLocalPersistence : browserSessionPersistence
-      );
+      const persistence = document.getElementById('remember-me').checked
+        ? browserLocalPersistence
+        : browserSessionPersistence;
+      await setPersistence(auth, persistence);
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       showError(errorDiv, getFriendlyError(error.code));
