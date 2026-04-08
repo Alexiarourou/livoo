@@ -498,6 +498,131 @@ nav {
   border-left: 2px solid #dcebe2;
   padding-left: 10px;
 }
+.thread-top-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 10px;
+}
+.thread-pill {
+  border: 1px solid #d6e8dc;
+  background: #f6fbf8;
+  color: #2f4f3d;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.thread-join-trigger {
+  width: 100%;
+  border: 1px solid #cfe4d7;
+  border-radius: 999px;
+  background: #fff;
+  color: #5d7467;
+  padding: 11px 14px;
+  text-align: left;
+  font: inherit;
+  cursor: text;
+}
+.thread-composer-panel {
+  margin-top: 8px;
+  border: 1px solid #d7e9dd;
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px;
+}
+.thread-composer-text {
+  width: 100%;
+  min-height: 90px;
+  padding: 12px;
+  border: 1px solid #c5e0d0;
+  border-radius: 8px;
+  resize: vertical;
+  font: inherit;
+}
+.thread-composer-text:focus {
+  outline: none;
+  border-color: var(--btn-green);
+  box-shadow: 0 0 0 3px rgba(26, 122, 74, 0.12);
+}
+.thread-composer-toolbar {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.thread-toolbar-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.thread-toolbar-btn {
+  border: 1px solid #d7e9dd;
+  background: #fff;
+  color: #335443;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.thread-toolbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.comment-controls-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+  margin: 12px 0;
+}
+.comment-sort-select,
+.comment-search-input {
+  border: 1px solid #d7e9dd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+}
+.comment-search-input {
+  width: 100%;
+}
+.comment-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  padding: 8px;
+}
+.comment-highlight {
+  background: #fff9e8;
+}
+.comment-actions-row {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #627a6d;
+  font-size: 12px;
+}
+.comment-action-link {
+  border: none;
+  background: transparent;
+  color: #627a6d;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+.comment-action-link:hover { color: var(--btn-green); }
 
 /* Modal */
 .modal {
@@ -1418,6 +1543,27 @@ nav {
       wrap.style.cssText = 'margin-top:12px;border-top:1px solid #e6efe9;padding-top:12px;';
       wrap.addEventListener('click', function (e) { e.stopPropagation(); });
 
+      const topPills = document.createElement('div');
+      topPills.className = 'thread-top-pills';
+      topPills.innerHTML =
+        '<span class="thread-pill">▲ ' + Number(data.upvoteCount || 0) + ' ▼</span>' +
+        '<span class="thread-pill">💬 ' + Number(data.commentCount || 0) + '</span>' +
+        '<span class="thread-pill">❤️ ' + Number(data.awardCount || 0) + '</span>';
+      const topShare = document.createElement('button');
+      topShare.type = 'button';
+      topShare.className = 'thread-pill';
+      topShare.textContent = 'Share';
+      topShare.addEventListener('click', function () {
+        const link = window.location.origin + window.location.pathname + '?city=' + encodeURIComponent(cityForFeedQuery()) + '#post-' + postId;
+        navigator.clipboard.writeText(link).then(function () {
+          const old = topShare.textContent;
+          topShare.textContent = 'Copied!';
+          setTimeout(function () { topShare.textContent = old; }, 1200);
+        }).catch(function () {});
+      });
+      topPills.appendChild(topShare);
+      wrap.appendChild(topPills);
+
       const fullPost = document.createElement('div');
       fullPost.className = 'thread-body';
       const bodyText = (data.body != null && String(data.body).trim())
@@ -1426,84 +1572,123 @@ nav {
       fullPost.textContent = bodyText || '';
       wrap.appendChild(fullPost);
 
-      const title = document.createElement('h3');
-      title.textContent = 'Comments';
-      title.style.cssText = 'margin:12px 0 8px;';
-      wrap.appendChild(title);
-
       const composer = document.createElement('div');
-      composer.style.marginBottom = '10px';
+      composer.style.margin = '12px 0 10px';
       let pendingScrollTarget = '';
+      const joinTrigger = document.createElement('button');
+      joinTrigger.type = 'button';
+      joinTrigger.className = 'thread-join-trigger';
+      joinTrigger.textContent = 'Join the conversation';
+      const composerPanel = document.createElement('div');
+      composerPanel.className = 'thread-composer-panel';
+      composerPanel.hidden = true;
       const textarea = document.createElement('textarea');
-      textarea.placeholder = 'Write a comment...';
-      textarea.rows = 4;
-      textarea.style.cssText = 'width:100%;min-height:80px;padding:12px;border:1px solid #c5e0d0;border-radius:8px;resize:vertical;margin-top:6px;transition:min-height .15s ease,border-color .15s ease,box-shadow .15s ease;';
-      textarea.addEventListener('focus', function () {
-        textarea.style.minHeight = '100px';
-        textarea.style.borderColor = 'var(--btn-green)';
-        textarea.style.boxShadow = '0 0 0 3px rgba(26,122,74,0.12)';
+      textarea.className = 'thread-composer-text';
+      textarea.placeholder = 'Join the conversation';
+      const toolbar = document.createElement('div');
+      toolbar.className = 'thread-composer-toolbar';
+      const toolbarLeft = document.createElement('div');
+      toolbarLeft.className = 'thread-toolbar-left';
+      ['🖼', 'GIF', 'Aa'].forEach(function (label) {
+        const tb = document.createElement('button');
+        tb.type = 'button';
+        tb.className = 'thread-toolbar-btn';
+        tb.textContent = label;
+        toolbarLeft.appendChild(tb);
       });
-      textarea.addEventListener('blur', function () {
-        if (!(textarea.value || '').trim()) textarea.style.minHeight = '80px';
-        textarea.style.boxShadow = '';
-      });
-      const replyInfo = document.createElement('div');
-      replyInfo.className = 'meta-pill';
-      replyInfo.hidden = true;
-      replyInfo.style.marginTop = '6px';
-      const actions = document.createElement('div');
-      actions.className = 'modal-actions';
-      actions.classList.add('comment-composer-actions');
-      actions.style.cssText = 'justify-content:flex-end;display:flex;margin-top:8px;';
+      const toolbarActions = document.createElement('div');
+      toolbarActions.className = 'thread-toolbar-actions';
       const cancelReplyBtn = document.createElement('button');
       cancelReplyBtn.type = 'button';
       cancelReplyBtn.className = 'btn-secondary';
-      cancelReplyBtn.textContent = 'Cancel reply';
-      cancelReplyBtn.hidden = true;
+      cancelReplyBtn.textContent = 'Cancel';
       const submitBtn = document.createElement('button');
       submitBtn.type = 'button';
       submitBtn.className = 'btn-primary';
       submitBtn.textContent = 'Comment';
-      actions.appendChild(cancelReplyBtn);
-      actions.appendChild(submitBtn);
-      composer.appendChild(textarea);
-      composer.appendChild(replyInfo);
-      composer.appendChild(actions);
+      toolbarActions.appendChild(cancelReplyBtn);
+      toolbarActions.appendChild(submitBtn);
+      toolbar.appendChild(toolbarLeft);
+      toolbar.appendChild(toolbarActions);
+      composerPanel.appendChild(textarea);
+      composerPanel.appendChild(toolbar);
+      composer.appendChild(joinTrigger);
+      composer.appendChild(composerPanel);
       wrap.appendChild(composer);
+
+      joinTrigger.addEventListener('click', function () {
+        joinTrigger.hidden = true;
+        composerPanel.hidden = false;
+        textarea.focus();
+      });
+      cancelReplyBtn.addEventListener('click', function () {
+        textarea.value = '';
+        composerPanel.hidden = true;
+        joinTrigger.hidden = false;
+      });
+
+      const controls = document.createElement('div');
+      controls.className = 'comment-controls-row';
+      const sortSelect = document.createElement('select');
+      sortSelect.className = 'comment-sort-select';
+      sortSelect.innerHTML = '<option value="best">Sort by: Best</option><option value="new">Sort by: New</option><option value="old">Sort by: Old</option>';
+      const searchInput = document.createElement('input');
+      searchInput.type = 'search';
+      searchInput.className = 'comment-search-input';
+      searchInput.placeholder = 'Search Comments';
+      controls.appendChild(sortSelect);
+      controls.appendChild(searchInput);
+      wrap.appendChild(controls);
 
       const listEl = document.createElement('div');
       listEl.innerHTML = '<p class="meta-pill">Loading comments...</p>';
       wrap.appendChild(listEl);
       contentCol.appendChild(wrap);
 
-      function collapseComposer() {
-        textarea.value = '';
-        replyInfo.hidden = true;
-        cancelReplyBtn.hidden = true;
-        replyingToCommentId = null;
-        replyingToUsername = '';
-      }
-      cancelReplyBtn.addEventListener('click', function () {
-        collapseComposer();
-      });
+      let latestComments = [];
+      let activeReplyBox = null;
 
-      const commentsRef = collection(db, 'communityPosts', postId, 'comments');
-      const cq = query(commentsRef, orderBy('createdAt', 'asc'));
-      threadCommentsUnsub = onSnapshot(cq, async function (csnap) {
+      function getMillis(ts) {
+        if (!ts) return 0;
+        if (typeof ts.toMillis === 'function') return ts.toMillis();
+        const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+        return d.getTime() || 0;
+      }
+
+      async function renderComments() {
         listEl.innerHTML = '';
         threadRepliesUnsubs.forEach(function (u) { try { u(); } catch (e) {} });
         threadRepliesUnsubs = [];
-        if (!csnap.docs.length) {
+        let docs = latestComments.slice();
+        const term = String(searchInput.value || '').trim().toLowerCase();
+        if (term) {
+          docs = docs.filter(function (cd) {
+            const c = cd.data() || {};
+            return String(c.text || '').toLowerCase().includes(term) || String(c.authorUsername || '').toLowerCase().includes(term);
+          });
+        }
+        if (sortSelect.value === 'best') {
+          docs.sort(function (a, b) {
+            const ad = a.data() || {}; const bd = b.data() || {};
+            return Number(bd.likeCount || 0) - Number(ad.likeCount || 0) || getMillis(bd.createdAt) - getMillis(ad.createdAt);
+          });
+        } else if (sortSelect.value === 'new') {
+          docs.sort(function (a, b) { return getMillis((b.data() || {}).createdAt) - getMillis((a.data() || {}).createdAt); });
+        } else {
+          docs.sort(function (a, b) { return getMillis((a.data() || {}).createdAt) - getMillis((b.data() || {}).createdAt); });
+        }
+        if (!docs.length) {
           listEl.innerHTML = '<p class="meta-pill">No comments yet.</p>';
           return;
         }
-        for (const cd of csnap.docs) {
+
+        for (const cd of docs) {
           const c = cd.data() || {};
           const username = String(c.authorUsername || 'Member').trim() || 'Member';
           const photo = String(c.authorPhoto || '').trim();
           const item = document.createElement('div');
-          item.className = 'comment';
-          item.style.cssText = 'display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;';
+          item.className = 'comment-item';
+
           const av = document.createElement('div');
           av.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
           if (photo) {
@@ -1515,114 +1700,124 @@ nav {
           } else {
             av.textContent = username.charAt(0).toUpperCase();
           }
+
           const right = document.createElement('div');
           right.style.flex = '1';
           const meta = document.createElement('div');
           meta.className = 'comment-meta';
-          meta.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;';
-          const metaText = document.createElement('span');
-          metaText.textContent = username + ' · ' + formatRelativeTime(c.createdAt);
-          meta.appendChild(metaText);
-          if (currentUser && c.authorUid && c.authorUid === currentUser.uid) {
-            const delCommentBtn = document.createElement('button');
-            delCommentBtn.type = 'button';
-            delCommentBtn.className = 'comment-reply-btn';
-            delCommentBtn.textContent = '🗑️';
-            delCommentBtn.title = 'Delete comment';
-            delCommentBtn.addEventListener('click', async function (e) {
-              e.stopPropagation();
-              try {
-                await deleteDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
-                await runTransaction(db, async function (transaction) {
-                  const postSnap = await transaction.get(doc(db, 'communityPosts', postId));
-                  if (!postSnap.exists()) return;
-                  const cur = Number((postSnap.data() || {}).commentCount || 0);
-                  transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
-                });
-              } catch (err) {
-                console.error('Delete comment failed:', err);
-              }
-            });
-            meta.appendChild(delCommentBtn);
-          }
+          meta.textContent = username + ' · ' + formatRelativeTime(c.createdAt);
           const textEl = document.createElement('div');
           textEl.className = 'comment-body';
           textEl.textContent = c.text || '';
-          const commentLikeBtn = document.createElement('button');
-          commentLikeBtn.type = 'button';
-          commentLikeBtn.className = 'comment-like-btn';
-          commentLikeBtn.textContent = '♡ ' + Number(c.likeCount || 0);
+
+          const actionRow = document.createElement('div');
+          actionRow.className = 'comment-actions-row';
+          const voteWrap = document.createElement('span');
+          const upBtn = document.createElement('button');
+          upBtn.type = 'button';
+          upBtn.className = 'comment-action-link';
+          upBtn.textContent = '▲';
+          const countSpan = document.createElement('span');
+          countSpan.textContent = String(Number(c.likeCount || 0));
+          const downBtn = document.createElement('button');
+          downBtn.type = 'button';
+          downBtn.className = 'comment-action-link';
+          downBtn.textContent = '▼';
+          voteWrap.appendChild(upBtn);
+          voteWrap.appendChild(document.createTextNode(' '));
+          voteWrap.appendChild(countSpan);
+          voteWrap.appendChild(document.createTextNode(' '));
+          voteWrap.appendChild(downBtn);
+
+          const replyBtn = document.createElement('button');
+          replyBtn.type = 'button';
+          replyBtn.className = 'comment-action-link';
+          replyBtn.textContent = 'Reply';
+
+          const shareBtn = document.createElement('button');
+          shareBtn.type = 'button';
+          shareBtn.className = 'comment-action-link';
+          shareBtn.textContent = 'Share';
+          shareBtn.addEventListener('click', function () {
+            const link = window.location.origin + window.location.pathname + '?city=' + encodeURIComponent(cityForFeedQuery()) + '#post-' + postId + '-comment-' + cd.id;
+            navigator.clipboard.writeText(link).then(function () {
+              const old = shareBtn.textContent;
+              shareBtn.textContent = 'Copied!';
+              setTimeout(function () { shareBtn.textContent = old; }, 1200);
+            }).catch(function () {});
+          });
+
+          const moreBtn = document.createElement('button');
+          moreBtn.type = 'button';
+          moreBtn.className = 'comment-action-link';
+          moreBtn.textContent = '···';
+
+          actionRow.appendChild(voteWrap);
+          actionRow.appendChild(replyBtn);
+          actionRow.appendChild(shareBtn);
+          actionRow.appendChild(moreBtn);
+
           if (currentUser) {
             const cLikeRef = doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid);
             getDoc(cLikeRef).then(function (ls) {
-              if (ls.exists()) {
-                commentLikeBtn.classList.add('liked');
-                commentLikeBtn.textContent = '❤ ' + Number(c.likeCount || 0);
-              }
+              if (ls.exists()) upBtn.style.color = 'var(--btn-green)';
             }).catch(function () {});
+            upBtn.addEventListener('click', async function (e) {
+              e.stopPropagation();
+              const cLikeSnap = await getDoc(cLikeRef);
+              if (cLikeSnap.exists()) {
+                await deleteDoc(cLikeRef);
+                await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likeCount: increment(-1) });
+                upBtn.style.color = '';
+              } else {
+                await setDoc(cLikeRef, { uid: currentUser.uid, createdAt: serverTimestamp() });
+                await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likeCount: increment(1) });
+                upBtn.style.color = 'var(--btn-green)';
+              }
+              const latest = await getDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
+              countSpan.textContent = String(Math.max(0, Number(latest.exists() ? (latest.data() || {}).likeCount || 0 : 0)));
+            });
           }
-          commentLikeBtn.addEventListener('click', async function (e) {
-            e.stopPropagation();
-            if (!currentUser) return;
-            const cLikeRef = doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid);
-            const cLikeSnap = await getDoc(cLikeRef);
-            if (cLikeSnap.exists()) {
-              await deleteDoc(cLikeRef);
-              await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likeCount: increment(-1) });
-              commentLikeBtn.classList.remove('liked');
-            } else {
-              await setDoc(cLikeRef, { uid: currentUser.uid, createdAt: serverTimestamp() });
-              await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likeCount: increment(1) });
-              commentLikeBtn.classList.add('liked');
-            }
-            const latest = await getDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
-            const safe = latest.exists() ? Math.max(0, Number((latest.data() || {}).likeCount || 0)) : 0;
-            commentLikeBtn.textContent = (commentLikeBtn.classList.contains('liked') ? '❤ ' : '♡ ') + safe;
-          });
-          const replyBtn = document.createElement('button');
-          replyBtn.type = 'button';
-          replyBtn.className = 'comment-reply-btn';
-          replyBtn.textContent = 'Reply';
-          right.appendChild(meta);
-          right.appendChild(textEl);
-          right.appendChild(commentLikeBtn);
-          right.appendChild(replyBtn);
 
           const repliesWrap = document.createElement('div');
           repliesWrap.className = 'nested-reply';
           repliesWrap.style.marginTop = '8px';
-          right.appendChild(repliesWrap);
+
           const inlineReplyWrap = document.createElement('div');
-          inlineReplyWrap.className = 'nested-reply';
+          inlineReplyWrap.className = 'nested-reply thread-composer-panel';
           inlineReplyWrap.style.marginTop = '8px';
           inlineReplyWrap.hidden = true;
           const inlineReplyInput = document.createElement('textarea');
-          inlineReplyInput.placeholder = 'Write a reply...';
-          inlineReplyInput.style.cssText = 'width:100%;min-height:80px;padding:12px;border:1px solid #c5e0d0;border-radius:8px;resize:vertical;transition:min-height .15s ease,border-color .15s ease,box-shadow .15s ease;';
-          inlineReplyInput.addEventListener('focus', function () {
-            inlineReplyInput.style.minHeight = '100px';
-            inlineReplyInput.style.borderColor = 'var(--btn-green)';
-            inlineReplyInput.style.boxShadow = '0 0 0 3px rgba(26,122,74,0.12)';
+          inlineReplyInput.className = 'thread-composer-text';
+          inlineReplyInput.placeholder = 'Reply to u/' + username;
+          const inlineReplyToolbar = document.createElement('div');
+          inlineReplyToolbar.className = 'thread-composer-toolbar';
+          const inlineLeft = document.createElement('div');
+          inlineLeft.className = 'thread-toolbar-left';
+          ['🖼', 'GIF', 'Aa'].forEach(function (label) {
+            const tb = document.createElement('button');
+            tb.type = 'button';
+            tb.className = 'thread-toolbar-btn';
+            tb.textContent = label;
+            inlineLeft.appendChild(tb);
           });
-          inlineReplyInput.addEventListener('blur', function () {
-            if (!(inlineReplyInput.value || '').trim()) inlineReplyInput.style.minHeight = '80px';
-            inlineReplyInput.style.boxShadow = '';
-          });
-          const inlineReplyActions = document.createElement('div');
-          inlineReplyActions.className = 'comment-composer-actions';
+          const inlineActions = document.createElement('div');
+          inlineActions.className = 'thread-toolbar-actions';
           const inlineReplyCancel = document.createElement('button');
           inlineReplyCancel.type = 'button';
-          inlineReplyCancel.className = 'comment-reply-btn';
+          inlineReplyCancel.className = 'btn-secondary';
           inlineReplyCancel.textContent = 'Cancel';
           const inlineReplySubmit = document.createElement('button');
           inlineReplySubmit.type = 'button';
           inlineReplySubmit.className = 'btn-primary';
-          inlineReplySubmit.textContent = 'Reply';
-          inlineReplyActions.appendChild(inlineReplyCancel);
-          inlineReplyActions.appendChild(inlineReplySubmit);
+          inlineReplySubmit.textContent = 'Comment';
+          inlineActions.appendChild(inlineReplyCancel);
+          inlineActions.appendChild(inlineReplySubmit);
+          inlineReplyToolbar.appendChild(inlineLeft);
+          inlineReplyToolbar.appendChild(inlineActions);
           inlineReplyWrap.appendChild(inlineReplyInput);
-          inlineReplyWrap.appendChild(inlineReplyActions);
-          right.appendChild(inlineReplyWrap);
+          inlineReplyWrap.appendChild(inlineReplyToolbar);
+
           const replyQ = query(collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies'), orderBy('createdAt', 'asc'));
           const unsubReplies = onSnapshot(replyQ, function (rsnap) {
             repliesWrap.innerHTML = '';
@@ -1630,9 +1825,8 @@ nav {
               const r = rd.data() || {};
               const rName = String(r.authorUsername || 'Member').trim() || 'Member';
               const row = document.createElement('div');
-              row.id = 'reply-' + rd.id;
-              row.className = 'comment';
-              row.style.cssText = 'display:flex;gap:8px;align-items:flex-start;margin-top:8px;';
+              row.className = 'comment-item';
+              row.style.marginTop = '8px';
               const rav = document.createElement('div');
               rav.style.cssText = 'width:26px;height:26px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;';
               if (r.authorPhoto) {
@@ -1648,32 +1842,7 @@ nav {
               rr.style.flex = '1';
               const rm = document.createElement('div');
               rm.className = 'comment-meta';
-              rm.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;';
-              const rmText = document.createElement('span');
-              rmText.textContent = rName + ' · ' + formatRelativeTime(r.createdAt);
-              rm.appendChild(rmText);
-              if (currentUser && r.authorUid && r.authorUid === currentUser.uid) {
-                const delReplyBtn = document.createElement('button');
-                delReplyBtn.type = 'button';
-                delReplyBtn.className = 'comment-reply-btn';
-                delReplyBtn.textContent = '🗑️';
-                delReplyBtn.title = 'Delete comment';
-                delReplyBtn.addEventListener('click', async function (e) {
-                  e.stopPropagation();
-                  try {
-                    await deleteDoc(doc(db, 'communityPosts', postId, 'comments', cd.id, 'replies', rd.id));
-                    await runTransaction(db, async function (transaction) {
-                      const postSnap = await transaction.get(doc(db, 'communityPosts', postId));
-                      if (!postSnap.exists()) return;
-                      const cur = Number((postSnap.data() || {}).commentCount || 0);
-                      transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
-                    });
-                  } catch (err) {
-                    console.error('Delete reply failed:', err);
-                  }
-                });
-                rm.appendChild(delReplyBtn);
-              }
+              rm.textContent = rName + ' · ' + formatRelativeTime(r.createdAt);
               const rb = document.createElement('div');
               rb.className = 'comment-body';
               rb.textContent = r.text || '';
@@ -1695,18 +1864,22 @@ nav {
             console.error('Replies load failed:', err);
           });
           threadRepliesUnsubs.push(unsubReplies);
+
           replyBtn.addEventListener('click', function (e) {
             e.stopPropagation();
+            if (activeReplyBox && activeReplyBox !== inlineReplyWrap) activeReplyBox.hidden = true;
+            if (activeReplyBox && activeReplyBox.parentNode) activeReplyBox.parentNode.classList.remove('comment-highlight');
+            activeReplyBox = inlineReplyWrap;
+            item.classList.add('comment-highlight');
             inlineReplyWrap.hidden = false;
             inlineReplyInput.focus();
           });
-          inlineReplyCancel.addEventListener('click', function (e) {
-            e.stopPropagation();
+          inlineReplyCancel.addEventListener('click', function () {
             inlineReplyInput.value = '';
             inlineReplyWrap.hidden = true;
+            item.classList.remove('comment-highlight');
           });
-          inlineReplySubmit.addEventListener('click', async function (e) {
-            e.stopPropagation();
+          inlineReplySubmit.addEventListener('click', async function () {
             if (!currentUser) return;
             const replyText = (inlineReplyInput.value || '').trim();
             if (!replyText) return;
@@ -1729,18 +1902,24 @@ nav {
               await updateDoc(doc(db, 'communityPosts', postId), { commentCount: increment(1) });
               const oldCount = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
               commentPillEl.textContent = '💬 ' + String(oldCount + 1);
+              topPills.children[1].textContent = '💬 ' + String(oldCount + 1);
               pendingScrollTarget = 'reply-' + newReplyRef.id;
               inlineReplyInput.value = '';
               inlineReplyWrap.hidden = true;
+              item.classList.remove('comment-highlight');
             } catch (err) {
               console.error('Inline reply submit failed:', err);
             }
           });
+
+          right.appendChild(meta);
+          right.appendChild(textEl);
+          right.appendChild(actionRow);
+          right.appendChild(inlineReplyWrap);
+          right.appendChild(repliesWrap);
           item.appendChild(av);
           item.appendChild(right);
-          if (pendingScrollTarget === 'comment-pending') {
-            item.id = 'new-comment-scroll-target';
-          }
+          if (pendingScrollTarget === 'comment-pending') item.id = 'new-comment-scroll-target';
           listEl.appendChild(item);
         }
         if (pendingScrollTarget === 'comment-pending') {
@@ -1751,13 +1930,22 @@ nav {
             pendingScrollTarget = '';
           }
         }
+      }
+
+      const commentsRef = collection(db, 'communityPosts', postId, 'comments');
+      const cq = query(commentsRef, orderBy('createdAt', 'asc'));
+      threadCommentsUnsub = onSnapshot(cq, function (csnap) {
+        latestComments = csnap.docs.slice();
+        renderComments();
       }, function (err) {
         listEl.innerHTML = '<p class="meta-pill">Could not load comments.</p>';
         console.error('Comments load failed:', err);
       });
 
-      submitBtn.addEventListener('click', async function (e) {
-        e.stopPropagation();
+      sortSelect.addEventListener('change', function () { renderComments(); });
+      searchInput.addEventListener('input', function () { renderComments(); });
+
+      submitBtn.addEventListener('click', async function () {
         if (!currentUser) return;
         const text = (textarea.value || '').trim();
         if (!text) return;
@@ -1770,36 +1958,24 @@ nav {
           || '';
         const batch = writeBatch(db);
         const postRef = doc(db, 'communityPosts', postId);
-        if (replyingToCommentId) {
-          const replyRef = doc(collection(db, 'communityPosts', postId, 'comments', replyingToCommentId, 'replies'));
-          batch.set(replyRef, {
-            text: text,
-            authorUid: currentUser.uid,
-            authorUsername: authorUsername,
-            authorPhoto: authorPhoto,
-            createdAt: serverTimestamp()
-          });
-        } else {
-          const commentRef = doc(collection(db, 'communityPosts', postId, 'comments'));
-          batch.set(commentRef, {
-            text: text,
-            authorUid: currentUser.uid,
-            authorUsername: authorUsername,
-            authorPhoto: authorPhoto,
-            createdAt: serverTimestamp()
-          });
-        }
+        const commentRef = doc(collection(db, 'communityPosts', postId, 'comments'));
+        batch.set(commentRef, {
+          text: text,
+          authorUid: currentUser.uid,
+          authorUsername: authorUsername,
+          authorPhoto: authorPhoto,
+          createdAt: serverTimestamp()
+        });
         batch.update(postRef, { commentCount: increment(1) });
         try {
           await batch.commit();
           const oldCount = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
           commentPillEl.textContent = '💬 ' + String(oldCount + 1);
+          topPills.children[1].textContent = '💬 ' + String(oldCount + 1);
           pendingScrollTarget = 'comment-pending';
           textarea.value = '';
-          replyInfo.hidden = true;
-          cancelReplyBtn.hidden = true;
-          replyingToCommentId = null;
-          replyingToUsername = '';
+          composerPanel.hidden = true;
+          joinTrigger.hidden = false;
         } catch (err) {
           console.error('Comment submit failed:', err);
         }
