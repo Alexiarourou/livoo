@@ -171,6 +171,23 @@ nav {
   border-color: var(--btn-green);
   color: var(--btn-green);
 }
+.cat-more-wrap { position: relative; display: inline-flex; }
+.cat-more-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 220px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 40;
+}
+.cat-more-menu[hidden] { display: none; }
 .btn-new-post {
   font-family: "DM Sans", sans-serif;
   font-size: 0.9rem;
@@ -689,11 +706,16 @@ nav {
           <button type="button" class="cat-tab" data-category="housing" role="tab" aria-selected="false">Housing Tips</button>
           <button type="button" class="cat-tab" data-category="events" role="tab" aria-selected="false">Events</button>
           <button type="button" class="cat-tab" data-category="flatmate" role="tab" aria-selected="false">Flatmate Search</button>
-          <button type="button" class="cat-tab" data-category="general" role="tab" aria-selected="false">General</button>
-          <button type="button" class="cat-tab" data-category="recommendations" role="tab" aria-selected="false" title="Restaurants, cafes, gyms, and more">Recommendations</button>
-          <button type="button" class="cat-tab" data-category="visa_admin" role="tab" aria-selected="false">Visa &amp; Admin</button>
-          <button type="button" class="cat-tab" data-category="jobs_remote" role="tab" aria-selected="false">Jobs &amp; Remote Work</button>
-          <button type="button" class="cat-tab" data-category="things_to_do" role="tab" aria-selected="false">Things to Do</button>
+          <div class="cat-more-wrap">
+            <button type="button" class="cat-tab" id="cat-more-toggle" aria-expanded="false">More ▾</button>
+            <div class="cat-more-menu" id="cat-more-menu" hidden>
+              <button type="button" class="cat-tab" data-category="general" role="tab" aria-selected="false">General</button>
+              <button type="button" class="cat-tab" data-category="recommendations" role="tab" aria-selected="false" title="Restaurants, cafes, gyms, and more">Recommendations</button>
+              <button type="button" class="cat-tab" data-category="visa_admin" role="tab" aria-selected="false">Visa &amp; Admin</button>
+              <button type="button" class="cat-tab" data-category="jobs_remote" role="tab" aria-selected="false">Jobs &amp; Remote Work</button>
+              <button type="button" class="cat-tab" data-category="things_to_do" role="tab" aria-selected="false">Things to Do</button>
+            </div>
+          </div>
         </div>
         <button type="button" class="btn-new-post" id="btn-new-post">New post</button>
       </div>
@@ -883,7 +905,9 @@ nav {
     const navCity = document.getElementById('nav-city-label');
     const navEmail = document.getElementById('nav-email');
     const feedEl = document.getElementById('feed');
-    const tabButtons = document.querySelectorAll('.cat-tab');
+    const tabButtons = document.querySelectorAll('.cat-tab[data-category]');
+    const moreToggle = document.getElementById('cat-more-toggle');
+    const moreMenu = document.getElementById('cat-more-menu');
 
     let activeCategory = 'all';
     let activeSort = 'recent';
@@ -916,17 +940,34 @@ nav {
       });
     });
 
+    function setActiveCategoryUI(category) {
+      tabButtons.forEach(function (b) {
+        var on = b.getAttribute('data-category') === category;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+    }
+
     tabButtons.forEach(function (btn) {
       btn.addEventListener('click', function () {
         activeCategory = btn.getAttribute('data-category');
-        tabButtons.forEach(function (b) {
-          const on = b === btn;
-          b.classList.toggle('active', on);
-          b.setAttribute('aria-selected', on ? 'true' : 'false');
-        });
+        setActiveCategoryUI(activeCategory);
         subscribeFeed();
       });
     });
+
+    if (moreToggle && moreMenu) {
+      moreToggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var open = !moreMenu.hidden;
+        moreMenu.hidden = open;
+        moreToggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+      });
+      moreMenu.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    }
 
     document.querySelectorAll('.sort-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -951,11 +992,7 @@ nav {
       e.preventDefault();
       activeCategory = 'all';
       activeSort = 'recent';
-      document.querySelectorAll('.cat-tab').forEach(function (b) {
-        var on = b.getAttribute('data-category') === 'all';
-        b.classList.toggle('active', on);
-        b.setAttribute('aria-selected', on ? 'true' : 'false');
-      });
+      setActiveCategoryUI('all');
       document.querySelectorAll('.sort-btn').forEach(function (b) {
         b.classList.toggle('active', b.getAttribute('data-sort') === 'recent');
       });
@@ -1353,7 +1390,32 @@ nav {
           right.style.flex = '1';
           const meta = document.createElement('div');
           meta.className = 'comment-meta';
-          meta.textContent = username + ' · ' + formatRelativeTime(c.createdAt);
+          meta.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;';
+          const metaText = document.createElement('span');
+          metaText.textContent = username + ' · ' + formatRelativeTime(c.createdAt);
+          meta.appendChild(metaText);
+          if (currentUser && c.authorUid && c.authorUid === currentUser.uid) {
+            const delCommentBtn = document.createElement('button');
+            delCommentBtn.type = 'button';
+            delCommentBtn.className = 'comment-reply-btn';
+            delCommentBtn.textContent = '🗑️';
+            delCommentBtn.title = 'Delete comment';
+            delCommentBtn.addEventListener('click', async function (e) {
+              e.stopPropagation();
+              try {
+                await deleteDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
+                await runTransaction(db, async function (transaction) {
+                  const postSnap = await transaction.get(doc(db, 'communityPosts', postId));
+                  if (!postSnap.exists) return;
+                  const cur = Number((postSnap.data() || {}).commentCount || 0);
+                  transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
+                });
+              } catch (err) {
+                console.error('Delete comment failed:', err);
+              }
+            });
+            meta.appendChild(delCommentBtn);
+          }
           const textEl = document.createElement('div');
           textEl.className = 'comment-body';
           textEl.textContent = c.text || '';
@@ -1402,7 +1464,32 @@ nav {
               rr.style.flex = '1';
               const rm = document.createElement('div');
               rm.className = 'comment-meta';
-              rm.textContent = rName + ' · ' + formatRelativeTime(r.createdAt);
+              rm.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;';
+              const rmText = document.createElement('span');
+              rmText.textContent = rName + ' · ' + formatRelativeTime(r.createdAt);
+              rm.appendChild(rmText);
+              if (currentUser && r.authorUid && r.authorUid === currentUser.uid) {
+                const delReplyBtn = document.createElement('button');
+                delReplyBtn.type = 'button';
+                delReplyBtn.className = 'comment-reply-btn';
+                delReplyBtn.textContent = '🗑️';
+                delReplyBtn.title = 'Delete comment';
+                delReplyBtn.addEventListener('click', async function (e) {
+                  e.stopPropagation();
+                  try {
+                    await deleteDoc(doc(db, 'communityPosts', postId, 'comments', cd.id, 'replies', rd.id));
+                    await runTransaction(db, async function (transaction) {
+                      const postSnap = await transaction.get(doc(db, 'communityPosts', postId));
+                      if (!postSnap.exists) return;
+                      const cur = Number((postSnap.data() || {}).commentCount || 0);
+                      transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
+                    });
+                  } catch (err) {
+                    console.error('Delete reply failed:', err);
+                  }
+                });
+                rm.appendChild(delReplyBtn);
+              }
               const rb = document.createElement('div');
               rb.className = 'comment-body';
               rb.textContent = r.text || '';
@@ -1464,7 +1551,11 @@ nav {
           await batch.commit();
           const oldCount = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
           commentPillEl.textContent = '💬 ' + String(oldCount + 1);
-          collapseComposer();
+          textarea.value = '';
+          replyInfo.hidden = true;
+          cancelReplyBtn.hidden = true;
+          replyingToCommentId = null;
+          replyingToUsername = '';
         } catch (err) {
           console.error('Comment submit failed:', err);
         }
@@ -1547,7 +1638,7 @@ nav {
     function setWelcomeAndNav(profileData) {
       const profileUsername = (profileData && String(profileData.username || '').trim()) || 'Member';
       const cityForUi = String(cityDisplay || '').trim() || String(cityDisplayName || '').trim();
-      welcomeEl.textContent = 'Hi, ' + profileUsername + ' · ' + cityForUi;
+      welcomeEl.textContent = 'Hi, ' + profileUsername;
       navCity.textContent = cityForUi + ' community';
       navEmail.textContent = '';
     }
