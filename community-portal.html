@@ -181,6 +181,34 @@ nav {
 }
 .btn-new-post:hover { background: var(--btn-green-hover); }
 
+.sort-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  flex-wrap: wrap;
+}
+.sort-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+.sort-btn {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sort-btn.active {
+  border-color: var(--btn-green);
+  color: var(--btn-green);
+  background: rgba(26, 122, 74, 0.1);
+}
+
 .feed { display: flex; flex-direction: column; gap: 14px; }
 .feed-empty {
   text-align: center;
@@ -278,6 +306,21 @@ nav {
 .meta-pill {
   font-size: 0.8rem;
   color: var(--muted);
+}
+.post-delete-icon {
+  border: none;
+  background: transparent;
+  color: #9aa8a0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+.post-delete-icon:hover {
+  background: #f3f6f4;
+  color: #5c6f65;
 }
 
 /* Modal */
@@ -514,6 +557,13 @@ nav {
     <button type="button" class="btn-new-post" id="btn-new-post">New post</button>
   </div>
 
+  <div class="sort-toolbar" role="toolbar" aria-label="Sort posts">
+    <span class="sort-label">Sort:</span>
+    <button type="button" class="sort-btn active" data-sort="recent">Most Recent</button>
+    <button type="button" class="sort-btn" data-sort="popular">Most Popular</button>
+    <button type="button" class="sort-btn" data-sort="oldest">Oldest</button>
+  </div>
+
   <div id="feed" class="feed" aria-live="polite"></div>
 </main>
 
@@ -574,6 +624,18 @@ nav {
     </div>
     <div class="modal-actions" style="margin-top:20px;">
       <button type="button" class="btn-secondary" data-close="modal-thread">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-delete-post" class="modal" hidden aria-modal="true" role="dialog" aria-labelledby="delete-post-title">
+  <div class="modal-backdrop" data-close="modal-delete-post"></div>
+  <div class="modal-panel" style="max-width:420px;">
+    <h2 id="delete-post-title">Delete post?</h2>
+    <p style="color:var(--muted);margin-bottom:18px;">Are you sure you want to delete this post?</p>
+    <div class="modal-actions" style="justify-content:flex-end;">
+      <button type="button" class="btn-secondary" data-close="modal-delete-post">Cancel</button>
+      <button type="button" class="btn-primary" id="confirm-delete-post" style="background:#b42318;border-color:#b42318;">Delete</button>
     </div>
   </div>
 </div>
@@ -678,6 +740,7 @@ nav {
     const tabButtons = document.querySelectorAll('.cat-tab');
 
     let activeCategory = 'all';
+    let activeSort = 'recent';
     let currentUser = null;
     let currentProfileData = null;
     let cityDisplay = cityDisplayName;
@@ -685,6 +748,7 @@ nav {
     let feedUnsub = null;
     let threadCommentsUnsub = null;
     let openThreadId = null;
+    let pendingDelete = null;
     const authorProfileCache = new Map();
 
     function openModal(id) {
@@ -713,6 +777,16 @@ nav {
       });
     });
 
+    document.querySelectorAll('.sort-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        activeSort = btn.getAttribute('data-sort') || 'recent';
+        document.querySelectorAll('.sort-btn').forEach(function (b) {
+          b.classList.toggle('active', b === btn);
+        });
+        subscribeFeed();
+      });
+    });
+
     function postDocMillis(d) {
       const c = d.data().createdAt;
       if (c && typeof c.toMillis === 'function') return c.toMillis();
@@ -733,9 +807,22 @@ nav {
           return (d.data().category || '') === category;
         });
       }
-      list.sort(function (a, b) {
-        return postDocMillis(b) - postDocMillis(a);
-      });
+      if (activeSort === 'popular') {
+        list.sort(function (a, b) {
+          var ap = Number((a.data() || {}).upvoteCount || 0);
+          var bp = Number((b.data() || {}).upvoteCount || 0);
+          if (bp !== ap) return bp - ap;
+          return postDocMillis(b) - postDocMillis(a);
+        });
+      } else if (activeSort === 'oldest') {
+        list.sort(function (a, b) {
+          return postDocMillis(a) - postDocMillis(b);
+        });
+      } else {
+        list.sort(function (a, b) {
+          return postDocMillis(b) - postDocMillis(a);
+        });
+      }
       return list.slice(0, 50);
     }
 
@@ -760,7 +847,7 @@ nav {
         if (uSnap.exists) {
           const ud = uSnap.data() || {};
           const username = String(ud.username || ud.displayName || fallbackUsername || 'Anonymous').trim();
-          const photoUrl = String(ud.photoURL || ud.photoUrl || ud.avatarUrl || '').trim();
+          const photoUrl = String(ud.photoURL || '').trim();
           profile = {
             username: username || 'Anonymous',
             photoUrl: photoUrl,
@@ -827,25 +914,17 @@ nav {
         titleWrap.appendChild(catEl);
         topRow.appendChild(titleWrap);
 
-        const canDelete = currentUser && authorUid && authorUid === currentUser.uid;
+          const canDelete = currentUser && authorUid && authorUid === currentUser.uid;
         if (canDelete) {
           const delBtn = document.createElement('button');
           delBtn.type = 'button';
-          delBtn.textContent = 'Delete';
-          delBtn.style.cssText = 'border:1px solid #e5b4b4;background:#fff6f6;color:#b42318;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;';
-          delBtn.addEventListener('click', async function () {
-            try {
-              await deleteDoc(doc(db, 'communityPosts', snap.id));
-              card.remove();
-              if (!feedEl.children.length) {
-                const emptyP = document.createElement('p');
-                emptyP.className = 'feed-empty';
-                emptyP.textContent = 'No posts yet. Be the first!';
-                feedEl.appendChild(emptyP);
-              }
-            } catch (err) {
-              alert('Delete failed: ' + (err && err.message ? err.message : 'Unknown error'));
-            }
+          delBtn.className = 'post-delete-icon';
+          delBtn.title = 'Delete post';
+          delBtn.setAttribute('aria-label', 'Delete post');
+          delBtn.textContent = '🗑';
+          delBtn.addEventListener('click', function () {
+            pendingDelete = { postId: snap.id, card: card };
+            openModal('modal-delete-post');
           });
           topRow.appendChild(delBtn);
         }
@@ -862,7 +941,7 @@ nav {
         const authorRow = document.createElement('div');
         authorRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:10px;';
         const avatar = document.createElement('div');
-        avatar.style.cssText = 'width:26px;height:26px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;';
+        avatar.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
         if (authorProfile.photoUrl) {
           const img = document.createElement('img');
           img.src = authorProfile.photoUrl;
@@ -1056,6 +1135,32 @@ nav {
       var cat = activeCategory === 'all' ? 'housing' : activeCategory;
       document.getElementById('post-category').value = cat;
       openModal('modal-new-post');
+    });
+
+    document.getElementById('confirm-delete-post').addEventListener('click', async function () {
+      if (!pendingDelete || !pendingDelete.postId) {
+        closeModal('modal-delete-post');
+        return;
+      }
+      const postId = pendingDelete.postId;
+      const card = pendingDelete.card;
+      pendingDelete = null;
+      try {
+        await deleteDoc(doc(db, 'communityPosts', postId));
+        if (card && card.parentNode) {
+          card.remove();
+        }
+        if (!feedEl.children.length) {
+          const emptyP = document.createElement('p');
+          emptyP.className = 'feed-empty';
+          emptyP.textContent = 'No posts yet. Be the first!';
+          feedEl.appendChild(emptyP);
+        }
+        closeModal('modal-delete-post');
+      } catch (err) {
+        closeModal('modal-delete-post');
+        alert('Delete failed: ' + (err && err.message ? err.message : 'Unknown error'));
+      }
     });
 
     const navEl = document.querySelector('nav');
