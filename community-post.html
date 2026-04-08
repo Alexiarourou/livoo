@@ -306,29 +306,60 @@
     async function toggleLike(postIdInner, btn) {
       const user = auth.currentUser;
       if (!user) return;
-      const likeRef = doc(db, 'communityPosts', postIdInner, 'upvotes', user.uid);
-      const likeSnap = await getDoc(likeRef);
-      const nowLiked = !likeSnap.exists();
-      if (likeSnap.exists()) {
-        await deleteDoc(likeRef);
-        await updateDoc(doc(db, 'communityPosts', postIdInner), { upvoteCount: increment(-1) });
+      const icon = btn.querySelector('.like-icon');
+      const countEl = btn.querySelector('.up-count');
+      if (!countEl) return;
+      const alreadyLiked = btn.classList.contains('is-on');
+      const currentCount = parseInt(countEl.textContent, 10) || 0;
+      if (alreadyLiked) {
+        btn.classList.remove('liked', 'is-on');
+        if (icon) icon.textContent = '♡';
+        countEl.textContent = String(Math.max(0, currentCount - 1));
       } else {
-        await setDoc(likeRef, { uid: user.uid });
-        await updateDoc(doc(db, 'communityPosts', postIdInner), { upvoteCount: increment(1) });
+        btn.classList.add('liked', 'is-on');
+        if (icon) icon.textContent = '❤';
+        countEl.textContent = String(currentCount + 1);
       }
-      const postSnap = await getDoc(doc(db, 'communityPosts', postIdInner));
-      const safeCount = postSnap.exists() ? Math.max(0, Number(postSnap.data().upvoteCount || 0)) : 0;
-      const root = document.getElementById('post-wrap');
-      const btns = root ? root.querySelectorAll('.post-like-btn') : [];
-      const list = btns && btns.length ? btns : [btn];
-      Array.prototype.forEach.call(list, function (b) {
-        b.classList.toggle('liked', nowLiked);
-        b.classList.toggle('is-on', nowLiked);
-        const countEl = b.querySelector('.up-count');
-        if (countEl) countEl.textContent = String(safeCount);
-        const icon = b.querySelector('.like-icon');
-        if (icon) icon.textContent = nowLiked ? '❤' : '♡';
-      });
+      try {
+        const likeRef = doc(db, 'communityPosts', postIdInner, 'upvotes', user.uid);
+        if (alreadyLiked) {
+          await deleteDoc(likeRef);
+          await updateDoc(doc(db, 'communityPosts', postIdInner), { upvoteCount: increment(-1) });
+        } else {
+          await setDoc(likeRef, { uid: user.uid });
+          await updateDoc(doc(db, 'communityPosts', postIdInner), { upvoteCount: increment(1) });
+        }
+      } catch (err) {
+        console.error(err);
+        if (alreadyLiked) {
+          btn.classList.add('liked', 'is-on');
+          if (icon) icon.textContent = '❤';
+          countEl.textContent = String(currentCount);
+        } else {
+          btn.classList.remove('liked', 'is-on');
+          if (icon) icon.textContent = '♡';
+          countEl.textContent = String(currentCount);
+        }
+      }
+    }
+
+    function makePendingCommentDoc(text, authorUsername, authorUid, authorPhoto) {
+      var id = 'pending-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
+      return {
+        id: id,
+        data: function () {
+          return {
+            text: text,
+            authorUsername: authorUsername,
+            authorUid: authorUid,
+            authorPhoto: authorPhoto,
+            authorPhotoURL: authorPhoto,
+            createdAt: { toDate: function () { return new Date(); } },
+            likes: 0,
+            likeCount: 0
+          };
+        }
+      };
     }
 
     const loadingEl = document.getElementById('loading');
@@ -671,6 +702,9 @@
         const authorUsername = (currentProfileData && String(currentProfileData.username || '').trim())
           || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : '') || 'Member';
         const authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim()) || currentUser.photoURL || '';
+        const pendingDoc = makePendingCommentDoc(text, authorUsername, currentUser.uid, authorPhoto);
+        latestComments = latestComments.concat([pendingDoc]);
+        renderComments();
         const batch = writeBatch(db);
         const postRef = doc(db, 'communityPosts', postId);
         const commentRef = doc(collection(db, 'communityPosts', postId, 'comments'));
@@ -690,6 +724,9 @@
           textarea.value = '';
         } catch (err) {
           console.error('Comment failed:', err);
+          var pid = pendingDoc.id;
+          latestComments = latestComments.filter(function (d) { return d.id !== pid; });
+          renderComments();
         }
       });
     }

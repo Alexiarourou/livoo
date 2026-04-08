@@ -655,23 +655,40 @@ button.cities-search-dropdown-item {
         <div id="cities-search-dropdown" class="cities-search-dropdown" role="listbox" aria-label="City suggestions" hidden></div>
       </div>
       <div class="cities-quick-pills">
-        <a href="signup.html?redirect=community&amp;city=Athens" class="cities-quick-pill">Athens</a>
-        <a href="signup.html?redirect=community&amp;city=London" class="cities-quick-pill">London</a>
-        <a href="signup.html?redirect=community&amp;city=Paris" class="cities-quick-pill">Paris</a>
-        <a href="signup.html?redirect=community&amp;city=Madrid" class="cities-quick-pill">Madrid</a>
-        <a href="signup.html?redirect=community&amp;city=Barcelona" class="cities-quick-pill">Barcelona</a>
-        <a href="signup.html?redirect=community&amp;city=Lisbon" class="cities-quick-pill">Lisbon</a>
-        <a href="signup.html?redirect=community&amp;city=Berlin" class="cities-quick-pill">Berlin</a>
         <a href="signup.html?redirect=community&amp;city=Amsterdam" class="cities-quick-pill">Amsterdam</a>
-        <a href="signup.html?redirect=community&amp;city=Rome" class="cities-quick-pill">Rome</a>
-        <a href="signup.html?redirect=community&amp;city=Prague" class="cities-quick-pill">Prague</a>
-        <a href="signup.html?redirect=community&amp;city=Milan" class="cities-quick-pill">Milan</a>
-        <a href="signup.html?redirect=community&amp;city=Vienna" class="cities-quick-pill">Vienna</a>
-        <a href="signup.html?redirect=community&amp;city=Zurich" class="cities-quick-pill">Zurich</a>
+        <a href="signup.html?redirect=community&amp;city=Athens" class="cities-quick-pill">Athens</a>
+        <a href="signup.html?redirect=community&amp;city=Barcelona" class="cities-quick-pill">Barcelona</a>
+        <a href="signup.html?redirect=community&amp;city=Berlin" class="cities-quick-pill">Berlin</a>
+        <a href="signup.html?redirect=community&amp;city=Bologna" class="cities-quick-pill">Bologna</a>
+        <a href="signup.html?redirect=community&amp;city=Brussels" class="cities-quick-pill">Brussels</a>
+        <a href="signup.html?redirect=community&amp;city=Budapest" class="cities-quick-pill">Budapest</a>
         <a href="signup.html?redirect=community&amp;city=Copenhagen" class="cities-quick-pill">Copenhagen</a>
         <a href="signup.html?redirect=community&amp;city=Dublin" class="cities-quick-pill">Dublin</a>
         <a href="signup.html?redirect=community&amp;city=Dubai" class="cities-quick-pill">Dubai</a>
+        <a href="signup.html?redirect=community&amp;city=Edinburgh" class="cities-quick-pill">Edinburgh</a>
+        <a href="signup.html?redirect=community&amp;city=Florence" class="cities-quick-pill">Florence</a>
+        <a href="signup.html?redirect=community&amp;city=Krakow" class="cities-quick-pill">Krakow</a>
+        <a href="signup.html?redirect=community&amp;city=Lisbon" class="cities-quick-pill">Lisbon</a>
+        <a href="signup.html?redirect=community&amp;city=Ljubljana" class="cities-quick-pill">Ljubljana</a>
+        <a href="signup.html?redirect=community&amp;city=London" class="cities-quick-pill">London</a>
+        <a href="signup.html?redirect=community&amp;city=Madrid" class="cities-quick-pill">Madrid</a>
+        <a href="signup.html?redirect=community&amp;city=Milan" class="cities-quick-pill">Milan</a>
+        <a href="signup.html?redirect=community&amp;city=Naples" class="cities-quick-pill">Naples</a>
         <a href="signup.html?redirect=community&amp;city=New%20York" class="cities-quick-pill">New York</a>
+        <a href="signup.html?redirect=community&amp;city=Oslo" class="cities-quick-pill">Oslo</a>
+        <a href="signup.html?redirect=community&amp;city=Paris" class="cities-quick-pill">Paris</a>
+        <a href="signup.html?redirect=community&amp;city=Porto" class="cities-quick-pill">Porto</a>
+        <a href="signup.html?redirect=community&amp;city=Prague" class="cities-quick-pill">Prague</a>
+        <a href="signup.html?redirect=community&amp;city=Riga" class="cities-quick-pill">Riga</a>
+        <a href="signup.html?redirect=community&amp;city=Rome" class="cities-quick-pill">Rome</a>
+        <a href="signup.html?redirect=community&amp;city=Seville" class="cities-quick-pill">Seville</a>
+        <a href="signup.html?redirect=community&amp;city=Stockholm" class="cities-quick-pill">Stockholm</a>
+        <a href="signup.html?redirect=community&amp;city=Tallinn" class="cities-quick-pill">Tallinn</a>
+        <a href="signup.html?redirect=community&amp;city=Valencia" class="cities-quick-pill">Valencia</a>
+        <a href="signup.html?redirect=community&amp;city=Vilnius" class="cities-quick-pill">Vilnius</a>
+        <a href="signup.html?redirect=community&amp;city=Vienna" class="cities-quick-pill">Vienna</a>
+        <a href="signup.html?redirect=community&amp;city=Warsaw" class="cities-quick-pill">Warsaw</a>
+        <a href="signup.html?redirect=community&amp;city=Zurich" class="cities-quick-pill">Zurich</a>
       </div>
       <p class="cities-more-note"><a href="index.html#waitlist">Can&apos;t find your city? Join the waitlist →</a></p>
     </div>
@@ -726,10 +743,12 @@ button.cities-search-dropdown-item {
 
 <script>
 (function () {
-  /* Master city list — keep in sync with community-portal.html #city-switcher */
+  /* Master city list — alphabetical; keep in sync with community-portal.html #city-switcher */
   var EUROPEAN_CITIES = [
-    'Athens', 'London', 'Paris', 'Madrid', 'Barcelona', 'Lisbon', 'Berlin', 'Amsterdam',
-    'Rome', 'Prague', 'Milan', 'Vienna', 'Zurich', 'Copenhagen', 'Dublin', 'Dubai', 'New York'
+    'Amsterdam', 'Athens', 'Barcelona', 'Berlin', 'Bologna', 'Brussels', 'Budapest', 'Copenhagen',
+    'Dublin', 'Dubai', 'Edinburgh', 'Florence', 'Krakow', 'Lisbon', 'Ljubljana', 'London', 'Madrid',
+    'Milan', 'Naples', 'New York', 'Oslo', 'Paris', 'Porto', 'Prague', 'Riga', 'Rome', 'Seville',
+    'Stockholm', 'Tallinn', 'Valencia', 'Vilnius', 'Vienna', 'Warsaw', 'Zurich'
   ];
   var REQUEST_CITY_HREF = 'index.html#waitlist';
 

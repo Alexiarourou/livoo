@@ -309,7 +309,10 @@ nav {
 }
 .sidebar-create-post:hover { background: var(--btn-green-hover); }
 
-.feed { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+.feed { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+
+.post-card:active { transform: scale(0.995); }
+.upvote-btn.voted { color: #2d6a2d !important; font-weight: 700; background: #e8f5e8 !important; }
 .feed-empty {
   text-align: center;
   color: var(--muted);
@@ -889,23 +892,40 @@ nav {
         <div style="position: relative;">
           <select id="city-switcher" onchange="switchCityFromDropdown(this.value)"
             style="width: 100%; font-size: 13px; font-weight: 500; color: #1a2e1a; background: white; border: 1.5px solid #d4e6d4; border-radius: 10px; padding: 9px 32px 9px 12px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%235a7a5a%22/></svg>'); background-repeat: no-repeat; background-position: right 12px center;">
-            <option value="athens">Athens</option>
-            <option value="london">London</option>
-            <option value="paris">Paris</option>
-            <option value="madrid">Madrid</option>
-            <option value="barcelona">Barcelona</option>
-            <option value="lisbon">Lisbon</option>
-            <option value="berlin">Berlin</option>
             <option value="amsterdam">Amsterdam</option>
-            <option value="rome">Rome</option>
-            <option value="prague">Prague</option>
-            <option value="milan">Milan</option>
-            <option value="vienna">Vienna</option>
-            <option value="zurich">Zurich</option>
+            <option value="athens">Athens</option>
+            <option value="barcelona">Barcelona</option>
+            <option value="berlin">Berlin</option>
+            <option value="bologna">Bologna</option>
+            <option value="brussels">Brussels</option>
+            <option value="budapest">Budapest</option>
             <option value="copenhagen">Copenhagen</option>
             <option value="dublin">Dublin</option>
             <option value="dubai">Dubai</option>
+            <option value="edinburgh">Edinburgh</option>
+            <option value="florence">Florence</option>
+            <option value="krakow">Krakow</option>
+            <option value="lisbon">Lisbon</option>
+            <option value="ljubljana">Ljubljana</option>
+            <option value="london">London</option>
+            <option value="madrid">Madrid</option>
+            <option value="milan">Milan</option>
+            <option value="naples">Naples</option>
             <option value="new-york">New York</option>
+            <option value="oslo">Oslo</option>
+            <option value="paris">Paris</option>
+            <option value="porto">Porto</option>
+            <option value="prague">Prague</option>
+            <option value="riga">Riga</option>
+            <option value="rome">Rome</option>
+            <option value="seville">Seville</option>
+            <option value="stockholm">Stockholm</option>
+            <option value="tallinn">Tallinn</option>
+            <option value="valencia">Valencia</option>
+            <option value="vilnius">Vilnius</option>
+            <option value="vienna">Vienna</option>
+            <option value="warsaw">Warsaw</option>
+            <option value="zurich">Zurich</option>
           </select>
         </div>
       </div>
@@ -986,6 +1006,17 @@ nav {
           <li>Protect personal information.</li>
         </ul>
       </div>
+      <div style="background:white;border:1px solid #e8f0e8;border-radius:12px;padding:16px;margin-top:12px;">
+        <h4 style="font-size:13px;font-weight:700;color:#1a2e1a;margin:0 0 10px 0;">📌 Quick links</h4>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <a href="search-athens.html" style="font-size:13px;color:#2d6a2d;text-decoration:none;display:flex;align-items:center;gap:6px;">
+            🏠 Browse rentals
+          </a>
+          <a href="flatmate-connect.html" style="font-size:13px;color:#2d6a2d;text-decoration:none;display:flex;align-items:center;gap:6px;">
+            👥 Find a flatmate
+          </a>
+        </div>
+      </div>
     </aside>
   </div>
 </main>
@@ -995,7 +1026,7 @@ nav {
   <div class="modal-panel">
     <h2 id="modal-new-title">New post</h2>
     <div class="form-row">
-      <label for="post-title">Title</label>
+      <label for="post-title" style="display:flex;justify-content:space-between;align-items:baseline;width:100%;gap:8px;">Title <span id="title-counter" style="font-size:11px;color:#9ab09a;font-weight:400;">200</span></label>
       <input type="text" id="post-title" maxlength="200" autocomplete="off" placeholder="Title" />
     </div>
     <div class="form-row">
@@ -1041,7 +1072,7 @@ nav {
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
     getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, doc, getDoc,
-    serverTimestamp, increment, writeBatch, deleteDoc, setDoc, updateDoc, runTransaction
+    increment, deleteDoc, setDoc, updateDoc
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   const CATEGORY_LABELS = {
     housing: 'Housing Tips',
@@ -1054,17 +1085,18 @@ nav {
     things_to_do: 'Things to Do'
   };
 
-  /* URL slug → display name; master 17 cities + legacy slugs for old links */
+  /* URL slug → display name; alphabet list sync with community.html + legacy slugs */
   const cityNames = {
-    athens: 'Athens', london: 'London', paris: 'Paris', madrid: 'Madrid', barcelona: 'Barcelona',
-    lisbon: 'Lisbon', berlin: 'Berlin', amsterdam: 'Amsterdam', rome: 'Rome', prague: 'Prague',
-    milan: 'Milan', vienna: 'Vienna', zurich: 'Zurich', copenhagen: 'Copenhagen', dublin: 'Dublin',
-    dubai: 'Dubai', newyork: 'New York',
-    budapest: 'Budapest', stockholm: 'Stockholm', brussels: 'Brussels', valencia: 'Valencia',
-    seville: 'Seville', porto: 'Porto', florence: 'Florence', bologna: 'Bologna',
+    amsterdam: 'Amsterdam', athens: 'Athens', barcelona: 'Barcelona', berlin: 'Berlin', bologna: 'Bologna',
+    brussels: 'Brussels', budapest: 'Budapest', copenhagen: 'Copenhagen', dublin: 'Dublin', dubai: 'Dubai',
+    edinburgh: 'Edinburgh', florence: 'Florence', krakow: 'Krakow', lisbon: 'Lisbon', ljubljana: 'Ljubljana',
+    london: 'London', madrid: 'Madrid', milan: 'Milan', naples: 'Naples', newyork: 'New York', oslo: 'Oslo',
+    paris: 'Paris', porto: 'Porto', prague: 'Prague', riga: 'Riga', rome: 'Rome', seville: 'Seville',
+    stockholm: 'Stockholm', tallinn: 'Tallinn', valencia: 'Valencia', vilnius: 'Vilnius', vienna: 'Vienna',
+    warsaw: 'Warsaw', zurich: 'Zurich',
     munich: 'Munich', hamburg: 'Hamburg', geneva: 'Geneva', rotterdam: 'Rotterdam',
-    ghent: 'Ghent', krakow: 'Krakow', warsaw: 'Warsaw', tallinn: 'Tallinn', riga: 'Riga', tbilisi: 'Tbilisi',
-    bucharest: 'Bucharest', sofia: 'Sofia', zagreb: 'Zagreb', bangkok: 'Bangkok', bali: 'Bali'
+    ghent: 'Ghent', tbilisi: 'Tbilisi', bucharest: 'Bucharest', sofia: 'Sofia', zagreb: 'Zagreb',
+    bangkok: 'Bangkok', bali: 'Bali'
   };
 
   window.switchCityFromDropdown = function switchCityFromDropdown(city) {
@@ -1268,6 +1300,74 @@ nav {
       return 'community-post.html?postId=' + encodeURIComponent(postId) + '&city=' + encodeURIComponent(cityForFeedQuery());
     }
 
+    window.openPost = function (postId) {
+      window.location.href = threadPageUrl(postId);
+    };
+    window.sharePost = function (postId) {
+      const base = (location.origin || '').replace(/\/$/, '');
+      const u = base + '/community-post.html?postId=' + encodeURIComponent(postId) + '&city=' + encodeURIComponent(cityForFeedQuery());
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(u).catch(function () {});
+      }
+    };
+    window.togglePostMenu = function (event, postId) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      document.querySelectorAll('.post-card-more-menu').forEach(function (m) {
+        if (m.id !== 'post-menu-' + postId) m.hidden = true;
+      });
+      const menu = document.getElementById('post-menu-' + postId);
+      if (menu) menu.hidden = !menu.hidden;
+    };
+    window.likePost = async function (event, postId) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const user = auth.currentUser;
+      if (!user) return;
+      const btn = document.getElementById('like-btn-' + postId);
+      const countEl = document.getElementById('like-count-' + postId);
+      if (!btn || !countEl) return;
+      const alreadyLiked = btn.classList.contains('voted');
+      const currentCount = parseInt(countEl.textContent, 10) || 0;
+      if (alreadyLiked) {
+        btn.classList.remove('voted');
+        countEl.textContent = String(Math.max(0, currentCount - 1));
+      } else {
+        btn.classList.add('voted');
+        countEl.textContent = String(currentCount + 1);
+        btn.style.transform = 'scale(1.3)';
+        setTimeout(function () { btn.style.transform = 'scale(1)'; }, 150);
+      }
+      try {
+        const likeRef = doc(db, 'communityPosts', postId, 'upvotes', user.uid);
+        if (alreadyLiked) {
+          await deleteDoc(likeRef);
+          await updateDoc(doc(db, 'communityPosts', postId), { upvoteCount: increment(-1) });
+        } else {
+          await setDoc(likeRef, { uid: user.uid });
+          await updateDoc(doc(db, 'communityPosts', postId), { upvoteCount: increment(1) });
+        }
+      } catch (err) {
+        console.error(err);
+        if (alreadyLiked) {
+          btn.classList.add('voted');
+          countEl.textContent = String(currentCount);
+        } else {
+          btn.classList.remove('voted');
+          countEl.textContent = String(currentCount);
+        }
+      }
+    };
+
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('.post-card-more-menu') || e.target.closest('.post-card-more-trigger')) return;
+      document.querySelectorAll('.post-card-more-menu').forEach(function (m) { m.hidden = true; });
+    });
+
     function prepareFeedDocs(allDocs, category) {
       var list = Array.from(allDocs || []).slice();
       if (category && category !== 'all') {
@@ -1356,63 +1456,91 @@ nav {
       });
     }
 
+    function renderFeedEmptyState() {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'text-align:center;padding:60px 20px;color:#6b8f6b;';
+      const emoji = document.createElement('div');
+      emoji.style.cssText = 'font-size:40px;margin-bottom:12px;';
+      emoji.textContent = '🌍';
+      const h3 = document.createElement('h3');
+      h3.style.cssText = 'font-size:16px;font-weight:700;color:#1a2e1a;margin:0 0 6px 0;';
+      h3.textContent = 'No posts in this city yet';
+      const p = document.createElement('p');
+      p.style.cssText = 'font-size:13px;margin:0 0 16px 0;';
+      p.textContent = 'Be the first to share a tip, event or question.';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.style.cssText = 'background:#2d6a2d;color:white;border:none;border-radius:20px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;';
+      btn.textContent = '+ Start the conversation';
+      btn.addEventListener('click', function () {
+        document.getElementById('new-post-btn').click();
+      });
+      wrap.appendChild(emoji);
+      wrap.appendChild(h3);
+      wrap.appendChild(p);
+      wrap.appendChild(btn);
+      feedEl.appendChild(wrap);
+    }
+
     async function renderFeed(docs) {
       var list = Array.from(docs || []);
       while (feedEl.firstChild) {
         feedEl.removeChild(feedEl.firstChild);
       }
       if (!list.length) {
-        var emptyP = document.createElement('p');
-        emptyP.className = 'feed-empty';
-        emptyP.textContent = 'No posts in ' + cityForFeedQuery() + ' yet. Be the first!';
-        feedEl.appendChild(emptyP);
+        renderFeedEmptyState();
         return;
       }
       for (const snap of list) {
         const d = snap.data() || {};
+        const postId = snap.id;
         const authorUid = d.author || d.authorId || '';
         const fallbackUsername = d.authorUsername || d.authorName || d.authorEmail || 'Anonymous';
         const authorProfile = await getAuthorProfile(authorUid, fallbackUsername, d.authorPhotoURL || d.authorPhoto || '');
         let hasUpvoted = false;
         if (currentUser) {
           try {
-            const voteState = await getDoc(doc(db, 'communityPosts', snap.id, 'upvotes', currentUser.uid));
+            const voteState = await getDoc(doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid));
             hasUpvoted = voteState.exists();
           } catch (e) {
             hasUpvoted = false;
           }
         }
 
-        const card = document.createElement('div');
-        card.className = 'feed-card reddit-card';
-        card.style.cssText = 'padding:16px;color:#1a2e24;text-align:left;cursor:default;';
-        card.addEventListener('click', function () {
-          card.querySelectorAll('.comment-more-menu').forEach(function (m) { m.hidden = true; });
-          card.querySelectorAll('.post-more-trigger').forEach(function (b) {
-            b.setAttribute('aria-expanded', 'false');
-          });
-        });
-
-        const contentCol = document.createElement('div');
-
-        const topRow = document.createElement('div');
-        topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:10px;';
-
-        const authorRow = document.createElement('div');
-        authorRow.style.cssText = 'display:flex;align-items:center;gap:8px;min-width:0;';
-        const avatarWrap = document.createElement('div');
-        avatarWrap.style.cssText = 'width:40px;height:40px;flex-shrink:0;';
         const displayName = authorProfile.username || 'Anonymous';
         const initial = authorProfile.initial || 'A';
-        const photoUrl = String(authorProfile.photoUrl || '').trim();
-        if (photoUrl) {
+        const photoUrlStr = String(authorProfile.photoUrl || '').trim();
+
+        const card = document.createElement('div');
+        card.className = 'post-card';
+        card.id = 'post-' + postId;
+        card.style.cssText = 'background:white; border:1px solid #e8f0e8; border-radius:12px; padding:12px 16px; margin-bottom:8px; cursor:pointer; transition: border-color 0.15s, box-shadow 0.15s;';
+        card.addEventListener('mouseenter', function () {
+          card.style.borderColor = '#2d6a2d';
+          card.style.boxShadow = '0 2px 8px rgba(45,106,45,0.1)';
+        });
+        card.addEventListener('mouseleave', function () {
+          card.style.borderColor = '#e8f0e8';
+          card.style.boxShadow = 'none';
+        });
+        card.addEventListener('click', function (ev) {
+          if (ev.target.closest('button') || ev.target.closest('.post-card-more-menu')) return;
+          window.location.href = threadPageUrl(postId);
+        });
+
+        const topRow = document.createElement('div');
+        topRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;';
+
+        const avatarWrap = document.createElement('div');
+        avatarWrap.style.cssText = 'width:32px;height:32px;flex-shrink:0;';
+        if (photoUrlStr) {
           const img = document.createElement('img');
-          img.src = photoUrl;
+          img.src = photoUrlStr;
           img.alt = displayName;
-          img.style.cssText = 'width:40px;height:40px;border-radius:50%;object-fit:cover;display:block;';
+          img.style.cssText = 'width:32px;height:32px;border-radius:50%;object-fit:cover;display:block;';
           const fallback = document.createElement('div');
           fallback.className = 'avatar-fallback';
-          fallback.style.cssText = 'display:none;width:40px;height:40px;border-radius:50%;background:#2d6a2d;color:white;font-weight:600;font-size:15px;align-items:center;justify-content:center;';
+          fallback.style.cssText = 'display:none;width:32px;height:32px;border-radius:50%;background:#2d6a2d;color:white;font-weight:600;font-size:12px;align-items:center;justify-content:center;';
           fallback.textContent = initial;
           img.addEventListener('error', function () {
             img.style.display = 'none';
@@ -1422,175 +1550,146 @@ nav {
           avatarWrap.appendChild(fallback);
         } else {
           const fb = document.createElement('div');
-          fb.style.cssText = 'width:40px;height:40px;border-radius:50%;background:#2d6a2d;color:white;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;';
+          fb.style.cssText = 'width:32px;height:32px;border-radius:50%;background:#2d6a2d;color:white;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;';
           fb.textContent = initial;
           avatarWrap.appendChild(fb);
         }
-        const nameEl = document.createElement('small');
-        nameEl.style.cssText = 'color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-        nameEl.textContent = (authorProfile.username || 'Anonymous') + (d.createdAt ? ' · ' + formatRelativeTime(d.createdAt) : '');
-        authorRow.appendChild(avatarWrap);
-        authorRow.appendChild(nameEl);
-        topRow.appendChild(authorRow);
+        topRow.appendChild(avatarWrap);
 
-          const canDelete = currentUser && authorUid && authorUid === currentUser.uid;
-        if (canDelete) {
-          const moreWrap = document.createElement('span');
-          moreWrap.className = 'comment-more-wrap';
-          moreWrap.style.flexShrink = '0';
-          const moreMenu = document.createElement('div');
-          moreMenu.className = 'comment-more-menu';
-          moreMenu.hidden = true;
-          moreMenu.addEventListener('click', function (e) { e.stopPropagation(); });
-          const moreBtn = document.createElement('button');
-          moreBtn.type = 'button';
-          moreBtn.className = 'post-more-trigger';
-          moreBtn.title = 'Post options';
-          moreBtn.setAttribute('aria-label', 'Post options');
-          moreBtn.setAttribute('aria-expanded', 'false');
-          moreBtn.textContent = '···';
-          moreBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            moreMenu.hidden = !moreMenu.hidden;
-            moreBtn.setAttribute('aria-expanded', moreMenu.hidden ? 'false' : 'true');
-          });
-          const delOpt = document.createElement('button');
-          delOpt.type = 'button';
-          delOpt.textContent = 'Delete';
-          delOpt.addEventListener('click', function (e) {
-            e.stopPropagation();
-            moreMenu.hidden = true;
-            moreBtn.setAttribute('aria-expanded', 'false');
-            pendingDelete = { postId: snap.id, card: card };
-            openModal('modal-delete-post');
-          });
-          moreMenu.appendChild(delOpt);
-          moreWrap.appendChild(moreBtn);
-          moreWrap.appendChild(moreMenu);
-          topRow.appendChild(moreWrap);
-        }
-        contentCol.appendChild(topRow);
+        const metaSpan = document.createElement('span');
+        metaSpan.style.cssText = 'font-size:12px;color:#6b8f6b;';
+        metaSpan.appendChild(document.createTextNode('Posted by '));
+        const strong = document.createElement('strong');
+        strong.textContent = displayName;
+        metaSpan.appendChild(strong);
+        metaSpan.appendChild(document.createTextNode(d.createdAt ? ' · ' + formatRelativeTime(d.createdAt) : ''));
+        topRow.appendChild(metaSpan);
 
-        const titleRow = document.createElement('div');
-        titleRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;';
-        const titleEl = document.createElement('strong');
+        const catKey = d.category || '';
+        const catPill = document.createElement('span');
+        catPill.style.cssText = 'font-size:11px;background:#f0f7f0;color:#2d6a2d;padding:2px 8px;border-radius:20px;font-weight:600;';
+        catPill.textContent = CATEGORY_LABELS[catKey] || catKey || 'Post';
+        topRow.appendChild(catPill);
+
+        const titleEl = document.createElement('h3');
+        titleEl.style.cssText = 'font-size:15px;font-weight:700;color:#1a2e1a;margin:0 0 4px 0;line-height:1.3;';
         titleEl.textContent = d.title || 'Untitled';
-        titleEl.style.cursor = 'pointer';
-        titleEl.tabIndex = 0;
-        titleEl.setAttribute('role', 'button');
-        const catEl = document.createElement('span');
-        catEl.style.cssText = 'display:inline-flex;align-items:center;color:#666;font-size:12px;padding:2px 8px;border-radius:999px;background:#f2f6f4;border:1px solid #e1ebe5;';
-        catEl.textContent = d.category || '';
-        titleRow.appendChild(titleEl);
-        titleRow.appendChild(catEl);
-        contentCol.appendChild(titleRow);
+        titleEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+          window.location.href = threadPageUrl(postId);
+        });
 
-        const p = document.createElement('p');
-        p.style.marginTop = '8px';
-        p.style.cursor = 'pointer';
         const bodyText = (d.body != null && String(d.body).trim())
           ? String(d.body)
           : stripHtml(d.bodyHtml || '');
-        p.textContent = bodyText || '';
-        contentCol.appendChild(p);
+        const preview = document.createElement('p');
+        preview.style.cssText = 'font-size:13px;color:#5a7a5a;margin:0 0 10px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;';
+        preview.textContent = bodyText || '';
+        preview.addEventListener('click', function (e) {
+          e.stopPropagation();
+          window.location.href = threadPageUrl(postId);
+        });
 
-        const actions = document.createElement('div');
-        actions.className = 'feed-card-actions';
-        actions.style.cssText = 'margin-top:10px;display:flex;align-items:center;gap:16px;flex-wrap:nowrap;';
+        const actionBar = document.createElement('div');
+        actionBar.style.cssText = 'display:flex;align-items:center;gap:4px;';
+
+        const voteShell = document.createElement('div');
+        voteShell.style.cssText = 'display:flex;align-items:center;background:#f5f5f5;border-radius:20px;overflow:hidden;';
 
         const upBtn = document.createElement('button');
         upBtn.type = 'button';
-        upBtn.className = 'btn-upvote post-like-btn' + (hasUpvoted ? ' is-on' : '');
-        upBtn.innerHTML = '<span class="like-icon" aria-hidden="true">' + (hasUpvoted ? '❤' : '♡') + '</span> <span class="up-count">' + Number(d.upvoteCount || 0) + '</span>';
+        upBtn.id = 'like-btn-' + postId;
+        upBtn.className = 'upvote-btn' + (hasUpvoted ? ' voted' : '');
+        upBtn.style.cssText = 'border:none;background:transparent;padding:5px 8px;cursor:pointer;font-size:13px;color:#5a7a5a;display:flex;align-items:center;gap:4px;';
+        upBtn.appendChild(document.createTextNode('▲ '));
+        const countSpan = document.createElement('span');
+        countSpan.id = 'like-count-' + postId;
+        countSpan.textContent = String(Number(d.upvoteCount || 0));
+        upBtn.appendChild(countSpan);
         upBtn.addEventListener('click', function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleLike(snap.id, upBtn);
+          window.likePost(e, postId);
         });
 
-        const commentPill = document.createElement('button');
-        commentPill.type = 'button';
-        commentPill.className = 'btn-upvote';
-        commentPill.style.padding = '6px 12px';
-        commentPill.textContent = '💬 ' + Number(d.commentCount || 0);
+        const divider = document.createElement('div');
+        divider.style.cssText = 'width:1px;height:16px;background:#e0e0e0;';
 
-        actions.appendChild(upBtn);
+        const downBtn = document.createElement('button');
+        downBtn.type = 'button';
+        downBtn.style.cssText = 'border:none;background:transparent;padding:5px 8px;cursor:pointer;font-size:13px;color:#5a7a5a;';
+        downBtn.textContent = '▼';
+        downBtn.addEventListener('click', function (e) { e.stopPropagation(); });
+
+        voteShell.appendChild(upBtn);
+        voteShell.appendChild(divider);
+        voteShell.appendChild(downBtn);
+
+        const cc = Number(d.commentCount || 0);
+        const commentBtn = document.createElement('button');
+        commentBtn.type = 'button';
+        commentBtn.style.cssText = 'border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:13px;color:#5a7a5a;display:flex;align-items:center;gap:5px;';
+        commentBtn.textContent = '💬 ' + cc + ' comment' + (cc === 1 ? '' : 's');
+        commentBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          window.openPost(postId);
+        });
+
         const shareBtn = document.createElement('button');
         shareBtn.type = 'button';
-        shareBtn.className = 'btn-upvote';
-        shareBtn.style.padding = '6px 12px';
-        shareBtn.innerHTML = '<span aria-hidden="true">↗</span> <span>Share</span>';
+        shareBtn.style.cssText = 'border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:13px;color:#5a7a5a;';
+        shareBtn.textContent = '↗ Share';
         shareBtn.addEventListener('click', function (e) {
-          e.preventDefault();
           e.stopPropagation();
-          const u = location.origin + '/community-post.html?postId=' + encodeURIComponent(snap.id) + '&city=' + encodeURIComponent(cityForFeedQuery());
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(u).then(function () {
-              const old = shareBtn.innerHTML;
-              shareBtn.innerHTML = '<span>Copied!</span>';
-              setTimeout(function () {
-                shareBtn.innerHTML = old;
-              }, 1200);
-            }).catch(function () {});
-          }
+          window.sharePost(postId);
         });
 
-        actions.appendChild(commentPill);
-        actions.appendChild(shareBtn);
-        contentCol.appendChild(actions);
-
-        function goToThreadPage(e) {
-          if (e) {
-            e.preventDefault();
+        const menuHost = document.createElement('div');
+        menuHost.style.cssText = 'margin-left:auto;display:flex;align-items:center;';
+        const canDelete = currentUser && authorUid && authorUid === currentUser.uid;
+        if (canDelete) {
+          const menuBtn = document.createElement('button');
+          menuBtn.type = 'button';
+          menuBtn.className = 'post-card-more-trigger';
+          menuBtn.style.cssText = 'border:none;background:transparent;padding:4px 8px;cursor:pointer;color:#9ab09a;font-size:18px;border-radius:50%;';
+          menuBtn.textContent = '···';
+          menuBtn.addEventListener('click', function (e) {
+            window.togglePostMenu(e, postId);
+          });
+          const menuWrap = document.createElement('div');
+          menuWrap.style.cssText = 'position:relative;';
+          const menuPop = document.createElement('div');
+          menuPop.id = 'post-menu-' + postId;
+          menuPop.className = 'post-card-more-menu';
+          menuPop.hidden = true;
+          menuPop.style.cssText = 'position:absolute;right:0;top:100%;margin-top:4px;background:#fff;border:1px solid #e8f0e8;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);z-index:20;min-width:120px;padding:4px;';
+          menuPop.addEventListener('click', function (e) { e.stopPropagation(); });
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.textContent = 'Delete';
+          delBtn.style.cssText = 'display:block;width:100%;text-align:left;padding:8px 12px;border:none;background:transparent;cursor:pointer;font:inherit;';
+          delBtn.addEventListener('click', function (e) {
             e.stopPropagation();
-          }
-          window.location.href = threadPageUrl(snap.id);
+            menuPop.hidden = true;
+            pendingDelete = { postId: postId, card: card };
+            openModal('modal-delete-post');
+          });
+          menuPop.appendChild(delBtn);
+          menuWrap.appendChild(menuBtn);
+          menuWrap.appendChild(menuPop);
+          menuHost.appendChild(menuWrap);
         }
-        titleEl.addEventListener('click', goToThreadPage);
-        titleEl.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') {
-            goToThreadPage(e);
-          }
-        });
-        p.addEventListener('click', goToThreadPage);
-        commentPill.addEventListener('click', function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-        });
-        card.id = 'post-' + snap.id;
 
-        card.appendChild(contentCol);
+        actionBar.appendChild(voteShell);
+        actionBar.appendChild(commentBtn);
+        actionBar.appendChild(shareBtn);
+        actionBar.appendChild(menuHost);
+
+        card.appendChild(topRow);
+        card.appendChild(titleEl);
+        card.appendChild(preview);
+        card.appendChild(actionBar);
 
         feedEl.appendChild(card);
       }
-    }
-
-    async function toggleLike(postId, btn) {
-      const user = (window.firebase && window.firebase.auth && window.firebase.auth().currentUser) || auth.currentUser;
-      if (!user) return;
-      const likeRef = doc(db, 'communityPosts', postId, 'upvotes', user.uid);
-      const likeSnap = await getDoc(likeRef);
-      const nowLiked = !likeSnap.exists();
-      if (likeSnap.exists()) {
-        await deleteDoc(likeRef);
-        await updateDoc(doc(db, 'communityPosts', postId), { upvoteCount: increment(-1) });
-      } else {
-        await setDoc(likeRef, { uid: user.uid });
-        await updateDoc(doc(db, 'communityPosts', postId), { upvoteCount: increment(1) });
-      }
-      const postSnap = await getDoc(doc(db, 'communityPosts', postId));
-      const safeCount = postSnap.exists() ? Math.max(0, Number(postSnap.data().upvoteCount || 0)) : 0;
-      const cardRoot = document.getElementById('post-' + postId);
-      const found = cardRoot ? cardRoot.querySelectorAll('.post-like-btn') : null;
-      const likeBtns = found && found.length ? found : [btn];
-      Array.prototype.forEach.call(likeBtns, function (b) {
-        b.classList.toggle('liked', nowLiked);
-        b.classList.toggle('is-on', nowLiked);
-        const countEl = b.querySelector('.up-count');
-        if (countEl) countEl.textContent = String(safeCount);
-        const icon = b.querySelector('.like-icon');
-        if (icon) icon.textContent = nowLiked ? '❤' : '♡';
-      });
     }
 
     document.getElementById('new-post-btn').addEventListener('click', function () {
@@ -1598,6 +1697,11 @@ nav {
       document.getElementById('post-body').value = '';
       var cat = activeCategory === 'all' ? 'housing' : activeCategory;
       document.getElementById('post-category').value = cat;
+      var tc = document.getElementById('title-counter');
+      if (tc) {
+        tc.textContent = '200';
+        tc.style.color = '#9ab09a';
+      }
       openModal('modal-new-post');
     });
     document.getElementById('btn-create-post-sidebar').addEventListener('click', function () {
@@ -1618,10 +1722,7 @@ nav {
           card.remove();
         }
         if (!feedEl.children.length) {
-          const emptyP = document.createElement('p');
-          emptyP.className = 'feed-empty';
-          emptyP.textContent = 'No posts in ' + cityForFeedQuery() + ' yet. Be the first!';
-          feedEl.appendChild(emptyP);
+          renderFeedEmptyState();
         }
         closeModal('modal-delete-post');
       } catch (err) {
@@ -1665,6 +1766,13 @@ nav {
 
     document.getElementById('post-title').addEventListener('input', function () {
       this.style.borderColor = '';
+      var maxLen = 200;
+      var remaining = maxLen - this.value.length;
+      var counter = document.getElementById('title-counter');
+      if (counter) {
+        counter.textContent = String(remaining);
+        counter.style.color = remaining < 20 ? '#e53e3e' : '#9ab09a';
+      }
     });
     document.getElementById('post-category').addEventListener('change', function () {
       this.style.borderColor = '';
@@ -1821,6 +1929,17 @@ nav {
       });
     }
   }
+</script>
+
+<button id="back-to-top" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+  style="display:none;position:fixed;bottom:24px;right:24px;width:40px;height:40px;border-radius:50%;background:#2d6a2d;color:white;border:none;cursor:pointer;font-size:18px;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:999;font-family:inherit;line-height:1;">
+  ↑
+</button>
+<script>
+window.addEventListener('scroll', function () {
+  var btn = document.getElementById('back-to-top');
+  if (btn) btn.style.display = window.scrollY > 400 ? 'flex' : 'none';
+});
 </script>
 </body>
 </html>
