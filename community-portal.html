@@ -181,6 +181,63 @@ nav {
 }
 .btn-new-post:hover { background: var(--btn-green-hover); }
 
+.portal-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 280px;
+  gap: 16px;
+  align-items: start;
+}
+.left-sidebar, .right-sidebar {
+  background: #fff;
+  border: 1px solid #d4eadb;
+  border-radius: 14px;
+  padding: 14px;
+  position: sticky;
+  top: 88px;
+}
+.left-sidebar h3, .right-sidebar h3 {
+  font-family: "Sora", sans-serif;
+  font-size: 0.86rem;
+  margin-bottom: 10px;
+}
+.side-links { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.side-links a {
+  text-decoration: none;
+  color: var(--text);
+  font-size: 0.87rem;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.side-links a:hover { background: rgba(26, 122, 74, 0.08); }
+.city-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.city-chip {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.main-column { min-width: 0; }
+.city-info-card, .rules-card, .explore-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.rules-card ul { margin-left: 16px; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+.sidebar-create-post {
+  width: 100%;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 10px;
+  background: var(--btn-green);
+  color: #fff;
+  padding: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sidebar-create-post:hover { background: var(--btn-green-hover); }
+
 .sort-toolbar {
   display: flex;
   align-items: center;
@@ -321,6 +378,42 @@ nav {
 .post-delete-icon:hover {
   background: #f3f6f4;
   color: #5c6f65;
+}
+.reddit-card {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 10px;
+}
+.vote-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+.vote-arrow {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+  color: #7a8f83;
+}
+.vote-arrow:hover { color: var(--btn-green); }
+.vote-count { font-size: 0.78rem; font-weight: 700; color: var(--text); }
+.comment-reply-btn {
+  border: none;
+  background: transparent;
+  color: var(--btn-green);
+  font-size: 0.78rem;
+  cursor: pointer;
+  margin-top: 4px;
+  padding: 0;
+}
+.nested-reply {
+  margin-left: 42px;
+  margin-top: 8px;
+  border-left: 2px solid #dcebe2;
+  padding-left: 10px;
 }
 
 /* Modal */
@@ -505,6 +598,8 @@ nav {
   }
   .nav-city-email { max-width: 100%; }
   .page-wrap { padding: 108px 24px 64px; }
+  .portal-layout { grid-template-columns: 1fr; }
+  .left-sidebar, .right-sidebar { position: static; top: auto; }
   .portal-toolbar { flex-direction: column; align-items: stretch; }
   .btn-new-post { width: 100%; }
 }
@@ -537,34 +632,84 @@ nav {
 </nav>
 
 <main id="portal-content" class="page-wrap" hidden>
-  <header class="portal-hero">
-    <h1 id="portal-welcome" class="portal-welcome-heading">Welcome to the community</h1>
-    <p id="portal-sub">Share tips, events, and connect with people in your city.</p>
-  </header>
+  <div class="portal-layout">
+    <aside class="left-sidebar">
+      <h3>Navigation</h3>
+      <div class="side-links">
+        <a href="#">Home</a>
+        <a href="#">Popular</a>
+        <a href="#">Explore</a>
+      </div>
+      <h3>Browse cities</h3>
+      <div class="city-list">
+        <span class="city-chip">Athens</span>
+        <span class="city-chip">London</span>
+        <span class="city-chip">Paris</span>
+        <span class="city-chip">Madrid</span>
+      </div>
+      <div class="side-links" style="margin-top:12px;">
+        <a href="flatmate-connect.html">Find a Flatmate</a>
+        <a href="search-athens.html">Browse Rentals</a>
+      </div>
+    </aside>
 
-  <div class="portal-toolbar">
-    <div class="category-tabs" role="tablist" aria-label="Topics">
-      <button type="button" class="cat-tab active" data-category="all" role="tab" aria-selected="true">All topics</button>
-      <button type="button" class="cat-tab" data-category="housing" role="tab" aria-selected="false">Housing Tips</button>
-      <button type="button" class="cat-tab" data-category="events" role="tab" aria-selected="false">Events</button>
-      <button type="button" class="cat-tab" data-category="flatmate" role="tab" aria-selected="false">Flatmate Search</button>
-      <button type="button" class="cat-tab" data-category="general" role="tab" aria-selected="false">General</button>
-      <button type="button" class="cat-tab" data-category="recommendations" role="tab" aria-selected="false" title="Restaurants, cafes, gyms, and more">Recommendations</button>
-      <button type="button" class="cat-tab" data-category="visa_admin" role="tab" aria-selected="false">Visa &amp; Admin</button>
-      <button type="button" class="cat-tab" data-category="jobs_remote" role="tab" aria-selected="false">Jobs &amp; Remote Work</button>
-      <button type="button" class="cat-tab" data-category="things_to_do" role="tab" aria-selected="false">Things to Do</button>
-    </div>
-    <button type="button" class="btn-new-post" id="btn-new-post">New post</button>
+    <section class="main-column">
+      <header class="portal-hero" style="text-align:left;margin-bottom:14px;">
+        <h1 id="portal-welcome" class="portal-welcome-heading">Welcome to the community</h1>
+        <p id="portal-sub">Share tips, events, and connect with people in your city.</p>
+      </header>
+
+      <div class="portal-toolbar">
+        <div class="category-tabs" role="tablist" aria-label="Topics">
+          <button type="button" class="cat-tab active" data-category="all" role="tab" aria-selected="true">All topics</button>
+          <button type="button" class="cat-tab" data-category="housing" role="tab" aria-selected="false">Housing Tips</button>
+          <button type="button" class="cat-tab" data-category="events" role="tab" aria-selected="false">Events</button>
+          <button type="button" class="cat-tab" data-category="flatmate" role="tab" aria-selected="false">Flatmate Search</button>
+          <button type="button" class="cat-tab" data-category="general" role="tab" aria-selected="false">General</button>
+          <button type="button" class="cat-tab" data-category="recommendations" role="tab" aria-selected="false" title="Restaurants, cafes, gyms, and more">Recommendations</button>
+          <button type="button" class="cat-tab" data-category="visa_admin" role="tab" aria-selected="false">Visa &amp; Admin</button>
+          <button type="button" class="cat-tab" data-category="jobs_remote" role="tab" aria-selected="false">Jobs &amp; Remote Work</button>
+          <button type="button" class="cat-tab" data-category="things_to_do" role="tab" aria-selected="false">Things to Do</button>
+        </div>
+        <button type="button" class="btn-new-post" id="btn-new-post">New post</button>
+      </div>
+
+      <div class="sort-toolbar" role="toolbar" aria-label="Sort posts">
+        <span class="sort-label">Sort:</span>
+        <button type="button" class="sort-btn active" data-sort="recent">Most Recent</button>
+        <button type="button" class="sort-btn" data-sort="popular">Most Popular</button>
+        <button type="button" class="sort-btn" data-sort="oldest">Oldest</button>
+      </div>
+
+      <div id="feed" class="feed" aria-live="polite"></div>
+    </section>
+
+    <aside class="right-sidebar">
+      <button type="button" class="sidebar-create-post" id="btn-create-post-sidebar">Create a post</button>
+      <div class="city-info-card">
+        <h3 id="city-info-title">Athens Community</h3>
+        <p class="meta-pill"><span id="city-member-count">0</span> members</p>
+      </div>
+      <div class="rules-card">
+        <h3>Community rules</h3>
+        <ul>
+          <li>Be kind and respectful.</li>
+          <li>No spam or self-promo dumps.</li>
+          <li>Keep posts relevant to the city.</li>
+          <li>Protect personal information.</li>
+        </ul>
+      </div>
+      <div class="explore-card">
+        <h3>Other cities to explore</h3>
+        <div class="city-list">
+          <span class="city-chip">Berlin</span>
+          <span class="city-chip">Lisbon</span>
+          <span class="city-chip">Amsterdam</span>
+          <span class="city-chip">Rome</span>
+        </div>
+      </div>
+    </aside>
   </div>
-
-  <div class="sort-toolbar" role="toolbar" aria-label="Sort posts">
-    <span class="sort-label">Sort:</span>
-    <button type="button" class="sort-btn active" data-sort="recent">Most Recent</button>
-    <button type="button" class="sort-btn" data-sort="popular">Most Popular</button>
-    <button type="button" class="sort-btn" data-sort="oldest">Oldest</button>
-  </div>
-
-  <div id="feed" class="feed" aria-live="polite"></div>
 </main>
 
 <div id="modal-new-post" class="modal" hidden aria-modal="true" role="dialog" aria-labelledby="modal-new-title">
@@ -613,14 +758,16 @@ nav {
     </div>
     <div class="thread-comments">
       <h3>Comments</h3>
-      <div id="thread-comments-list"></div>
-      <div class="comment-form" style="margin-top:14px;">
+      <div class="comment-form" style="margin-top:10px;">
         <label for="thread-comment-input" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Your comment</label>
-        <textarea id="thread-comment-input" placeholder="Write a comment…"></textarea>
-        <div class="modal-actions" style="margin-top:12px; justify-content:flex-end;">
+        <textarea id="thread-comment-input" placeholder="Join the conversation" style="margin-bottom:6px;"></textarea>
+        <div id="thread-replying-to" class="meta-pill" hidden></div>
+        <div class="modal-actions" style="margin-top:8px; justify-content:flex-end;">
+          <button type="button" class="btn-secondary" id="thread-reply-cancel" hidden>Cancel reply</button>
           <button type="button" class="btn-primary" id="thread-comment-submit">Post comment</button>
         </div>
       </div>
+      <div id="thread-comments-list"></div>
     </div>
     <div class="modal-actions" style="margin-top:20px;">
       <button type="button" class="btn-secondary" data-close="modal-thread">Close</button>
@@ -748,6 +895,8 @@ nav {
     let feedUnsub = null;
     let threadCommentsUnsub = null;
     let openThreadId = null;
+    let replyingToCommentId = null;
+    let replyingToUsername = '';
     let pendingDelete = null;
     const authorProfileCache = new Map();
 
@@ -869,6 +1018,14 @@ nav {
       var feedCity = cityForFeedQuery();
       var q = query(collection(db, 'communityPosts'), where('city', '==', feedCity));
       feedUnsub = onSnapshot(q, function (snap) {
+        const uniqueAuthors = new Set();
+        snap.docs.forEach(function (d) {
+          const data = d.data() || {};
+          const aid = data.author || data.authorId;
+          if (aid) uniqueAuthors.add(aid);
+        });
+        document.getElementById('city-member-count').textContent = String(uniqueAuthors.size || 0);
+        document.getElementById('city-info-title').textContent = cityForFeedQuery() + ' Community';
         renderFeed(prepareFeedDocs(Array.from(snap.docs), activeCategory));
       }, function (err) {
         console.error(err);
@@ -907,8 +1064,32 @@ nav {
         }
 
         const card = document.createElement('div');
-        card.className = 'feed-card';
+        card.className = 'feed-card reddit-card';
         card.style.cssText = 'padding:16px;color:#1a2e24;text-align:left;cursor:pointer;';
+
+        const voteRail = document.createElement('div');
+        voteRail.className = 'vote-rail';
+        const upArrow = document.createElement('button');
+        upArrow.type = 'button';
+        upArrow.className = 'vote-arrow';
+        upArrow.textContent = '▲';
+        upArrow.title = 'Upvote';
+        const voteCount = document.createElement('div');
+        voteCount.className = 'vote-count';
+        voteCount.textContent = String(Number(d.upvoteCount || 0));
+        const downArrow = document.createElement('button');
+        downArrow.type = 'button';
+        downArrow.className = 'vote-arrow';
+        downArrow.textContent = '▼';
+        downArrow.title = 'Downvote disabled';
+        downArrow.disabled = true;
+        downArrow.style.opacity = '0.4';
+        voteRail.appendChild(upArrow);
+        voteRail.appendChild(voteCount);
+        voteRail.appendChild(downArrow);
+        card.appendChild(voteRail);
+
+        const contentCol = document.createElement('div');
 
         const topRow = document.createElement('div');
         topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:10px;';
@@ -941,7 +1122,7 @@ nav {
           });
           topRow.appendChild(delBtn);
         }
-        card.appendChild(topRow);
+        contentCol.appendChild(topRow);
 
         const p = document.createElement('p');
         p.style.marginTop = '8px';
@@ -949,7 +1130,7 @@ nav {
           ? String(d.body)
           : stripHtml(d.bodyHtml || '');
         p.textContent = bodyText || '';
-        card.appendChild(p);
+        contentCol.appendChild(p);
 
         const authorRow = document.createElement('div');
         authorRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:10px;';
@@ -969,7 +1150,7 @@ nav {
         nameEl.textContent = (authorProfile.username || 'Anonymous') + (d.createdAt ? ' · ' + formatTime(d.createdAt) : '');
         authorRow.appendChild(avatar);
         authorRow.appendChild(nameEl);
-        card.appendChild(authorRow);
+        contentCol.appendChild(authorRow);
 
         const actions = document.createElement('div');
         actions.className = 'feed-card-actions';
@@ -984,14 +1165,34 @@ nav {
           e.stopPropagation();
           toggleUpvote(snap.id, upBtn);
         });
+        upArrow.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleUpvote(snap.id, upBtn, voteCount);
+        });
 
         const commentPill = document.createElement('span');
         commentPill.className = 'meta-pill';
         commentPill.textContent = '💬 ' + Number(d.commentCount || 0);
 
         actions.appendChild(upBtn);
+        const shareBtn = document.createElement('button');
+        shareBtn.type = 'button';
+        shareBtn.className = 'btn-upvote';
+        shareBtn.style.padding = '6px 12px';
+        shareBtn.innerHTML = '<span aria-hidden="true">↗</span> <span>Share</span>';
+        shareBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const u = location.origin + location.pathname + '?city=' + encodeURIComponent(cityForFeedQuery()) + '#post-' + snap.id;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(u).catch(function () {});
+          }
+        });
+
         actions.appendChild(commentPill);
-        card.appendChild(actions);
+        actions.appendChild(shareBtn);
+        contentCol.appendChild(actions);
 
         card.addEventListener('click', function () {
           openThreadModal(snap.id, d);
@@ -1004,12 +1205,15 @@ nav {
         });
         card.tabIndex = 0;
         card.setAttribute('role', 'button');
+        card.id = 'post-' + snap.id;
+
+        card.appendChild(contentCol);
 
         feedEl.appendChild(card);
       }
     }
 
-    async function toggleUpvote(postId, btnEl) {
+    async function toggleUpvote(postId, btnEl, voteCountEl) {
       if (!currentUser) return;
       const postRef = doc(db, 'communityPosts', postId);
       const voteRef = doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid);
@@ -1035,6 +1239,7 @@ nav {
           const cnt = btnEl.querySelector('.up-count');
           if (label) label.textContent = on ? 'Upvoted' : 'Upvote';
           if (cnt) cnt.textContent = String(c);
+          if (voteCountEl) voteCountEl.textContent = String(c);
         }
         if (openThreadId === postId) {
           syncThreadUpvoteUI(postId, on, c);
@@ -1123,6 +1328,10 @@ nav {
       const listEl = document.getElementById('thread-comments-list');
       listEl.innerHTML = '<p class="meta-pill">Loading…</p>';
       document.getElementById('thread-comment-input').value = '';
+      replyingToCommentId = null;
+      replyingToUsername = '';
+      document.getElementById('thread-replying-to').hidden = true;
+      document.getElementById('thread-reply-cancel').hidden = true;
 
       const cq = query(
         collection(db, 'communityPosts', postId, 'comments'),
@@ -1137,9 +1346,16 @@ nav {
         const rows = await Promise.all(csnap.docs.map(async function (cd) {
           const c = cd.data() || {};
           const profile = await getAuthorProfile(c.authorId || '', c.authorName || c.authorEmail || 'Member');
-          return { c: c, profile: profile };
+          return { id: cd.id, c: c, profile: profile };
         }));
+        const byParent = {};
         rows.forEach(function (row) {
+          const pid = row.c.parentId || '__root__';
+          if (!byParent[pid]) byParent[pid] = [];
+          byParent[pid].push(row);
+        });
+
+        function drawComment(row, isNested) {
           const c = row.c;
           const profile = row.profile;
           const div = document.createElement('div');
@@ -1147,6 +1363,7 @@ nav {
           div.style.display = 'flex';
           div.style.gap = '10px';
           div.style.alignItems = 'flex-start';
+          if (isNested) div.classList.add('nested-reply');
           const avatar = document.createElement('div');
           avatar.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
           if (profile.photoUrl) {
@@ -1166,11 +1383,31 @@ nav {
           const cb = document.createElement('div');
           cb.className = 'comment-body';
           cb.textContent = c.body || '';
+          const replyBtn = document.createElement('button');
+          replyBtn.type = 'button';
+          replyBtn.className = 'comment-reply-btn';
+          replyBtn.textContent = 'Reply';
+          replyBtn.addEventListener('click', function () {
+            replyingToCommentId = row.id;
+            replyingToUsername = profile.username || c.authorName || 'Member';
+            const replyInfo = document.getElementById('thread-replying-to');
+            replyInfo.textContent = 'Replying to ' + replyingToUsername;
+            replyInfo.hidden = false;
+            document.getElementById('thread-reply-cancel').hidden = false;
+            document.getElementById('thread-comment-input').focus();
+          });
           content.appendChild(cm);
           content.appendChild(cb);
+          content.appendChild(replyBtn);
           div.appendChild(avatar);
           div.appendChild(content);
           listEl.appendChild(div);
+          const kids = byParent[row.id] || [];
+          kids.forEach(function (k) { drawComment(k, true); });
+        }
+
+        (byParent.__root__ || []).forEach(function (row) {
+          drawComment(row, false);
         });
       });
 
@@ -1191,15 +1428,27 @@ nav {
         authorEmail: currentUser.email || '',
         authorName: currentUser.displayName || currentUser.email || 'Member',
         body: text,
+        parentId: replyingToCommentId || null,
         createdAt: serverTimestamp()
       });
       batch.update(postRef, { commentCount: increment(1) });
       try {
         await batch.commit();
         input.value = '';
+        replyingToCommentId = null;
+        replyingToUsername = '';
+        document.getElementById('thread-replying-to').hidden = true;
+        document.getElementById('thread-reply-cancel').hidden = true;
       } catch (err) {
         console.error(err);
       }
+    });
+
+    document.getElementById('thread-reply-cancel').addEventListener('click', function () {
+      replyingToCommentId = null;
+      replyingToUsername = '';
+      document.getElementById('thread-replying-to').hidden = true;
+      document.getElementById('thread-reply-cancel').hidden = true;
     });
 
     document.getElementById('btn-new-post').addEventListener('click', function () {
@@ -1208,6 +1457,9 @@ nav {
       var cat = activeCategory === 'all' ? 'housing' : activeCategory;
       document.getElementById('post-category').value = cat;
       openModal('modal-new-post');
+    });
+    document.getElementById('btn-create-post-sidebar').addEventListener('click', function () {
+      document.getElementById('btn-new-post').click();
     });
 
     document.getElementById('confirm-delete-post').addEventListener('click', async function () {
