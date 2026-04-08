@@ -965,9 +965,6 @@ nav {
         e.preventDefault();
         var nextCity = String(el.getAttribute('data-city') || '').trim();
         if (!nextCity) return;
-        if (nextCity === 'Madrid') {
-          alert('switching to Madrid');
-        }
         localStorage.setItem('livvo_city', nextCity);
         window.location.href = 'community-portal.html?city=' + encodeURIComponent(nextCity);
       });
@@ -1006,7 +1003,7 @@ nav {
     function cityForFeedQuery() {
       var fromLs = (localStorage.getItem('livvo_city') || '').trim();
       if (fromLs) return fromLs;
-      return (cityDisplay || '').trim() || 'Athens';
+      return (cityDisplay || '').trim() || cityDisplay;
     }
 
     function prepareFeedDocs(allDocs, category) {
@@ -1104,7 +1101,7 @@ nav {
       if (!list.length) {
         var emptyP = document.createElement('p');
         emptyP.className = 'feed-empty';
-        emptyP.textContent = 'No posts yet. Be the first!';
+        emptyP.textContent = 'No posts in ' + cityForFeedQuery() + ' yet. Be the first!';
         feedEl.appendChild(emptyP);
         return;
       }
@@ -1538,7 +1535,7 @@ nav {
         if (!feedEl.children.length) {
           const emptyP = document.createElement('p');
           emptyP.className = 'feed-empty';
-          emptyP.textContent = 'No posts yet. Be the first!';
+          emptyP.textContent = 'No posts in ' + cityForFeedQuery() + ' yet. Be the first!';
           feedEl.appendChild(emptyP);
         }
         closeModal('modal-delete-post');
