@@ -221,6 +221,10 @@ nav {
   z-index: 40;
 }
 .cat-more-menu[hidden] { display: none; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
 .portal-layout {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
@@ -1004,7 +1008,16 @@ nav {
         </div>
       </div>
 
-      <div id="feed" class="feed" aria-live="polite"></div>
+      <div id="posts-container" class="feed" aria-live="polite"></div>
+      <div id="load-more-container" style="display:none;text-align:center;padding:20px 0;">
+        <button type="button" id="load-more-btn"
+          style="border:1.5px solid #2d6a2d;background:white;color:#2d6a2d;border-radius:20px;padding:9px 28px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;">
+          Load more posts
+        </button>
+      </div>
+      <div id="all-loaded-msg" style="display:none;text-align:center;padding:20px 0;">
+        <p style="font-size:13px;color:#9ab09a;">You've seen all posts in this city</p>
+      </div>
     </section>
   </div>
 </main>
@@ -1059,8 +1072,8 @@ nav {
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
-    getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, doc, getDoc,
-    increment, deleteDoc, setDoc, updateDoc
+    getFirestore, collection, query, where, orderBy, addDoc, doc, getDoc, getDocs,
+    limit, startAfter, increment, deleteDoc, setDoc, updateDoc
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   const CATEGORY_LABELS = {
     housing: 'Housing Tips',
@@ -1165,13 +1178,18 @@ nav {
     const navEmail = document.getElementById('nav-email');
     const navProfileTrigger = document.getElementById('nav-profile-trigger');
     const navProfileMenu = document.getElementById('nav-profile-menu');
-    const feedEl = document.getElementById('feed');
+    const feedEl = document.getElementById('posts-container');
     const tabButtons = document.querySelectorAll('.cat-tab[data-category]');
     const moreToggle = document.getElementById('cat-more-toggle');
     const moreMenu = document.getElementById('cat-more-menu');
 
     let activeCategory = 'all';
     let activeSort = 'recent';
+    /** Pagination & feed loading (aligned with #sort-select: recent | popular | oldest) */
+    let lastVisiblePost = null;
+    let isLoadingPosts = false;
+    let allPostsLoaded = false;
+    const POSTS_PER_PAGE = 15;
 
     function syncSortSelect() {
       var sel = document.getElementById('sort-select');
@@ -1190,7 +1208,6 @@ nav {
       }
     }
 
-    let feedUnsub = null;
     let pendingDelete = null;
     const authorProfileCache = new Map();
 
@@ -1225,7 +1242,8 @@ nav {
           moreMenu.hidden = true;
           if (moreToggle) moreToggle.setAttribute('aria-expanded', 'false');
         }
-        subscribeFeed();
+        loadPosts(true);
+        refreshSidebarCommunityStats();
       });
     });
 
@@ -1250,7 +1268,8 @@ nav {
     if (sortSelectEl) {
       sortSelectEl.addEventListener('change', function () {
         activeSort = sortSelectEl.value || 'recent';
-        subscribeFeed();
+        loadPosts(true);
+        refreshSidebarCommunityStats();
       });
     }
 
@@ -1266,17 +1285,11 @@ nav {
           moreMenu.hidden = true;
           if (moreToggle) moreToggle.setAttribute('aria-expanded', 'false');
         }
-        subscribeFeed();
+        loadPosts(true);
+        refreshSidebarCommunityStats();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     });
-
-    function postDocMillis(d) {
-      const c = d.data().createdAt;
-      if (c && typeof c.toMillis === 'function') return c.toMillis();
-      if (c && typeof c.seconds === 'number') return c.seconds * 1000;
-      return 0;
-    }
 
     function cityForFeedQuery() {
       var fromUrl = (cityDisplay || '').trim();
@@ -1356,32 +1369,6 @@ nav {
       document.querySelectorAll('.post-card-more-menu').forEach(function (m) { m.hidden = true; });
     });
 
-    function prepareFeedDocs(allDocs, category) {
-      var list = Array.from(allDocs || []).slice();
-      if (category && category !== 'all') {
-        list = list.filter(function (d) {
-          return (d.data().category || '') === category;
-        });
-      }
-      if (activeSort === 'popular') {
-        list.sort(function (a, b) {
-          var ap = Number((a.data() || {}).upvoteCount || 0);
-          var bp = Number((b.data() || {}).upvoteCount || 0);
-          if (bp !== ap) return bp - ap;
-          return postDocMillis(b) - postDocMillis(a);
-        });
-      } else if (activeSort === 'oldest') {
-        list.sort(function (a, b) {
-          return postDocMillis(a) - postDocMillis(b);
-        });
-      } else {
-        list.sort(function (a, b) {
-          return postDocMillis(b) - postDocMillis(a);
-        });
-      }
-      return list.slice(0, 50);
-    }
-
     async function getAuthorProfile(authorUid, fallbackUsername, fallbackPhotoUrl) {
       if (!authorUid) {
         return {
@@ -1418,14 +1405,10 @@ nav {
       return profile;
     }
 
-    function subscribeFeed() {
-      if (feedUnsub) {
-        feedUnsub();
-        feedUnsub = null;
-      }
-      var feedCity = cityForFeedQuery();
-      var q = query(collection(db, 'communityPosts'), where('city', '==', feedCity));
-      feedUnsub = onSnapshot(q, function (snap) {
+    async function refreshSidebarCommunityStats() {
+      const feedCity = cityForFeedQuery();
+      try {
+        const snap = await getDocs(query(collection(db, 'communityPosts'), where('city', '==', feedCity)));
         const uniqueAuthors = new Set();
         snap.docs.forEach(function (d) {
           const data = d.data() || {};
@@ -1433,16 +1416,130 @@ nav {
           if (aid) uniqueAuthors.add(aid);
         });
         document.getElementById('sidebar-member-count').textContent = String(uniqueAuthors.size || 0);
-        document.getElementById('sidebar-city-name').textContent = cityForFeedQuery() + ' Community';
-        renderFeed(prepareFeedDocs(Array.from(snap.docs), activeCategory));
-      }, function (err) {
+        document.getElementById('sidebar-city-name').textContent = feedCity + ' Community';
+      } catch (err) {
         console.error(err);
+      }
+    }
+
+    function showPostSkeleton() {
+      if (document.getElementById('post-skeleton')) return;
+      const skeleton = document.createElement('div');
+      skeleton.id = 'post-skeleton';
+      skeleton.innerHTML = [1, 2, 3].map(function () {
+        return '<div style="background:white;border:1px solid #e8f0e8;border-radius:12px;padding:16px;margin-bottom:8px;animation:pulse 1.5s ease-in-out infinite;">'
+          + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">'
+          + '<div style="width:32px;height:32px;border-radius:50%;background:#e8f0e8;"></div>'
+          + '<div style="width:120px;height:10px;border-radius:6px;background:#e8f0e8;"></div></div>'
+          + '<div style="width:70%;height:14px;border-radius:6px;background:#e8f0e8;margin-bottom:8px;"></div>'
+          + '<div style="width:90%;height:10px;border-radius:6px;background:#e8f0e8;margin-bottom:6px;"></div>'
+          + '<div style="width:50%;height:10px;border-radius:6px;background:#e8f0e8;"></div></div>';
+      }).join('');
+      feedEl.appendChild(skeleton);
+    }
+
+    function hidePostSkeleton() {
+      const skeleton = document.getElementById('post-skeleton');
+      if (skeleton) skeleton.remove();
+    }
+
+    function showLoadMoreButton() {
+      const lm = document.getElementById('load-more-container');
+      const end = document.getElementById('all-loaded-msg');
+      if (lm) lm.style.display = 'block';
+      if (end) end.style.display = 'none';
+    }
+
+    function hideLoadMoreButton() {
+      const lm = document.getElementById('load-more-container');
+      const end = document.getElementById('all-loaded-msg');
+      if (lm) lm.style.display = 'none';
+      if (end) end.style.display = 'block';
+    }
+
+    function hidePaginationFooter() {
+      const lm = document.getElementById('load-more-container');
+      const end = document.getElementById('all-loaded-msg');
+      if (lm) lm.style.display = 'none';
+      if (end) end.style.display = 'none';
+    }
+
+    async function loadPosts(reset) {
+      if (isLoadingPosts) return;
+      if (allPostsLoaded && !reset) return;
+
+      isLoadingPosts = true;
+      if (reset) {
+        lastVisiblePost = null;
+        allPostsLoaded = false;
+        feedEl.innerHTML = '';
+        hidePaginationFooter();
+      }
+
+      showPostSkeleton();
+
+      const cursorBeforeQuery = lastVisiblePost;
+      const feedCity = cityForFeedQuery();
+
+      try {
+        const constraints = [where('city', '==', feedCity)];
+        if (activeCategory && activeCategory !== 'all') {
+          constraints.push(where('category', '==', activeCategory));
+        }
+        if (activeSort === 'popular') {
+          constraints.push(orderBy('upvoteCount', 'desc'));
+        } else if (activeSort === 'oldest') {
+          constraints.push(orderBy('createdAt', 'asc'));
+        } else {
+          constraints.push(orderBy('createdAt', 'desc'));
+        }
+        if (lastVisiblePost) {
+          constraints.push(startAfter(lastVisiblePost));
+        }
+        constraints.push(limit(POSTS_PER_PAGE));
+
+        const q = query(collection(db, 'communityPosts'), ...constraints);
+        const snapshot = await getDocs(q);
+
+        hidePostSkeleton();
+
+        if (snapshot.empty) {
+          if (!cursorBeforeQuery) {
+            hidePaginationFooter();
+            renderFeedEmptyState();
+          } else {
+            allPostsLoaded = true;
+            hideLoadMoreButton();
+          }
+          isLoadingPosts = false;
+          return;
+        }
+
+        if (snapshot.docs.length < POSTS_PER_PAGE) {
+          allPostsLoaded = true;
+          hideLoadMoreButton();
+        } else {
+          showLoadMoreButton();
+        }
+
+        lastVisiblePost = snapshot.docs[snapshot.docs.length - 1];
+        await appendPostCardsFromQueryDocs(snapshot.docs);
+      } catch (err) {
+        hidePostSkeleton();
+        console.error('Error loading posts:', err);
         var hint = (err && err.code === 'permission-denied')
           ? 'You do not have permission to read posts.'
           : 'Could not load posts. Please try again in a moment.';
-        feedEl.innerHTML = '<p class="feed-empty">' + hint + '</p>';
-      });
+        if (reset || !feedEl.querySelector('.post-card')) {
+          feedEl.innerHTML = '<p class="feed-empty">' + hint + '</p>';
+        }
+        hidePaginationFooter();
+      }
+
+      isLoadingPosts = false;
     }
+
+    window.loadPosts = loadPosts;
 
     function renderFeedEmptyState() {
       const wrap = document.createElement('div');
@@ -1470,15 +1567,8 @@ nav {
       feedEl.appendChild(wrap);
     }
 
-    async function renderFeed(docs) {
+    async function appendPostCardsFromQueryDocs(docs) {
       var list = Array.from(docs || []);
-      while (feedEl.firstChild) {
-        feedEl.removeChild(feedEl.firstChild);
-      }
-      if (!list.length) {
-        renderFeedEmptyState();
-        return;
-      }
       for (const snap of list) {
         const d = snap.data() || {};
         const postId = snap.id;
@@ -1725,7 +1815,21 @@ nav {
       navEl.style.display = '';
       portalContent.removeAttribute('hidden');
       portalContent.style.display = '';
-      subscribeFeed();
+      loadPosts(true);
+      refreshSidebarCommunityStats();
+    }
+
+    var loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', function () { loadPosts(false); });
+      loadMoreBtn.addEventListener('mouseenter', function () {
+        loadMoreBtn.style.background = '#2d6a2d';
+        loadMoreBtn.style.color = 'white';
+      });
+      loadMoreBtn.addEventListener('mouseleave', function () {
+        loadMoreBtn.style.background = 'white';
+        loadMoreBtn.style.color = '#2d6a2d';
+      });
     }
 
     document.getElementById('post-title').addEventListener('input', function () {
