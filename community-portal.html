@@ -1072,8 +1072,8 @@ nav {
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
-    getFirestore, collection, query, where, orderBy, addDoc, doc, getDoc, getDocs,
-    limit, startAfter, increment, deleteDoc, setDoc, updateDoc
+    getFirestore, collection, query, where, addDoc, doc, getDoc, getDocs,
+    limit, increment, deleteDoc, setDoc, updateDoc
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   const CATEGORY_LABELS = {
     housing: 'Housing Tips',
@@ -1185,15 +1185,13 @@ nav {
 
     let activeCategory = 'all';
     let activeSort = 'recent';
-    /** Pagination & feed loading (aligned with #sort-select: recent | popular | oldest) */
-    let lastVisiblePost = null;
+    /** Feed: city-only Firestore query + filter/sort/paginate in memory (includes posts missing createdAt/upvoteCount). */
     let isLoadingPosts = false;
     let allPostsLoaded = false;
-    /** When true, pagination uses clientFeedPool (no composite index required). */
     let clientFeedActive = false;
     let clientFeedPool = [];
     let clientFeedOffset = 0;
-    const CLIENT_FEED_FETCH_CAP = 200;
+    const CLIENT_FEED_FETCH_CAP = 500;
     const POSTS_PER_PAGE = 15;
 
     function docCreatedMillis(snap) {
@@ -1218,6 +1216,7 @@ nav {
         if (activeSort === 'oldest') {
           if (ta !== tb) return ta - tb;
         } else {
+          /* recent, popular (ties), default: newest first */
           if (tb !== ta) return tb - ta;
         }
         return String(a.id).localeCompare(String(b.id));
@@ -1602,7 +1601,6 @@ nav {
 
       isLoadingPosts = true;
       if (reset) {
-        lastVisiblePost = null;
         allPostsLoaded = false;
         clientFeedActive = false;
         clientFeedPool = [];
@@ -1612,85 +1610,19 @@ nav {
       }
 
       showPostSkeleton();
-
-      const cursorBeforeQuery = lastVisiblePost;
-      const feedCity = cityForFeedQuery();
-
       try {
-        const constraints = [where('city', '==', feedCity)];
-        if (activeCategory && activeCategory !== 'all') {
-          constraints.push(where('category', '==', activeCategory));
-        }
-        if (activeSort === 'popular') {
-          constraints.push(orderBy('upvoteCount', 'desc'));
-        } else if (activeSort === 'oldest') {
-          constraints.push(orderBy('createdAt', 'asc'));
-        } else {
-          constraints.push(orderBy('createdAt', 'desc'));
-        }
-        if (lastVisiblePost) {
-          constraints.push(startAfter(lastVisiblePost));
-        }
-        constraints.push(limit(POSTS_PER_PAGE));
-
-        // Collection ID must be communityPosts (not "posts"). Modular SDK: collection(db, 'communityPosts'); compat would be db.collection('communityPosts').
-        const q = query(collection(db, 'communityPosts'), ...constraints);
-        const snapshot = await getDocs(q);
-        clientFeedActive = false;
-
-        hidePostSkeleton();
-
-        if (snapshot.empty) {
-          if (!cursorBeforeQuery) {
-            hidePaginationFooter();
-            renderFeedEmptyState();
-          } else {
-            allPostsLoaded = true;
-            hideLoadMoreButton();
-          }
-          isLoadingPosts = false;
-          return;
-        }
-
-        if (snapshot.docs.length < POSTS_PER_PAGE) {
-          allPostsLoaded = true;
-          hideLoadMoreButton();
-        } else {
-          showLoadMoreButton();
-        }
-
-        lastVisiblePost = snapshot.docs[snapshot.docs.length - 1];
-        await appendPostCardsFromQueryDocs(snapshot.docs);
+        await loadPostsWithClientSort(reset);
       } catch (err) {
         hidePostSkeleton();
         console.error('Error loading posts:', err);
-        var isIndexErr = err && (err.code === 'failed-precondition'
-          || (String(err.message || '').toLowerCase().indexOf('index') >= 0));
-        if (isIndexErr) {
-          console.warn('Firestore index missing or building; using client-side feed (first ' + CLIENT_FEED_FETCH_CAP + ' in city). Deploy indexes for scalable sorting.');
-          try {
-            await loadPostsWithClientSort(reset);
-          } catch (err2) {
-            console.error('Client-side feed fallback failed:', err2);
-            var hint2 = 'Could not load posts. Please try again in a moment.';
-            if (err2 && err2.code === 'permission-denied') {
-              hint2 = 'You do not have permission to read posts.';
-            }
-            if (reset || !feedEl.querySelector('.post-card')) {
-              feedEl.innerHTML = '<p class="feed-empty">' + hint2 + '</p>';
-            }
-            hidePaginationFooter();
-          }
-        } else {
-          var hint = 'Could not load posts. Please try again in a moment.';
-          if (err && err.code === 'permission-denied') {
-            hint = 'You do not have permission to read posts.';
-          }
-          if (reset || !feedEl.querySelector('.post-card')) {
-            feedEl.innerHTML = '<p class="feed-empty">' + hint + '</p>';
-          }
-          hidePaginationFooter();
+        var hint = 'Could not load posts. Please try again in a moment.';
+        if (err && err.code === 'permission-denied') {
+          hint = 'You do not have permission to read posts.';
         }
+        if (reset || !feedEl.querySelector('.post-card')) {
+          feedEl.innerHTML = '<p class="feed-empty">' + hint + '</p>';
+        }
+        hidePaginationFooter();
       }
 
       isLoadingPosts = false;
