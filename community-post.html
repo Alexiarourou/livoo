@@ -208,7 +208,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               <span id="post-comment-count">0</span> comments
             </button>
-            <button type="button" onclick="sharePost()" style="margin-left: auto; display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; cursor: pointer; font-size: 13px; color: #5a7a5a;">
+            <button type="button" id="post-share-btn" onclick="sharePost()" style="margin-left: auto; display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; cursor: pointer; font-size: 13px; color: #5a7a5a;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               Share
             </button>
@@ -440,6 +440,11 @@
     const postAuthorAvatarEl = document.getElementById('post-avatar');
     const postBodyEl = document.getElementById('post-body');
     const postLikeBtn = document.getElementById('post-like-btn');
+    const postShareBtn = document.getElementById('post-share-btn');
+    if (postShareBtn) {
+      postShareBtn.removeAttribute('title');
+      postShareBtn.removeAttribute('aria-label');
+    }
     const sortSelect = document.getElementById('sort-comments');
     const listEl = document.getElementById('comments-container');
     const commentInputEl = document.getElementById('comment-input');
