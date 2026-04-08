@@ -1314,7 +1314,8 @@ nav {
         if (uSnap.exists()) {
           const ud = uSnap.data() || {};
           const username = String(ud.username || ud.displayName || fallbackUsername || 'Anonymous').trim();
-          const photoUrl = String(ud.photoURL || '').trim();
+          const photoUrl = String(ud.photoURL || '').trim()
+            || String(fallbackPhotoUrl || '').trim();
           profile = {
             username: username || 'Anonymous',
             photoUrl: photoUrl,
@@ -1370,7 +1371,7 @@ nav {
         const d = snap.data() || {};
         const authorUid = d.author || d.authorId || '';
         const fallbackUsername = d.authorUsername || d.authorName || d.authorEmail || 'Anonymous';
-        const authorProfile = await getAuthorProfile(authorUid, fallbackUsername, d.authorPhoto || '');
+        const authorProfile = await getAuthorProfile(authorUid, fallbackUsername, d.authorPhotoURL || d.authorPhoto || '');
         let hasUpvoted = false;
         if (currentUser) {
           try {
@@ -1398,21 +1399,36 @@ nav {
 
         const authorRow = document.createElement('div');
         authorRow.style.cssText = 'display:flex;align-items:center;gap:8px;min-width:0;';
-        const avatar = document.createElement('div');
-        avatar.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
-        if (authorProfile.photoUrl) {
+        const avatarWrap = document.createElement('div');
+        avatarWrap.style.cssText = 'width:40px;height:40px;flex-shrink:0;';
+        const displayName = authorProfile.username || 'Anonymous';
+        const initial = authorProfile.initial || 'A';
+        const photoUrl = String(authorProfile.photoUrl || '').trim();
+        if (photoUrl) {
           const img = document.createElement('img');
-          img.src = authorProfile.photoUrl;
-          img.alt = authorProfile.username;
-          img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-          avatar.appendChild(img);
+          img.src = photoUrl;
+          img.alt = displayName;
+          img.style.cssText = 'width:40px;height:40px;border-radius:50%;object-fit:cover;display:block;';
+          const fallback = document.createElement('div');
+          fallback.className = 'avatar-fallback';
+          fallback.style.cssText = 'display:none;width:40px;height:40px;border-radius:50%;background:#2d6a2d;color:white;font-weight:600;font-size:15px;align-items:center;justify-content:center;';
+          fallback.textContent = initial;
+          img.addEventListener('error', function () {
+            img.style.display = 'none';
+            fallback.style.display = 'flex';
+          });
+          avatarWrap.appendChild(img);
+          avatarWrap.appendChild(fallback);
         } else {
-          avatar.textContent = authorProfile.initial || 'A';
+          const fb = document.createElement('div');
+          fb.style.cssText = 'width:40px;height:40px;border-radius:50%;background:#2d6a2d;color:white;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;';
+          fb.textContent = initial;
+          avatarWrap.appendChild(fb);
         }
         const nameEl = document.createElement('small');
         nameEl.style.cssText = 'color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
         nameEl.textContent = (authorProfile.username || 'Anonymous') + (d.createdAt ? ' · ' + formatRelativeTime(d.createdAt) : '');
-        authorRow.appendChild(avatar);
+        authorRow.appendChild(avatarWrap);
         authorRow.appendChild(nameEl);
         topRow.appendChild(authorRow);
 
@@ -1685,6 +1701,9 @@ nav {
       const submitBtn = document.getElementById('submit-post-btn');
       if (submitBtn) submitBtn.disabled = true;
       try {
+        const resolvedPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim())
+          || user.photoURL
+          || '';
         await addDoc(collection(db, 'communityPosts'), {
           title: document.getElementById('post-title').value,
           body: document.getElementById('post-body').value,
@@ -1695,9 +1714,8 @@ nav {
             || user.displayName
             || (user.email ? user.email.split('@')[0] : '')
             || 'Anonymous',
-          authorPhoto: (currentProfileData && String(currentProfileData.photoURL || '').trim())
-            || user.photoURL
-            || '',
+          authorPhotoURL: resolvedPhoto || null,
+          authorPhoto: resolvedPhoto,
           createdAt: new Date(),
           commentCount: 0,
           upvoteCount: 0,
