@@ -166,35 +166,74 @@ nav {
   const sendBtn = document.getElementById('btnSend');
   const quickEl = document.getElementById('quickReplies');
 
-  const QUICK_TOPICS = [
-    'What is Livvo?',
-    'Do I need a guarantor?',
-    'Which cities do you cover?',
-    'I\'m a landlord - how do I list?',
-    'How do I find a flatmate?',
-    'Pricing & fees'
+  const SUPPORT_EMAIL = 'hello@livvo.net';
+
+  const TOPICS = [
+    { id: 'rentals', label: 'Rentals & booking' },
+    { id: 'community', label: 'Community posts' },
+    { id: 'account', label: 'Account / login' },
+    { id: 'landlord', label: 'Landlord listing' },
+    { id: 'bug', label: 'Report a bug' }
   ];
 
-  const AUTO_RESPONSES = {
-    'livvo': 'Livvo helps students, interns and young professionals find flatshares and flatmates when moving abroad. No guarantor, flexible stays (1–12 months), and a community to connect before you arrive.',
-    'guarantor': 'No! Livvo landlords understand that students and interns often can\'t provide a local guarantor. You verify through your university email or work placement letter instead.',
-    'cities': 'We\'re live in Athens and expanding to Paris, London, Barcelona, Berlin, Amsterdam, Madrid, Milan, Lisbon, Dublin and more. Join the waitlist to be notified when we launch in your city.',
-    'landlord': 'Sign up at livvo.com, verify your email, and list your property in minutes. You set the price and duration. We handle verification and matching with vetted tenants.',
-    'flatmate': 'Create a free account, build your profile (budget, lifestyle, move-in date), and browse compatible flatmates in your city. You can connect before you even land!',
-    'pricing': 'For tenants: Browse and connect are free. For landlords: We take a small service fee on bookings. Pricing is transparent on each listing.',
-    'hello': 'Hi! 👋 How can I help you today?',
-    'hi': 'Hi! 👋 How can I help you today?',
-    'help': 'I\'m here to help! Ask about Livvo, guarantors, cities, listing as a landlord, or finding a flatmate. Or type your question below.',
-    'thanks': 'You\'re welcome! Anything else I can help with?',
-    'default': 'Thanks for your message! I\'ve shared it with our team. For quicker answers, check our <a href="faqs.html">FAQs</a> or try one of the topics above. We\'ll get back to you soon.'
+  const FLOW_QUESTIONS = {
+    rentals: [
+      { key: 'city', prompt: 'Which city is this about?' },
+      { key: 'stage', prompt: 'What stage are you at? (browsing / booking / move-in)' },
+      { key: 'details', prompt: 'What exactly do you need help with?' }
+    ],
+    community: [
+      { key: 'city', prompt: 'Which city community is this for?' },
+      { key: 'issue', prompt: 'Is this about posting, comments, or moderation?' },
+      { key: 'details', prompt: 'Share a short description of the issue.' }
+    ],
+    account: [
+      { key: 'issue', prompt: 'Is it login, signup, password reset, or profile setup?' },
+      { key: 'email', prompt: 'What email are you using? (optional)' },
+      { key: 'details', prompt: 'What error do you see?' }
+    ],
+    landlord: [
+      { key: 'city', prompt: 'Which city is your property in?' },
+      { key: 'units', prompt: 'How many listings do you plan to add?' },
+      { key: 'details', prompt: 'What do you need help with in listing flow?' }
+    ],
+    bug: [
+      { key: 'page', prompt: 'Which page is broken? (URL or page name)' },
+      { key: 'device', prompt: 'Which device/browser are you using?' },
+      { key: 'details', prompt: 'What happened vs what you expected?' }
+    ]
   };
+
+  const QUICK_ANSWERS = {
+    rentals: 'For bookings and rentals, we recommend sharing city + timeline so we can route this faster.',
+    community: 'Community posts are city-specific. Include city and whether this is create/read/comment issue.',
+    account: 'For account help, include your login method (email/password or Google) and the exact error text.',
+    landlord: 'Landlord onboarding is quickest when you share city and listing count.',
+    bug: 'Bug reports are much faster with page URL and browser/device details.'
+  };
+
+  const state = {
+    stage: 'topic',
+    topic: null,
+    answers: {},
+    questionIndex: 0
+  };
+
+  function timestamp() {
+    const now = new Date();
+    return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+  }
 
   function addMsg(text, isUser) {
     const div = document.createElement('div');
     div.className = 'msg ' + (isUser ? 'user' : 'bot');
-    const now = new Date();
-    const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-    div.innerHTML = text.replace(/\n/g, '<br>') + '<div class="time">' + time + '</div>';
+    const body = document.createElement('div');
+    body.innerHTML = String(text).replace(/\n/g, '<br>');
+    const t = document.createElement('div');
+    t.className = 'time';
+    t.textContent = timestamp();
+    div.appendChild(body);
+    div.appendChild(t);
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -213,58 +252,150 @@ nav {
     if (el) el.remove();
   }
 
-  function getResponse(text) {
-    const lower = text.toLowerCase().trim();
-    if (lower.match(/guarantor|guarante|cosign/)) return AUTO_RESPONSES.guarantor;
-    if (lower.match(/cit(y|ies)|where|paris|london|athens|barcelona|expand/)) return AUTO_RESPONSES.cities;
-    if (lower.match(/landlord|list|property|rent out/)) return AUTO_RESPONSES.landlord;
-    if (lower.match(/flatmate|roommate|find (a|my) (flat)?mate/)) return AUTO_RESPONSES.flatmate;
-    if (lower.match(/price|fee|cost|how much/)) return AUTO_RESPONSES.pricing;
-    if (lower.match(/^(hi|hey|hello|hola)\s*[!.]?$/)) return AUTO_RESPONSES.hello;
-    if (lower.match(/what is livvo|livvo\?/)) return AUTO_RESPONSES.livvo;
-    if (lower.match(/help|support/)) return AUTO_RESPONSES.help;
-    if (lower.match(/thank|thanks|cheers/)) return AUTO_RESPONSES.thanks;
-    return AUTO_RESPONSES.default;
+  function setQuickReplies(items, onPick) {
+    quickEl.innerHTML = '';
+    items.forEach(function (item) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'quick-btn';
+      btn.textContent = item.label;
+      btn.addEventListener('click', function () {
+        onPick(item);
+      });
+      quickEl.appendChild(btn);
+    });
   }
 
-  function sendUserMessage(text) {
+  function askCurrentQuestion() {
+    const q = FLOW_QUESTIONS[state.topic][state.questionIndex];
+    if (!q) {
+      finishFlow();
+      return;
+    }
+    addTyping();
+    setTimeout(function () {
+      removeTyping();
+      addMsg(q.prompt, false);
+    }, 300);
+  }
+
+  function beginTopic(topicId, topicLabel) {
+    state.stage = 'question';
+    state.topic = topicId;
+    state.answers = { topic: topicLabel };
+    state.questionIndex = 0;
+    addTyping();
+    setTimeout(function () {
+      removeTyping();
+      addMsg(QUICK_ANSWERS[topicId], false);
+      askCurrentQuestion();
+      setQuickReplies([
+        { id: 'human', label: 'Contact human' },
+        { id: 'restart', label: 'Start over' }
+      ], function (choice) {
+        if (choice.id === 'human') {
+          finishFlow();
+        } else {
+          resetFlow();
+        }
+      });
+    }, 350);
+  }
+
+  function finishFlow() {
+    const lines = [];
+    lines.push('Topic: ' + (state.answers.topic || 'General'));
+    Object.keys(state.answers).forEach(function (k) {
+      if (k === 'topic') return;
+      lines.push(k + ': ' + state.answers[k]);
+    });
+    const subject = '[Support] ' + (state.answers.topic || 'General question');
+    const body = 'Hi Livvo team,%0D%0A%0D%0AI need help with:%0D%0A' + encodeURIComponent(lines.join('\n')) + '%0D%0A%0D%0AThanks!';
+    addTyping();
+    setTimeout(function () {
+      removeTyping();
+      addMsg('Thanks — I collected the key details. You can now send this directly to our team.', false);
+      quickEl.innerHTML = '';
+      const mailBtn = document.createElement('button');
+      mailBtn.type = 'button';
+      mailBtn.className = 'quick-btn';
+      mailBtn.textContent = 'Open email draft';
+      mailBtn.addEventListener('click', function () {
+        const url = 'mailto:' + SUPPORT_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + body;
+        window.location.href = url;
+      });
+      const restartBtn = document.createElement('button');
+      restartBtn.type = 'button';
+      restartBtn.className = 'quick-btn';
+      restartBtn.textContent = 'Ask another question';
+      restartBtn.addEventListener('click', resetFlow);
+      quickEl.appendChild(mailBtn);
+      quickEl.appendChild(restartBtn);
+      state.stage = 'done';
+    }, 350);
+  }
+
+  function resetFlow() {
+    state.stage = 'topic';
+    state.topic = null;
+    state.answers = {};
+    state.questionIndex = 0;
+    addMsg('Pick a topic and I will ask a few quick questions to route your request.', false);
+    setQuickReplies(TOPICS, function (topic) {
+      addMsg(topic.label, true);
+      beginTopic(topic.id, topic.label);
+    });
+  }
+
+  function handleUserText(text) {
     if (!text.trim()) return;
     addMsg(text, true);
     inputEl.value = '';
     inputEl.style.height = 'auto';
-    quickEl.innerHTML = '';
 
-    addTyping();
-    setTimeout(() => {
-      removeTyping();
-      const reply = getResponse(text);
-      addMsg(reply, false);
-      renderQuickReplies();
-    }, 600 + Math.random() * 400);
+    if (state.stage === 'topic') {
+      const lower = text.toLowerCase();
+      const match = TOPICS.find(function (t) {
+        return lower.includes(t.id) || lower.includes(t.label.toLowerCase().split(' ')[0]);
+      });
+      if (match) {
+        beginTopic(match.id, match.label);
+      } else {
+        addMsg('Please pick one topic above so I can ask the right follow-up questions.', false);
+      }
+      return;
+    }
+
+    if (state.stage === 'question') {
+      const q = FLOW_QUESTIONS[state.topic][state.questionIndex];
+      if (!q) {
+        finishFlow();
+        return;
+      }
+      state.answers[q.key] = text.trim();
+      state.questionIndex += 1;
+      askCurrentQuestion();
+      return;
+    }
+
+    addMsg('Use "Ask another question" to start a new support flow.', false);
   }
 
-  function renderQuickReplies() {
-    quickEl.innerHTML = QUICK_TOPICS.map(t => 
-      '<button class="quick-btn" data-msg="' + t.replace(/"/g, '&quot;') + '">' + t + '</button>'
-    ).join('');
-    quickEl.querySelectorAll('.quick-btn').forEach(btn => {
-      btn.addEventListener('click', () => sendUserMessage(btn.dataset.msg));
-    });
-  }
+  addMsg('Hi! I am the Livvo support assistant. I can guide you through a few quick questions and prepare a support draft for our team.', false);
+  resetFlow();
 
-  addMsg('Hi! I\'m the Livvo support assistant. 👋\n\nWhat would you like to know? You can ask about flatshares, flatmates, guarantors, cities, or how to list your property.', false);
-  renderQuickReplies();
+  sendBtn.addEventListener('click', function () {
+    handleUserText(inputEl.value.trim());
+  });
 
-  sendBtn.addEventListener('click', () => sendUserMessage(inputEl.value.trim()));
-
-  inputEl.addEventListener('keydown', function(e) {
+  inputEl.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      sendUserMessage(this.value.trim());
+      handleUserText(this.value.trim());
     }
   });
 
-  inputEl.addEventListener('input', function() {
+  inputEl.addEventListener('input', function () {
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 120) + 'px';
   });
