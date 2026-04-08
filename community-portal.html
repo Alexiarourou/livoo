@@ -623,6 +623,22 @@ nav {
   padding: 0;
 }
 .comment-action-link:hover { color: var(--btn-green); }
+.reply-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.reply-cancel-link {
+  border: none;
+  background: transparent;
+  color: #60776a;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+.reply-cancel-link:hover { color: var(--btn-green); }
 
 /* Modal */
 .modal {
@@ -1647,6 +1663,7 @@ nav {
 
       let latestComments = [];
       let activeReplyBox = null;
+      let hasInitialCommentsRender = false;
 
       function getMillis(ts) {
         if (!ts) return 0;
@@ -1670,7 +1687,7 @@ nav {
         if (sortSelect.value === 'best') {
           docs.sort(function (a, b) {
             const ad = a.data() || {}; const bd = b.data() || {};
-            return Number(bd.likeCount || 0) - Number(ad.likeCount || 0) || getMillis(bd.createdAt) - getMillis(ad.createdAt);
+            return Number(bd.likes || bd.likeCount || 0) - Number(ad.likes || ad.likeCount || 0) || getMillis(bd.createdAt) - getMillis(ad.createdAt);
           });
         } else if (sortSelect.value === 'new') {
           docs.sort(function (a, b) { return getMillis((b.data() || {}).createdAt) - getMillis((a.data() || {}).createdAt); });
@@ -1712,22 +1729,10 @@ nav {
 
           const actionRow = document.createElement('div');
           actionRow.className = 'comment-actions-row';
-          const voteWrap = document.createElement('span');
-          const upBtn = document.createElement('button');
-          upBtn.type = 'button';
-          upBtn.className = 'comment-action-link';
-          upBtn.textContent = '▲';
-          const countSpan = document.createElement('span');
-          countSpan.textContent = String(Number(c.likeCount || 0));
-          const downBtn = document.createElement('button');
-          downBtn.type = 'button';
-          downBtn.className = 'comment-action-link';
-          downBtn.textContent = '▼';
-          voteWrap.appendChild(upBtn);
-          voteWrap.appendChild(document.createTextNode(' '));
-          voteWrap.appendChild(countSpan);
-          voteWrap.appendChild(document.createTextNode(' '));
-          voteWrap.appendChild(downBtn);
+          const likeBtn = document.createElement('button');
+          likeBtn.type = 'button';
+          likeBtn.className = 'comment-action-link';
+          likeBtn.textContent = '♡ ' + String(Number(c.likes || c.likeCount || 0));
 
           const replyBtn = document.createElement('button');
           replyBtn.type = 'button';
@@ -1752,7 +1757,7 @@ nav {
           moreBtn.className = 'comment-action-link';
           moreBtn.textContent = '···';
 
-          actionRow.appendChild(voteWrap);
+          actionRow.appendChild(likeBtn);
           actionRow.appendChild(replyBtn);
           actionRow.appendChild(shareBtn);
           actionRow.appendChild(moreBtn);
@@ -1760,22 +1765,26 @@ nav {
           if (currentUser) {
             const cLikeRef = doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid);
             getDoc(cLikeRef).then(function (ls) {
-              if (ls.exists()) upBtn.style.color = 'var(--btn-green)';
+              if (ls.exists()) {
+                likeBtn.style.color = 'var(--btn-green)';
+                likeBtn.textContent = '❤ ' + String(Number(c.likes || c.likeCount || 0));
+              }
             }).catch(function () {});
-            upBtn.addEventListener('click', async function (e) {
+            likeBtn.addEventListener('click', async function (e) {
               e.stopPropagation();
               const cLikeSnap = await getDoc(cLikeRef);
               if (cLikeSnap.exists()) {
                 await deleteDoc(cLikeRef);
-                await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likeCount: increment(-1) });
-                upBtn.style.color = '';
+                await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likes: increment(-1) });
+                likeBtn.style.color = '';
               } else {
                 await setDoc(cLikeRef, { uid: currentUser.uid, createdAt: serverTimestamp() });
-                await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likeCount: increment(1) });
-                upBtn.style.color = 'var(--btn-green)';
+                await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likes: increment(1) });
+                likeBtn.style.color = 'var(--btn-green)';
               }
               const latest = await getDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
-              countSpan.textContent = String(Math.max(0, Number(latest.exists() ? (latest.data() || {}).likeCount || 0 : 0)));
+              const safeLikes = Math.max(0, Number(latest.exists() ? (latest.data() || {}).likes || 0 : 0));
+              likeBtn.textContent = (cLikeSnap.exists() ? '♡ ' : '❤ ') + String(safeLikes);
             });
           }
 
@@ -1802,15 +1811,15 @@ nav {
             inlineLeft.appendChild(tb);
           });
           const inlineActions = document.createElement('div');
-          inlineActions.className = 'thread-toolbar-actions';
+          inlineActions.className = 'reply-actions-row';
           const inlineReplyCancel = document.createElement('button');
           inlineReplyCancel.type = 'button';
-          inlineReplyCancel.className = 'btn-secondary';
+          inlineReplyCancel.className = 'reply-cancel-link';
           inlineReplyCancel.textContent = 'Cancel';
           const inlineReplySubmit = document.createElement('button');
           inlineReplySubmit.type = 'button';
           inlineReplySubmit.className = 'btn-primary';
-          inlineReplySubmit.textContent = 'Comment';
+          inlineReplySubmit.textContent = 'Reply';
           inlineActions.appendChild(inlineReplyCancel);
           inlineActions.appendChild(inlineReplySubmit);
           inlineReplyToolbar.appendChild(inlineLeft);
@@ -1903,7 +1912,33 @@ nav {
               const oldCount = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
               commentPillEl.textContent = '💬 ' + String(oldCount + 1);
               topPills.children[1].textContent = '💬 ' + String(oldCount + 1);
-              pendingScrollTarget = 'reply-' + newReplyRef.id;
+              const replyRow = document.createElement('div');
+              replyRow.className = 'comment-item';
+              replyRow.style.marginTop = '8px';
+              const rrAvatar = document.createElement('div');
+              rrAvatar.style.cssText = 'width:26px;height:26px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;';
+              if (authorPhoto) {
+                const rrImg = document.createElement('img');
+                rrImg.src = authorPhoto;
+                rrImg.alt = authorUsername;
+                rrImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+                rrAvatar.appendChild(rrImg);
+              } else {
+                rrAvatar.textContent = authorUsername.charAt(0).toUpperCase();
+              }
+              const rrWrap = document.createElement('div');
+              rrWrap.style.flex = '1';
+              const rrMeta = document.createElement('div');
+              rrMeta.className = 'comment-meta';
+              rrMeta.textContent = authorUsername + ' · now';
+              const rrBody = document.createElement('div');
+              rrBody.className = 'comment-body';
+              rrBody.textContent = replyText;
+              rrWrap.appendChild(rrMeta);
+              rrWrap.appendChild(rrBody);
+              replyRow.appendChild(rrAvatar);
+              replyRow.appendChild(rrWrap);
+              repliesWrap.appendChild(replyRow);
               inlineReplyInput.value = '';
               inlineReplyWrap.hidden = true;
               item.classList.remove('comment-highlight');
@@ -1936,7 +1971,10 @@ nav {
       const cq = query(commentsRef, orderBy('createdAt', 'asc'));
       threadCommentsUnsub = onSnapshot(cq, function (csnap) {
         latestComments = csnap.docs.slice();
-        renderComments();
+        if (!hasInitialCommentsRender) {
+          renderComments();
+          hasInitialCommentsRender = true;
+        }
       }, function (err) {
         listEl.innerHTML = '<p class="meta-pill">Could not load comments.</p>';
         console.error('Comments load failed:', err);
@@ -1964,6 +2002,7 @@ nav {
           authorUid: currentUser.uid,
           authorUsername: authorUsername,
           authorPhoto: authorPhoto,
+          likes: 0,
           createdAt: serverTimestamp()
         });
         batch.update(postRef, { commentCount: increment(1) });
@@ -1972,10 +2011,34 @@ nav {
           const oldCount = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
           commentPillEl.textContent = '💬 ' + String(oldCount + 1);
           topPills.children[1].textContent = '💬 ' + String(oldCount + 1);
-          pendingScrollTarget = 'comment-pending';
+          if (listEl.querySelector('.meta-pill')) listEl.innerHTML = '';
+          const quick = document.createElement('div');
+          quick.className = 'comment-item';
+          const qAv = document.createElement('div');
+          qAv.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
+          if (authorPhoto) {
+            const qi = document.createElement('img');
+            qi.src = authorPhoto;
+            qi.alt = authorUsername;
+            qi.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            qAv.appendChild(qi);
+          } else {
+            qAv.textContent = authorUsername.charAt(0).toUpperCase();
+          }
+          const qRight = document.createElement('div');
+          qRight.style.flex = '1';
+          const qMeta = document.createElement('div');
+          qMeta.className = 'comment-meta';
+          qMeta.textContent = authorUsername + ' · now';
+          const qBody = document.createElement('div');
+          qBody.className = 'comment-body';
+          qBody.textContent = text;
+          qRight.appendChild(qMeta);
+          qRight.appendChild(qBody);
+          quick.appendChild(qAv);
+          quick.appendChild(qRight);
+          listEl.appendChild(quick);
           textarea.value = '';
-          composerPanel.hidden = true;
-          joinTrigger.hidden = false;
         } catch (err) {
           console.error('Comment submit failed:', err);
         }
