@@ -216,11 +216,19 @@ nav {
 .side-links a:hover { background: rgba(26, 122, 74, 0.08); }
 .city-list { display: flex; flex-wrap: wrap; gap: 6px; }
 .city-chip {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 5px 9px;
   font-size: 0.72rem;
   color: var(--muted);
+}
+.city-chip:hover {
+  border-color: var(--btn-green);
+  color: var(--btn-green);
+  background: rgba(26, 122, 74, 0.08);
 }
 .main-column { min-width: 500px; width: 100%; }
 .city-info-card, .rules-card, .explore-card {
@@ -646,16 +654,22 @@ nav {
     <aside class="left-sidebar">
       <h3>Navigation</h3>
       <div class="side-links">
-        <a href="#">Home</a>
-        <a href="#">Popular</a>
-        <a href="#">Explore</a>
+        <a href="#" id="left-nav-home">Home</a>
+        <a href="#" id="left-nav-popular">Popular</a>
+        <a href="community.html" id="left-nav-explore">Explore</a>
       </div>
       <h3>Browse cities</h3>
       <div class="city-list">
-        <span class="city-chip">Athens</span>
-        <span class="city-chip">London</span>
-        <span class="city-chip">Paris</span>
-        <span class="city-chip">Madrid</span>
+        <a href="#" class="city-chip city-switch-link" data-city="Athens">Athens</a>
+        <a href="#" class="city-chip city-switch-link" data-city="London">London</a>
+        <a href="#" class="city-chip city-switch-link" data-city="Paris">Paris</a>
+        <a href="#" class="city-chip city-switch-link" data-city="Madrid">Madrid</a>
+        <a href="#" class="city-chip city-switch-link" data-city="Barcelona">Barcelona</a>
+        <a href="#" class="city-chip city-switch-link" data-city="Lisbon">Lisbon</a>
+        <a href="#" class="city-chip city-switch-link" data-city="Berlin">Berlin</a>
+        <a href="#" class="city-chip city-switch-link" data-city="Amsterdam">Amsterdam</a>
+        <a href="#" class="city-chip city-switch-link" data-city="Rome">Rome</a>
+        <a href="#" class="city-chip city-switch-link" data-city="Prague">Prague</a>
       </div>
       <div class="side-links" style="margin-top:12px;">
         <a href="flatmate-connect.html">Find a Flatmate</a>
@@ -712,10 +726,10 @@ nav {
       <div class="explore-card">
         <h3>Other cities to explore</h3>
         <div class="city-list">
-          <span class="city-chip">Berlin</span>
-          <span class="city-chip">Lisbon</span>
-          <span class="city-chip">Amsterdam</span>
-          <span class="city-chip">Rome</span>
+          <a href="#" class="city-chip city-switch-link" data-city="Berlin">Berlin</a>
+          <a href="#" class="city-chip city-switch-link" data-city="Lisbon">Lisbon</a>
+          <a href="#" class="city-chip city-switch-link" data-city="Amsterdam">Amsterdam</a>
+          <a href="#" class="city-chip city-switch-link" data-city="Rome">Rome</a>
         </div>
       </div>
     </aside>
@@ -944,6 +958,39 @@ nav {
         });
         subscribeFeed();
       });
+    });
+
+    document.querySelectorAll('.city-switch-link').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        var nextCity = String(el.getAttribute('data-city') || '').trim();
+        if (!nextCity) return;
+        localStorage.setItem('livvo_city', nextCity);
+        window.location.href = 'community-portal.html?city=' + encodeURIComponent(nextCity);
+      });
+    });
+
+    document.getElementById('left-nav-home').addEventListener('click', function (e) {
+      e.preventDefault();
+      activeCategory = 'all';
+      activeSort = 'recent';
+      document.querySelectorAll('.cat-tab').forEach(function (b) {
+        var on = b.getAttribute('data-category') === 'all';
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      document.querySelectorAll('.sort-btn').forEach(function (b) {
+        b.classList.toggle('active', b.getAttribute('data-sort') === 'recent');
+      });
+      subscribeFeed();
+    });
+    document.getElementById('left-nav-popular').addEventListener('click', function (e) {
+      e.preventDefault();
+      activeSort = 'popular';
+      document.querySelectorAll('.sort-btn').forEach(function (b) {
+        b.classList.toggle('active', b.getAttribute('data-sort') === 'popular');
+      });
+      subscribeFeed();
     });
 
     function postDocMillis(d) {
