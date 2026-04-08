@@ -428,41 +428,16 @@ nav {
   }
   const cityName = cityNames[slug] || titleCaseFromRaw(rawCity || '');
 
-  function isUserProfileComplete(d) {
-    if (!d || typeof d !== 'object') return false;
-    var name = String(d.username || d.displayName || '').trim();
-    var cityVal = String(d.city || '').trim();
-    return name.length > 0 && cityVal.length > 0;
-  }
-
-  function goToProfileSetup() {
-    localStorage.setItem('livvo_city', cityName);
-    window.location.href = 'profile-setup.html?city=' + encodeURIComponent(cityName);
-  }
-
   function goToCommunityPortal() {
-    localStorage.setItem('livvo_city', cityName);
     window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityName);
   }
 
-  async function routeAfterCommunityAuth(uid) {
-    const userSnap = await getDoc(doc(db, 'users', uid));
-    const data = userSnap.exists ? userSnap.data() : null;
-    const complete = isUserProfileComplete(data);
-    console.log('[routeAfterCommunityAuth] uid:', uid);
-    console.log('[routeAfterCommunityAuth] Firestore users doc exists:', userSnap.exists);
-    console.log('[routeAfterCommunityAuth] user doc data:', data);
-    console.log('[routeAfterCommunityAuth] isUserProfileComplete:', complete);
-    console.log('[routeAfterCommunityAuth] route →', complete ? 'community-portal' : 'profile-setup');
-    if (complete) {
-      goToCommunityPortal();
-    } else {
-      goToProfileSetup();
-    }
+  async function routeAfterCommunityAuth() {
+    goToCommunityPortal();
   }
 
   async function redirectNewAccountAfterAuth(uid) {
-    await routeAfterCommunityAuth(uid);
+    await routeAfterCommunityAuth();
   }
 
   // Google button (popup)
@@ -470,14 +445,7 @@ nav {
     try {
       var provider = new GoogleAuthProvider();
       var result = await signInWithPopup(auth, provider);
-      var user = result.user;
-      var userSnap = await getDoc(doc(db, 'users', user.uid));
-      var city = localStorage.getItem('livvo_city') || cityName || 'Athens';
-      if (userSnap.exists && userSnap.data() && userSnap.data().username) {
-        window.location.href = 'community-portal.html?city=' + encodeURIComponent(city);
-      } else {
-        window.location.href = 'profile-setup.html?city=' + encodeURIComponent(city);
-      }
+      goToCommunityPortal();
     } catch (err) {
       alert('Google sign-in error: ' + err.message);
     }
@@ -639,7 +607,7 @@ nav {
       await redirectNewAccountAfterAuth(cred.user.uid);
     } catch (err) {
       console.error('Post-signup profile route:', err);
-      goToProfileSetup();
+      goToCommunityPortal();
     }
   });
 
@@ -664,10 +632,10 @@ nav {
       return;
     }
     try {
-      await routeAfterCommunityAuth(auth.currentUser.uid);
+      await routeAfterCommunityAuth();
     } catch (err) {
       console.error('Post-login profile route:', err);
-      goToProfileSetup();
+      goToCommunityPortal();
     }
   });
 
