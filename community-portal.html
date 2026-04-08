@@ -269,22 +269,6 @@ nav {
 }
 .sidebar-community-icon { flex-shrink: 0; color: var(--muted); }
 .sidebar-filter-btn:hover { background: rgba(26, 122, 74, 0.08); }
-.city-show-more-btn {
-  display: block;
-  width: 100%;
-  margin: 8px 0 14px;
-  padding: 6px 10px;
-  border: none;
-  background: transparent;
-  color: var(--btn-green);
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-  text-align: left;
-  border-radius: 8px;
-}
-.city-show-more-btn:hover { background: rgba(26, 122, 74, 0.08); }
 .left-sidebar-footer {
   margin-top: 18px;
   padding-top: 14px;
@@ -303,22 +287,6 @@ nav {
   margin-top: 8px;
   font-size: 0.7rem;
   color: #8aa896;
-}
-.city-list { display: flex; flex-wrap: wrap; gap: 6px; }
-.city-chip {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 5px 9px;
-  font-size: 0.72rem;
-  color: var(--muted);
-}
-.city-chip:hover {
-  border-color: var(--btn-green);
-  color: var(--btn-green);
-  background: rgba(26, 122, 74, 0.08);
 }
 .main-column { min-width: 500px; width: 100%; }
 .city-info-card, .rules-card {
@@ -916,35 +884,31 @@ nav {
 <main id="portal-content" class="page-wrap" hidden>
   <div class="portal-layout">
     <aside class="left-sidebar">
-      <h3>Navigation</h3>
-      <div class="side-links">
-        <a href="#" id="left-nav-home">Home</a>
-        <a href="#" id="left-nav-popular">Popular</a>
-        <a href="#" id="left-nav-explore">Explore</a>
+      <div style="margin-bottom: 24px;">
+        <label style="font-size: 13px; font-weight: 700; color: #1a2e1a; display: block; margin-bottom: 8px;">Browse cities</label>
+        <div style="position: relative;">
+          <select id="city-switcher" onchange="switchCityFromDropdown(this.value)"
+            style="width: 100%; font-size: 13px; font-weight: 500; color: #1a2e1a; background: white; border: 1.5px solid #d4e6d4; border-radius: 10px; padding: 9px 32px 9px 12px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%235a7a5a%22/></svg>'); background-repeat: no-repeat; background-position: right 12px center;">
+            <option value="athens">Athens</option>
+            <option value="london">London</option>
+            <option value="paris">Paris</option>
+            <option value="madrid">Madrid</option>
+            <option value="barcelona">Barcelona</option>
+            <option value="lisbon">Lisbon</option>
+            <option value="berlin">Berlin</option>
+            <option value="amsterdam">Amsterdam</option>
+            <option value="rome">Rome</option>
+            <option value="prague">Prague</option>
+            <option value="milan">Milan</option>
+            <option value="vienna">Vienna</option>
+            <option value="zurich">Zurich</option>
+            <option value="dubai">Dubai</option>
+            <option value="bangkok">Bangkok</option>
+            <option value="bali">Bali</option>
+            <option value="new-york">New York</option>
+          </select>
+        </div>
       </div>
-      <h3>Browse cities</h3>
-      <div class="city-list" id="city-list-short" aria-label="Popular cities">
-        <a href="#" class="city-chip city-switch-link" data-city="Athens">Athens</a>
-        <a href="#" class="city-chip city-switch-link" data-city="London">London</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Paris">Paris</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Madrid">Madrid</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Barcelona">Barcelona</a>
-      </div>
-      <div class="city-list" id="city-list-more" hidden aria-label="More cities">
-        <a href="#" class="city-chip city-switch-link" data-city="Lisbon">Lisbon</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Berlin">Berlin</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Amsterdam">Amsterdam</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Rome">Rome</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Prague">Prague</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Milan">Milan</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Vienna">Vienna</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Zurich">Zurich</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Dubai">Dubai</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Bangkok">Bangkok</a>
-        <a href="#" class="city-chip city-switch-link" data-city="Bali">Bali</a>
-        <a href="#" class="city-chip city-switch-link" data-city="New York">New York</a>
-      </div>
-      <button type="button" class="city-show-more-btn" id="city-show-more-toggle" aria-expanded="false">Show more ▾</button>
       <h3>Community</h3>
       <div class="side-links">
         <a href="search-athens.html" style="display:flex; align-items:center; gap:8px;"><svg class="sidebar-community-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Housing — Browse Rentals</a>
@@ -1070,35 +1034,6 @@ nav {
   </div>
 </div>
 
-<div id="modal-switch-city" class="modal" hidden aria-modal="true" role="dialog" aria-labelledby="switch-city-title">
-  <div class="modal-backdrop" data-close="modal-switch-city"></div>
-  <div class="modal-panel" style="max-width:420px;">
-    <h2 id="switch-city-title">Switch city</h2>
-    <div class="city-list" style="margin-top:12px;">
-      <a href="#" class="city-chip city-modal-link" data-city="Athens">Athens</a>
-      <a href="#" class="city-chip city-modal-link" data-city="London">London</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Paris">Paris</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Madrid">Madrid</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Barcelona">Barcelona</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Lisbon">Lisbon</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Berlin">Berlin</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Amsterdam">Amsterdam</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Rome">Rome</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Prague">Prague</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Milan">Milan</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Vienna">Vienna</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Zurich">Zurich</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Dubai">Dubai</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Bangkok">Bangkok</a>
-      <a href="#" class="city-chip city-modal-link" data-city="Bali">Bali</a>
-      <a href="#" class="city-chip city-modal-link" data-city="New York">New York</a>
-    </div>
-    <div class="modal-actions" style="justify-content:flex-end;margin-top:14px;">
-      <button type="button" class="btn-secondary" data-close="modal-switch-city">Cancel</button>
-    </div>
-  </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
 
 <script type="module">
@@ -1127,7 +1062,14 @@ nav {
     seville: 'Seville', porto: 'Porto', rome: 'Rome', florence: 'Florence', bologna: 'Bologna',
     munich: 'Munich', hamburg: 'Hamburg', zurich: 'Zurich', geneva: 'Geneva', rotterdam: 'Rotterdam',
     ghent: 'Ghent', krakow: 'Krakow', warsaw: 'Warsaw', tallinn: 'Tallinn', riga: 'Riga', tbilisi: 'Tbilisi',
-    bucharest: 'Bucharest', sofia: 'Sofia', zagreb: 'Zagreb'
+    bucharest: 'Bucharest', sofia: 'Sofia', zagreb: 'Zagreb',
+    newyork: 'New York', dubai: 'Dubai', bangkok: 'Bangkok', bali: 'Bali'
+  };
+
+  window.switchCityFromDropdown = function switchCityFromDropdown(city) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('city', city);
+    window.location.search = params.toString();
   };
 
   function titleCaseFromRaw(str) {
@@ -1218,6 +1160,15 @@ nav {
     let currentProfileData = null;
     let cityDisplay = cityDisplayName;
 
+    const citySelect = document.getElementById('city-switcher');
+    if (citySelect) {
+      const currentCity = cityDisplayName;
+      const selectVal = currentCity.toLowerCase() === 'new york' ? 'new-york' : currentCity.toLowerCase().replace(/\s+/g, '-');
+      if (Array.prototype.some.call(citySelect.options, function (o) { return o.value === selectVal; })) {
+        citySelect.value = selectVal;
+      }
+    }
+
     let feedUnsub = null;
     let pendingDelete = null;
     const authorProfileCache = new Map();
@@ -1281,64 +1232,6 @@ nav {
         subscribeFeed();
       });
     }
-
-    document.querySelectorAll('.city-switch-link').forEach(function (el) {
-      el.addEventListener('click', function (e) {
-        e.preventDefault();
-        var nextCity = String(el.getAttribute('data-city') || '').trim();
-        if (!nextCity) return;
-        window.location.href = 'community-portal.html?city=' + encodeURIComponent(nextCity);
-      });
-    });
-    document.querySelectorAll('.city-modal-link').forEach(function (el) {
-      el.addEventListener('click', function (e) {
-        e.preventDefault();
-        var nextCity = String(el.getAttribute('data-city') || '').trim();
-        if (!nextCity) return;
-        window.location.href = 'community-portal.html?city=' + encodeURIComponent(nextCity);
-      });
-    });
-
-    document.getElementById('left-nav-home').addEventListener('click', function (e) {
-      e.preventDefault();
-      activeCategory = 'all';
-      activeSort = 'recent';
-      setActiveCategoryUI('all');
-      syncSortSelect();
-      subscribeFeed();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    document.getElementById('left-nav-popular').addEventListener('click', function (e) {
-      e.preventDefault();
-      activeCategory = 'all';
-      activeSort = 'popular';
-      setActiveCategoryUI('all');
-      syncSortSelect();
-      subscribeFeed();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    document.getElementById('left-nav-explore').addEventListener('click', function (e) {
-      e.preventDefault();
-      openModal('modal-switch-city');
-    });
-
-    (function setupCityShowMore() {
-      var toggle = document.getElementById('city-show-more-toggle');
-      var more = document.getElementById('city-list-more');
-      if (!toggle || !more) return;
-      toggle.addEventListener('click', function () {
-        var open = more.hasAttribute('hidden');
-        if (open) {
-          more.removeAttribute('hidden');
-          toggle.textContent = 'Show less ▴';
-          toggle.setAttribute('aria-expanded', 'true');
-        } else {
-          more.setAttribute('hidden', '');
-          toggle.textContent = 'Show more ▾';
-          toggle.setAttribute('aria-expanded', 'false');
-        }
-      });
-    })();
 
     document.querySelectorAll('.sidebar-filter-btn[data-sidebar-category]').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -1898,7 +1791,11 @@ nav {
       });
       document.getElementById('menu-switch-city').addEventListener('click', function () {
         navProfileMenu.hidden = true;
-        openModal('modal-switch-city');
+        var cs = document.getElementById('city-switcher');
+        if (cs) {
+          cs.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          cs.focus({ preventScroll: true });
+        }
       });
       document.getElementById('menu-signout').addEventListener('click', function () {
         document.getElementById('nav-signout').click();
