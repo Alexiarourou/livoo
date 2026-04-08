@@ -269,6 +269,12 @@ textarea { min-height: 88px; resize: vertical; }
       <button type="button" class="btn-complete" id="save-profile-btn">Complete my profile</button>
       <p id="complete-error" class="field-error" role="alert" style="text-align:center;margin-top:10px;" hidden></p>
     </form>
+    <div id="delete-account-wrap" style="text-align:center;margin-top:24px;padding-top:24px;border-top:1px solid #f0f5f0;" hidden>
+      <button type="button" onclick="confirmDeleteAccount()"
+        style="border:none;background:none;font-size:13px;color:#c0c0c0;cursor:pointer;text-decoration:underline;">
+        Delete my account
+      </button>
+    </div>
     <p class="back-link"><a href="community.html">← Back to cities</a></p>
   </div>
 </div>
@@ -423,6 +429,8 @@ textarea { min-height: 88px; resize: vertical; }
     if (hint) hint.textContent = 'Click to change your photo (optional)';
     var star = document.querySelector('.photo-field-label .req-star');
     if (star) star.style.display = 'none';
+    var delWrap = document.getElementById('delete-account-wrap');
+    if (delWrap) delWrap.hidden = false;
   }
 
   var photoInput = document.getElementById('photo-input');
@@ -576,6 +584,23 @@ textarea { min-height: 88px; resize: vertical; }
   }
 
   window.saveProfile = saveProfile;
+
+  window.confirmDeleteAccount = async function confirmDeleteAccount() {
+    if (!confirm('Are you sure you want to delete your account? This cannot be undone.')) return;
+    try {
+      var user = firebase.auth().currentUser;
+      if (!user) return;
+      await firebase.firestore().collection('users').doc(user.uid).delete();
+      await user.delete();
+      window.location.href = 'index.html';
+    } catch (err) {
+      if (err && err.code === 'auth/requires-recent-login') {
+        alert('For security, please sign out and sign back in before deleting your account.');
+      } else {
+        console.error('Delete error:', err);
+      }
+    }
+  };
 
   completeBtn.addEventListener('click', function () {
     saveProfile();

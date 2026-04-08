@@ -878,7 +878,6 @@ nav {
       <div class="nav-profile-wrap">
         <button type="button" id="nav-profile-trigger" class="nav-profile-trigger" aria-label="Open profile menu"></button>
         <div id="nav-profile-menu" class="nav-profile-menu" hidden>
-          <button type="button" class="nav-profile-item" id="menu-my-profile">My Profile</button>
           <button type="button" class="nav-profile-item" id="menu-edit-profile">Edit Profile</button>
           <button type="button" class="nav-profile-item" id="menu-switch-city">Switch City</button>
           <button type="button" class="nav-profile-item" id="menu-signout">Sign out</button>
@@ -2146,9 +2145,6 @@ nav {
       });
       navProfileMenu.addEventListener('click', function (e) { e.stopPropagation(); });
       document.addEventListener('click', function () { navProfileMenu.hidden = true; });
-      document.getElementById('menu-my-profile').addEventListener('click', function () {
-        window.location.href = 'profile-setup.html?city=' + encodeURIComponent(cityForFeedQuery()) + '&edit=1';
-      });
       document.getElementById('menu-edit-profile').addEventListener('click', function () {
         window.location.href = 'profile-setup.html?city=' + encodeURIComponent(cityForFeedQuery()) + '&edit=1';
       });
