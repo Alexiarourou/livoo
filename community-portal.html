@@ -895,7 +895,7 @@ nav {
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
     getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, doc, getDoc,
-    serverTimestamp, runTransaction, increment, writeBatch, deleteDoc
+    serverTimestamp, increment, writeBatch, deleteDoc, setDoc, updateDoc, runTransaction
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   const CATEGORY_LABELS = {
     housing: 'Housing Tips',
@@ -1160,7 +1160,7 @@ nav {
       };
       try {
         const uSnap = await getDoc(doc(db, 'users', authorUid));
-        if (uSnap.exists) {
+        if (uSnap.exists()) {
           const ud = uSnap.data() || {};
           const username = String(ud.username || ud.displayName || fallbackUsername || 'Anonymous').trim();
           const photoUrl = String(ud.photoURL || '').trim();
@@ -1224,7 +1224,7 @@ nav {
         if (currentUser) {
           try {
             const voteState = await getDoc(doc(db, 'communityPosts', snap.id, 'upvotes', currentUser.uid));
-            hasUpvoted = voteState.exists;
+            hasUpvoted = voteState.exists();
           } catch (e) {
             hasUpvoted = false;
           }
@@ -1311,7 +1311,7 @@ nav {
         upBtn.addEventListener('click', function (e) {
           e.preventDefault();
           e.stopPropagation();
-          toggleUpvote(snap.id, upBtn);
+          toggleLike(snap.id, upBtn);
         });
 
         const commentPill = document.createElement('button');
@@ -1503,7 +1503,7 @@ nav {
                 await deleteDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
                 await runTransaction(db, async function (transaction) {
                   const postSnap = await transaction.get(doc(db, 'communityPosts', postId));
-                  if (!postSnap.exists) return;
+                  if (!postSnap.exists()) return;
                   const cur = Number((postSnap.data() || {}).commentCount || 0);
                   transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
                 });
@@ -1520,15 +1520,6 @@ nav {
           replyBtn.type = 'button';
           replyBtn.className = 'comment-reply-btn';
           replyBtn.textContent = 'Reply';
-          replyBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            replyingToCommentId = cd.id;
-            replyingToUsername = username;
-            replyInfo.textContent = 'Replying to ' + replyingToUsername;
-            replyInfo.hidden = false;
-            cancelReplyBtn.hidden = false;
-            textarea.focus();
-          });
           right.appendChild(meta);
           right.appendChild(textEl);
           right.appendChild(replyBtn);
@@ -1537,6 +1528,28 @@ nav {
           repliesWrap.className = 'nested-reply';
           repliesWrap.style.marginTop = '8px';
           right.appendChild(repliesWrap);
+          const inlineReplyWrap = document.createElement('div');
+          inlineReplyWrap.className = 'nested-reply';
+          inlineReplyWrap.style.marginTop = '8px';
+          inlineReplyWrap.hidden = true;
+          const inlineReplyInput = document.createElement('textarea');
+          inlineReplyInput.placeholder = 'Write a reply...';
+          inlineReplyInput.style.cssText = 'width:100%;min-height:80px;padding:12px;border:1px solid #c5e0d0;border-radius:8px;resize:vertical;';
+          const inlineReplyActions = document.createElement('div');
+          inlineReplyActions.className = 'comment-composer-actions';
+          const inlineReplyCancel = document.createElement('button');
+          inlineReplyCancel.type = 'button';
+          inlineReplyCancel.className = 'btn-secondary';
+          inlineReplyCancel.textContent = 'Cancel';
+          const inlineReplySubmit = document.createElement('button');
+          inlineReplySubmit.type = 'button';
+          inlineReplySubmit.className = 'btn-primary';
+          inlineReplySubmit.textContent = 'Reply';
+          inlineReplyActions.appendChild(inlineReplyCancel);
+          inlineReplyActions.appendChild(inlineReplySubmit);
+          inlineReplyWrap.appendChild(inlineReplyInput);
+          inlineReplyWrap.appendChild(inlineReplyActions);
+          right.appendChild(inlineReplyWrap);
           const replyQ = query(collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies'), orderBy('createdAt', 'asc'));
           const unsubReplies = onSnapshot(replyQ, function (rsnap) {
             repliesWrap.innerHTML = '';
@@ -1577,7 +1590,7 @@ nav {
                     await deleteDoc(doc(db, 'communityPosts', postId, 'comments', cd.id, 'replies', rd.id));
                     await runTransaction(db, async function (transaction) {
                       const postSnap = await transaction.get(doc(db, 'communityPosts', postId));
-                      if (!postSnap.exists) return;
+                      if (!postSnap.exists()) return;
                       const cur = Number((postSnap.data() || {}).commentCount || 0);
                       transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
                     });
@@ -1601,6 +1614,45 @@ nav {
             console.error('Replies load failed:', err);
           });
           threadRepliesUnsubs.push(unsubReplies);
+          replyBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            inlineReplyWrap.hidden = false;
+            inlineReplyInput.focus();
+          });
+          inlineReplyCancel.addEventListener('click', function (e) {
+            e.stopPropagation();
+            inlineReplyInput.value = '';
+            inlineReplyWrap.hidden = true;
+          });
+          inlineReplySubmit.addEventListener('click', async function (e) {
+            e.stopPropagation();
+            if (!currentUser) return;
+            const replyText = (inlineReplyInput.value || '').trim();
+            if (!replyText) return;
+            const authorUsername = (currentProfileData && String(currentProfileData.username || '').trim())
+              || currentUser.displayName
+              || (currentUser.email ? currentUser.email.split('@')[0] : '')
+              || 'Member';
+            const authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim())
+              || currentUser.photoURL
+              || '';
+            try {
+              await setDoc(doc(collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies')), {
+                text: replyText,
+                authorUid: currentUser.uid,
+                authorUsername: authorUsername,
+                authorPhoto: authorPhoto,
+                createdAt: serverTimestamp()
+              });
+              await updateDoc(doc(db, 'communityPosts', postId), { commentCount: increment(1) });
+              const oldCount = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
+              commentPillEl.textContent = '💬 ' + String(oldCount + 1);
+              inlineReplyInput.value = '';
+              inlineReplyWrap.hidden = true;
+            } catch (err) {
+              console.error('Inline reply submit failed:', err);
+            }
+          });
           item.appendChild(av);
           item.appendChild(right);
           listEl.appendChild(item);
@@ -1659,38 +1711,28 @@ nav {
       });
     }
 
-    async function toggleUpvote(postId, btnEl) {
-      if (!currentUser) return;
-      const postRef = doc(db, 'communityPosts', postId);
-      const voteRef = doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid);
-      try {
-        await runTransaction(db, async function (transaction) {
-          const postSnap = await transaction.get(postRef);
-          const voteSnap = await transaction.get(voteRef);
-          if (!postSnap.exists) throw new Error('missing post');
-          if (!voteSnap.exists) {
-            transaction.set(voteRef, { createdAt: serverTimestamp() });
-            transaction.update(postRef, { upvoteCount: increment(1) });
-          } else {
-            transaction.delete(voteRef);
-            const currentCount = Number((postSnap.data() || {}).upvoteCount || 0);
-            transaction.update(postRef, { upvoteCount: Math.max(0, currentCount - 1) });
-          }
-        });
-        const voteSnap = await getDoc(voteRef);
-        const on = voteSnap.exists;
-        const postSnap = await getDoc(postRef);
-        const c = postSnap.exists ? (postSnap.data().upvoteCount || 0) : 0;
-        if (btnEl) {
-          btnEl.classList.toggle('is-on', on);
-          const icon = btnEl.querySelector('.like-icon');
-          const cnt = btnEl.querySelector('.up-count');
-          if (icon) icon.textContent = on ? '❤' : '♡';
-          if (cnt) cnt.textContent = String(c);
-        }
-      } catch (err) {
-        console.error(err);
+    async function toggleLike(postId, btn) {
+      const user = (window.firebase && window.firebase.auth && window.firebase.auth().currentUser) || auth.currentUser;
+      if (!user) return;
+      const likeRef = doc(db, 'communityPosts', postId, 'upvotes', user.uid);
+      const likeSnap = await getDoc(likeRef);
+      if (likeSnap.exists()) {
+        await deleteDoc(likeRef);
+        await updateDoc(doc(db, 'communityPosts', postId), { upvoteCount: increment(-1) });
+        btn.classList.remove('liked');
+        btn.classList.remove('is-on');
+      } else {
+        await setDoc(likeRef, { uid: user.uid });
+        await updateDoc(doc(db, 'communityPosts', postId), { upvoteCount: increment(1) });
+        btn.classList.add('liked');
+        btn.classList.add('is-on');
       }
+      const postSnap = await getDoc(doc(db, 'communityPosts', postId));
+      const safeCount = postSnap.exists() ? Math.max(0, Number(postSnap.data().upvoteCount || 0)) : 0;
+      const countEl = btn.querySelector('.up-count');
+      if (countEl) countEl.textContent = String(safeCount);
+      const icon = btn.querySelector('.like-icon');
+      if (icon) icon.textContent = btn.classList.contains('liked') ? '❤' : '♡';
     }
 
     document.getElementById('btn-new-post').addEventListener('click', function () {
@@ -1825,7 +1867,7 @@ nav {
         }
 
         const profileDoc = await getDoc(doc(db, 'users', user.uid));
-        const pdata = profileDoc.exists ? profileDoc.data() : null;
+        const pdata = profileDoc.exists() ? profileDoc.data() : null;
         showPortal(user, pdata);
       } catch (error) {
         console.error('Portal error:', error);
@@ -1846,7 +1888,7 @@ nav {
       if (!u) return;
       try {
         const profileDoc = await getDoc(doc(db, 'users', u.uid));
-        const pdata = profileDoc.exists ? profileDoc.data() : null;
+        const pdata = profileDoc.exists() ? profileDoc.data() : null;
         showPortal(u, pdata);
       } catch (e) {
         showPortal(u, null);
