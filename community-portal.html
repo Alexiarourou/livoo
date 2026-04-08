@@ -1189,7 +1189,92 @@ nav {
     let lastVisiblePost = null;
     let isLoadingPosts = false;
     let allPostsLoaded = false;
+    /** When true, pagination uses clientFeedPool (no composite index required). */
+    let clientFeedActive = false;
+    let clientFeedPool = [];
+    let clientFeedOffset = 0;
+    const CLIENT_FEED_FETCH_CAP = 200;
     const POSTS_PER_PAGE = 15;
+
+    function docCreatedMillis(snap) {
+      const ts = (snap.data() && snap.data().createdAt);
+      if (ts && typeof ts.toMillis === 'function') return ts.toMillis();
+      if (ts && typeof ts.toDate === 'function') return ts.toDate().getTime();
+      return 0;
+    }
+
+    function sortDocsClient(docs) {
+      var arr = docs.slice();
+      arr.sort(function (a, b) {
+        var da = a.data() || {};
+        var db = b.data() || {};
+        if (activeSort === 'popular') {
+          var va = Number(da.upvoteCount || 0);
+          var vb = Number(db.upvoteCount || 0);
+          if (vb !== va) return vb - va;
+        }
+        var ta = docCreatedMillis(a);
+        var tb = docCreatedMillis(b);
+        if (activeSort === 'oldest') {
+          if (ta !== tb) return ta - tb;
+        } else {
+          if (tb !== ta) return tb - ta;
+        }
+        return String(a.id).localeCompare(String(b.id));
+      });
+      return arr;
+    }
+
+    async function loadPostsWithClientSort(reset) {
+      const feedCity = cityForFeedQuery();
+      clientFeedActive = true;
+      if (reset) {
+        showPostSkeleton();
+      }
+      try {
+        if (reset) {
+          clientFeedOffset = 0;
+          clientFeedPool = [];
+          const snapshot = await getDocs(query(
+            collection(db, 'communityPosts'),
+            where('city', '==', feedCity),
+            limit(CLIENT_FEED_FETCH_CAP)
+          ));
+          var docs = snapshot.docs;
+          if (activeCategory && activeCategory !== 'all') {
+            docs = docs.filter(function (s) {
+              return String((s.data() || {}).category || '') === activeCategory;
+            });
+          }
+          clientFeedPool = sortDocsClient(docs);
+        }
+
+        if (!clientFeedPool.length) {
+          if (reset) {
+            hidePaginationFooter();
+            renderFeedEmptyState();
+          } else {
+            allPostsLoaded = true;
+            hideLoadMoreButton();
+          }
+          return;
+        }
+
+        var slice = clientFeedPool.slice(clientFeedOffset, clientFeedOffset + POSTS_PER_PAGE);
+        clientFeedOffset += slice.length;
+
+        if (slice.length < POSTS_PER_PAGE || clientFeedOffset >= clientFeedPool.length) {
+          allPostsLoaded = true;
+          hideLoadMoreButton();
+        } else {
+          showLoadMoreButton();
+        }
+
+        await appendPostCardsFromQueryDocs(slice);
+      } finally {
+        hidePostSkeleton();
+      }
+    }
 
     function syncSortSelect() {
       var sel = document.getElementById('sort-select');
@@ -1503,10 +1588,25 @@ nav {
       if (isLoadingPosts) return;
       if (allPostsLoaded && !reset) return;
 
+      if (!reset && clientFeedActive) {
+        isLoadingPosts = true;
+        showPostSkeleton();
+        try {
+          await loadPostsWithClientSort(false);
+        } catch (e) {
+          console.error(e);
+        }
+        isLoadingPosts = false;
+        return;
+      }
+
       isLoadingPosts = true;
       if (reset) {
         lastVisiblePost = null;
         allPostsLoaded = false;
+        clientFeedActive = false;
+        clientFeedPool = [];
+        clientFeedOffset = 0;
         feedEl.innerHTML = '';
         hidePaginationFooter();
       }
@@ -1536,6 +1636,7 @@ nav {
         // Collection ID must be communityPosts (not "posts"). Modular SDK: collection(db, 'communityPosts'); compat would be db.collection('communityPosts').
         const q = query(collection(db, 'communityPosts'), ...constraints);
         const snapshot = await getDocs(q);
+        clientFeedActive = false;
 
         hidePostSkeleton();
 
@@ -1563,16 +1664,33 @@ nav {
       } catch (err) {
         hidePostSkeleton();
         console.error('Error loading posts:', err);
-        var hint = 'Could not load posts. Please try again in a moment.';
-        if (err && err.code === 'permission-denied') {
-          hint = 'You do not have permission to read posts.';
-        } else if (err && (err.code === 'failed-precondition' || (String(err.message || '').toLowerCase().indexOf('index') >= 0))) {
-          hint = 'Feed query needs a Firestore composite index (city + sort field). Open the browser console — Firebase prints a link to create it — or run: firebase deploy --only firestore:indexes';
+        var isIndexErr = err && (err.code === 'failed-precondition'
+          || (String(err.message || '').toLowerCase().indexOf('index') >= 0));
+        if (isIndexErr) {
+          console.warn('Firestore index missing or building; using client-side feed (first ' + CLIENT_FEED_FETCH_CAP + ' in city). Deploy indexes for scalable sorting.');
+          try {
+            await loadPostsWithClientSort(reset);
+          } catch (err2) {
+            console.error('Client-side feed fallback failed:', err2);
+            var hint2 = 'Could not load posts. Please try again in a moment.';
+            if (err2 && err2.code === 'permission-denied') {
+              hint2 = 'You do not have permission to read posts.';
+            }
+            if (reset || !feedEl.querySelector('.post-card')) {
+              feedEl.innerHTML = '<p class="feed-empty">' + hint2 + '</p>';
+            }
+            hidePaginationFooter();
+          }
+        } else {
+          var hint = 'Could not load posts. Please try again in a moment.';
+          if (err && err.code === 'permission-denied') {
+            hint = 'You do not have permission to read posts.';
+          }
+          if (reset || !feedEl.querySelector('.post-card')) {
+            feedEl.innerHTML = '<p class="feed-empty">' + hint + '</p>';
+          }
+          hidePaginationFooter();
         }
-        if (reset || !feedEl.querySelector('.post-card')) {
-          feedEl.innerHTML = '<p class="feed-empty">' + hint + '</p>';
-        }
-        hidePaginationFooter();
       }
 
       isLoadingPosts = false;
