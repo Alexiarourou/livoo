@@ -339,6 +339,17 @@ textarea { min-height: 88px; resize: vertical; }
   }
   var cityDisplay = window.__livvoCityDisplay;
   var isEditMode = new URLSearchParams(location.search).get('edit') === '1';
+  var loadedProfession = '';
+
+  function updateBioCountFromDom() {
+    var b = document.getElementById('profile-bio');
+    var bioCountNum = document.getElementById('bio-count-num');
+    var bioCountRow = document.getElementById('bio-count');
+    if (!b || !bioCountNum || !bioCountRow) return;
+    var n = (b.value || '').length;
+    bioCountNum.textContent = String(n);
+    bioCountRow.classList.toggle('at-limit', n >= 150);
+  }
 
   var firebaseConfig = {
     apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
@@ -367,14 +378,29 @@ textarea { min-height: 88px; resize: vertical; }
           uname = String(user.displayName || '').trim();
         }
         document.getElementById('profile-name').value = uname;
-        document.getElementById('profession').value = String(d.profession || d.role || '');
+        loadedProfession = String(d.profession || d.role || '').trim();
+        var profEl = document.getElementById('profession');
+        profEl.value = loadedProfession;
+        if (loadedProfession && profEl.value !== loadedProfession) {
+          for (var oi = 0; oi < profEl.options.length; oi++) {
+            var opt = profEl.options[oi];
+            if (opt.value === loadedProfession || opt.textContent.trim() === loadedProfession) {
+              profEl.value = opt.value;
+              break;
+            }
+          }
+        }
         document.getElementById('profile-bio').value = String(d.aboutMe || d.bio || '').trim();
         if (d.photoURL) {
-          photoPreview.src = d.photoURL;
-          photoPreview.hidden = false;
-          photoLabel.classList.add('has-image');
+          var prevEl = document.getElementById('photo-preview');
+          var lblEl = document.getElementById('photo-label');
+          if (prevEl && lblEl) {
+            prevEl.src = d.photoURL;
+            prevEl.hidden = false;
+            lblEl.classList.add('has-image');
+          }
         }
-        updateBioCount();
+        updateBioCountFromDom();
         var name = String(d.username || d.displayName || '').trim();
         var cityVal = String(d.city || '').trim();
         var prof = String(d.profession || d.role || '').trim();
@@ -393,6 +419,10 @@ textarea { min-height: 88px; resize: vertical; }
     if (ph) ph.textContent = 'Edit your profile';
     var sv = document.getElementById('save-profile-btn');
     if (sv) sv.textContent = 'Save changes';
+    var hint = document.querySelector('.photo-hint');
+    if (hint) hint.textContent = 'Click to change your photo (optional)';
+    var star = document.querySelector('.photo-field-label .req-star');
+    if (star) star.style.display = 'none';
   }
 
   var photoInput = document.getElementById('photo-input');
@@ -400,8 +430,6 @@ textarea { min-height: 88px; resize: vertical; }
   var photoLabel = document.getElementById('photo-label');
   var photoErrorEl = document.getElementById('photo-error');
   var bio = document.getElementById('profile-bio');
-  var bioCountNum = document.getElementById('bio-count-num');
-  var bioCountRow = document.getElementById('bio-count');
 
   photoInput.addEventListener('change', function () {
     var f = photoInput.files && photoInput.files[0];
@@ -414,13 +442,10 @@ textarea { min-height: 88px; resize: vertical; }
     photoErrorEl.hidden = true;
   });
 
-  function updateBioCount() {
-    var n = (bio.value || '').length;
-    bioCountNum.textContent = String(n);
-    bioCountRow.classList.toggle('at-limit', n >= 150);
-  }
-  bio.addEventListener('input', updateBioCount);
-  updateBioCount();
+  bio.addEventListener('input', function () {
+    updateBioCountFromDom();
+  });
+  updateBioCountFromDom();
 
   var completeBtn = document.getElementById('save-profile-btn');
   var completeErrorEl = document.getElementById('complete-error');
@@ -442,6 +467,8 @@ textarea { min-height: 88px; resize: vertical; }
     usernameErrorEl.hidden = true;
     roleErrorEl.textContent = '';
     roleErrorEl.hidden = true;
+    photoErrorEl.textContent = '';
+    photoErrorEl.hidden = true;
   }
 
   if (!completeBtn) {
@@ -466,6 +493,9 @@ textarea { min-height: 88px; resize: vertical; }
 
     var displayName = usernameInputEl.value.trim();
     var profession = professionSelectEl.value;
+    if (isEditMode && !profession && loadedProfession) {
+      profession = loadedProfession;
+    }
     var bioVal = (bio.value || '').trim();
 
     if (!displayName) {
@@ -478,6 +508,13 @@ textarea { min-height: 88px; resize: vertical; }
       showFieldErr(roleErrorEl, 'Please select what describes you');
       return;
     }
+    var hasPhotoFile = !!(photoInput.files && photoInput.files[0]);
+    var hasExistingPhoto = photoPreview && !photoPreview.hidden && photoPreview.src && !String(photoPreview.src).startsWith('blob:');
+    if (!isEditMode && !hasPhotoFile && !hasExistingPhoto) {
+      showFieldErr(photoErrorEl, 'Please add a profile photo');
+      return;
+    }
+    photoErrorEl.hidden = true;
 
     var user = firebase.auth().currentUser;
     if (!user) {
@@ -492,16 +529,19 @@ textarea { min-height: 88px; resize: vertical; }
     var prevBg = completeBtn.style.background;
 
     try {
-      await user.updateProfile({ displayName: displayName });
       var photoURL = '';
       if (photoInput.files && photoInput.files[0]) {
         var file = photoInput.files[0];
-        var path = 'profilePhotos/' + user.uid + '/' + Date.now() + '_' + file.name.replace(/\s+/g, '_');
+        // Must match storage.rules path: profile-photos/{userId}/...
+        var path = 'profile-photos/' + user.uid + '/' + Date.now() + '_' + file.name.replace(/\s+/g, '_');
         var snapUpload = await firebase.storage().ref(path).put(file);
         photoURL = await snapUpload.ref.getDownloadURL();
       } else if (photoPreview && !photoPreview.hidden && photoPreview.src && !String(photoPreview.src).startsWith('blob:')) {
         photoURL = photoPreview.src;
       }
+      var authUpdate = { displayName: displayName };
+      if (photoURL) authUpdate.photoURL = photoURL;
+      await user.updateProfile(authUpdate);
       var payload = {
         username: displayName,
         profession: profession || '',
@@ -529,7 +569,13 @@ textarea { min-height: 88px; resize: vertical; }
       }
     } catch (err) {
       console.error('Profile save error:', err);
-      completeErrorEl.textContent = 'Something went wrong. Please try again.';
+      var msg = 'Something went wrong. Please try again.';
+      if (err && err.code === 'storage/unauthorized') {
+        msg = 'Photo upload was blocked. Please try a smaller image or sign in again.';
+      } else if (err && err.code === 'storage/quota-exceeded') {
+        msg = 'Storage limit reached. Try a smaller photo.';
+      }
+      completeErrorEl.textContent = msg;
       completeErrorEl.hidden = false;
       completeBtn.textContent = 'Error — try again';
       completeBtn.disabled = false;
