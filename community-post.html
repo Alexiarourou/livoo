@@ -608,6 +608,72 @@
       showToast('Comment reported — thank you');
     };
 
+    window.editComment = function (commentId) {
+      var menu = document.getElementById('comment-menu-' + commentId);
+      if (menu) menu.style.display = 'none';
+      var commentEl = document.getElementById('comment-' + commentId);
+      var textEl = commentEl && commentEl.querySelector('.comment-text');
+      if (!textEl) return;
+      var plain = textEl.textContent;
+      textEl.innerHTML = '';
+      var ta = document.createElement('textarea');
+      ta.id = 'edit-comment-' + commentId;
+      ta.value = plain;
+      ta.style.cssText = 'width:100%;border:1.5px solid #2d6a2d;border-radius:8px;padding:8px;font-size:14px;color:#1a2e1a;outline:none;font-family:inherit;resize:none;min-height:60px;box-sizing:border-box;';
+      ta.addEventListener('input', function () {
+        ta.style.height = 'auto';
+        ta.style.height = ta.scrollHeight + 'px';
+      });
+      var actions = document.createElement('div');
+      actions.style.cssText = 'display:flex;justify-content:flex-end;gap:6px;margin-top:6px;';
+      var cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.style.cssText = 'border:1px solid #e8f0e8;background:white;border-radius:20px;padding:5px 12px;font-size:12px;color:#5a7a5a;cursor:pointer;';
+      cancelBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        window.cancelEditComment(commentId, plain);
+      });
+      var saveBtn = document.createElement('button');
+      saveBtn.type = 'button';
+      saveBtn.textContent = 'Save';
+      saveBtn.style.cssText = 'border:none;background:#2d6a2d;color:white;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;';
+      saveBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        window.saveEditComment(commentId);
+      });
+      actions.appendChild(cancelBtn);
+      actions.appendChild(saveBtn);
+      textEl.appendChild(ta);
+      textEl.appendChild(actions);
+    };
+
+    window.cancelEditComment = function (commentId, plainText) {
+      var row = document.getElementById('comment-' + commentId);
+      var textEl = row && row.querySelector('.comment-text');
+      if (!textEl) return;
+      textEl.innerHTML = linkify(plainText);
+    };
+
+    window.saveEditComment = async function (commentId) {
+      var ta = document.getElementById('edit-comment-' + commentId);
+      var newText = ta && ta.value.trim();
+      if (!newText) return;
+      try {
+        await updateDoc(doc(db, 'communityPosts', postId, 'comments', commentId), {
+          text: newText,
+          editedAt: serverTimestamp()
+        });
+        var row = document.getElementById('comment-' + commentId);
+        var textEl = row && row.querySelector('.comment-text');
+        if (textEl) textEl.innerHTML = linkify(newText);
+        showToast('Comment updated');
+      } catch (err) {
+        console.error(err);
+        showToast('Could not update comment');
+      }
+    };
+
     /** Optimistic UI + Firestore only — full list re-render is skipped when snapshot is like-only (see onSnapshot). */
     window.likeComment = async function (commentId) {
       if (!currentUser) return;
@@ -761,6 +827,7 @@
         meta.appendChild(nameSpan);
         meta.appendChild(timeSpan);
         const textEl = document.createElement('p');
+        textEl.className = 'comment-text';
         textEl.style.cssText = 'font-size:14px;color:#2d4a2d;line-height:1.6;margin:0 0 8px 0;word-break:break-word;';
         textEl.innerHTML = linkify(c.text || '');
 
@@ -791,7 +858,7 @@
         const moreMenu = document.createElement('div');
         moreMenu.id = 'comment-menu-' + cd.id;
         moreMenu.className = 'comment-more-menu';
-        moreMenu.style.cssText = 'display:none;position:absolute;right:0;top:28px;background:#fff;border:1px solid #e8f0e8;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1);z-index:100;min-width:140px;overflow:hidden;';
+        moreMenu.style.cssText = 'display:none;position:absolute;right:0;top:28px;background:#fff;border:1px solid #e8f0e8;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:100;min-width:160px;overflow:hidden;padding:4px;';
         moreMenu.addEventListener('click', function (e) { e.stopPropagation(); });
         const moreBtn = document.createElement('button');
         moreBtn.type = 'button';
@@ -804,9 +871,21 @@
           window.toggleCommentMenu(e, cd.id);
         });
         if (currentUser && c.authorUid && c.authorUid === currentUser.uid) {
+          const editBtn = document.createElement('button');
+          editBtn.type = 'button';
+          editBtn.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#1a2e1a;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
+          editBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>Edit</span>';
+          editBtn.addEventListener('mouseenter', function () { editBtn.style.background = '#f5f5f5'; });
+          editBtn.addEventListener('mouseleave', function () { editBtn.style.background = 'none'; });
+          editBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            moreMenu.style.display = 'none';
+            window.editComment(cd.id);
+          });
+          moreMenu.appendChild(editBtn);
           const delBtn = document.createElement('button');
           delBtn.type = 'button';
-          delBtn.style.cssText = 'width:100%;border:none;background:none;padding:10px 16px;text-align:left;font-size:13px;color:#e53e3e;cursor:pointer;display:flex;align-items:center;gap:8px;font:inherit;';
+          delBtn.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#e53e3e;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
           delBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><span>Delete</span>';
           delBtn.addEventListener('mouseenter', function () { delBtn.style.background = '#fff5f5'; });
           delBtn.addEventListener('mouseleave', function () { delBtn.style.background = 'none'; });
@@ -816,10 +895,13 @@
             window.deleteComment(cd.id);
           });
           moreMenu.appendChild(delBtn);
+          const commentMenuDivider = document.createElement('div');
+          commentMenuDivider.style.cssText = 'height:1px;background:#f0f5f0;margin:4px 0;';
+          moreMenu.appendChild(commentMenuDivider);
         }
         const reportBtn = document.createElement('button');
         reportBtn.type = 'button';
-        reportBtn.style.cssText = 'width:100%;border:none;background:none;padding:10px 16px;text-align:left;font-size:13px;color:#5a7a5a;cursor:pointer;display:flex;align-items:center;gap:8px;font:inherit;';
+        reportBtn.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#5a7a5a;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
         reportBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg><span>Report</span>';
         reportBtn.addEventListener('mouseenter', function () { reportBtn.style.background = '#f8f8f8'; });
         reportBtn.addEventListener('mouseleave', function () { reportBtn.style.background = 'none'; });

@@ -1072,7 +1072,7 @@ nav {
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
     getFirestore, collection, query, where, addDoc, doc, getDoc, getDocs,
-    limit, increment, deleteDoc, setDoc, updateDoc
+    limit, increment, deleteDoc, setDoc, updateDoc, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   const CATEGORY_LABELS = {
     housing: 'Housing Tips',
@@ -1429,6 +1429,97 @@ nav {
       showPortalToast('Post reported — thank you');
     };
 
+    window.editPost = function (postId) {
+      var menu = document.getElementById('post-menu-' + postId);
+      if (menu) menu.style.display = 'none';
+      var card = document.getElementById('post-card-' + postId);
+      if (!card) return;
+      var titleEl = card.querySelector('.post-title');
+      var bodyEl = card.querySelector('.post-body');
+      if (!titleEl || !bodyEl) return;
+      var currentTitle = titleEl.textContent;
+      var currentBody = bodyEl.textContent;
+      card.__editBackup = { title: currentTitle, body: currentBody };
+
+      titleEl.textContent = '';
+      var inp = document.createElement('input');
+      inp.id = 'edit-title-' + postId;
+      inp.value = currentTitle;
+      inp.style.cssText = 'width:100%;border:1.5px solid #2d6a2d;border-radius:8px;padding:8px 12px;font-size:15px;font-weight:700;color:#1a2e1a;outline:none;font-family:inherit;box-sizing:border-box;';
+      inp.addEventListener('click', function (e) { e.stopPropagation(); });
+      titleEl.appendChild(inp);
+
+      bodyEl.textContent = '';
+      var ta = document.createElement('textarea');
+      ta.id = 'edit-body-' + postId;
+      ta.value = currentBody;
+      ta.style.cssText = 'width:100%;border:1.5px solid #e8f0e8;border-radius:8px;padding:8px 12px;font-size:14px;color:#3d5a3d;outline:none;font-family:inherit;resize:none;min-height:80px;line-height:1.6;box-sizing:border-box;';
+      ta.addEventListener('click', function (e) { e.stopPropagation(); });
+      ta.addEventListener('input', function () {
+        ta.style.height = 'auto';
+        ta.style.height = ta.scrollHeight + 'px';
+      });
+      var actions = document.createElement('div');
+      actions.style.cssText = 'display:flex;justify-content:flex-end;gap:8px;margin-top:8px;';
+      var cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.style.cssText = 'border:1px solid #e8f0e8;background:white;border-radius:20px;padding:6px 14px;font-size:12px;color:#5a7a5a;cursor:pointer;';
+      cancelBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        window.cancelEditPost(postId);
+      });
+      var saveBtn = document.createElement('button');
+      saveBtn.type = 'button';
+      saveBtn.textContent = 'Save';
+      saveBtn.style.cssText = 'border:none;background:#2d6a2d;color:white;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;';
+      saveBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        window.saveEditPost(postId);
+      });
+      actions.appendChild(cancelBtn);
+      actions.appendChild(saveBtn);
+      bodyEl.appendChild(ta);
+      bodyEl.appendChild(actions);
+    };
+
+    window.cancelEditPost = function (postId) {
+      var card = document.getElementById('post-card-' + postId);
+      if (!card || !card.__editBackup) return;
+      var titleEl = card.querySelector('.post-title');
+      var bodyEl = card.querySelector('.post-body');
+      if (!titleEl || !bodyEl) return;
+      titleEl.textContent = card.__editBackup.title;
+      bodyEl.textContent = card.__editBackup.body;
+      delete card.__editBackup;
+    };
+
+    window.saveEditPost = async function (postId) {
+      var titleInp = document.getElementById('edit-title-' + postId);
+      var bodyTa = document.getElementById('edit-body-' + postId);
+      var newTitle = titleInp && titleInp.value.trim();
+      var newBody = bodyTa ? bodyTa.value.trim() : '';
+      if (!newTitle) return;
+      try {
+        await updateDoc(doc(db, 'communityPosts', postId), {
+          title: newTitle,
+          body: newBody,
+          editedAt: serverTimestamp()
+        });
+        var card = document.getElementById('post-card-' + postId);
+        if (!card) return;
+        var titleEl = card.querySelector('.post-title');
+        var bodyEl = card.querySelector('.post-body');
+        if (titleEl) titleEl.textContent = newTitle;
+        if (bodyEl) bodyEl.textContent = newBody;
+        delete card.__editBackup;
+        showToast('Post updated');
+      } catch (err) {
+        console.error('Edit error:', err);
+        showToast('Could not update post');
+      }
+    };
+
     window.sharePost = async function (postId) {
       var base = (location.origin || '').replace(/\/$/, '');
       var u = base + '/community-post.html?postId=' + encodeURIComponent(postId) + '&city=' + encodeURIComponent(cityForFeedQuery());
@@ -1763,6 +1854,7 @@ nav {
         });
         card.addEventListener('click', function (ev) {
           if (ev.target.closest('button') || ev.target.closest('[id^="post-menu-"]') || ev.target.closest('.post-card-more-trigger')) return;
+          if (card.querySelector('input[id^="edit-title-"]')) return;
           window.location.href = threadPageUrl(postId);
         });
 
@@ -1810,9 +1902,11 @@ nav {
         topRow.appendChild(catPill);
 
         const titleEl = document.createElement('h3');
+        titleEl.className = 'post-title';
         titleEl.style.cssText = 'font-size:15px;font-weight:700;color:#1a2e1a;margin:0 0 4px 0;line-height:1.3;';
         titleEl.textContent = d.title || 'Untitled';
         titleEl.addEventListener('click', function (e) {
+          if (e.target.closest && e.target.closest('input')) return;
           e.stopPropagation();
           window.location.href = threadPageUrl(postId);
         });
@@ -1821,9 +1915,11 @@ nav {
           ? String(d.body)
           : stripHtml(d.bodyHtml || '');
         const preview = document.createElement('p');
+        preview.className = 'post-body';
         preview.style.cssText = 'font-size:13px;color:#5a7a5a;margin:0 0 10px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;';
         preview.textContent = bodyText || '';
         preview.addEventListener('click', function (e) {
+          if (e.target.closest && (e.target.closest('textarea') || e.target.closest('button'))) return;
           e.stopPropagation();
           window.location.href = threadPageUrl(postId);
         });
@@ -1880,12 +1976,24 @@ nav {
         const menuPop = document.createElement('div');
         menuPop.id = 'post-menu-' + postId;
         menuPop.className = 'post-card-more-menu';
-        menuPop.style.cssText = 'display:none;position:absolute;right:0;top:28px;background:#fff;border:1px solid #e8f0e8;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1);z-index:100;min-width:140px;overflow:hidden;padding:0;';
+        menuPop.style.cssText = 'display:none;position:absolute;right:0;top:28px;background:#fff;border:1px solid #e8f0e8;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:100;min-width:160px;overflow:hidden;padding:4px;';
         menuPop.addEventListener('click', function (e) { e.stopPropagation(); });
         if (canDelete) {
+          const editBtn = document.createElement('button');
+          editBtn.type = 'button';
+          editBtn.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#1a2e1a;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
+          editBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>Edit post</span>';
+          editBtn.addEventListener('mouseenter', function () { editBtn.style.background = '#f5f5f5'; });
+          editBtn.addEventListener('mouseleave', function () { editBtn.style.background = 'none'; });
+          editBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            menuPop.style.display = 'none';
+            window.editPost(postId);
+          });
+          menuPop.appendChild(editBtn);
           const delBtn = document.createElement('button');
           delBtn.type = 'button';
-          delBtn.style.cssText = 'width:100%;border:none;background:none;padding:10px 16px;text-align:left;font-size:13px;color:#e53e3e;cursor:pointer;display:flex;align-items:center;gap:8px;font:inherit;';
+          delBtn.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#e53e3e;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
           delBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><span>Delete post</span>';
           delBtn.addEventListener('mouseenter', function () { delBtn.style.background = '#fff5f5'; });
           delBtn.addEventListener('mouseleave', function () { delBtn.style.background = 'none'; });
@@ -1895,10 +2003,13 @@ nav {
             window.deletePost(postId);
           });
           menuPop.appendChild(delBtn);
+          const menuDivider = document.createElement('div');
+          menuDivider.style.cssText = 'height:1px;background:#f0f5f0;margin:4px 0;';
+          menuPop.appendChild(menuDivider);
         }
         const reportBtn = document.createElement('button');
         reportBtn.type = 'button';
-        reportBtn.style.cssText = 'width:100%;border:none;background:none;padding:10px 16px;text-align:left;font-size:13px;color:#5a7a5a;cursor:pointer;display:flex;align-items:center;gap:8px;font:inherit;';
+        reportBtn.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#5a7a5a;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
         reportBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg><span>Report</span>';
         reportBtn.addEventListener('mouseenter', function () { reportBtn.style.background = '#f8f8f8'; });
         reportBtn.addEventListener('mouseleave', function () { reportBtn.style.background = 'none'; });
