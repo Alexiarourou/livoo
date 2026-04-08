@@ -1131,6 +1131,9 @@ nav {
         const titleWrap = document.createElement('div');
         const titleEl = document.createElement('strong');
         titleEl.textContent = d.title || 'Untitled';
+        titleEl.style.cursor = 'pointer';
+        titleEl.tabIndex = 0;
+        titleEl.setAttribute('role', 'button');
         titleWrap.appendChild(titleEl);
 
         const catEl = document.createElement('span');
@@ -1205,8 +1208,10 @@ nav {
           toggleUpvote(snap.id, upBtn, voteCount);
         });
 
-        const commentPill = document.createElement('span');
-        commentPill.className = 'meta-pill';
+        const commentPill = document.createElement('button');
+        commentPill.type = 'button';
+        commentPill.className = 'btn-upvote';
+        commentPill.style.padding = '6px 12px';
         commentPill.textContent = '💬 ' + Number(d.commentCount || 0);
 
         actions.appendChild(upBtn);
@@ -1220,7 +1225,13 @@ nav {
           e.stopPropagation();
           const u = location.origin + location.pathname + '?city=' + encodeURIComponent(cityForFeedQuery()) + '#post-' + snap.id;
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(u).catch(function () {});
+            navigator.clipboard.writeText(u).then(function () {
+              const old = shareBtn.innerHTML;
+              shareBtn.innerHTML = '<span>Copied!</span>';
+              setTimeout(function () {
+                shareBtn.innerHTML = old;
+              }, 1200);
+            }).catch(function () {});
           }
         });
 
@@ -1228,17 +1239,20 @@ nav {
         actions.appendChild(shareBtn);
         contentCol.appendChild(actions);
 
-        card.addEventListener('click', function () {
-          openThreadInline(snap.id, d, card, contentCol, commentPill);
-        });
-        card.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') {
+        function openThreadFromControl(e) {
+          if (e) {
             e.preventDefault();
-            openThreadInline(snap.id, d, card, contentCol, commentPill);
+            e.stopPropagation();
+          }
+          openThreadInline(snap.id, d, card, contentCol, commentPill);
+        }
+        titleEl.addEventListener('click', openThreadFromControl);
+        titleEl.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            openThreadFromControl(e);
           }
         });
-        card.tabIndex = 0;
-        card.setAttribute('role', 'button');
+        commentPill.addEventListener('click', openThreadFromControl);
         card.id = 'post-' + snap.id;
 
         card.appendChild(contentCol);
@@ -1291,21 +1305,17 @@ nav {
 
       const composer = document.createElement('div');
       composer.style.marginBottom = '10px';
-      const preview = document.createElement('input');
-      preview.type = 'text';
-      preview.placeholder = 'Join the conversation...';
-      preview.style.cssText = 'width:100%;';
       const textarea = document.createElement('textarea');
-      textarea.placeholder = 'Join the conversation...';
+      textarea.placeholder = 'Write a comment...';
       textarea.rows = 4;
-      textarea.style.cssText = 'width:100%;display:none;margin-top:6px;';
+      textarea.style.cssText = 'width:100%;margin-top:6px;';
       const replyInfo = document.createElement('div');
       replyInfo.className = 'meta-pill';
       replyInfo.hidden = true;
       replyInfo.style.marginTop = '6px';
       const actions = document.createElement('div');
       actions.className = 'modal-actions';
-      actions.style.cssText = 'justify-content:flex-end;display:none;margin-top:8px;';
+      actions.style.cssText = 'justify-content:flex-end;display:flex;margin-top:8px;';
       const cancelReplyBtn = document.createElement('button');
       cancelReplyBtn.type = 'button';
       cancelReplyBtn.className = 'btn-secondary';
@@ -1317,7 +1327,6 @@ nav {
       submitBtn.textContent = 'Comment';
       actions.appendChild(cancelReplyBtn);
       actions.appendChild(submitBtn);
-      composer.appendChild(preview);
       composer.appendChild(textarea);
       composer.appendChild(replyInfo);
       composer.appendChild(actions);
@@ -1328,24 +1337,13 @@ nav {
       wrap.appendChild(listEl);
       contentCol.appendChild(wrap);
 
-      function expandComposer() {
-        preview.style.display = 'none';
-        textarea.style.display = '';
-        actions.style.display = 'flex';
-        textarea.focus();
-      }
       function collapseComposer() {
-        preview.value = '';
         textarea.value = '';
-        preview.style.display = '';
-        textarea.style.display = 'none';
-        actions.style.display = 'none';
         replyInfo.hidden = true;
         cancelReplyBtn.hidden = true;
         replyingToCommentId = null;
         replyingToUsername = '';
       }
-      preview.addEventListener('focus', expandComposer);
       cancelReplyBtn.addEventListener('click', function () {
         collapseComposer();
       });
@@ -1397,7 +1395,7 @@ nav {
             replyInfo.textContent = 'Replying to ' + replyingToUsername;
             replyInfo.hidden = false;
             cancelReplyBtn.hidden = false;
-            expandComposer();
+            textarea.focus();
           });
           right.appendChild(meta);
           right.appendChild(textEl);
@@ -1512,6 +1510,9 @@ nav {
           if (!voteSnap.exists) {
             transaction.set(voteRef, { createdAt: serverTimestamp() });
             transaction.update(postRef, { upvoteCount: increment(1) });
+          } else {
+            transaction.delete(voteRef);
+            transaction.update(postRef, { upvoteCount: increment(-1) });
           }
         });
         const voteSnap = await getDoc(voteRef);
