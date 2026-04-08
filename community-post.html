@@ -7,6 +7,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23059669'/><path d='M8 12l8 12 8-12-4-6H12z' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -220,16 +221,18 @@
   </style>
 </head>
 <body>
-  <nav style="position:sticky;top:0;z-index:100;background:white;border-bottom:1px solid #e8f0e8;padding:0 16px 0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;">
-    <a href="index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;font-family:Sora,sans-serif;font-weight:700;font-size:1.1rem;color:#1a2e1a;">
-      <span style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M8 12l8 12 8-12-4-6H12z"/></svg>
-      </span>
-      Liv<span style="color:#059669">vo</span>
+  <nav style="position:sticky;top:0;z-index:100;background:white;border-bottom:1px solid #e8f0e8;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;">
+    <a href="community-portal.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="28" height="28" rx="7" fill="#059669"/>
+        <polyline points="6,10 14,21 22,10" fill="none" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="10,15 14,20 18,15" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
+      </svg>
+      <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#1a2e1a;letter-spacing:-0.04em;">livvo</span>
     </a>
-    <div style="display:flex;align-items:center;gap:12px;">
+    <div style="display:flex;align-items:center;gap:16px;">
       <a id="thread-nav-community" href="community-portal.html" style="font-size:13px;color:#5a7a5a;text-decoration:none;font-weight:500;">Community</a>
-      <div id="thread-nav-avatar" style="cursor:pointer;width:32px;height:32px;flex-shrink:0;" aria-hidden="true"></div>
+      <div id="thread-nav-avatar" style="width:32px;height:32px;border-radius:50%;overflow:hidden;background:#2d6a2d;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;cursor:pointer;"></div>
     </div>
   </nav>
   <main class="thread-page" style="max-width: none; padding: 16px 0 48px;">
