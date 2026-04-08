@@ -223,11 +223,11 @@ nav {
 .cat-more-menu[hidden] { display: none; }
 .portal-layout {
   display: grid;
-  grid-template-columns: 220px 1fr 300px;
+  grid-template-columns: 220px minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
-.left-sidebar, .right-sidebar {
+.left-sidebar {
   background: #fff;
   border: 1px solid #d4eadb;
   border-radius: 14px;
@@ -235,7 +235,7 @@ nav {
   position: sticky;
   top: 88px;
 }
-.left-sidebar h3, .right-sidebar h3 {
+.left-sidebar h3 {
   font-family: "Sora", sans-serif;
   font-size: 0.86rem;
   margin-bottom: 10px;
@@ -843,7 +843,7 @@ nav {
   .nav-city-email { max-width: 100%; }
   .page-wrap { padding: 108px 24px 64px; }
   .portal-layout { grid-template-columns: 1fr; }
-  .left-sidebar, .right-sidebar { position: static; top: auto; }
+  .left-sidebar { position: static; top: auto; }
   .portal-main-toolbar { flex-direction: column; align-items: stretch; }
   #new-post-btn { width: 100%; }
   #sort-select { width: 100%; }
@@ -938,6 +938,20 @@ nav {
         <button type="button" class="sidebar-filter-btn" data-sidebar-category="jobs_remote"><svg class="sidebar-community-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Jobs &amp; Remote Work</button>
         <button type="button" class="sidebar-filter-btn" data-sidebar-category="visa_admin"><svg class="sidebar-community-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Visa &amp; Admin</button>
       </div>
+      <!-- Community info — moved from right sidebar -->
+      <div style="border-top:1px solid #e8f0e8;margin-top:20px;padding-top:20px;">
+        <h4 style="font-size:13px;font-weight:700;color:#1a2e1a;margin:0 0 4px 0;" id="sidebar-city-name">Athens Community</h4>
+        <p style="font-size:12px;color:#6b8f6b;margin:0 0 16px 0;">
+          <span id="sidebar-member-count">0</span> members
+        </p>
+        <h4 style="font-size:13px;font-weight:700;color:#1a2e1a;margin:0 0 8px 0;">Community rules</h4>
+        <ol style="font-size:12px;color:#5a7a5a;margin:0;padding-left:16px;line-height:1.8;">
+          <li>Be kind and respectful.</li>
+          <li>No spam or self-promo dumps.</li>
+          <li>Keep posts relevant to the city.</li>
+          <li>Protect personal information.</li>
+        </ol>
+      </div>
       <div class="left-sidebar-footer">
         <a href="faqs.html">Community Guidelines</a>
         <a href="privacy-policy.html">Privacy Policy</a>
@@ -992,39 +1006,6 @@ nav {
 
       <div id="feed" class="feed" aria-live="polite"></div>
     </section>
-
-    <aside class="right-sidebar">
-      <button type="button" class="sidebar-create-post" id="btn-create-post-sidebar">Create a post</button>
-      <div class="city-info-card">
-        <h3 id="city-info-title">Athens Community</h3>
-        <p class="meta-pill"><span id="city-member-count">0</span> members</p>
-      </div>
-      <div class="rules-card">
-        <h3>Community rules</h3>
-        <ul>
-          <li>Be kind and respectful.</li>
-          <li>No spam or self-promo dumps.</li>
-          <li>Keep posts relevant to the city.</li>
-          <li>Protect personal information.</li>
-        </ul>
-      </div>
-      <div style="background:white;border:1px solid #e8f0e8;border-radius:12px;padding:16px;margin-top:12px;">
-        <h4 style="font-size:13px;font-weight:700;color:#1a2e1a;margin:0 0 10px 0;display:flex;align-items:center;gap:6px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z"/></svg>
-          Quick links
-        </h4>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <a href="search-athens.html" style="font-size:13px;color:#2d6a2d;text-decoration:none;display:flex;align-items:center;gap:6px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            Browse rentals
-          </a>
-          <a href="flatmate-connect.html" style="font-size:13px;color:#2d6a2d;text-decoration:none;display:flex;align-items:center;gap:6px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            Find a flatmate
-          </a>
-        </div>
-      </div>
-    </aside>
   </div>
 </main>
 
@@ -1451,8 +1432,8 @@ nav {
           const aid = data.author || data.authorId;
           if (aid) uniqueAuthors.add(aid);
         });
-        document.getElementById('city-member-count').textContent = String(uniqueAuthors.size || 0);
-        document.getElementById('city-info-title').textContent = cityForFeedQuery() + ' Community';
+        document.getElementById('sidebar-member-count').textContent = String(uniqueAuthors.size || 0);
+        document.getElementById('sidebar-city-name').textContent = cityForFeedQuery() + ' Community';
         renderFeed(prepareFeedDocs(Array.from(snap.docs), activeCategory));
       }, function (err) {
         console.error(err);
@@ -1691,10 +1672,6 @@ nav {
       }
       openModal('modal-new-post');
     });
-    document.getElementById('btn-create-post-sidebar').addEventListener('click', function () {
-      document.getElementById('new-post-btn').click();
-    });
-
     document.getElementById('confirm-delete-post').addEventListener('click', async function () {
       if (!pendingDelete || !pendingDelete.postId) {
         closeModal('modal-delete-post');
