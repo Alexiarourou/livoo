@@ -585,7 +585,7 @@ nav {
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
     getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, doc, getDoc,
-    serverTimestamp, runTransaction, increment, writeBatch
+    serverTimestamp, runTransaction, increment, writeBatch, deleteDoc
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   const CATEGORY_LABELS = {
     housing: 'Housing Tips',
@@ -679,11 +679,13 @@ nav {
 
     let activeCategory = 'all';
     let currentUser = null;
+    let currentProfileData = null;
     let cityDisplay = cityDisplayName;
 
     let feedUnsub = null;
     let threadCommentsUnsub = null;
     let openThreadId = null;
+    const authorProfileCache = new Map();
 
     function openModal(id) {
       document.getElementById(id).hidden = false;
@@ -737,6 +739,41 @@ nav {
       return list.slice(0, 50);
     }
 
+    async function getAuthorProfile(authorUid, fallbackUsername) {
+      if (!authorUid) {
+        return {
+          username: fallbackUsername || 'Anonymous',
+          photoUrl: '',
+          initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase()
+        };
+      }
+      if (authorProfileCache.has(authorUid)) {
+        return authorProfileCache.get(authorUid);
+      }
+      let profile = {
+        username: fallbackUsername || 'Anonymous',
+        photoUrl: '',
+        initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase()
+      };
+      try {
+        const uSnap = await getDoc(doc(db, 'users', authorUid));
+        if (uSnap.exists) {
+          const ud = uSnap.data() || {};
+          const username = String(ud.username || ud.displayName || fallbackUsername || 'Anonymous').trim();
+          const photoUrl = String(ud.photoURL || ud.photoUrl || ud.avatarUrl || '').trim();
+          profile = {
+            username: username || 'Anonymous',
+            photoUrl: photoUrl,
+            initial: String((username || 'A').charAt(0)).toUpperCase()
+          };
+        }
+      } catch (e) {
+        console.warn('Author profile lookup failed:', authorUid, e);
+      }
+      authorProfileCache.set(authorUid, profile);
+      return profile;
+    }
+
     function subscribeFeed() {
       if (feedUnsub) {
         feedUnsub();
@@ -755,7 +792,7 @@ nav {
       });
     }
 
-    function renderFeed(docs) {
+    async function renderFeed(docs) {
       var list = Array.from(docs || []);
       while (feedEl.firstChild) {
         feedEl.removeChild(feedEl.firstChild);
@@ -767,32 +804,83 @@ nav {
         feedEl.appendChild(emptyP);
         return;
       }
-      list.forEach(function (snap) {
-        var d = snap.data();
-        var card = document.createElement('div');
+      for (const snap of list) {
+        const d = snap.data() || {};
+        const authorUid = d.author || d.authorId || '';
+        const fallbackUsername = d.authorUsername || d.authorName || d.authorEmail || 'Anonymous';
+        const authorProfile = await getAuthorProfile(authorUid, fallbackUsername);
+
+        const card = document.createElement('div');
         card.style.cssText = 'background:white;padding:16px;margin-bottom:12px;border-radius:8px;border:1px solid #ddd;color:#1a2e24;text-align:left;';
-        var head = document.createElement('div');
-        var titleEl = document.createElement('strong');
+
+        const topRow = document.createElement('div');
+        topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:10px;';
+
+        const titleWrap = document.createElement('div');
+        const titleEl = document.createElement('strong');
         titleEl.textContent = d.title || 'Untitled';
-        var catEl = document.createElement('span');
-        catEl.style.cssText = 'color:#666;font-size:12px;margin-left:8px;';
+        titleWrap.appendChild(titleEl);
+
+        const catEl = document.createElement('span');
+        catEl.style.cssText = 'display:inline-block;color:#666;font-size:12px;margin-left:8px;';
         catEl.textContent = d.category || '';
-        head.appendChild(titleEl);
-        head.appendChild(catEl);
-        card.appendChild(head);
-        var p = document.createElement('p');
+        titleWrap.appendChild(catEl);
+        topRow.appendChild(titleWrap);
+
+        const canDelete = currentUser && authorUid && authorUid === currentUser.uid;
+        if (canDelete) {
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.textContent = 'Delete';
+          delBtn.style.cssText = 'border:1px solid #e5b4b4;background:#fff6f6;color:#b42318;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;';
+          delBtn.addEventListener('click', async function () {
+            try {
+              await deleteDoc(doc(db, 'communityPosts', snap.id));
+              card.remove();
+              if (!feedEl.children.length) {
+                const emptyP = document.createElement('p');
+                emptyP.className = 'feed-empty';
+                emptyP.textContent = 'No posts yet. Be the first!';
+                feedEl.appendChild(emptyP);
+              }
+            } catch (err) {
+              alert('Delete failed: ' + (err && err.message ? err.message : 'Unknown error'));
+            }
+          });
+          topRow.appendChild(delBtn);
+        }
+        card.appendChild(topRow);
+
+        const p = document.createElement('p');
         p.style.marginTop = '8px';
-        var bodyText = (d.body != null && String(d.body).trim())
+        const bodyText = (d.body != null && String(d.body).trim())
           ? String(d.body)
           : stripHtml(d.bodyHtml || '');
         p.textContent = bodyText || '';
         card.appendChild(p);
-        var small = document.createElement('small');
-        small.style.color = '#666';
-        small.textContent = d.authorUsername || d.authorName || d.authorEmail || 'Anonymous';
-        card.appendChild(small);
+
+        const authorRow = document.createElement('div');
+        authorRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:10px;';
+        const avatar = document.createElement('div');
+        avatar.style.cssText = 'width:26px;height:26px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;';
+        if (authorProfile.photoUrl) {
+          const img = document.createElement('img');
+          img.src = authorProfile.photoUrl;
+          img.alt = authorProfile.username;
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+          avatar.appendChild(img);
+        } else {
+          avatar.textContent = authorProfile.initial || 'A';
+        }
+        const nameEl = document.createElement('small');
+        nameEl.style.color = '#666';
+        nameEl.textContent = authorProfile.username || 'Anonymous';
+        authorRow.appendChild(avatar);
+        authorRow.appendChild(nameEl);
+        card.appendChild(authorRow);
+
         feedEl.appendChild(card);
-      });
+      }
     }
 
     async function toggleUpvote(postId, btnEl) {
@@ -991,6 +1079,7 @@ nav {
     function showPortal(user, profileData) {
       if (!user) return;
       currentUser = user;
+      currentProfileData = profileData || null;
       localStorage.setItem('livvo_city', cityDisplay);
       setWelcomeAndNav(profileData);
       subEl.textContent = 'Share tips, events, housing advice, and flatmate searches with people here.';
@@ -1016,6 +1105,10 @@ nav {
           category: document.getElementById('post-category').value,
           city: city,
           author: user.uid,
+          authorUsername: (currentProfileData && String(currentProfileData.username || '').trim())
+            || user.displayName
+            || (user.email ? user.email.split('@')[0] : '')
+            || 'Anonymous',
           createdAt: new Date(),
           commentCount: 0,
           upvoteCount: 0,
