@@ -873,16 +873,11 @@ nav {
 
   const params = new URLSearchParams(location.search);
   let rawCity = params.get('city');
-  const hasUrlCity = rawCity && String(rawCity).trim();
-
-  if (!hasUrlCity) {
-    const stored = localStorage.getItem('livvo_city');
-    if (stored && stored.trim()) {
-      window.location.replace('community.html?city=' + encodeURIComponent(stored.trim()));
-    } else {
-      window.location.replace('community.html');
-    }
+  const storedCity = (localStorage.getItem('livvo_city') || '').trim();
+  if (!rawCity || !String(rawCity).trim()) {
+    rawCity = storedCity || 'Athens';
   }
+  const hasUrlCity = rawCity && String(rawCity).trim();
 
   if (!hasUrlCity) {
     /* redirecting */
@@ -1001,9 +996,11 @@ nav {
     }
 
     function cityForFeedQuery() {
+      var fromUrl = (cityDisplay || '').trim();
+      if (fromUrl) return fromUrl;
       var fromLs = (localStorage.getItem('livvo_city') || '').trim();
       if (fromLs) return fromLs;
-      return (cityDisplay || '').trim() || cityDisplay;
+      return 'Athens';
     }
 
     function prepareFeedDocs(allDocs, category) {
