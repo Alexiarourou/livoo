@@ -646,12 +646,27 @@ nav {
   font-size: 0.9rem;
   resize: vertical;
 }
+.inline-thread textarea:focus {
+  outline: none;
+  border-color: var(--btn-green);
+  box-shadow: 0 0 0 3px rgba(26, 122, 74, 0.12);
+}
 .inline-thread .comment-composer-actions {
   display: flex;
   justify-content: flex-end;
   width: 100%;
   margin-top: 8px;
 }
+.comment-like-btn {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+  margin-top: 4px;
+  padding: 0;
+}
+.comment-like-btn.liked { color: var(--btn-green); font-weight: 600; }
 
 @media (max-width: 768px) {
   nav { padding: 0 24px; }
@@ -1411,10 +1426,20 @@ nav {
 
       const composer = document.createElement('div');
       composer.style.marginBottom = '10px';
+      let pendingScrollTarget = '';
       const textarea = document.createElement('textarea');
       textarea.placeholder = 'Write a comment...';
       textarea.rows = 4;
-      textarea.style.cssText = 'width:100%;margin-top:6px;';
+      textarea.style.cssText = 'width:100%;min-height:80px;padding:12px;border:1px solid #c5e0d0;border-radius:8px;resize:vertical;margin-top:6px;transition:min-height .15s ease,border-color .15s ease,box-shadow .15s ease;';
+      textarea.addEventListener('focus', function () {
+        textarea.style.minHeight = '100px';
+        textarea.style.borderColor = 'var(--btn-green)';
+        textarea.style.boxShadow = '0 0 0 3px rgba(26,122,74,0.12)';
+      });
+      textarea.addEventListener('blur', function () {
+        if (!(textarea.value || '').trim()) textarea.style.minHeight = '80px';
+        textarea.style.boxShadow = '';
+      });
       const replyInfo = document.createElement('div');
       replyInfo.className = 'meta-pill';
       replyInfo.hidden = true;
@@ -1516,12 +1541,44 @@ nav {
           const textEl = document.createElement('div');
           textEl.className = 'comment-body';
           textEl.textContent = c.text || '';
+          const commentLikeBtn = document.createElement('button');
+          commentLikeBtn.type = 'button';
+          commentLikeBtn.className = 'comment-like-btn';
+          commentLikeBtn.textContent = '♡ ' + Number(c.likeCount || 0);
+          if (currentUser) {
+            const cLikeRef = doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid);
+            getDoc(cLikeRef).then(function (ls) {
+              if (ls.exists()) {
+                commentLikeBtn.classList.add('liked');
+                commentLikeBtn.textContent = '❤ ' + Number(c.likeCount || 0);
+              }
+            }).catch(function () {});
+          }
+          commentLikeBtn.addEventListener('click', async function (e) {
+            e.stopPropagation();
+            if (!currentUser) return;
+            const cLikeRef = doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid);
+            const cLikeSnap = await getDoc(cLikeRef);
+            if (cLikeSnap.exists()) {
+              await deleteDoc(cLikeRef);
+              await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likeCount: increment(-1) });
+              commentLikeBtn.classList.remove('liked');
+            } else {
+              await setDoc(cLikeRef, { uid: currentUser.uid, createdAt: serverTimestamp() });
+              await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likeCount: increment(1) });
+              commentLikeBtn.classList.add('liked');
+            }
+            const latest = await getDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
+            const safe = latest.exists() ? Math.max(0, Number((latest.data() || {}).likeCount || 0)) : 0;
+            commentLikeBtn.textContent = (commentLikeBtn.classList.contains('liked') ? '❤ ' : '♡ ') + safe;
+          });
           const replyBtn = document.createElement('button');
           replyBtn.type = 'button';
           replyBtn.className = 'comment-reply-btn';
           replyBtn.textContent = 'Reply';
           right.appendChild(meta);
           right.appendChild(textEl);
+          right.appendChild(commentLikeBtn);
           right.appendChild(replyBtn);
 
           const repliesWrap = document.createElement('div');
@@ -1534,12 +1591,21 @@ nav {
           inlineReplyWrap.hidden = true;
           const inlineReplyInput = document.createElement('textarea');
           inlineReplyInput.placeholder = 'Write a reply...';
-          inlineReplyInput.style.cssText = 'width:100%;min-height:80px;padding:12px;border:1px solid #c5e0d0;border-radius:8px;resize:vertical;';
+          inlineReplyInput.style.cssText = 'width:100%;min-height:80px;padding:12px;border:1px solid #c5e0d0;border-radius:8px;resize:vertical;transition:min-height .15s ease,border-color .15s ease,box-shadow .15s ease;';
+          inlineReplyInput.addEventListener('focus', function () {
+            inlineReplyInput.style.minHeight = '100px';
+            inlineReplyInput.style.borderColor = 'var(--btn-green)';
+            inlineReplyInput.style.boxShadow = '0 0 0 3px rgba(26,122,74,0.12)';
+          });
+          inlineReplyInput.addEventListener('blur', function () {
+            if (!(inlineReplyInput.value || '').trim()) inlineReplyInput.style.minHeight = '80px';
+            inlineReplyInput.style.boxShadow = '';
+          });
           const inlineReplyActions = document.createElement('div');
           inlineReplyActions.className = 'comment-composer-actions';
           const inlineReplyCancel = document.createElement('button');
           inlineReplyCancel.type = 'button';
-          inlineReplyCancel.className = 'btn-secondary';
+          inlineReplyCancel.className = 'comment-reply-btn';
           inlineReplyCancel.textContent = 'Cancel';
           const inlineReplySubmit = document.createElement('button');
           inlineReplySubmit.type = 'button';
@@ -1557,6 +1623,7 @@ nav {
               const r = rd.data() || {};
               const rName = String(r.authorUsername || 'Member').trim() || 'Member';
               const row = document.createElement('div');
+              row.id = 'reply-' + rd.id;
               row.className = 'comment';
               row.style.cssText = 'display:flex;gap:8px;align-items:flex-start;margin-top:8px;';
               const rav = document.createElement('div');
@@ -1609,6 +1676,13 @@ nav {
               row.appendChild(rr);
               repliesWrap.appendChild(row);
             });
+            if (pendingScrollTarget) {
+              const replyTarget = document.getElementById(pendingScrollTarget);
+              if (replyTarget) {
+                replyTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                pendingScrollTarget = '';
+              }
+            }
           }, function (err) {
             repliesWrap.innerHTML = '<p class="meta-pill">Could not load replies.</p>';
             console.error('Replies load failed:', err);
@@ -1637,7 +1711,8 @@ nav {
               || currentUser.photoURL
               || '';
             try {
-              await setDoc(doc(collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies')), {
+              const newReplyRef = doc(collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies'));
+              await setDoc(newReplyRef, {
                 text: replyText,
                 authorUid: currentUser.uid,
                 authorUsername: authorUsername,
@@ -1647,6 +1722,7 @@ nav {
               await updateDoc(doc(db, 'communityPosts', postId), { commentCount: increment(1) });
               const oldCount = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
               commentPillEl.textContent = '💬 ' + String(oldCount + 1);
+              pendingScrollTarget = 'reply-' + newReplyRef.id;
               inlineReplyInput.value = '';
               inlineReplyWrap.hidden = true;
             } catch (err) {
@@ -1655,7 +1731,18 @@ nav {
           });
           item.appendChild(av);
           item.appendChild(right);
+          if (pendingScrollTarget === 'comment-pending') {
+            item.id = 'new-comment-scroll-target';
+          }
           listEl.appendChild(item);
+        }
+        if (pendingScrollTarget === 'comment-pending') {
+          const target = document.getElementById('new-comment-scroll-target');
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            target.id = '';
+            pendingScrollTarget = '';
+          }
         }
       }, function (err) {
         listEl.innerHTML = '<p class="meta-pill">Could not load comments.</p>';
@@ -1700,6 +1787,7 @@ nav {
           await batch.commit();
           const oldCount = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
           commentPillEl.textContent = '💬 ' + String(oldCount + 1);
+          pendingScrollTarget = 'comment-pending';
           textarea.value = '';
           replyInfo.hidden = true;
           cancelReplyBtn.hidden = true;
