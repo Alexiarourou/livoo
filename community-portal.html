@@ -1408,7 +1408,7 @@ nav {
     async function refreshSidebarCommunityStats() {
       const feedCity = cityForFeedQuery();
       try {
-        const snap = await getDocs(query(collection(db, 'communityPosts'), where('city', '==', feedCity)));
+        const snap = await getDocs(query(collection(db, 'communityPosts'), where('city', '==', feedCity))); // collection: communityPosts
         const uniqueAuthors = new Set();
         snap.docs.forEach(function (d) {
           const data = d.data() || {};
@@ -1498,6 +1498,7 @@ nav {
         }
         constraints.push(limit(POSTS_PER_PAGE));
 
+        // Collection ID must be communityPosts (not "posts"). Modular SDK: collection(db, 'communityPosts'); compat would be db.collection('communityPosts').
         const q = query(collection(db, 'communityPosts'), ...constraints);
         const snapshot = await getDocs(q);
 
