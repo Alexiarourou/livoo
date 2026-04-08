@@ -1101,20 +1101,6 @@ nav {
         card.className = 'feed-card reddit-card';
         card.style.cssText = 'padding:16px;color:#1a2e24;text-align:left;cursor:pointer;';
 
-        const voteRail = document.createElement('div');
-        voteRail.className = 'vote-rail';
-        const upArrow = document.createElement('button');
-        upArrow.type = 'button';
-        upArrow.className = 'vote-arrow';
-        upArrow.textContent = '▲';
-        upArrow.title = 'Upvote';
-        const voteCount = document.createElement('div');
-        voteCount.className = 'vote-count';
-        voteCount.textContent = String(Number(d.upvoteCount || 0));
-        voteRail.appendChild(upArrow);
-        voteRail.appendChild(voteCount);
-        card.appendChild(voteRail);
-
         const contentCol = document.createElement('div');
 
         const topRow = document.createElement('div');
@@ -1188,16 +1174,11 @@ nav {
         const upBtn = document.createElement('button');
         upBtn.type = 'button';
         upBtn.className = 'btn-upvote' + (hasUpvoted ? ' is-on' : '');
-        upBtn.innerHTML = '<span aria-hidden="true">👍</span> <span class="vote-label">' + (hasUpvoted ? 'Upvoted' : 'Upvote') + '</span> <span class="up-count">' + Number(d.upvoteCount || 0) + '</span>';
+        upBtn.innerHTML = '<span class="like-icon" aria-hidden="true">' + (hasUpvoted ? '❤' : '♡') + '</span> <span class="up-count">' + Number(d.upvoteCount || 0) + '</span>';
         upBtn.addEventListener('click', function (e) {
           e.preventDefault();
           e.stopPropagation();
           toggleUpvote(snap.id, upBtn);
-        });
-        upArrow.addEventListener('click', function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleUpvote(snap.id, upBtn, voteCount);
         });
 
         const commentPill = document.createElement('button');
@@ -1490,7 +1471,7 @@ nav {
       });
     }
 
-    async function toggleUpvote(postId, btnEl, voteCountEl) {
+    async function toggleUpvote(postId, btnEl) {
       if (!currentUser) return;
       const postRef = doc(db, 'communityPosts', postId);
       const voteRef = doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid);
@@ -1514,11 +1495,10 @@ nav {
         const c = postSnap.exists ? (postSnap.data().upvoteCount || 0) : 0;
         if (btnEl) {
           btnEl.classList.toggle('is-on', on);
-          const label = btnEl.querySelector('.vote-label');
+          const icon = btnEl.querySelector('.like-icon');
           const cnt = btnEl.querySelector('.up-count');
-          if (label) label.textContent = on ? 'Upvoted' : 'Upvote';
+          if (icon) icon.textContent = on ? '❤' : '♡';
           if (cnt) cnt.textContent = String(c);
-          if (voteCountEl) voteCountEl.textContent = String(c);
         }
       } catch (err) {
         console.error(err);
