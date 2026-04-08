@@ -101,7 +101,7 @@ nav {
     </form>
     <p id="formSuccess" style="display:none;padding:16px;border-radius:10px;background:rgba(5,150,105,0.1);border:1px solid rgba(5,150,105,0.2);color:var(--green-dark);font-size:0.95rem;line-height:1.5;text-align:center;margin-top:8px;">Account created! You&apos;re signed in.</p>
   </div>
-  <p class="auth-footer">Already have an account? <a href="flatmate-login.html">Log in</a></p>
+  <p class="auth-footer">Already have an account? <a href="signup.html?redirect=flatmate">Log in</a></p>
 </div>
 
 <script>
@@ -113,7 +113,9 @@ nav {
     document.getElementById('authTitle').textContent = 'Join the community';
     document.getElementById('authSub').textContent = 'Create a free account to join the forum, chat with others, and connect with people in your city.';
     document.getElementById('navBack').textContent = '← Back to cities';
-    document.getElementById('navBack').href = params.get('city') ? 'signup.html?city=' + encodeURIComponent(params.get('city')) : 'community.html';
+    document.getElementById('navBack').href = params.get('city')
+      ? 'signup.html?redirect=community&city=' + encodeURIComponent(params.get('city'))
+      : 'community.html';
   }
 </script>
 <script type="module">

@@ -371,7 +371,7 @@ nav {
 <script>
   (function checkAuth() {
     if (localStorage.getItem('livvo_landlord_verified') || localStorage.getItem('livvo_landlord_logged_in')) return;
-    window.location.href = 'landlord-login.html';
+    window.location.href = 'signup.html?redirect=landlord';
   })();
 
   document.getElementById('logoutLink').addEventListener('click', function(e) {
@@ -380,7 +380,7 @@ nav {
     localStorage.removeItem('livvo_landlord_email');
     localStorage.removeItem('livvo_landlord_password');
     localStorage.removeItem('livvo_landlord_verified');
-    window.location.href = 'landlord-login.html';
+    window.location.href = 'signup.html?redirect=landlord';
   });
 
   function switchTab(id) {

@@ -418,6 +418,10 @@ nav {
     ghent: 'Ghent', krakow: 'Krakow', warsaw: 'Warsaw', tallinn: 'Tallinn', riga: 'Riga', tbilisi: 'Tbilisi'
   };
   const params = new URLSearchParams(location.search);
+  const redirectParam = String(params.get('redirect') || '').trim().toLowerCase();
+  const redirectTarget = (redirectParam === 'landlord' || redirectParam === 'flatmate' || redirectParam === 'community')
+    ? redirectParam
+    : 'community';
   const rawCity = params.get('city');
   const slug = rawCity
     ? rawCity.toLowerCase().trim().replace(/[\s_-]+/g, '')
@@ -428,16 +432,22 @@ nav {
   }
   const cityName = cityNames[slug] || titleCaseFromRaw(rawCity || '');
 
-  function goToCommunityPortal() {
-    window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityName);
+  function destinationAfterAuth() {
+    if (redirectTarget === 'landlord') return 'landlord-dashboard.html';
+    if (redirectTarget === 'flatmate') return 'flatmate-profile.html';
+    return 'community-portal.html?city=' + encodeURIComponent(cityName);
   }
 
-  async function routeAfterCommunityAuth() {
-    goToCommunityPortal();
+  function goAfterAuth() {
+    window.location.href = destinationAfterAuth();
+  }
+
+  async function routeAfterAuth() {
+    goAfterAuth();
   }
 
   async function redirectNewAccountAfterAuth(uid) {
-    await routeAfterCommunityAuth();
+    await routeAfterAuth();
   }
 
   // Google button (popup)
@@ -445,7 +455,7 @@ nav {
     try {
       var provider = new GoogleAuthProvider();
       var result = await signInWithPopup(auth, provider);
-      goToCommunityPortal();
+      goAfterAuth();
     } catch (err) {
       console.error('Google sign-in error:', err);
       showError(document.getElementById('signin-error'), getFriendlyError(err && err.code));
@@ -456,12 +466,20 @@ nav {
   if (googleBtn) googleBtn.addEventListener('click', handleGooglePopupSignIn);
   var googleSigninBtn = document.getElementById('btnGoogleSignin');
   if (googleSigninBtn) googleSigninBtn.addEventListener('click', handleGooglePopupSignIn);
-  document.getElementById('pageTitle').textContent = 'Join the ' + cityName + ' community';
-  document.getElementById('pageSub').textContent =
-    'Free to join. Connect with people moving to ' + cityName + ', find flatmates and get local tips.';
+  if (redirectTarget === 'landlord') {
+    document.getElementById('pageTitle').textContent = 'Log in to your landlord account';
+    document.getElementById('pageSub').textContent = 'Use one Livvo account to access landlord tools.';
+  } else if (redirectTarget === 'flatmate') {
+    document.getElementById('pageTitle').textContent = 'Log in to your flatmate account';
+    document.getElementById('pageSub').textContent = 'Use one Livvo account to access your flatmate profile.';
+  } else {
+    document.getElementById('pageTitle').textContent = 'Join the ' + cityName + ' community';
+    document.getElementById('pageSub').textContent =
+      'Free to join. Connect with people moving to ' + cityName + ', find flatmates and get local tips.';
+  }
   document.getElementById('signupCityField').value = cityName;
   document.getElementById('signinCityField').value = cityName;
-  document.getElementById('joinBackLink').href = 'community.html';
+  document.getElementById('joinBackLink').href = (redirectTarget === 'community') ? 'community.html' : 'index.html';
   var joinEmail = params.get('email');
   if (joinEmail) {
     document.getElementById('signup-email').value = joinEmail;
@@ -608,7 +626,7 @@ nav {
       await redirectNewAccountAfterAuth(cred.user.uid);
     } catch (err) {
       console.error('Post-signup profile route:', err);
-      goToCommunityPortal();
+      goAfterAuth();
     }
   });
 
@@ -633,10 +651,10 @@ nav {
       return;
     }
     try {
-      await routeAfterCommunityAuth();
+      await routeAfterAuth();
     } catch (err) {
       console.error('Post-login profile route:', err);
-      goToCommunityPortal();
+      goAfterAuth();
     }
   });
 

@@ -350,7 +350,7 @@ textarea { min-height: 88px; resize: vertical; }
 
   firebase.auth().onAuthStateChanged(async function (user) {
     if (!user) {
-      window.location.href = 'signup.html?city=' + encodeURIComponent(cityDisplay);
+      window.location.href = 'signup.html?redirect=community&city=' + encodeURIComponent(cityDisplay);
       return;
     }
     try {

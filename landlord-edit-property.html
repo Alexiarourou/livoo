@@ -126,7 +126,7 @@ nav {
   </a>
   <div class="nav-links">
     <a href="landlord-dashboard.html">Dashboard</a>
-    <a href="landlord-login.html">Log out</a>
+    <a href="signup.html?redirect=landlord">Log out</a>
   </div>
 </nav>
 
@@ -290,7 +290,7 @@ nav {
 
 <script>
   if (!localStorage.getItem('livvo_landlord_verified') && !localStorage.getItem('livvo_landlord_logged_in')) {
-    window.location.href = 'landlord-login.html';
+    window.location.href = 'signup.html?redirect=landlord';
   }
   const params = new URLSearchParams(location.search);
   const propId = params.get('id');

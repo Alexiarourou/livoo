@@ -611,7 +611,7 @@ button.cities-search-dropdown-item {
       </div>
       <div class="city-body">
         <p class="city-card-desc">Art, culture and a growing expat scene</p>
-        <a href="signup.html?city=Paris" class="btn-city btn-city-active">Join Paris community</a>
+        <a href="signup.html?redirect=community&amp;city=Paris" class="btn-city btn-city-active">Join Paris community</a>
       </div>
     </div>
     <div class="city-card">
@@ -620,7 +620,7 @@ button.cities-search-dropdown-item {
       </div>
       <div class="city-body">
         <p class="city-card-desc">Sun, history and one of Europe&apos;s most welcoming cities</p>
-        <a href="signup.html?city=Athens" class="btn-city btn-city-active">Join Athens community</a>
+        <a href="signup.html?redirect=community&amp;city=Athens" class="btn-city btn-city-active">Join Athens community</a>
       </div>
     </div>
     <div class="city-card">
@@ -629,7 +629,7 @@ button.cities-search-dropdown-item {
       </div>
       <div class="city-body">
         <p class="city-card-desc">The classic first move abroad</p>
-        <a href="signup.html?city=London" class="btn-city btn-city-active">Join London community</a>
+        <a href="signup.html?redirect=community&amp;city=London" class="btn-city btn-city-active">Join London community</a>
       </div>
     </div>
     <div class="city-card">
@@ -638,7 +638,7 @@ button.cities-search-dropdown-item {
       </div>
       <div class="city-body">
         <p class="city-card-desc">Warm nights, great food, instant community</p>
-        <a href="signup.html?city=Madrid" class="btn-city btn-city-active">Join Madrid community</a>
+        <a href="signup.html?redirect=community&amp;city=Madrid" class="btn-city btn-city-active">Join Madrid community</a>
       </div>
     </div>
   </div>
@@ -655,14 +655,14 @@ button.cities-search-dropdown-item {
         <div id="cities-search-dropdown" class="cities-search-dropdown" role="listbox" aria-label="City suggestions" hidden></div>
       </div>
       <div class="cities-quick-pills">
-        <a href="signup.html?city=Amsterdam" class="cities-quick-pill">Amsterdam</a>
-        <a href="signup.html?city=Barcelona" class="cities-quick-pill">Barcelona</a>
-        <a href="signup.html?city=Berlin" class="cities-quick-pill">Berlin</a>
-        <a href="signup.html?city=Lisbon" class="cities-quick-pill">Lisbon</a>
-        <a href="signup.html?city=Rome" class="cities-quick-pill">Rome</a>
-        <a href="signup.html?city=Copenhagen" class="cities-quick-pill">Copenhagen</a>
-        <a href="signup.html?city=Prague" class="cities-quick-pill">Prague</a>
-        <a href="signup.html?city=Dublin" class="cities-quick-pill">Dublin</a>
+        <a href="signup.html?redirect=community&amp;city=Amsterdam" class="cities-quick-pill">Amsterdam</a>
+        <a href="signup.html?redirect=community&amp;city=Barcelona" class="cities-quick-pill">Barcelona</a>
+        <a href="signup.html?redirect=community&amp;city=Berlin" class="cities-quick-pill">Berlin</a>
+        <a href="signup.html?redirect=community&amp;city=Lisbon" class="cities-quick-pill">Lisbon</a>
+        <a href="signup.html?redirect=community&amp;city=Rome" class="cities-quick-pill">Rome</a>
+        <a href="signup.html?redirect=community&amp;city=Copenhagen" class="cities-quick-pill">Copenhagen</a>
+        <a href="signup.html?redirect=community&amp;city=Prague" class="cities-quick-pill">Prague</a>
+        <a href="signup.html?redirect=community&amp;city=Dublin" class="cities-quick-pill">Dublin</a>
       </div>
       <p class="cities-more-note"><a href="index.html#waitlist">Can&apos;t find your city? Join the waitlist →</a></p>
     </div>
@@ -760,7 +760,7 @@ button.cities-search-dropdown-item {
     if (matches.length > 0) {
       matches.forEach(function (city) {
         var row = document.createElement('a');
-        row.href = 'signup.html?city=' + encodeURIComponent(city);
+        row.href = 'signup.html?redirect=community&city=' + encodeURIComponent(city);
         row.className = 'cities-search-dropdown-item';
         row.setAttribute('role', 'option');
         row.textContent = city;
@@ -797,7 +797,7 @@ button.cities-search-dropdown-item {
     e.preventDefault();
     var matches = filterCities(input.value);
     if (matches.length > 0) {
-      window.location.href = 'signup.html?city=' + encodeURIComponent(matches[0]);
+      window.location.href = 'signup.html?redirect=community&city=' + encodeURIComponent(matches[0]);
     } else {
       window.location.href = REQUEST_CITY_HREF;
     }

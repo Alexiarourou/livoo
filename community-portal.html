@@ -1640,7 +1640,7 @@ nav {
     onAuthStateChanged(auth, async function (user) {
       try {
         if (!user) {
-          scheduleRedirectIfStillSignedOut('signup.html?city=' + encodeURIComponent(city));
+          scheduleRedirectIfStillSignedOut('signup.html?redirect=community&city=' + encodeURIComponent(city));
           return;
         }
         if (pendingAuthRedirectTimer) {
