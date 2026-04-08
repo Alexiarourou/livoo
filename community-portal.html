@@ -107,7 +107,8 @@ nav {
 
 .page-wrap {
   padding: 96px 48px 80px;
-  max-width: 720px;
+  max-width: 1560px;
+  width: 100%;
   margin: 0 auto;
 }
 .portal-hero { margin-bottom: 28px; text-align: center; }
@@ -136,17 +137,21 @@ nav {
 }
 
 .portal-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 22px;
 }
 .category-tabs {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
 }
 .cat-tab {
   font-family: "DM Sans", sans-serif;
@@ -183,7 +188,7 @@ nav {
 
 .portal-layout {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr) 280px;
+  grid-template-columns: 220px 1fr 300px;
   gap: 16px;
   align-items: start;
 }
@@ -217,7 +222,7 @@ nav {
   font-size: 0.72rem;
   color: var(--muted);
 }
-.main-column { min-width: 0; }
+.main-column { min-width: 500px; width: 100%; }
 .city-info-card, .rules-card, .explore-card {
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -243,12 +248,16 @@ nav {
   align-items: center;
   gap: 8px;
   margin: 0 0 14px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
 }
 .sort-label {
   font-size: 0.8rem;
   color: var(--muted);
   font-weight: 600;
+  white-space: nowrap;
 }
 .sort-btn {
   border: 1px solid var(--border);
@@ -266,7 +275,7 @@ nav {
   background: rgba(26, 122, 74, 0.1);
 }
 
-.feed { display: flex; flex-direction: column; gap: 14px; }
+.feed { display: flex; flex-direction: column; gap: 14px; width: 100%; }
 .feed-empty {
   text-align: center;
   color: var(--muted);
@@ -288,6 +297,7 @@ nav {
   font: inherit;
   color: inherit;
   display: block;
+  box-sizing: border-box;
 }
 .feed-card:hover {
   border-color: var(--green);
