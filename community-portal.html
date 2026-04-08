@@ -768,38 +768,6 @@ nav {
   </div>
 </div>
 
-<div id="modal-thread" class="modal" hidden aria-modal="true" role="dialog" aria-labelledby="thread-title">
-  <div class="modal-backdrop" data-close="modal-thread"></div>
-  <div class="modal-panel thread-panel">
-    <h2 id="thread-title" style="margin-bottom:10px;"></h2>
-    <div id="thread-meta" class="thread-meta"></div>
-    <div id="thread-image" class="thread-image" hidden></div>
-    <div id="thread-link" class="thread-link" hidden></div>
-    <div id="thread-body" class="thread-body"></div>
-    <div class="thread-actions feed-card-actions" style="margin-bottom:8px;">
-      <button type="button" class="btn-upvote" id="thread-upvote"><span aria-hidden="true">▲</span> <span id="thread-upvote-label">Upvote</span> <span id="thread-upvote-count">0</span></button>
-      <span class="meta-pill" id="thread-comment-total"></span>
-    </div>
-    <div class="thread-comments">
-      <h3>Comments</h3>
-      <div class="comment-form" style="margin-top:10px;">
-        <label for="thread-comment-input-preview" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Your comment</label>
-        <input id="thread-comment-input-preview" type="text" placeholder="Join the conversation..." style="margin-bottom:6px;" />
-        <textarea id="thread-comment-input" placeholder="Join the conversation..." style="margin-bottom:6px;display:none;" rows="4"></textarea>
-        <div id="thread-replying-to" class="meta-pill" hidden></div>
-        <div class="modal-actions" id="thread-comment-actions" style="margin-top:8px; justify-content:flex-end; display:none;">
-          <button type="button" class="btn-secondary" id="thread-reply-cancel" hidden>Cancel reply</button>
-          <button type="button" class="btn-primary" id="thread-comment-submit">Comment</button>
-        </div>
-      </div>
-      <div id="thread-comments-list"></div>
-    </div>
-    <div class="modal-actions" style="margin-top:20px;">
-      <button type="button" class="btn-secondary" data-close="modal-thread">Close</button>
-    </div>
-  </div>
-</div>
-
 <div id="modal-delete-post" class="modal" hidden aria-modal="true" role="dialog" aria-labelledby="delete-post-title">
   <div class="modal-backdrop" data-close="modal-delete-post"></div>
   <div class="modal-panel" style="max-width:420px;">
@@ -818,7 +786,7 @@ nav {
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
-    getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, doc, getDoc, getDocs,
+    getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, doc, getDoc,
     serverTimestamp, runTransaction, increment, writeBatch, deleteDoc
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   const CATEGORY_LABELS = {
@@ -925,12 +893,13 @@ nav {
 
     let feedUnsub = null;
     let threadCommentsUnsub = null;
+    let threadRepliesUnsubs = [];
+    let activeThreadHost = null;
     let openThreadId = null;
     let replyingToCommentId = null;
     let replyingToUsername = '';
     let pendingDelete = null;
     const authorProfileCache = new Map();
-    let composerExpanded = false;
 
     function openModal(id) {
       document.getElementById(id).hidden = false;
@@ -941,17 +910,6 @@ nav {
       document.body.style.overflow = '';
     }
 
-    function setThreadComposerExpanded(expanded) {
-      composerExpanded = !!expanded;
-      const preview = document.getElementById('thread-comment-input-preview');
-      const input = document.getElementById('thread-comment-input');
-      const actions = document.getElementById('thread-comment-actions');
-      if (!preview || !input || !actions) return;
-      preview.style.display = composerExpanded ? 'none' : '';
-      input.style.display = composerExpanded ? '' : 'none';
-      actions.style.display = composerExpanded ? 'flex' : 'none';
-      if (composerExpanded) input.focus();
-    }
     document.querySelectorAll('[data-close]').forEach(function (el) {
       el.addEventListener('click', function () {
         closeModal(el.getAttribute('data-close'));
@@ -1271,12 +1229,12 @@ nav {
         contentCol.appendChild(actions);
 
         card.addEventListener('click', function () {
-          openThreadModal(snap.id, d);
+          openThreadInline(snap.id, d, card, contentCol, commentPill);
         });
         card.addEventListener('keydown', function (e) {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            openThreadModal(snap.id, d);
+            openThreadInline(snap.id, d, card, contentCol, commentPill);
           }
         });
         card.tabIndex = 0;
@@ -1287,6 +1245,259 @@ nav {
 
         feedEl.appendChild(card);
       }
+    }
+
+    async function openThreadInline(postId, data, card, contentCol, commentPillEl) {
+      if (!card || !contentCol) return;
+      if (activeThreadHost && activeThreadHost !== contentCol) {
+        const existing = activeThreadHost.querySelector('.inline-thread');
+        if (existing) existing.remove();
+      }
+      if (threadCommentsUnsub) {
+        threadCommentsUnsub();
+        threadCommentsUnsub = null;
+      }
+      threadRepliesUnsubs.forEach(function (u) { try { u(); } catch (e) {} });
+      threadRepliesUnsubs = [];
+
+      const existing = contentCol.querySelector('.inline-thread');
+      if (existing && openThreadId === postId) {
+        existing.remove();
+        openThreadId = null;
+        activeThreadHost = null;
+        return;
+      }
+      if (existing) existing.remove();
+      openThreadId = postId;
+      activeThreadHost = contentCol;
+
+      const wrap = document.createElement('div');
+      wrap.className = 'inline-thread';
+      wrap.style.cssText = 'margin-top:12px;border-top:1px solid #e6efe9;padding-top:12px;';
+      wrap.addEventListener('click', function (e) { e.stopPropagation(); });
+
+      const fullPost = document.createElement('div');
+      fullPost.className = 'thread-body';
+      const bodyText = (data.body != null && String(data.body).trim())
+        ? String(data.body)
+        : stripHtml(data.bodyHtml || '');
+      fullPost.textContent = bodyText || '';
+      wrap.appendChild(fullPost);
+
+      const title = document.createElement('h3');
+      title.textContent = 'Comments';
+      title.style.cssText = 'margin:12px 0 8px;';
+      wrap.appendChild(title);
+
+      const composer = document.createElement('div');
+      composer.style.marginBottom = '10px';
+      const preview = document.createElement('input');
+      preview.type = 'text';
+      preview.placeholder = 'Join the conversation...';
+      preview.style.cssText = 'width:100%;';
+      const textarea = document.createElement('textarea');
+      textarea.placeholder = 'Join the conversation...';
+      textarea.rows = 4;
+      textarea.style.cssText = 'width:100%;display:none;margin-top:6px;';
+      const replyInfo = document.createElement('div');
+      replyInfo.className = 'meta-pill';
+      replyInfo.hidden = true;
+      replyInfo.style.marginTop = '6px';
+      const actions = document.createElement('div');
+      actions.className = 'modal-actions';
+      actions.style.cssText = 'justify-content:flex-end;display:none;margin-top:8px;';
+      const cancelReplyBtn = document.createElement('button');
+      cancelReplyBtn.type = 'button';
+      cancelReplyBtn.className = 'btn-secondary';
+      cancelReplyBtn.textContent = 'Cancel reply';
+      cancelReplyBtn.hidden = true;
+      const submitBtn = document.createElement('button');
+      submitBtn.type = 'button';
+      submitBtn.className = 'btn-primary';
+      submitBtn.textContent = 'Comment';
+      actions.appendChild(cancelReplyBtn);
+      actions.appendChild(submitBtn);
+      composer.appendChild(preview);
+      composer.appendChild(textarea);
+      composer.appendChild(replyInfo);
+      composer.appendChild(actions);
+      wrap.appendChild(composer);
+
+      const listEl = document.createElement('div');
+      listEl.innerHTML = '<p class="meta-pill">Loading comments...</p>';
+      wrap.appendChild(listEl);
+      contentCol.appendChild(wrap);
+
+      function expandComposer() {
+        preview.style.display = 'none';
+        textarea.style.display = '';
+        actions.style.display = 'flex';
+        textarea.focus();
+      }
+      function collapseComposer() {
+        preview.value = '';
+        textarea.value = '';
+        preview.style.display = '';
+        textarea.style.display = 'none';
+        actions.style.display = 'none';
+        replyInfo.hidden = true;
+        cancelReplyBtn.hidden = true;
+        replyingToCommentId = null;
+        replyingToUsername = '';
+      }
+      preview.addEventListener('focus', expandComposer);
+      cancelReplyBtn.addEventListener('click', function () {
+        collapseComposer();
+      });
+
+      const commentsRef = collection(db, 'communityPosts', postId, 'comments');
+      const cq = query(commentsRef, orderBy('createdAt', 'asc'));
+      threadCommentsUnsub = onSnapshot(cq, async function (csnap) {
+        listEl.innerHTML = '';
+        threadRepliesUnsubs.forEach(function (u) { try { u(); } catch (e) {} });
+        threadRepliesUnsubs = [];
+        if (!csnap.docs.length) {
+          listEl.innerHTML = '<p class="meta-pill">No comments yet.</p>';
+          return;
+        }
+        for (const cd of csnap.docs) {
+          const c = cd.data() || {};
+          const username = String(c.authorUsername || 'Member').trim() || 'Member';
+          const photo = String(c.authorPhoto || '').trim();
+          const item = document.createElement('div');
+          item.className = 'comment';
+          item.style.cssText = 'display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;';
+          const av = document.createElement('div');
+          av.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
+          if (photo) {
+            const img = document.createElement('img');
+            img.src = photo;
+            img.alt = username;
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            av.appendChild(img);
+          } else {
+            av.textContent = username.charAt(0).toUpperCase();
+          }
+          const right = document.createElement('div');
+          right.style.flex = '1';
+          const meta = document.createElement('div');
+          meta.className = 'comment-meta';
+          meta.textContent = username + ' · ' + formatRelativeTime(c.createdAt);
+          const textEl = document.createElement('div');
+          textEl.className = 'comment-body';
+          textEl.textContent = c.text || '';
+          const replyBtn = document.createElement('button');
+          replyBtn.type = 'button';
+          replyBtn.className = 'comment-reply-btn';
+          replyBtn.textContent = 'Reply';
+          replyBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            replyingToCommentId = cd.id;
+            replyingToUsername = username;
+            replyInfo.textContent = 'Replying to ' + replyingToUsername;
+            replyInfo.hidden = false;
+            cancelReplyBtn.hidden = false;
+            expandComposer();
+          });
+          right.appendChild(meta);
+          right.appendChild(textEl);
+          right.appendChild(replyBtn);
+
+          const repliesWrap = document.createElement('div');
+          repliesWrap.className = 'nested-reply';
+          repliesWrap.style.marginTop = '8px';
+          right.appendChild(repliesWrap);
+          const replyQ = query(collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies'), orderBy('createdAt', 'asc'));
+          const unsubReplies = onSnapshot(replyQ, function (rsnap) {
+            repliesWrap.innerHTML = '';
+            rsnap.docs.forEach(function (rd) {
+              const r = rd.data() || {};
+              const rName = String(r.authorUsername || 'Member').trim() || 'Member';
+              const row = document.createElement('div');
+              row.className = 'comment';
+              row.style.cssText = 'display:flex;gap:8px;align-items:flex-start;margin-top:8px;';
+              const rav = document.createElement('div');
+              rav.style.cssText = 'width:26px;height:26px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;';
+              if (r.authorPhoto) {
+                const ri = document.createElement('img');
+                ri.src = r.authorPhoto;
+                ri.alt = rName;
+                ri.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+                rav.appendChild(ri);
+              } else {
+                rav.textContent = rName.charAt(0).toUpperCase();
+              }
+              const rr = document.createElement('div');
+              rr.style.flex = '1';
+              const rm = document.createElement('div');
+              rm.className = 'comment-meta';
+              rm.textContent = rName + ' · ' + formatRelativeTime(r.createdAt);
+              const rb = document.createElement('div');
+              rb.className = 'comment-body';
+              rb.textContent = r.text || '';
+              rr.appendChild(rm);
+              rr.appendChild(rb);
+              row.appendChild(rav);
+              row.appendChild(rr);
+              repliesWrap.appendChild(row);
+            });
+          }, function (err) {
+            repliesWrap.innerHTML = '<p class="meta-pill">Could not load replies.</p>';
+            console.error('Replies load failed:', err);
+          });
+          threadRepliesUnsubs.push(unsubReplies);
+          item.appendChild(av);
+          item.appendChild(right);
+          listEl.appendChild(item);
+        }
+      }, function (err) {
+        listEl.innerHTML = '<p class="meta-pill">Could not load comments.</p>';
+        console.error('Comments load failed:', err);
+      });
+
+      submitBtn.addEventListener('click', async function (e) {
+        e.stopPropagation();
+        if (!currentUser) return;
+        const text = (textarea.value || '').trim();
+        if (!text) return;
+        const authorUsername = (currentProfileData && String(currentProfileData.username || '').trim())
+          || currentUser.displayName
+          || (currentUser.email ? currentUser.email.split('@')[0] : '')
+          || 'Member';
+        const authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim())
+          || currentUser.photoURL
+          || '';
+        const batch = writeBatch(db);
+        const postRef = doc(db, 'communityPosts', postId);
+        if (replyingToCommentId) {
+          const replyRef = doc(collection(db, 'communityPosts', postId, 'comments', replyingToCommentId, 'replies'));
+          batch.set(replyRef, {
+            text: text,
+            authorUid: currentUser.uid,
+            authorUsername: authorUsername,
+            authorPhoto: authorPhoto,
+            createdAt: serverTimestamp()
+          });
+        } else {
+          const commentRef = doc(collection(db, 'communityPosts', postId, 'comments'));
+          batch.set(commentRef, {
+            text: text,
+            authorUid: currentUser.uid,
+            authorUsername: authorUsername,
+            authorPhoto: authorPhoto,
+            createdAt: serverTimestamp()
+          });
+        }
+        batch.update(postRef, { commentCount: increment(1) });
+        try {
+          await batch.commit();
+          const oldCount = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
+          commentPillEl.textContent = '💬 ' + String(oldCount + 1);
+          collapseComposer();
+        } catch (err) {
+          console.error('Comment submit failed:', err);
+        }
+      });
     }
 
     async function toggleUpvote(postId, btnEl, voteCountEl) {
@@ -1307,9 +1518,7 @@ nav {
         const on = voteSnap.exists;
         const postSnap = await getDoc(postRef);
         const c = postSnap.exists ? (postSnap.data().upvoteCount || 0) : 0;
-        if (btnEl && btnEl.id === 'thread-upvote') {
-          syncThreadUpvoteUI(postId, on, c);
-        } else if (btnEl) {
+        if (btnEl) {
           btnEl.classList.toggle('is-on', on);
           const label = btnEl.querySelector('.vote-label');
           const cnt = btnEl.querySelector('.up-count');
@@ -1317,275 +1526,10 @@ nav {
           if (cnt) cnt.textContent = String(c);
           if (voteCountEl) voteCountEl.textContent = String(c);
         }
-        if (openThreadId === postId) {
-          syncThreadUpvoteUI(postId, on, c);
-        }
       } catch (err) {
         console.error(err);
       }
     }
-
-    function syncThreadUpvoteUI(postId, voted, count) {
-      const btn = document.getElementById('thread-upvote');
-      const cntEl = document.getElementById('thread-upvote-count');
-      btn.classList.toggle('is-on', voted);
-      document.getElementById('thread-upvote-label').textContent = voted ? 'Upvoted' : 'Upvote';
-      cntEl.textContent = String(count);
-    }
-
-    function openThreadModal(postId, data) {
-      openThreadId = postId;
-        if (threadCommentsUnsub) {
-          threadCommentsUnsub();
-          threadCommentsUnsub = null;
-        }
-      const Purify = window.DOMPurify;
-      document.getElementById('thread-title').textContent = data.title || 'Post';
-      document.getElementById('thread-meta').textContent =
-        (CATEGORY_LABELS[data.category] || data.category) + ' · ' +
-        (data.authorName || data.authorEmail || 'Member') + ' · ' +
-        formatTime(data.createdAt);
-
-      const imgWrap = document.getElementById('thread-image');
-      imgWrap.innerHTML = '';
-      if (data.imageUrl) {
-        imgWrap.hidden = false;
-        const im = document.createElement('img');
-        im.src = data.imageUrl;
-        im.alt = '';
-        imgWrap.appendChild(im);
-      } else {
-        imgWrap.hidden = true;
-      }
-
-      const linkEl = document.getElementById('thread-link');
-      linkEl.textContent = '';
-      const linkStr = data.linkUrl && String(data.linkUrl).trim();
-      if (linkStr) {
-        try {
-          const u = new URL(linkStr);
-          if (u.protocol === 'http:' || u.protocol === 'https:') {
-            linkEl.hidden = false;
-            const a = document.createElement('a');
-            a.href = u.href;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            a.textContent = 'Open link';
-            linkEl.appendChild(a);
-          } else {
-            linkEl.hidden = true;
-          }
-        } catch (e) {
-          linkEl.hidden = true;
-        }
-      } else {
-        linkEl.hidden = true;
-      }
-
-      const bodyEl = document.getElementById('thread-body');
-      if (data.bodyHtml) {
-        bodyEl.innerHTML = Purify ? Purify.sanitize(data.bodyHtml, { ADD_ATTR: ['target'] }) : data.bodyHtml;
-      } else {
-        bodyEl.textContent = data.body != null ? String(data.body) : '';
-      }
-
-      document.getElementById('thread-comment-total').textContent =
-        (data.commentCount || 0) + ' comment' + ((data.commentCount || 0) === 1 ? '' : 's');
-
-      getDoc(doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid)).then(function (vs) {
-        syncThreadUpvoteUI(postId, vs.exists, data.upvoteCount || 0);
-      });
-
-      document.getElementById('thread-upvote').onclick = function (e) {
-        e.preventDefault();
-        toggleUpvote(postId, document.getElementById('thread-upvote'));
-      };
-
-      const listEl = document.getElementById('thread-comments-list');
-      listEl.innerHTML = '<p class="meta-pill">Loading…</p>';
-      document.getElementById('thread-comment-input-preview').value = '';
-      document.getElementById('thread-comment-input').value = '';
-      setThreadComposerExpanded(false);
-      replyingToCommentId = null;
-      replyingToUsername = '';
-      document.getElementById('thread-replying-to').hidden = true;
-      document.getElementById('thread-reply-cancel').hidden = true;
-
-      const cq = query(
-        collection(db, 'communityPosts', postId, 'comments'),
-        orderBy('createdAt', 'asc')
-      );
-      threadCommentsUnsub = onSnapshot(cq, async function (csnap) {
-        listEl.innerHTML = '';
-        if (!csnap.docs.length) {
-          listEl.innerHTML = '<p class="meta-pill">No comments yet.</p>';
-          return;
-        }
-        for (const cd of csnap.docs) {
-          const c = cd.data() || {};
-          const profile = await getAuthorProfile(
-            c.authorUid || c.authorId || '',
-            c.authorUsername || c.authorName || c.authorEmail || 'Member'
-          );
-          const authorUsername = c.authorUsername || profile.username || 'Member';
-          const authorPhoto = c.authorPhoto || profile.photoUrl || '';
-          const authorInitial = String((authorUsername || 'A').charAt(0)).toUpperCase();
-          const div = document.createElement('div');
-          div.className = 'comment';
-          div.style.display = 'flex';
-          div.style.gap = '10px';
-          div.style.alignItems = 'flex-start';
-          const avatar = document.createElement('div');
-          avatar.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
-          if (authorPhoto) {
-            const img = document.createElement('img');
-            img.src = authorPhoto;
-            img.alt = authorUsername;
-            img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-            avatar.appendChild(img);
-          } else {
-            avatar.textContent = authorInitial;
-          }
-          const content = document.createElement('div');
-          content.style.flex = '1';
-          const cm = document.createElement('div');
-          cm.className = 'comment-meta';
-          cm.textContent = authorUsername + ' · ' + formatRelativeTime(c.createdAt);
-          const cb = document.createElement('div');
-          cb.className = 'comment-body';
-          cb.textContent = c.text || c.body || '';
-          const replyBtn = document.createElement('button');
-          replyBtn.type = 'button';
-          replyBtn.className = 'comment-reply-btn';
-          replyBtn.textContent = 'Reply';
-          replyBtn.addEventListener('click', function () {
-            replyingToCommentId = cd.id;
-            replyingToUsername = authorUsername;
-            const replyInfo = document.getElementById('thread-replying-to');
-            replyInfo.textContent = 'Replying to ' + replyingToUsername;
-            replyInfo.hidden = false;
-            document.getElementById('thread-reply-cancel').hidden = false;
-            setThreadComposerExpanded(true);
-          });
-          content.appendChild(cm);
-          content.appendChild(cb);
-          content.appendChild(replyBtn);
-          div.appendChild(avatar);
-          div.appendChild(content);
-          listEl.appendChild(div);
-
-          const repliesWrap = document.createElement('div');
-          repliesWrap.className = 'nested-reply';
-          repliesWrap.style.marginTop = '8px';
-          content.appendChild(repliesWrap);
-          const replyQ = query(
-            collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies'),
-            orderBy('createdAt', 'asc')
-          );
-          const replySnap = await getDocs(replyQ);
-          replySnap.docs.forEach(function (rd) {
-            const r = rd.data() || {};
-            const rName = String(r.authorUsername || r.authorName || 'Member').trim() || 'Member';
-            const rPhoto = String(r.authorPhoto || '').trim();
-            const row = document.createElement('div');
-            row.className = 'comment';
-            row.style.display = 'flex';
-            row.style.gap = '10px';
-            row.style.alignItems = 'flex-start';
-            row.style.marginTop = '10px';
-
-            const rav = document.createElement('div');
-            rav.style.cssText = 'width:28px;height:28px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;';
-            if (rPhoto) {
-              const img = document.createElement('img');
-              img.src = rPhoto;
-              img.alt = rName;
-              img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-              rav.appendChild(img);
-            } else {
-              rav.textContent = String((rName || 'A').charAt(0)).toUpperCase();
-            }
-            const rc = document.createElement('div');
-            rc.style.flex = '1';
-            const rm = document.createElement('div');
-            rm.className = 'comment-meta';
-            rm.textContent = rName + ' · ' + formatRelativeTime(r.createdAt);
-            const rb = document.createElement('div');
-            rb.className = 'comment-body';
-            rb.textContent = r.text || '';
-            rc.appendChild(rm);
-            rc.appendChild(rb);
-            row.appendChild(rav);
-            row.appendChild(rc);
-            repliesWrap.appendChild(row);
-          });
-        }
-      });
-
-      openModal('modal-thread');
-    }
-
-    document.getElementById('thread-comment-input-preview').addEventListener('focus', function () {
-      setThreadComposerExpanded(true);
-    });
-
-    document.getElementById('thread-comment-submit').addEventListener('click', async function () {
-      if (!currentUser || !openThreadId) return;
-      const input = document.getElementById('thread-comment-input');
-      const text = (input.value || '').trim();
-      if (!text) return;
-      const postRef = doc(db, 'communityPosts', openThreadId);
-      const batch = writeBatch(db);
-      if (replyingToCommentId) {
-        const replyRef = doc(collection(db, 'communityPosts', openThreadId, 'comments', replyingToCommentId, 'replies'));
-        batch.set(replyRef, {
-          text: text,
-          authorUid: currentUser.uid,
-          authorUsername: (currentProfileData && String(currentProfileData.username || '').trim())
-            || currentUser.displayName
-            || (currentUser.email ? currentUser.email.split('@')[0] : '')
-            || 'Member',
-          authorPhoto: (currentProfileData && String(currentProfileData.photoURL || '').trim()) || '',
-          createdAt: serverTimestamp()
-        });
-      } else {
-        const newRef = doc(collection(db, 'communityPosts', openThreadId, 'comments'));
-        batch.set(newRef, {
-          text: text,
-          authorUid: currentUser.uid,
-          authorUsername: (currentProfileData && String(currentProfileData.username || '').trim())
-            || currentUser.displayName
-            || (currentUser.email ? currentUser.email.split('@')[0] : '')
-            || 'Member',
-          authorPhoto: (currentProfileData && String(currentProfileData.photoURL || '').trim()) || '',
-          createdAt: serverTimestamp()
-        });
-      }
-      batch.update(postRef, { commentCount: increment(1) });
-      try {
-        await batch.commit();
-        const totalEl = document.getElementById('thread-comment-total');
-        const prev = Number((totalEl.textContent || '0').split(' ')[0] || 0);
-        const next = prev + 1;
-        totalEl.textContent = next + ' comment' + (next === 1 ? '' : 's');
-        input.value = '';
-        replyingToCommentId = null;
-        replyingToUsername = '';
-        document.getElementById('thread-replying-to').hidden = true;
-        document.getElementById('thread-reply-cancel').hidden = true;
-        setThreadComposerExpanded(false);
-      } catch (err) {
-        console.error(err);
-      }
-    });
-
-    document.getElementById('thread-reply-cancel').addEventListener('click', function () {
-      replyingToCommentId = null;
-      replyingToUsername = '';
-      document.getElementById('thread-replying-to').hidden = true;
-      document.getElementById('thread-reply-cancel').hidden = true;
-      setThreadComposerExpanded(false);
-    });
 
     document.getElementById('btn-new-post').addEventListener('click', function () {
       document.getElementById('post-title').value = '';
