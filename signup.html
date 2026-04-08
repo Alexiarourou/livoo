@@ -432,9 +432,21 @@ nav {
   }
   const cityName = cityNames[slug] || titleCaseFromRaw(rawCity || '');
 
+  function safeReturnPath(raw) {
+    if (!raw || typeof raw !== 'string') return '';
+    var s = raw.trim();
+    if (!s) return '';
+    if (s.indexOf('://') >= 0 || s.indexOf('//') === 0 || s.indexOf('<') >= 0) return '';
+    if (!/^community-post\.html\?/i.test(s) && !/^community-portal\.html\?/i.test(s)) return '';
+    return s;
+  }
+
+  var returnPath = safeReturnPath(String(params.get('return') || ''));
+
   function destinationAfterAuth() {
     if (redirectTarget === 'landlord') return 'landlord-dashboard.html';
     if (redirectTarget === 'flatmate') return 'flatmate-profile.html';
+    if (returnPath) return returnPath;
     return 'community-portal.html?city=' + encodeURIComponent(cityName);
   }
 

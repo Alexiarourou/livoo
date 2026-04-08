@@ -1192,12 +1192,6 @@ nav {
     let cityDisplay = cityDisplayName;
 
     let feedUnsub = null;
-    let threadCommentsUnsub = null;
-    let threadRepliesUnsubs = [];
-    let activeThreadHost = null;
-    let openThreadId = null;
-    let replyingToCommentId = null;
-    let replyingToUsername = '';
     let pendingDelete = null;
     const authorProfileCache = new Map();
 
@@ -1310,6 +1304,10 @@ nav {
       var fromUrl = (cityDisplay || '').trim();
       if (fromUrl) return fromUrl;
       return 'Athens';
+    }
+
+    function threadPageUrl(postId) {
+      return 'community-post.html?postId=' + encodeURIComponent(postId) + '&city=' + encodeURIComponent(cityForFeedQuery());
     }
 
     function prepareFeedDocs(allDocs, category) {
@@ -1428,7 +1426,7 @@ nav {
 
         const card = document.createElement('div');
         card.className = 'feed-card reddit-card';
-        card.style.cssText = 'padding:16px;color:#1a2e24;text-align:left;cursor:pointer;';
+        card.style.cssText = 'padding:16px;color:#1a2e24;text-align:left;cursor:default;';
 
         const contentCol = document.createElement('div');
 
@@ -1490,6 +1488,7 @@ nav {
 
         const p = document.createElement('p');
         p.style.marginTop = '8px';
+        p.style.cursor = 'pointer';
         const bodyText = (d.body != null && String(d.body).trim())
           ? String(d.body)
           : stripHtml(d.bodyHtml || '');
@@ -1525,7 +1524,7 @@ nav {
         shareBtn.addEventListener('click', function (e) {
           e.preventDefault();
           e.stopPropagation();
-          const u = location.origin + location.pathname + '?city=' + encodeURIComponent(cityForFeedQuery()) + '#post-' + snap.id;
+          const u = location.origin + '/community-post.html?postId=' + encodeURIComponent(snap.id) + '&city=' + encodeURIComponent(cityForFeedQuery());
           if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(u).then(function () {
               const old = shareBtn.innerHTML;
@@ -1541,547 +1540,30 @@ nav {
         actions.appendChild(shareBtn);
         contentCol.appendChild(actions);
 
-        function openThreadFromControl(e) {
+        function goToThreadPage(e) {
           if (e) {
             e.preventDefault();
             e.stopPropagation();
           }
-          openThreadInline(snap.id, d, card, contentCol, commentPill);
+          window.location.href = threadPageUrl(snap.id);
         }
-        titleEl.addEventListener('click', openThreadFromControl);
+        titleEl.addEventListener('click', goToThreadPage);
         titleEl.addEventListener('keydown', function (e) {
           if (e.key === 'Enter' || e.key === ' ') {
-            openThreadFromControl(e);
+            goToThreadPage(e);
           }
         });
-        commentPill.addEventListener('click', openThreadFromControl);
+        p.addEventListener('click', goToThreadPage);
+        commentPill.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        });
         card.id = 'post-' + snap.id;
 
         card.appendChild(contentCol);
 
         feedEl.appendChild(card);
       }
-    }
-
-    async function openThreadInline(postId, data, card, contentCol, commentPillEl) {
-      if (!card || !contentCol) return;
-      if (activeThreadHost && activeThreadHost !== contentCol) {
-        const existing = activeThreadHost.querySelector('.inline-thread');
-        if (existing) existing.remove();
-        const prevAct = activeThreadHost.querySelector('.feed-card-actions');
-        if (prevAct) prevAct.style.display = '';
-      }
-      if (threadCommentsUnsub) {
-        threadCommentsUnsub();
-        threadCommentsUnsub = null;
-      }
-      threadRepliesUnsubs.forEach(function (u) { try { u(); } catch (e) {} });
-      threadRepliesUnsubs = [];
-
-      const existing = contentCol.querySelector('.inline-thread');
-      if (existing && openThreadId === postId) {
-        existing.remove();
-        openThreadId = null;
-        activeThreadHost = null;
-        const actRest = contentCol.querySelector('.feed-card-actions');
-        if (actRest) actRest.style.display = '';
-        return;
-      }
-      if (existing) existing.remove();
-      openThreadId = postId;
-      activeThreadHost = contentCol;
-
-      const actOpen = contentCol.querySelector('.feed-card-actions');
-      if (actOpen) actOpen.style.display = 'none';
-
-      let threadHasLiked = false;
-      if (currentUser) {
-        try {
-          const vs = await getDoc(doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid));
-          threadHasLiked = vs.exists();
-        } catch (e) {}
-      }
-
-      const wrap = document.createElement('div');
-      wrap.className = 'inline-thread';
-      wrap.style.cssText = 'margin-top:12px;border-top:1px solid #e6efe9;padding-top:12px;';
-      wrap.addEventListener('click', function (e) { e.stopPropagation(); });
-      wrap.addEventListener('click', function () {
-        wrap.querySelectorAll('.comment-more-menu').forEach(function (m) {
-          m.hidden = true;
-        });
-      });
-
-      const topPills = document.createElement('div');
-      topPills.className = 'thread-top-pills';
-      const topLikeBtn = document.createElement('button');
-      topLikeBtn.type = 'button';
-      topLikeBtn.className = 'thread-pill post-like-btn' + (threadHasLiked ? ' is-on liked' : '');
-      topLikeBtn.innerHTML = '<span class="like-icon" aria-hidden="true">' + (threadHasLiked ? '❤' : '♡') + '</span> <span class="up-count">' + Number(data.upvoteCount || 0) + '</span>';
-      topLikeBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleLike(postId, topLikeBtn);
-      });
-      const threadCommentPill = document.createElement('span');
-      threadCommentPill.className = 'thread-pill';
-      threadCommentPill.textContent = '💬 ' + Number(data.commentCount || 0);
-
-      const topShare = document.createElement('button');
-      topShare.type = 'button';
-      topShare.className = 'thread-pill';
-      topShare.textContent = 'Share';
-      topShare.addEventListener('click', function (e) {
-        e.stopPropagation();
-        const link = window.location.origin + window.location.pathname + '?city=' + encodeURIComponent(cityForFeedQuery()) + '#post-' + postId;
-        navigator.clipboard.writeText(link).then(function () {
-          const old = topShare.textContent;
-          topShare.textContent = 'Copied!';
-          setTimeout(function () { topShare.textContent = old; }, 1200);
-        }).catch(function () {});
-      });
-      topPills.appendChild(topLikeBtn);
-      topPills.appendChild(threadCommentPill);
-      topPills.appendChild(topShare);
-      wrap.appendChild(topPills);
-
-      const fullPost = document.createElement('div');
-      fullPost.className = 'thread-body';
-      const bodyText = (data.body != null && String(data.body).trim())
-        ? String(data.body)
-        : stripHtml(data.bodyHtml || '');
-      fullPost.textContent = bodyText || '';
-      wrap.appendChild(fullPost);
-
-      const composer = document.createElement('div');
-      composer.style.margin = '12px 0 10px';
-      let pendingScrollTarget = '';
-      const joinTrigger = document.createElement('button');
-      joinTrigger.type = 'button';
-      joinTrigger.className = 'thread-join-trigger';
-      joinTrigger.textContent = 'Join the conversation';
-      const composerPanel = document.createElement('div');
-      composerPanel.className = 'thread-composer-panel';
-      composerPanel.hidden = true;
-      const textarea = document.createElement('textarea');
-      textarea.className = 'thread-composer-text';
-      textarea.placeholder = 'Join the conversation';
-      const toolbar = document.createElement('div');
-      toolbar.className = 'thread-composer-toolbar';
-      const toolbarLeft = document.createElement('div');
-      toolbarLeft.className = 'thread-toolbar-left';
-      attachCommentComposerIcons(toolbarLeft, textarea);
-      const toolbarActions = document.createElement('div');
-      toolbarActions.className = 'thread-toolbar-actions';
-      const cancelReplyBtn = document.createElement('button');
-      cancelReplyBtn.type = 'button';
-      cancelReplyBtn.className = 'btn-secondary';
-      cancelReplyBtn.textContent = 'Cancel';
-      const submitBtn = document.createElement('button');
-      submitBtn.type = 'button';
-      submitBtn.className = 'btn-primary';
-      submitBtn.textContent = 'Comment';
-      toolbarActions.appendChild(cancelReplyBtn);
-      toolbarActions.appendChild(submitBtn);
-      toolbar.appendChild(toolbarLeft);
-      toolbar.appendChild(toolbarActions);
-      composerPanel.appendChild(textarea);
-      composerPanel.appendChild(toolbar);
-      composer.appendChild(joinTrigger);
-      composer.appendChild(composerPanel);
-      wrap.appendChild(composer);
-
-      joinTrigger.addEventListener('click', function () {
-        joinTrigger.hidden = true;
-        composerPanel.hidden = false;
-        textarea.focus();
-      });
-      cancelReplyBtn.addEventListener('click', function () {
-        textarea.value = '';
-        composerPanel.hidden = true;
-        joinTrigger.hidden = false;
-      });
-
-      const controls = document.createElement('div');
-      controls.className = 'comment-controls-row';
-      const sortSelect = document.createElement('select');
-      sortSelect.className = 'comment-sort-select';
-      sortSelect.innerHTML = '<option value="best">Sort by: Best</option><option value="new">Sort by: New</option><option value="old">Sort by: Old</option>';
-      const searchInput = document.createElement('input');
-      searchInput.type = 'search';
-      searchInput.className = 'comment-search-input';
-      searchInput.placeholder = 'Search Comments';
-      controls.appendChild(sortSelect);
-      controls.appendChild(searchInput);
-      wrap.appendChild(controls);
-
-      const listEl = document.createElement('div');
-      listEl.innerHTML = '<p class="meta-pill">Loading comments...</p>';
-      wrap.appendChild(listEl);
-      contentCol.appendChild(wrap);
-
-      let latestComments = [];
-      let activeReplyBox = null;
-
-      function getMillis(ts) {
-        if (!ts) return 0;
-        if (typeof ts.toMillis === 'function') return ts.toMillis();
-        const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
-        return d.getTime() || 0;
-      }
-
-      async function renderComments() {
-        listEl.innerHTML = '';
-        threadRepliesUnsubs.forEach(function (u) { try { u(); } catch (e) {} });
-        threadRepliesUnsubs = [];
-        let docs = latestComments.slice();
-        const term = String(searchInput.value || '').trim().toLowerCase();
-        if (term) {
-          docs = docs.filter(function (cd) {
-            const c = cd.data() || {};
-            return String(c.text || '').toLowerCase().includes(term) || String(c.authorUsername || '').toLowerCase().includes(term);
-          });
-        }
-        if (sortSelect.value === 'best') {
-          docs.sort(function (a, b) {
-            const ad = a.data() || {}; const bd = b.data() || {};
-            return Number(bd.likes || bd.likeCount || 0) - Number(ad.likes || ad.likeCount || 0) || getMillis(bd.createdAt) - getMillis(ad.createdAt);
-          });
-        } else if (sortSelect.value === 'new') {
-          docs.sort(function (a, b) { return getMillis((b.data() || {}).createdAt) - getMillis((a.data() || {}).createdAt); });
-        } else {
-          docs.sort(function (a, b) { return getMillis((a.data() || {}).createdAt) - getMillis((b.data() || {}).createdAt); });
-        }
-        if (!docs.length) {
-          listEl.innerHTML = '<p class="meta-pill">No comments yet.</p>';
-          return;
-        }
-
-        for (const cd of docs) {
-          const c = cd.data() || {};
-          const username = String(c.authorUsername || 'Member').trim() || 'Member';
-          const photo = String(c.authorPhoto || '').trim();
-          const item = document.createElement('div');
-          item.className = 'comment-item';
-
-          const av = document.createElement('div');
-          av.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
-          if (photo) {
-            const img = document.createElement('img');
-            img.src = photo;
-            img.alt = username;
-            img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-            av.appendChild(img);
-          } else {
-            av.textContent = username.charAt(0).toUpperCase();
-          }
-
-          const right = document.createElement('div');
-          right.style.flex = '1';
-          const meta = document.createElement('div');
-          meta.className = 'comment-meta';
-          meta.textContent = username + ' · ' + formatRelativeTime(c.createdAt);
-          const textEl = document.createElement('div');
-          textEl.className = 'comment-body';
-          textEl.textContent = c.text || '';
-
-          const actionRow = document.createElement('div');
-          actionRow.className = 'comment-actions-row';
-          const likeBtn = document.createElement('button');
-          likeBtn.type = 'button';
-          likeBtn.className = 'comment-action-link';
-          likeBtn.textContent = '♡ ' + String(Number(c.likes || c.likeCount || 0));
-
-          const replyBtn = document.createElement('button');
-          replyBtn.type = 'button';
-          replyBtn.className = 'comment-action-link';
-          replyBtn.textContent = 'Reply';
-
-          const shareBtn = document.createElement('button');
-          shareBtn.type = 'button';
-          shareBtn.className = 'comment-action-link';
-          shareBtn.textContent = 'Share';
-          shareBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const link = window.location.origin + window.location.pathname + '?city=' + encodeURIComponent(cityForFeedQuery()) + '#post-' + postId + '-comment-' + cd.id;
-            navigator.clipboard.writeText(link).then(function () {
-              const old = shareBtn.textContent;
-              shareBtn.textContent = 'Copied!';
-              setTimeout(function () { shareBtn.textContent = old; }, 1200);
-            }).catch(function () {});
-          });
-
-          const moreWrap = document.createElement('span');
-          moreWrap.className = 'comment-more-wrap';
-          const moreMenu = document.createElement('div');
-          moreMenu.className = 'comment-more-menu';
-          moreMenu.hidden = true;
-          moreMenu.addEventListener('click', function (e) { e.stopPropagation(); });
-          const moreBtn = document.createElement('button');
-          moreBtn.type = 'button';
-          moreBtn.className = 'comment-action-link';
-          moreBtn.textContent = '···';
-          moreBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            moreMenu.hidden = !moreMenu.hidden;
-          });
-          if (currentUser && c.authorUid && c.authorUid === currentUser.uid) {
-            const delOpt = document.createElement('button');
-            delOpt.type = 'button';
-            delOpt.textContent = 'Delete';
-            delOpt.addEventListener('click', async function (e) {
-              e.stopPropagation();
-              moreMenu.hidden = true;
-              try {
-                await deleteDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
-                await runTransaction(db, async function (transaction) {
-                  const postSnap = await transaction.get(doc(db, 'communityPosts', postId));
-                  if (!postSnap.exists()) return;
-                  const cur = Number((postSnap.data() || {}).commentCount || 0);
-                  transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
-                });
-                const cnt = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
-                const next = Math.max(0, cnt - 1);
-                commentPillEl.textContent = '💬 ' + String(next);
-                threadCommentPill.textContent = '💬 ' + String(next);
-              } catch (err) {
-                console.error('Delete comment failed:', err);
-              }
-            });
-            moreMenu.appendChild(delOpt);
-          }
-          moreWrap.appendChild(moreBtn);
-          moreWrap.appendChild(moreMenu);
-
-          actionRow.appendChild(likeBtn);
-          actionRow.appendChild(replyBtn);
-          actionRow.appendChild(shareBtn);
-          if (moreMenu.firstChild) actionRow.appendChild(moreWrap);
-
-          const cLikeRef = doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid);
-          if (currentUser) {
-            getDoc(cLikeRef).then(function (ls) {
-              if (ls.exists()) {
-                likeBtn.style.color = 'var(--btn-green)';
-                likeBtn.textContent = '❤ ' + String(Number(c.likes || c.likeCount || 0));
-              }
-            }).catch(function () {});
-          }
-          likeBtn.addEventListener('click', async function (e) {
-            e.stopPropagation();
-            if (!currentUser) return;
-            const cLikeSnap = await getDoc(cLikeRef);
-            const wasLiked = cLikeSnap.exists();
-            try {
-              if (wasLiked) {
-                await deleteDoc(cLikeRef);
-                await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likes: increment(-1) });
-                likeBtn.style.color = '';
-              } else {
-                await setDoc(cLikeRef, { uid: currentUser.uid, createdAt: serverTimestamp() });
-                await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likes: increment(1) });
-                likeBtn.style.color = 'var(--btn-green)';
-              }
-              const latest = await getDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
-              const safeLikes = Math.max(0, Number(latest.exists() ? (latest.data() || {}).likes || 0 : 0));
-              likeBtn.textContent = (wasLiked ? '♡ ' : '❤ ') + String(safeLikes);
-            } catch (err) {
-              console.error('Comment like failed:', err);
-            }
-          });
-
-          const repliesWrap = document.createElement('div');
-          repliesWrap.className = 'nested-reply';
-          repliesWrap.style.marginTop = '8px';
-
-          const inlineReplyWrap = document.createElement('div');
-          inlineReplyWrap.className = 'nested-reply thread-composer-panel';
-          inlineReplyWrap.style.marginTop = '8px';
-          inlineReplyWrap.hidden = true;
-          const inlineReplyInput = document.createElement('textarea');
-          inlineReplyInput.className = 'thread-composer-text';
-          inlineReplyInput.placeholder = 'Reply to u/' + username;
-          const inlineReplyToolbar = document.createElement('div');
-          inlineReplyToolbar.className = 'thread-composer-toolbar';
-          const inlineLeft = document.createElement('div');
-          inlineLeft.className = 'thread-toolbar-left';
-          attachCommentComposerIcons(inlineLeft, inlineReplyInput);
-          const inlineActions = document.createElement('div');
-          inlineActions.className = 'reply-actions-row';
-          const inlineReplyCancel = document.createElement('button');
-          inlineReplyCancel.type = 'button';
-          inlineReplyCancel.className = 'reply-cancel-link';
-          inlineReplyCancel.textContent = 'Cancel';
-          const inlineReplySubmit = document.createElement('button');
-          inlineReplySubmit.type = 'button';
-          inlineReplySubmit.className = 'btn-primary';
-          inlineReplySubmit.textContent = 'Reply';
-          inlineActions.appendChild(inlineReplyCancel);
-          inlineActions.appendChild(inlineReplySubmit);
-          inlineReplyToolbar.appendChild(inlineLeft);
-          inlineReplyToolbar.appendChild(inlineActions);
-          inlineReplyWrap.appendChild(inlineReplyInput);
-          inlineReplyWrap.appendChild(inlineReplyToolbar);
-
-          const replyQ = query(collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies'), orderBy('createdAt', 'asc'));
-          const unsubReplies = onSnapshot(replyQ, function (rsnap) {
-            repliesWrap.innerHTML = '';
-            rsnap.docs.forEach(function (rd) {
-              const r = rd.data() || {};
-              const rName = String(r.authorUsername || 'Member').trim() || 'Member';
-              const row = document.createElement('div');
-              row.className = 'comment-item';
-              row.style.marginTop = '8px';
-              const rav = document.createElement('div');
-              rav.style.cssText = 'width:26px;height:26px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;';
-              if (r.authorPhoto) {
-                const ri = document.createElement('img');
-                ri.src = r.authorPhoto;
-                ri.alt = rName;
-                ri.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-                rav.appendChild(ri);
-              } else {
-                rav.textContent = rName.charAt(0).toUpperCase();
-              }
-              const rr = document.createElement('div');
-              rr.style.flex = '1';
-              const rm = document.createElement('div');
-              rm.className = 'comment-meta';
-              rm.textContent = rName + ' · ' + formatRelativeTime(r.createdAt);
-              const rb = document.createElement('div');
-              rb.className = 'comment-body';
-              rb.textContent = r.text || '';
-              rr.appendChild(rm);
-              rr.appendChild(rb);
-              row.appendChild(rav);
-              row.appendChild(rr);
-              repliesWrap.appendChild(row);
-            });
-            if (pendingScrollTarget) {
-              const replyTarget = document.getElementById(pendingScrollTarget);
-              if (replyTarget) {
-                replyTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                pendingScrollTarget = '';
-              }
-            }
-          }, function (err) {
-            repliesWrap.innerHTML = '<p class="meta-pill">Could not load replies.</p>';
-            console.error('Replies load failed:', err);
-          });
-          threadRepliesUnsubs.push(unsubReplies);
-
-          replyBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            if (activeReplyBox && activeReplyBox !== inlineReplyWrap) activeReplyBox.hidden = true;
-            if (activeReplyBox && activeReplyBox.parentNode) activeReplyBox.parentNode.classList.remove('comment-highlight');
-            activeReplyBox = inlineReplyWrap;
-            item.classList.add('comment-highlight');
-            inlineReplyWrap.hidden = false;
-            inlineReplyInput.focus();
-          });
-          inlineReplyCancel.addEventListener('click', function () {
-            inlineReplyInput.value = '';
-            inlineReplyWrap.hidden = true;
-            item.classList.remove('comment-highlight');
-          });
-          inlineReplySubmit.addEventListener('click', async function () {
-            if (!currentUser) return;
-            const replyText = (inlineReplyInput.value || '').trim();
-            if (!replyText) return;
-            const authorUsername = (currentProfileData && String(currentProfileData.username || '').trim())
-              || currentUser.displayName
-              || (currentUser.email ? currentUser.email.split('@')[0] : '')
-              || 'Member';
-            const authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim())
-              || currentUser.photoURL
-              || '';
-            try {
-              const newReplyRef = doc(collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies'));
-              await setDoc(newReplyRef, {
-                text: replyText,
-                authorUid: currentUser.uid,
-                authorUsername: authorUsername,
-                authorPhoto: authorPhoto,
-                createdAt: serverTimestamp()
-              });
-              await updateDoc(doc(db, 'communityPosts', postId), { commentCount: increment(1) });
-              const oldCount = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
-              commentPillEl.textContent = '💬 ' + String(oldCount + 1);
-              threadCommentPill.textContent = '💬 ' + String(oldCount + 1);
-              inlineReplyInput.value = '';
-              inlineReplyWrap.hidden = true;
-              item.classList.remove('comment-highlight');
-            } catch (err) {
-              console.error('Inline reply submit failed:', err);
-            }
-          });
-
-          right.appendChild(meta);
-          right.appendChild(textEl);
-          right.appendChild(actionRow);
-          right.appendChild(inlineReplyWrap);
-          right.appendChild(repliesWrap);
-          item.appendChild(av);
-          item.appendChild(right);
-          if (pendingScrollTarget === 'comment-pending') item.id = 'new-comment-scroll-target';
-          listEl.appendChild(item);
-        }
-        if (pendingScrollTarget === 'comment-pending') {
-          const target = document.getElementById('new-comment-scroll-target');
-          if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            target.id = '';
-            pendingScrollTarget = '';
-          }
-        }
-      }
-
-      const commentsRef = collection(db, 'communityPosts', postId, 'comments');
-      const cq = query(commentsRef, orderBy('createdAt', 'asc'));
-      threadCommentsUnsub = onSnapshot(cq, function (csnap) {
-        latestComments = csnap.docs.slice();
-        renderComments();
-      }, function (err) {
-        listEl.innerHTML = '<p class="meta-pill">Could not load comments.</p>';
-        console.error('Comments load failed:', err);
-      });
-
-      sortSelect.addEventListener('change', function () { renderComments(); });
-      searchInput.addEventListener('input', function () { renderComments(); });
-
-      submitBtn.addEventListener('click', async function () {
-        if (!currentUser) return;
-        const text = (textarea.value || '').trim();
-        if (!text) return;
-        const authorUsername = (currentProfileData && String(currentProfileData.username || '').trim())
-          || currentUser.displayName
-          || (currentUser.email ? currentUser.email.split('@')[0] : '')
-          || 'Member';
-        const authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim())
-          || currentUser.photoURL
-          || '';
-        const batch = writeBatch(db);
-        const postRef = doc(db, 'communityPosts', postId);
-        const commentRef = doc(collection(db, 'communityPosts', postId, 'comments'));
-        batch.set(commentRef, {
-          text: text,
-          authorUid: currentUser.uid,
-          authorUsername: authorUsername,
-          authorPhoto: authorPhoto,
-          likes: 0,
-          createdAt: serverTimestamp()
-        });
-        batch.update(postRef, { commentCount: increment(1) });
-        try {
-          await batch.commit();
-          const oldCount = Number(String(commentPillEl.textContent || '').replace(/[^\d]/g, '') || 0);
-          commentPillEl.textContent = '💬 ' + String(oldCount + 1);
-          threadCommentPill.textContent = '💬 ' + String(oldCount + 1);
-          textarea.value = '';
-        } catch (err) {
-          console.error('Comment submit failed:', err);
-        }
-      });
     }
 
     async function toggleLike(postId, btn) {
@@ -2110,31 +1592,6 @@ nav {
         const icon = b.querySelector('.like-icon');
         if (icon) icon.textContent = nowLiked ? '❤' : '♡';
       });
-    }
-
-    function attachCommentComposerIcons(leftEl, textarea) {
-      const imgBtn = document.createElement('button');
-      imgBtn.type = 'button';
-      imgBtn.className = 'thread-toolbar-btn';
-      imgBtn.setAttribute('title', 'Upload image');
-      imgBtn.setAttribute('aria-label', 'Upload image');
-      imgBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
-      imgBtn.addEventListener('click', function () {
-        window.alert('Coming soon');
-      });
-      const aaBtn = document.createElement('button');
-      aaBtn.type = 'button';
-      aaBtn.className = 'thread-toolbar-btn';
-      aaBtn.textContent = 'Aa';
-      aaBtn.title = 'Text size';
-      aaBtn.setAttribute('aria-label', 'Text size');
-      let large = false;
-      aaBtn.addEventListener('click', function () {
-        large = !large;
-        textarea.style.fontSize = large ? '1.08rem' : '';
-      });
-      leftEl.appendChild(imgBtn);
-      leftEl.appendChild(aaBtn);
     }
 
     document.getElementById('btn-new-post').addEventListener('click', function () {

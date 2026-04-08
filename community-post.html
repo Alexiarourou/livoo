@@ -1,185 +1,841 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Post — Livvo Community</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root { --green: #059669; --green-dark: #047857; --bg: #f0f7f2; --surface: #ffffff; --border: #d4e5dc; --text: #1a2e24; --muted: #4a7c5e; }
-body { background: var(--bg); color: var(--text); font-family: "DM Sans", sans-serif; }
-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.98); border-bottom: 1px solid var(--border); }
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
-.logo-icon { width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, var(--green), #10b981); }
-.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.1rem; }
-.logo-word span { color: var(--green); }
-.nav-back { font-size: 0.85rem; color: var(--muted); text-decoration: none; }
-.nav-back:hover { color: var(--green); }
-.page { max-width: 720px; margin: 0 auto; padding: 80px 24px 60px; }
-.post-full { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
-.post-meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 12px; }
-.post-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.5rem; line-height: 1.3; margin-bottom: 16px; }
-.post-body { font-size: 1rem; line-height: 1.7; color: var(--text); }
-.post-vote-row { display: flex; align-items: center; gap: 16px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
-.post-vote-row button { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1.1rem; padding: 4px; }
-.post-vote-row button:hover { color: var(--green); }
-.comments-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
-.comments-section h3 { font-family: "Outfit", sans-serif; font-size: 1rem; margin-bottom: 20px; }
-.comment { padding: 14px 0; border-bottom: 1px solid var(--border); }
-.comment:last-child { border-bottom: none; }
-.comment-meta { font-size: 0.75rem; color: var(--muted); margin-bottom: 6px; }
-.comment-meta strong { color: var(--text); }
-.comment-body { font-size: 0.9rem; line-height: 1.6; }
-.comment-form { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
-.comment-form label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 8px; }
-.comment-form input, .comment-form textarea { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.95rem; margin-bottom: 12px; }
-.comment-form input:focus, .comment-form textarea:focus { outline: none; border-color: var(--green); }
-.comment-form textarea { min-height: 100px; resize: vertical; }
-.btn-submit { background: var(--green); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
-.btn-submit:hover { background: var(--green-dark); }
-.msg-success { display: none; background: rgba(5,150,105,0.1); border: 1px solid rgba(5,150,105,0.3); border-radius: 10px; padding: 14px; color: var(--green); font-size: 0.9rem; margin-bottom: 16px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post | Livvo</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23059669'/><path d='M8 12l8 12 8-12-4-6H12z' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #059669;
+      --btn-green: #1a7a4a;
+      --btn-green-hover: #156b42;
+      --bg: #edf7f0;
+      --surface: #ffffff;
+      --border: #d4e5dc;
+      --text: #1a2e24;
+      --muted: #4a7c5e;
+    }
+    body { background: var(--bg); color: var(--text); font-family: "DM Sans", sans-serif; min-height: 100vh; }
+    .thread-page { max-width: 720px; margin: 0 auto; padding: 88px 20px 48px; }
+    .thread-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--btn-green);
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      margin-bottom: 20px;
+    }
+    .thread-back:hover { text-decoration: underline; }
+    .post-card {
+      background: var(--surface);
+      border: 1px solid #d4eadb;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+    .post-card h1 {
+      font-family: "Sora", sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+    .post-cat {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: #f2f6f4;
+      border: 1px solid #e1ebe5;
+      color: #666;
+      margin-bottom: 14px;
+    }
+    .post-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .post-author-av {
+      width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
+      background: #059669; color: #fff; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px; flex-shrink: 0;
+    }
+    .post-author-av img { width: 100%; height: 100%; object-fit: cover; }
+    .post-author-meta { font-size: 0.88rem; color: #666; }
+    .post-body-text { font-size: 1rem; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+    .thread-top-pills {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      margin: 18px 0 0;
+    }
+    .thread-pill {
+      border: 1px solid #d6e8dc; background: #f6fbf8; color: #2f4f3d;
+      border-radius: 999px; padding: 8px 12px; font-size: 13px; font-weight: 700;
+      display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font: inherit;
+    }
+    .thread-join-trigger {
+      width: 100%; border: 1px solid #cfe4d7; border-radius: 999px; background: #fff;
+      color: #5d7467; padding: 11px 14px; text-align: left; font: inherit; cursor: text;
+      margin-top: 16px;
+    }
+    .thread-composer-panel {
+      margin-top: 8px; border: 1px solid #d7e9dd; border-radius: 10px; background: #fff; padding: 10px;
+    }
+    .thread-composer-text {
+      width: 100%; min-height: 90px; padding: 12px; border: 1px solid #c5e0d0; border-radius: 8px;
+      resize: vertical; font: inherit;
+    }
+    .thread-composer-text:focus {
+      outline: none; border-color: var(--btn-green);
+      box-shadow: 0 0 0 3px rgba(26, 122, 74, 0.12);
+    }
+    .thread-composer-toolbar {
+      margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .thread-toolbar-left { display: inline-flex; align-items: center; gap: 6px; }
+    .thread-toolbar-btn {
+      border: 1px solid #d7e9dd; background: #fff; color: #335443;
+      border-radius: 8px; padding: 4px 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .thread-toolbar-actions { display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary {
+      font-family: inherit; font-size: 0.9rem; font-weight: 600; padding: 10px 18px;
+      border-radius: 10px; border: none; background: var(--btn-green); color: #fff; cursor: pointer;
+    }
+    .btn-primary:hover { background: var(--btn-green-hover); }
+    .btn-secondary {
+      font-family: inherit; font-size: 0.9rem; font-weight: 600; padding: 10px 18px;
+      border-radius: 10px; border: 1px solid var(--border); background: #fff; color: var(--text); cursor: pointer;
+    }
+    .sort-row { margin: 20px 0 12px; }
+    .sort-row select {
+      border: 1px solid #d7e9dd; border-radius: 8px; padding: 8px 12px; font: inherit; font-size: 14px;
+    }
+    .comment-item {
+      display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px;
+      border-radius: 10px; padding: 8px;
+    }
+    .comment-highlight { background: #fff9e8; }
+    .comment-meta { font-size: 0.86rem; color: #666; margin-bottom: 4px; }
+    .comment-body { font-size: 0.95rem; line-height: 1.5; }
+    .comment-actions-row { margin-top: 6px; display: flex; align-items: center; gap: 10px; color: #627a6d; font-size: 12px; }
+    .comment-action-link {
+      border: none; background: transparent; color: #627a6d; font-size: 12px; font-weight: 700;
+      cursor: pointer; padding: 0;
+    }
+    .comment-action-link:hover { color: var(--btn-green); }
+    .nested-reply {
+      margin-left: 36px; margin-top: 8px; border-left: 2px solid #dcebe2; padding-left: 10px;
+    }
+    .reply-actions-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+    .reply-cancel-link {
+      border: none; background: transparent; color: #60776a; font-size: 13px; font-weight: 600;
+      cursor: pointer; padding: 8px 4px;
+    }
+    .comment-more-wrap { position: relative; display: inline-flex; }
+    .comment-more-menu {
+      position: absolute; right: 0; top: calc(100% + 4px); min-width: 120px;
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08); padding: 6px; z-index: 50;
+    }
+    .comment-more-menu[hidden] { display: none !important; }
+    .comment-more-menu button {
+      display: block; width: 100%; text-align: left; padding: 8px 10px; border: none; border-radius: 6px;
+      background: transparent; font: inherit; font-size: 13px; font-weight: 600; color: #b42318; cursor: pointer;
+    }
+    .comment-more-menu button:hover { background: #fef2f2; }
+    .feed-empty, .meta-pill { text-align: center; color: var(--muted); padding: 24px; }
+    .meta-pill { text-align: left; padding: 0; font-size: 0.88rem; }
+  </style>
 </head>
 <body>
-<nav>
-  <a href="index.html" class="logo"><div class="logo-icon"></div><span class="logo-word">li<span>vv</span>o</span></a>
-  <a href="#" class="nav-back" id="backLink">← Back to feed</a>
-</nav>
-<div class="page">
-  <div id="postContainer" class="post-full"></div>
-  <div class="comments-section">
-    <h3 id="commentsTitle">Comments</h3>
-    <div id="commentsList"></div>
-    <form class="comment-form" id="commentForm" onsubmit="return false;">
-      <input type="hidden" name="post_id" id="postIdField" value="" />
-      <div class="msg-success" id="successMsg">Thanks! Your comment has been submitted.</div>
-      <label for="commentName">Your name</label>
-      <input type="text" name="name" id="commentName" placeholder="e.g. Alexia R." required />
-      <label for="commentEmail">Your email</label>
-      <input type="email" name="email" id="commentEmail" placeholder="your@email.com" required />
-      <label for="commentBody">Your comment</label>
-      <textarea name="message" id="commentBody" placeholder="Write your comment..." required></textarea>
-      <button type="button" class="btn-submit" id="commentPostBtn">Post comment</button>
-    </form>
-  </div>
-</div>
-<script>
-  const POSTS = {
-    'flatmate-exarchia': {
-      author: 'Maria K. (Erasmus, Universitat Barcelona)',
-      time: '2h ago',
-      title: 'Looking for a flatmate in Exarchia — 2BR, 650€ total, move-in Sept 1',
-      body: 'Found a great flat on Zoodochou Pigis, 5 min walk from Exarchia square. Two bedrooms, shared kitchen and bathroom. Landlord is super chill. I\'m coming for Erasmus at NKUA. Looking for a female flatmate, non-smoker. Deposit is 1 month rent. Message me if you want to video call and see the place!',
-      votes: 24,
-      comments: [
-        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '1h ago', body: 'Hi Maria! I\'m also doing Erasmus at NKUA from September. The area sounds perfect — I\'ve heard Exarchia has a really cool vibe. Is the flat still available? Would love to organise a call this week.' },
-        { author: 'Maria K.', time: '45m ago', body: 'Yes still available! Sent you a DM with my WhatsApp. Let\'s chat tomorrow?', reply: true },
-        { author: 'Sophie M.', time: '30m ago', body: 'Exarchia is amazing, lived there last year. Pro tip: the weekly market on Friday morning has the best cheap fruit & veg. Good luck with the search!' }
-      ]
-    },
-    'coworking-athens': {
-      author: 'Alex K.', time: '5h ago',
-      title: 'Best coworking spots in Athens? Good WiFi + coffee near Monastiraki',
-      body: 'Just landed in Athens for 2 months. Working remotely for a German startup. Need somewhere reliable with fast internet for video calls. Prefer cafes or shared spaces — not a fan of silent offices. Any nomads here with tips?',
-      votes: 18,
-      comments: [
-        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '4h ago', body: 'Taf Coffee in Psiri has solid WiFi and great coffee. They\'re used to people working there. Another option is The Works in Metaxourgeio — it\'s a proper coworking but has a chill vibe, day pass is 12€.' },
-        { author: 'Nikolas', time: '3h ago', body: '+1 for Taf. Also try Communitism in Kerameikos — it\'s a creative space, free WiFi, you can sit with a coffee for hours. Very nomad-friendly.' }
-      ]
-    },
-    'erasmus-meetup': {
-      author: 'Sophie L.', time: '1d ago',
-      title: 'Erasmus Athens meetup — Saturday 7pm at Six d.o.g.s (Psiri)',
-      body: 'Hey everyone! A few of us from the Erasmus group are organising a casual meetup this Saturday. Six d.o.g.s is a bar/cafe with a nice courtyard — easy to find, good for groups. Come say hi if you\'re new in Athens or want to meet other students. No pressure, just vibes. DM me if you need the exact address or have questions.',
-      votes: 31,
-      comments: [
-        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '20h ago', body: 'I\'ll be there! Really looking forward to meeting everyone. I arrive in Athens on Thursday so perfect timing.' },
-        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '18h ago', body: 'For anyone wondering — Six d.o.g.s is on Avramiotou 6, right by Monastiraki metro. The courtyard is at the back, we\'ll probably be there. Look for the Livvo crowd!' },
-        { author: 'Lucas', time: '12h ago', body: 'Count me in! First week here, need to make some friends haha' }
-      ]
-    },
-    'pwc-internship': {
-      author: 'Lucas T.', time: '2d ago',
-      title: 'PWC Athens internship — where to live? Budget 500–600€, office near Syntagma',
-      body: 'Starting a 6-month audit internship in September. Office is on Stadiou street. Looking for a room in a shared flat — budget around 500–600 all in. Prefer somewhere safe and max 30 min commute. Kolonaki? Pagrati? Any interns who\'ve been through this with tips?',
-      votes: 15,
-      comments: [
-        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '1d ago', body: 'Pagrati and Kypseli are both within your budget and on the metro line to Syntagma. Kypseli is cheaper and has a lot of young people. Avoid living too far north — the commute can get long. Good luck with the internship!' }
-      ]
-    },
-    'beaches-weekend': {
-      author: 'Julia M.', time: '3d ago',
-      title: 'Weekend beach trip from Athens — best spots by bus/train?',
-      body: 'In Athens for a few weeks, want to get out to the coast for a weekend. Looking for somewhere easy to reach without a car — KTEL bus or train. Clean water, maybe a few cafes. Heard about Sounio and Rafina — any comparisons? Or other suggestions?',
-      votes: 9,
-      comments: [
-        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '2d ago', body: 'Sounio is stunning — the temple at sunset is worth it. Beach is ok, a bit rocky. For proper swimming I\'d recommend taking the ferry from Rafina to Andros or Evia. Rafina port is 45 min by bus from Athens. Hydra is also doable as a day trip if you leave early.' }
-      ]
-    }
-  };
-
-  const params = new URLSearchParams(location.search);
-  const postId = params.get('id') || 'flatmate-exarchia';
-  const city = params.get('city') || 'athens';
-  let post = POSTS[postId];
-  if (!post && postId.startsWith('user-')) {
-    const stored = localStorage.getItem('livvo_posts') || '[]';
-    const userPosts = JSON.parse(stored).filter(p => p.id === postId);
-    post = userPosts[0] ? { author: userPosts[0].author, time: userPosts[0].time, title: userPosts[0].title, body: userPosts[0].body, votes: userPosts[0].votes || 0, comments: userPosts[0].comments || [] } : null;
-  }
-  if (!post) post = POSTS['flatmate-exarchia'];
-
-  document.getElementById('backLink').href = 'community-feed.html?city=' + city;
-  const cityNamesMap = { paris: 'Paris', athens: 'Athens', london: 'London' };
-  document.getElementById('postIdField').value = postId + ' (' + (cityNamesMap[city] || city) + ')';
-
-  function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-  const bodyEscaped = esc(post.body).replace(/\n/g, '<br>');
-  const container = document.getElementById('postContainer');
-  container.innerHTML = `
-    <div class="post-meta">${esc(post.author)} · ${esc(post.time)}</div>
-    <h1 class="post-title">${esc(post.title)}</h1>
-    <div class="post-body">${bodyEscaped}</div>
-    <div class="post-vote-row">
-      <button type="button">&#9650;</button><span>${post.votes}</span><button type="button">&#9660;</button>
-    </div>
-  `;
-
-  const commentsList = document.getElementById('commentsList');
-  let allComments = [...(post.comments || [])];
-  const stored = localStorage.getItem('livvo_comments_' + postId);
-  if (stored) try { allComments = allComments.concat(JSON.parse(stored)); } catch(e) {}
-
-  function renderComments() {
-    commentsList.innerHTML = allComments.map(c => `
-      <div class="comment" ${c.reply ? 'style="margin-left:20px;padding-left:16px;border-left:2px solid var(--border)"' : ''}>
-        <div class="comment-meta"><strong>${esc(c.author)}</strong> · ${esc(c.time)}</div>
-        <div class="comment-body">${c.body}</div>
+  <main class="thread-page">
+    <a class="thread-back" id="back-link" href="#">← Back</a>
+    <div id="loading" class="meta-pill">Loading…</div>
+    <p id="err-msg" class="feed-empty" hidden></p>
+    <div id="post-shell" hidden>
+      <article class="post-card" id="post-wrap">
+        <h1 id="view-title"></h1>
+        <span class="post-cat" id="view-cat"></span>
+        <div class="post-author" id="view-author"></div>
+        <div class="post-body-text" id="view-body"></div>
+        <div class="thread-top-pills" id="view-pills"></div>
+      </article>
+      <div id="composer-host"></div>
+      <div class="sort-row">
+        <label for="sort-comments" class="meta-pill" style="display:inline;margin-right:8px;">Sort:</label>
+        <select id="sort-comments">
+          <option value="best">Best</option>
+          <option value="new">New</option>
+          <option value="old">Old</option>
+        </select>
       </div>
-    `).join('');
-  }
-  renderComments();
+      <div id="comments-list"></div>
+    </div>
+  </main>
 
-  function postComment() {
-    const form = document.getElementById('commentForm');
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import {
+      getFirestore, collection, query, orderBy, onSnapshot, doc, getDoc,
+      serverTimestamp, increment, deleteDoc, setDoc, updateDoc, runTransaction, writeBatch
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const CATEGORY_LABELS = {
+      housing: 'Housing Tips', events: 'Events', flatmate: 'Flatmate Search', general: 'General',
+      recommendations: 'Recommendations', visa_admin: 'Visa & Admin', jobs_remote: 'Jobs & Remote Work',
+      things_to_do: 'Things to Do'
+    };
+
+    const params = new URLSearchParams(location.search);
+    const postId = String(params.get('postId') || '').trim();
+    let city = String(params.get('city') || '').trim();
+    if (!city) city = 'Athens';
+
+    const backLink = document.getElementById('back-link');
+    backLink.href = 'community-portal.html?city=' + encodeURIComponent(city);
+
+    if (!postId) {
+      window.location.replace('community-portal.html?city=' + encodeURIComponent(city));
+      throw new Error('missing postId');
     }
-    const formData = new FormData(form);
-    formData.append('post', postId);
-    const newComment = { author: formData.get('name'), email: formData.get('email'), time: 'Just now', body: formData.get('message') };
-    allComments.push(newComment);
-    const stored = localStorage.getItem('livvo_comments_' + postId);
-    const arr = stored ? JSON.parse(stored) : [];
-    arr.push(newComment);
-    localStorage.setItem('livvo_comments_' + postId, JSON.stringify(arr));
-    renderComments();
-    document.getElementById('successMsg').style.display = 'block';
-    form.reset();
-  }
-  document.getElementById('commentPostBtn').addEventListener('click', postComment);
-</script>
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
+      authDomain: "livvo-573e1.firebaseapp.com",
+      projectId: "livvo-573e1",
+      storageBucket: "livvo-573e1.firebasestorage.app",
+      messagingSenderId: "438563892670",
+      appId: "1:438563892670:web:c038316d9d3fcbee065def"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let currentProfileData = null;
+    let postData = null;
+    let threadRepliesUnsubs = [];
+    const authorCache = new Map();
+
+    function stripHtml(html) {
+      const d = document.createElement('div');
+      d.innerHTML = html || '';
+      return (d.textContent || d.innerText || '').trim().replace(/\s+/g, ' ');
+    }
+
+    function formatRelativeTime(ts) {
+      if (!ts || typeof ts.toDate !== 'function') return 'just now';
+      const then = ts.toDate().getTime();
+      if (!then) return 'just now';
+      const diffSec = Math.max(1, Math.floor((Date.now() - then) / 1000));
+      if (diffSec < 60) return diffSec + 's ago';
+      const diffMin = Math.floor(diffSec / 60);
+      if (diffMin < 60) return diffMin + 'm ago';
+      const diffHr = Math.floor(diffMin / 60);
+      if (diffHr < 24) return diffHr + 'h ago';
+      return Math.floor(diffHr / 24) + 'd ago';
+    }
+
+    function getMillis(ts) {
+      if (!ts) return 0;
+      if (typeof ts.toMillis === 'function') return ts.toMillis();
+      const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+      return d.getTime() || 0;
+    }
+
+    async function getAuthorProfile(authorUid, fallbackUsername, fallbackPhoto) {
+      if (!authorUid) {
+        return {
+          username: fallbackUsername || 'Anonymous',
+          photoUrl: fallbackPhoto || '',
+          initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase()
+        };
+      }
+      if (authorCache.has(authorUid)) return authorCache.get(authorUid);
+      let profile = {
+        username: fallbackUsername || 'Anonymous',
+        photoUrl: fallbackPhoto || '',
+        initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase()
+      };
+      try {
+        const uSnap = await getDoc(doc(db, 'users', authorUid));
+        if (uSnap.exists()) {
+          const ud = uSnap.data() || {};
+          const un = String(ud.username || ud.displayName || fallbackUsername || 'Anonymous').trim();
+          const ph = String(ud.photoURL || '').trim();
+          profile = { username: un || 'Anonymous', photoUrl: ph, initial: String((un || 'A').charAt(0)).toUpperCase() };
+        }
+      } catch (e) {}
+      authorCache.set(authorUid, profile);
+      return profile;
+    }
+
+    function attachCommentComposerIcons(leftEl, textarea) {
+      const imgBtn = document.createElement('button');
+      imgBtn.type = 'button';
+      imgBtn.className = 'thread-toolbar-btn';
+      imgBtn.setAttribute('title', 'Upload image');
+      imgBtn.setAttribute('aria-label', 'Upload image');
+      imgBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+      imgBtn.addEventListener('click', function () { window.alert('Coming soon'); });
+      const aaBtn = document.createElement('button');
+      aaBtn.type = 'button';
+      aaBtn.className = 'thread-toolbar-btn';
+      aaBtn.textContent = 'Aa';
+      aaBtn.title = 'Text size';
+      let large = false;
+      aaBtn.addEventListener('click', function () {
+        large = !large;
+        textarea.style.fontSize = large ? '1.08rem' : '';
+      });
+      leftEl.appendChild(imgBtn);
+      leftEl.appendChild(aaBtn);
+    }
+
+    async function toggleLike(postIdInner, btn) {
+      const user = auth.currentUser;
+      if (!user) return;
+      const likeRef = doc(db, 'communityPosts', postIdInner, 'upvotes', user.uid);
+      const likeSnap = await getDoc(likeRef);
+      const nowLiked = !likeSnap.exists();
+      if (likeSnap.exists()) {
+        await deleteDoc(likeRef);
+        await updateDoc(doc(db, 'communityPosts', postIdInner), { upvoteCount: increment(-1) });
+      } else {
+        await setDoc(likeRef, { uid: user.uid });
+        await updateDoc(doc(db, 'communityPosts', postIdInner), { upvoteCount: increment(1) });
+      }
+      const postSnap = await getDoc(doc(db, 'communityPosts', postIdInner));
+      const safeCount = postSnap.exists() ? Math.max(0, Number(postSnap.data().upvoteCount || 0)) : 0;
+      const root = document.getElementById('post-wrap');
+      const btns = root ? root.querySelectorAll('.post-like-btn') : [];
+      const list = btns && btns.length ? btns : [btn];
+      Array.prototype.forEach.call(list, function (b) {
+        b.classList.toggle('liked', nowLiked);
+        b.classList.toggle('is-on', nowLiked);
+        const countEl = b.querySelector('.up-count');
+        if (countEl) countEl.textContent = String(safeCount);
+        const icon = b.querySelector('.like-icon');
+        if (icon) icon.textContent = nowLiked ? '❤' : '♡';
+      });
+    }
+
+    const loadingEl = document.getElementById('loading');
+    const errEl = document.getElementById('err-msg');
+    const shell = document.getElementById('post-shell');
+    const viewTitle = document.getElementById('view-title');
+    const viewCat = document.getElementById('view-cat');
+    const viewAuthor = document.getElementById('view-author');
+    const viewBody = document.getElementById('view-body');
+    const viewPills = document.getElementById('view-pills');
+    const composerHost = document.getElementById('composer-host');
+    const sortSelect = document.getElementById('sort-comments');
+    const listEl = document.getElementById('comments-list');
+
+    let threadCommentPill = null;
+    let latestComments = [];
+    let activeReplyBox = null;
+    let pendingScrollTarget = '';
+
+    function closeAllCommentMenus() {
+      listEl.querySelectorAll('.comment-more-menu').forEach(function (m) { m.hidden = true; });
+    }
+
+    listEl.addEventListener('click', closeAllCommentMenus);
+
+    function renderComments() {
+      closeAllCommentMenus();
+      listEl.innerHTML = '';
+      threadRepliesUnsubs.forEach(function (u) { try { u(); } catch (e) {} });
+      threadRepliesUnsubs = [];
+
+      let docs = latestComments.slice();
+      if (sortSelect.value === 'best') {
+        docs.sort(function (a, b) {
+          const ad = a.data() || {}, bd = b.data() || {};
+          return Number(bd.likes || bd.likeCount || 0) - Number(ad.likes || ad.likeCount || 0)
+            || getMillis(bd.createdAt) - getMillis(ad.createdAt);
+        });
+      } else if (sortSelect.value === 'new') {
+        docs.sort(function (a, b) { return getMillis((b.data() || {}).createdAt) - getMillis((a.data() || {}).createdAt); });
+      } else {
+        docs.sort(function (a, b) { return getMillis((a.data() || {}).createdAt) - getMillis((b.data() || {}).createdAt); });
+      }
+
+      if (!docs.length) {
+        listEl.innerHTML = '<p class="meta-pill">No comments yet.</p>';
+        return;
+      }
+
+      docs.forEach(function (cd) {
+        const c = cd.data() || {};
+        const username = String(c.authorUsername || 'Member').trim() || 'Member';
+        const photo = String(c.authorPhoto || '').trim();
+        const item = document.createElement('div');
+        item.className = 'comment-item';
+
+        const av = document.createElement('div');
+        av.className = 'post-author-av';
+        av.style.width = '32px';
+        av.style.height = '32px';
+        av.style.fontSize = '13px';
+        if (photo) {
+          const img = document.createElement('img');
+          img.src = photo;
+          img.alt = username;
+          av.appendChild(img);
+        } else av.textContent = username.charAt(0).toUpperCase();
+
+        const right = document.createElement('div');
+        right.style.flex = '1';
+        const meta = document.createElement('div');
+        meta.className = 'comment-meta';
+        meta.textContent = username + ' · ' + formatRelativeTime(c.createdAt);
+        const textEl = document.createElement('div');
+        textEl.className = 'comment-body';
+        textEl.textContent = c.text || '';
+
+        const actionRow = document.createElement('div');
+        actionRow.className = 'comment-actions-row';
+        const likeBtn = document.createElement('button');
+        likeBtn.type = 'button';
+        likeBtn.className = 'comment-action-link';
+        likeBtn.textContent = '♡ ' + String(Number(c.likes || c.likeCount || 0));
+        const replyBtn = document.createElement('button');
+        replyBtn.type = 'button';
+        replyBtn.className = 'comment-action-link';
+        replyBtn.textContent = 'Reply';
+
+        const moreWrap = document.createElement('span');
+        moreWrap.className = 'comment-more-wrap';
+        const moreMenu = document.createElement('div');
+        moreMenu.className = 'comment-more-menu';
+        moreMenu.hidden = true;
+        moreMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+        const moreBtn = document.createElement('button');
+        moreBtn.type = 'button';
+        moreBtn.className = 'comment-action-link';
+        moreBtn.textContent = '···';
+        moreBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          moreMenu.hidden = !moreMenu.hidden;
+        });
+        if (currentUser && c.authorUid && c.authorUid === currentUser.uid) {
+          const delOpt = document.createElement('button');
+          delOpt.type = 'button';
+          delOpt.textContent = 'Delete';
+          delOpt.addEventListener('click', async function (e) {
+            e.stopPropagation();
+            moreMenu.hidden = true;
+            try {
+              await deleteDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
+              await runTransaction(db, async function (transaction) {
+                const postSnap = await transaction.get(doc(db, 'communityPosts', postId));
+                if (!postSnap.exists()) return;
+                const cur = Number((postSnap.data() || {}).commentCount || 0);
+                transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
+              });
+              if (threadCommentPill) {
+                const cnt = Number(String(threadCommentPill.textContent || '').replace(/[^\d]/g, '') || 0);
+                threadCommentPill.textContent = '💬 ' + String(Math.max(0, cnt - 1));
+              }
+            } catch (err) {
+              console.error('Delete comment failed:', err);
+            }
+          });
+          moreMenu.appendChild(delOpt);
+        }
+        moreWrap.appendChild(moreBtn);
+        moreWrap.appendChild(moreMenu);
+
+        actionRow.appendChild(likeBtn);
+        actionRow.appendChild(replyBtn);
+        if (moreMenu.firstChild) actionRow.appendChild(moreWrap);
+
+        if (currentUser) {
+          getDoc(doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid)).then(function (ls) {
+            if (ls.exists()) {
+              likeBtn.style.color = 'var(--btn-green)';
+              likeBtn.textContent = '❤ ' + String(Number(c.likes || c.likeCount || 0));
+            }
+          }).catch(function () {});
+        }
+        likeBtn.addEventListener('click', async function (e) {
+          e.stopPropagation();
+          if (!currentUser) return;
+          const ref = doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid);
+          const cLikeSnap = await getDoc(ref);
+          const wasLiked = cLikeSnap.exists();
+          try {
+            if (wasLiked) {
+              await deleteDoc(ref);
+              await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likes: increment(-1) });
+              likeBtn.style.color = '';
+            } else {
+              await setDoc(ref, { uid: currentUser.uid, createdAt: serverTimestamp() });
+              await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likes: increment(1) });
+              likeBtn.style.color = 'var(--btn-green)';
+            }
+            const latest = await getDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
+            const safeLikes = Math.max(0, Number(latest.exists() ? (latest.data() || {}).likes || 0 : 0));
+            likeBtn.textContent = (wasLiked ? '♡ ' : '❤ ') + String(safeLikes);
+          } catch (err) {
+            console.error('Comment like failed:', err);
+          }
+        });
+
+        const repliesWrap = document.createElement('div');
+        repliesWrap.className = 'nested-reply';
+
+        const inlineReplyWrap = document.createElement('div');
+        inlineReplyWrap.className = 'nested-reply thread-composer-panel';
+        inlineReplyWrap.hidden = true;
+        const inlineReplyInput = document.createElement('textarea');
+        inlineReplyInput.className = 'thread-composer-text';
+        inlineReplyInput.placeholder = 'Reply to u/' + username;
+        const inlineReplyToolbar = document.createElement('div');
+        inlineReplyToolbar.className = 'thread-composer-toolbar';
+        const inlineLeft = document.createElement('div');
+        inlineLeft.className = 'thread-toolbar-left';
+        attachCommentComposerIcons(inlineLeft, inlineReplyInput);
+        const inlineActions = document.createElement('div');
+        inlineActions.className = 'reply-actions-row';
+        const inlineReplyCancel = document.createElement('button');
+        inlineReplyCancel.type = 'button';
+        inlineReplyCancel.className = 'reply-cancel-link';
+        inlineReplyCancel.textContent = 'Cancel';
+        const inlineReplySubmit = document.createElement('button');
+        inlineReplySubmit.type = 'button';
+        inlineReplySubmit.className = 'btn-primary';
+        inlineReplySubmit.textContent = 'Reply';
+        inlineActions.appendChild(inlineReplyCancel);
+        inlineActions.appendChild(inlineReplySubmit);
+        inlineReplyToolbar.appendChild(inlineLeft);
+        inlineReplyToolbar.appendChild(inlineActions);
+        inlineReplyWrap.appendChild(inlineReplyInput);
+        inlineReplyWrap.appendChild(inlineReplyToolbar);
+
+        const replyQ = query(collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies'), orderBy('createdAt', 'asc'));
+        const unsubReplies = onSnapshot(replyQ, function (rsnap) {
+          repliesWrap.innerHTML = '';
+          rsnap.docs.forEach(function (rd) {
+            const r = rd.data() || {};
+            const rName = String(r.authorUsername || 'Member').trim() || 'Member';
+            const row = document.createElement('div');
+            row.className = 'comment-item';
+            row.style.marginTop = '6px';
+            const rav = document.createElement('div');
+            rav.className = 'post-author-av';
+            rav.style.width = '26px';
+            rav.style.height = '26px';
+            rav.style.fontSize = '11px';
+            if (r.authorPhoto) {
+              const ri = document.createElement('img');
+              ri.src = r.authorPhoto;
+              ri.alt = rName;
+              rav.appendChild(ri);
+            } else rav.textContent = rName.charAt(0).toUpperCase();
+            const rr = document.createElement('div');
+            rr.style.flex = '1';
+            const rm = document.createElement('div');
+            rm.className = 'comment-meta';
+            rm.textContent = rName + ' · ' + formatRelativeTime(r.createdAt);
+            const rb = document.createElement('div');
+            rb.className = 'comment-body';
+            rb.textContent = r.text || '';
+            rr.appendChild(rm);
+            rr.appendChild(rb);
+            row.appendChild(rav);
+            row.appendChild(rr);
+            repliesWrap.appendChild(row);
+          });
+        });
+        threadRepliesUnsubs.push(unsubReplies);
+
+        replyBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (activeReplyBox && activeReplyBox !== inlineReplyWrap) activeReplyBox.hidden = true;
+          if (activeReplyBox && activeReplyBox.parentNode) activeReplyBox.parentNode.classList.remove('comment-highlight');
+          activeReplyBox = inlineReplyWrap;
+          item.classList.add('comment-highlight');
+          inlineReplyWrap.hidden = false;
+          inlineReplyInput.focus();
+        });
+        inlineReplyCancel.addEventListener('click', function () {
+          inlineReplyInput.value = '';
+          inlineReplyWrap.hidden = true;
+          item.classList.remove('comment-highlight');
+        });
+        inlineReplySubmit.addEventListener('click', async function () {
+          if (!currentUser) return;
+          const replyText = (inlineReplyInput.value || '').trim();
+          if (!replyText) return;
+          const authorUsername = (currentProfileData && String(currentProfileData.username || '').trim())
+            || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : '') || 'Member';
+          const authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim()) || currentUser.photoURL || '';
+          try {
+            const replyCol = collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies');
+            await setDoc(doc(replyCol), {
+              text: replyText,
+              authorUid: currentUser.uid,
+              authorUsername: authorUsername,
+              authorPhoto: authorPhoto,
+              createdAt: serverTimestamp()
+            });
+            await updateDoc(doc(db, 'communityPosts', postId), { commentCount: increment(1) });
+            if (threadCommentPill) {
+              const oc = Number(String(threadCommentPill.textContent || '').replace(/[^\d]/g, '') || 0);
+              threadCommentPill.textContent = '💬 ' + String(oc + 1);
+            }
+            inlineReplyInput.value = '';
+            inlineReplyWrap.hidden = true;
+            item.classList.remove('comment-highlight');
+          } catch (err) {
+            console.error('Reply failed:', err);
+          }
+        });
+
+        right.appendChild(meta);
+        right.appendChild(textEl);
+        right.appendChild(actionRow);
+        right.appendChild(inlineReplyWrap);
+        right.appendChild(repliesWrap);
+        item.appendChild(av);
+        item.appendChild(right);
+        listEl.appendChild(item);
+      });
+    }
+
+    function buildComposer() {
+      composerHost.innerHTML = '';
+      const joinTrigger = document.createElement('button');
+      joinTrigger.type = 'button';
+      joinTrigger.className = 'thread-join-trigger';
+      joinTrigger.textContent = 'Join the conversation';
+      const composerPanel = document.createElement('div');
+      composerPanel.className = 'thread-composer-panel';
+      composerPanel.hidden = true;
+      const textarea = document.createElement('textarea');
+      textarea.className = 'thread-composer-text';
+      textarea.placeholder = 'Join the conversation';
+      const toolbar = document.createElement('div');
+      toolbar.className = 'thread-composer-toolbar';
+      const toolbarLeft = document.createElement('div');
+      toolbarLeft.className = 'thread-toolbar-left';
+      attachCommentComposerIcons(toolbarLeft, textarea);
+      const toolbarActions = document.createElement('div');
+      toolbarActions.className = 'thread-toolbar-actions';
+      const cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'btn-secondary';
+      cancelBtn.textContent = 'Cancel';
+      const submitBtn = document.createElement('button');
+      submitBtn.type = 'button';
+      submitBtn.className = 'btn-primary';
+      submitBtn.textContent = 'Comment';
+      toolbarActions.appendChild(cancelBtn);
+      toolbarActions.appendChild(submitBtn);
+      toolbar.appendChild(toolbarLeft);
+      toolbar.appendChild(toolbarActions);
+      composerPanel.appendChild(textarea);
+      composerPanel.appendChild(toolbar);
+      composerHost.appendChild(joinTrigger);
+      composerHost.appendChild(composerPanel);
+
+      joinTrigger.addEventListener('click', function () {
+        joinTrigger.hidden = true;
+        composerPanel.hidden = false;
+        textarea.focus();
+      });
+      cancelBtn.addEventListener('click', function () {
+        textarea.value = '';
+        composerPanel.hidden = true;
+        joinTrigger.hidden = false;
+      });
+      submitBtn.addEventListener('click', async function () {
+        if (!currentUser) return;
+        const text = (textarea.value || '').trim();
+        if (!text) return;
+        const authorUsername = (currentProfileData && String(currentProfileData.username || '').trim())
+          || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : '') || 'Member';
+        const authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim()) || currentUser.photoURL || '';
+        const batch = writeBatch(db);
+        const postRef = doc(db, 'communityPosts', postId);
+        const commentRef = doc(collection(db, 'communityPosts', postId, 'comments'));
+        batch.set(commentRef, {
+          text, authorUid: currentUser.uid, authorUsername, authorPhoto,
+          likes: 0, createdAt: serverTimestamp()
+        });
+        batch.update(postRef, { commentCount: increment(1) });
+        try {
+          await batch.commit();
+          if (threadCommentPill) {
+            const oc = Number(String(threadCommentPill.textContent || '').replace(/[^\d]/g, '') || 0);
+            threadCommentPill.textContent = '💬 ' + String(oc + 1);
+          }
+          textarea.value = '';
+        } catch (err) {
+          console.error('Comment failed:', err);
+        }
+      });
+    }
+
+    async function hydratePost(data) {
+      postData = data;
+      const authorUid = data.author || data.authorId || '';
+      const fallback = data.authorUsername || data.authorName || 'Anonymous';
+      const ap = await getAuthorProfile(authorUid, fallback, data.authorPhoto || '');
+
+      viewTitle.textContent = data.title || 'Untitled';
+      const catKey = data.category || '';
+      viewCat.textContent = CATEGORY_LABELS[catKey] || catKey || '';
+
+      viewAuthor.innerHTML = '';
+      const av = document.createElement('div');
+      av.className = 'post-author-av';
+      if (ap.photoUrl) {
+        const im = document.createElement('img');
+        im.src = ap.photoUrl;
+        im.alt = ap.username;
+        av.appendChild(im);
+      } else av.textContent = ap.initial;
+      const meta = document.createElement('div');
+      meta.className = 'post-author-meta';
+      meta.textContent = (ap.username || 'Member') + (data.createdAt ? ' · ' + formatRelativeTime(data.createdAt) : '');
+      viewAuthor.appendChild(av);
+      viewAuthor.appendChild(meta);
+
+      const bodyPlain = (data.body != null && String(data.body).trim()) ? String(data.body) : stripHtml(data.bodyHtml || '');
+      viewBody.textContent = bodyPlain || '';
+
+      viewPills.innerHTML = '';
+      let hasLiked = false;
+      if (currentUser) {
+        try {
+          const vs = await getDoc(doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid));
+          hasLiked = vs.exists();
+        } catch (e) {}
+      }
+      const likeBtn = document.createElement('button');
+      likeBtn.type = 'button';
+      likeBtn.className = 'thread-pill post-like-btn' + (hasLiked ? ' is-on' : '');
+      likeBtn.innerHTML = '<span class="like-icon">' + (hasLiked ? '❤' : '♡') + '</span> <span class="up-count">' + Number(data.upvoteCount || 0) + '</span>';
+      likeBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        toggleLike(postId, likeBtn);
+      });
+      threadCommentPill = document.createElement('span');
+      threadCommentPill.className = 'thread-pill';
+      threadCommentPill.textContent = '💬 ' + Number(data.commentCount || 0);
+      const shareBtn = document.createElement('button');
+      shareBtn.type = 'button';
+      shareBtn.className = 'thread-pill';
+      shareBtn.textContent = 'Share';
+      shareBtn.addEventListener('click', function () {
+        const link = location.href.split('#')[0];
+        navigator.clipboard.writeText(link).then(function () {
+          const o = shareBtn.textContent;
+          shareBtn.textContent = 'Copied!';
+          setTimeout(function () { shareBtn.textContent = o; }, 1200);
+        }).catch(function () {});
+      });
+      viewPills.appendChild(likeBtn);
+      viewPills.appendChild(threadCommentPill);
+      viewPills.appendChild(shareBtn);
+
+      buildComposer();
+    }
+
+    let commentsUnsub = null;
+
+    function wireCommentsListener() {
+      if (commentsUnsub) {
+        commentsUnsub();
+        commentsUnsub = null;
+      }
+      const cq = query(collection(db, 'communityPosts', postId, 'comments'), orderBy('createdAt', 'asc'));
+      commentsUnsub = onSnapshot(cq, function (csnap) {
+        latestComments = csnap.docs.slice();
+        renderComments();
+      }, function () {
+        listEl.innerHTML = '<p class="meta-pill">Could not load comments.</p>';
+      });
+    }
+
+    sortSelect.addEventListener('change', function () { renderComments(); });
+
+    let postUnsub = null;
+    let postHydrated = false;
+
+    function startPostListener() {
+      if (postUnsub) { postUnsub(); postUnsub = null; }
+      const pref = doc(db, 'communityPosts', postId);
+      postUnsub = onSnapshot(pref, async function (snap) {
+        if (!snap.exists()) {
+          loadingEl.hidden = true;
+          shell.hidden = true;
+          errEl.hidden = false;
+          errEl.textContent = 'This post could not be found.';
+          return;
+        }
+        const pdata = snap.data() || {};
+        loadingEl.hidden = true;
+        errEl.hidden = true;
+        shell.hidden = false;
+        document.title = (pdata.title || 'Post') + ' | Livvo';
+        if (!postHydrated) {
+          await hydratePost(pdata);
+          postHydrated = true;
+          wireCommentsListener();
+        } else {
+          if (threadCommentPill) threadCommentPill.textContent = '💬 ' + Number(pdata.commentCount || 0);
+          const countEl = viewPills.querySelector('.post-like-btn .up-count');
+          if (countEl) countEl.textContent = String(Number(pdata.upvoteCount || 0));
+        }
+      }, function () {
+        loadingEl.hidden = true;
+        errEl.hidden = false;
+        errEl.textContent = 'Could not load this post.';
+      });
+    }
+
+    let authTimer = null;
+    function scheduleRedirect() {
+      if (authTimer) clearTimeout(authTimer);
+      authTimer = setTimeout(function () {
+        if (!auth.currentUser) {
+          const ret = 'community-post.html?postId=' + encodeURIComponent(postId) + '&city=' + encodeURIComponent(city);
+          window.location.href = 'signup.html?redirect=community&city=' + encodeURIComponent(city) + '&return=' + encodeURIComponent(ret);
+        }
+      }, 2000);
+    }
+
+    onAuthStateChanged(auth, async function (user) {
+      if (!user) {
+        scheduleRedirect();
+        return;
+      }
+      if (authTimer) { clearTimeout(authTimer); authTimer = null; }
+      currentUser = user;
+      try {
+        const pd = await getDoc(doc(db, 'users', user.uid));
+        currentProfileData = pd.exists() ? pd.data() : null;
+      } catch (e) {
+        currentProfileData = null;
+      }
+      startPostListener();
+    });
+  </script>
 </body>
 </html>
