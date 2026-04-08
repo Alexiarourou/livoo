@@ -198,8 +198,7 @@ nav {
   display: flex;
   flex-wrap: nowrap;
   gap: 8px;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: visible;
   white-space: nowrap;
   padding-bottom: 2px;
   scrollbar-width: thin;
@@ -1055,6 +1054,10 @@ nav {
       btn.addEventListener('click', function () {
         activeCategory = btn.getAttribute('data-category');
         setActiveCategoryUI(activeCategory);
+        if (moreMenu && btn.closest('#cat-more-menu')) {
+          moreMenu.hidden = true;
+          if (moreToggle) moreToggle.setAttribute('aria-expanded', 'false');
+        }
         subscribeFeed();
       });
     });
@@ -1069,6 +1072,10 @@ nav {
       });
       moreMenu.addEventListener('click', function (e) {
         e.stopPropagation();
+      });
+      document.addEventListener('click', function () {
+        moreMenu.hidden = true;
+        moreToggle.setAttribute('aria-expanded', 'false');
       });
     }
 
