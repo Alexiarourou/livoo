@@ -1210,6 +1210,17 @@ nav {
         </div>
       </div>
 
+      <div style="position:relative;margin-bottom:16px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ab09a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input id="post-search" type="text" placeholder="Search posts in this city..."
+          oninput="filterPosts(this.value)"
+          style="width:100%;padding:11px 16px 11px 40px;border:1.5px solid #e8f0e8;border-radius:12px;font-size:14px;color:#1a2e1a;background:white;outline:none;font-family:inherit;transition:border-color 0.15s;"
+          onfocus="this.style.borderColor='#2d6a2d'"
+          onblur="this.style.borderColor='#e8f0e8'">
+      </div>
+
       <div id="posts-container" class="feed" aria-live="polite"></div>
       <!-- Mobile community info — bottom of feed on mobile -->
       <div id="mobile-community-card">
@@ -1484,6 +1495,8 @@ nav {
         }
 
         await appendPostCardsFromQueryDocs(slice);
+        var ps = document.getElementById('post-search');
+        if (ps && ps.value) window.filterPosts(ps.value);
       } finally {
         hidePostSkeleton();
       }
@@ -1647,6 +1660,58 @@ nav {
       }, 2500);
     }
     window.showToast = showToast;
+
+    function getCategoryStyle(category) {
+      var styles = {
+        'housing tips': 'background:#e8f4fd;color:#1a6fa8;',
+        'housing': 'background:#e8f4fd;color:#1a6fa8;',
+        'events': 'background:#fdf3e8;color:#a86b1a;',
+        'flatmate search': 'background:#f3e8fd;color:#6b1aa8;',
+        'flatmate': 'background:#f3e8fd;color:#6b1aa8;',
+        'general': 'background:#f0f7f0;color:#2d6a2d;',
+        'recommendations': 'background:#fde8e8;color:#a81a1a;',
+        'visa & admin': 'background:#e8fdf3;color:#1aa86b;',
+        'visa': 'background:#e8fdf3;color:#1aa86b;',
+        'visa_admin': 'background:#e8fdf3;color:#1aa86b;',
+        'jobs & remote work': 'background:#fdf9e8;color:#a8961a;',
+        'jobs': 'background:#fdf9e8;color:#a8961a;',
+        'jobs_remote': 'background:#fdf9e8;color:#a8961a;',
+        'things to do': 'background:#e8eafd;color:#1a2ea8;',
+        'things_to_do': 'background:#e8eafd;color:#1a2ea8;',
+        'post': 'background:#f0f7f0;color:#2d6a2d;'
+      };
+      var key = category ? String(category).toLowerCase().trim() : 'general';
+      return styles[key] || 'background:#f0f7f0;color:#2d6a2d;';
+    }
+
+    window.filterPosts = function (query) {
+      var q = String(query || '').toLowerCase().trim();
+      var cards = document.querySelectorAll('[id^="post-card-"]');
+      var visibleCount = 0;
+      cards.forEach(function (card) {
+        var titleEl = card.querySelector('.post-title');
+        var bodyEl = card.querySelector('.post-body');
+        var badgeEl = card.querySelector('.post-badge, .cat-badge');
+        var authorEl = card.querySelector('.post-author');
+        var title = titleEl ? (titleEl.textContent || '').toLowerCase() : '';
+        var body = bodyEl ? (bodyEl.textContent || '').toLowerCase() : '';
+        var category = badgeEl ? (badgeEl.textContent || '').toLowerCase() : '';
+        var author = authorEl ? (authorEl.textContent || '').toLowerCase() : '';
+        var matches = !q || title.indexOf(q) !== -1 || body.indexOf(q) !== -1 || category.indexOf(q) !== -1 || author.indexOf(q) !== -1;
+        card.style.display = matches ? '' : 'none';
+        if (matches) visibleCount++;
+      });
+      var noResults = document.getElementById('no-search-results');
+      if (!noResults) {
+        noResults = document.createElement('div');
+        noResults.id = 'no-search-results';
+        noResults.style.cssText = 'text-align:center;padding:40px 20px;color:#9ab09a;display:none;';
+        noResults.innerHTML = '<p style="font-size:14px;font-weight:600;color:#1a2e1a;margin-bottom:4px;">No posts found</p><p style="font-size:13px;">Try a different search term</p>';
+        var pc = document.getElementById('posts-container');
+        if (pc) pc.appendChild(noResults);
+      }
+      noResults.style.display = (q && visibleCount === 0) ? 'block' : 'none';
+    };
 
     window.deletePost = async function (postId) {
       if (!confirm('Delete this post?')) return;
@@ -2128,15 +2193,18 @@ nav {
         metaSpan.style.cssText = 'font-size:12px;color:#6b8f6b;';
         metaSpan.appendChild(document.createTextNode('Posted by '));
         const strong = document.createElement('strong');
+        strong.className = 'post-author';
         strong.textContent = displayName;
         metaSpan.appendChild(strong);
         metaSpan.appendChild(document.createTextNode(d.createdAt ? ' · ' + formatRelativeTime(d.createdAt) : ''));
         topRow.appendChild(metaSpan);
 
         const catKey = d.category || '';
+        const catLabel = CATEGORY_LABELS[catKey] || catKey || 'Post';
         const catPill = document.createElement('span');
-        catPill.style.cssText = 'font-size:11px;background:#f0f7f0;color:#2d6a2d;padding:2px 8px;border-radius:20px;font-weight:600;';
-        catPill.textContent = CATEGORY_LABELS[catKey] || catKey || 'Post';
+        catPill.className = 'post-badge';
+        catPill.style.cssText = 'font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;' + getCategoryStyle(catLabel);
+        catPill.textContent = catLabel;
         topRow.appendChild(catPill);
 
         const titleEl = document.createElement('h3');

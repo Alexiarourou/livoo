@@ -165,6 +165,34 @@
     #composer-avatar-small { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; background: #2d6a2d; color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     #composer-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
 
+    .comment-wrapper {
+      position: relative;
+      padding-bottom: 4px;
+    }
+
+    .comment-wrapper:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 16px;
+      top: 36px;
+      bottom: 0;
+      width: 2px;
+      background: #e8f0e8;
+      border-radius: 2px;
+    }
+
+    .replies-container {
+      margin-top: 10px;
+      padding-left: 16px;
+      border-left: 2px solid #e8f0e8;
+      margin-left: 16px;
+    }
+
+    .reply-item {
+      padding: 8px 0;
+      position: relative;
+    }
+
     @media (max-width: 768px) {
       .post-area, #post-container {
         border-radius: 12px !important;
@@ -220,7 +248,7 @@
               <span style="font-size: 13px; font-weight: 700; color: #1a2e1a;" id="post-author"></span>
               <span style="font-size: 12px; color: #9ab09a; margin-left: 6px;" id="post-time"></span>
             </div>
-            <span id="post-category" style="margin-left: auto; font-size: 11px; background: #f0f7f0; color: #2d6a2d; padding: 3px 10px; border-radius: 20px; font-weight: 600; flex-shrink: 0;"></span>
+            <span id="post-category" class="post-badge" style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;flex-shrink:0;"></span>
           </div>
           <h1 style="font-size: 22px; font-weight: 800; color: #1a2e1a; margin: 0 0 8px 0; line-height: 1.3;" id="post-title"></h1>
           <p style="font-size: 15px; color: #3d5a3d; line-height: 1.7; margin: 0 0 20px 0; white-space: pre-wrap;" id="post-body"></p>
@@ -258,6 +286,16 @@
             <option value="oldest">Oldest</option>
           </select>
         </div>
+        <div style="position:relative;margin-bottom:16px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ab09a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input id="comment-search" type="text" placeholder="Search comments..."
+            oninput="filterComments(this.value)"
+            style="width:100%;padding:9px 16px 9px 36px;border:1.5px solid #e8f0e8;border-radius:20px;font-size:13px;color:#1a2e1a;background:white;outline:none;font-family:inherit;transition:border-color 0.15s;"
+            onfocus="this.style.borderColor='#2d6a2d'"
+            onblur="this.style.borderColor='#e8f0e8'">
+        </div>
         <div id="comments-container"></div>
       </div>
     </div>
@@ -276,6 +314,29 @@
       recommendations: 'Recommendations', visa_admin: 'Visa & Admin', jobs_remote: 'Jobs & Remote Work',
       things_to_do: 'Things to Do'
     };
+
+    function getCategoryStyle(category) {
+      var styles = {
+        'housing tips': 'background:#e8f4fd;color:#1a6fa8;',
+        'housing': 'background:#e8f4fd;color:#1a6fa8;',
+        'events': 'background:#fdf3e8;color:#a86b1a;',
+        'flatmate search': 'background:#f3e8fd;color:#6b1aa8;',
+        'flatmate': 'background:#f3e8fd;color:#6b1aa8;',
+        'general': 'background:#f0f7f0;color:#2d6a2d;',
+        'recommendations': 'background:#fde8e8;color:#a81a1a;',
+        'visa & admin': 'background:#e8fdf3;color:#1aa86b;',
+        'visa': 'background:#e8fdf3;color:#1aa86b;',
+        'visa_admin': 'background:#e8fdf3;color:#1aa86b;',
+        'jobs & remote work': 'background:#fdf9e8;color:#a8961a;',
+        'jobs': 'background:#fdf9e8;color:#a8961a;',
+        'jobs_remote': 'background:#fdf9e8;color:#a8961a;',
+        'things to do': 'background:#e8eafd;color:#1a2ea8;',
+        'things_to_do': 'background:#e8eafd;color:#1a2ea8;',
+        'post': 'background:#f0f7f0;color:#2d6a2d;'
+      };
+      var key = category ? String(category).toLowerCase().trim() : 'general';
+      return styles[key] || 'background:#f0f7f0;color:#2d6a2d;';
+    }
 
     const params = new URLSearchParams(location.search);
     const postId = String(params.get('postId') || '').trim();
@@ -541,6 +602,32 @@
     window.expandComposer = expandComposer;
     window.collapseComposer = collapseComposer;
     window.showToast = showToast;
+
+    window.filterComments = function (query) {
+      var q = String(query || '').toLowerCase().trim();
+      var comments = document.querySelectorAll('.comment-wrapper');
+      var visible = 0;
+      comments.forEach(function (comment) {
+        var textEl = comment.querySelector('.comment-text');
+        var nameEl = comment.querySelector('.comment-name');
+        var text = textEl ? (textEl.textContent || '').toLowerCase() : '';
+        var author = nameEl ? (nameEl.textContent || '').toLowerCase() : '';
+        var matches = !q || text.indexOf(q) !== -1 || author.indexOf(q) !== -1;
+        comment.style.display = matches ? '' : 'none';
+        if (matches) visible++;
+      });
+      var noResults = document.getElementById('no-comment-results');
+      if (!noResults) {
+        noResults = document.createElement('div');
+        noResults.id = 'no-comment-results';
+        noResults.style.cssText = 'text-align:center;padding:20px;color:#9ab09a;font-size:13px;display:none;';
+        noResults.textContent = 'No comments match your search';
+        var cc = document.getElementById('comments-container');
+        if (cc) cc.appendChild(noResults);
+      }
+      noResults.style.display = (q && visible === 0) ? 'block' : 'none';
+    };
+
     window.sharePost = function sharePost() {
       const href = window.location.href;
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -820,8 +907,10 @@
         const c = cd.data() || {};
         const username = String(c.authorUsername || 'Member').trim() || 'Member';
         const photo = String(c.authorPhotoURL || c.authorPhoto || '').trim();
+        const wrapper = document.createElement('div');
+        wrapper.className = 'comment-wrapper';
+        wrapper.id = 'comment-' + cd.id;
         const item = document.createElement('div');
-        item.id = 'comment-' + cd.id;
         item.className = 'comment';
         item.style.cssText = 'display:flex;gap:10px;margin-bottom:20px;align-items:flex-start;';
 
@@ -841,6 +930,7 @@
         const meta = document.createElement('div');
         meta.style.cssText = 'display:flex;align-items:baseline;gap:6px;margin-bottom:3px;';
         const nameSpan = document.createElement('span');
+        nameSpan.className = 'comment-name';
         nameSpan.style.cssText = 'font-size:13px;font-weight:700;color:#1a2e1a;';
         nameSpan.textContent = username;
         const timeSpan = document.createElement('span');
@@ -983,7 +1073,7 @@
 
         const repliesWrap = document.createElement('div');
         repliesWrap.id = 'replies-' + cd.id;
-        repliesWrap.style.cssText = 'margin-top:12px;padding-left:12px;border-left:2px solid #e8f0e8;';
+        repliesWrap.className = 'replies-container';
 
         const replyQ = query(collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies'), orderBy('createdAt', 'asc'));
         const unsubReplies = onSnapshot(replyQ, function (rsnap) {
@@ -992,6 +1082,7 @@
             const r = rd.data() || {};
             const rName = String(r.authorUsername || 'Member').trim() || 'Member';
             const row = document.createElement('div');
+            row.className = 'reply-item';
             row.style.cssText = 'display:flex;gap:10px;margin-bottom:12px;align-items:flex-start;';
             const rav = document.createElement('div');
             rav.style.cssText = 'flex-shrink:0;width:28px;height:28px;border-radius:50%;overflow:hidden;background:#2d6a2d;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;';
@@ -1030,11 +1121,14 @@
         right.appendChild(textEl);
         right.appendChild(actionRow);
         right.appendChild(replyBox);
-        right.appendChild(repliesWrap);
         item.appendChild(av);
         item.appendChild(right);
-        listEl.appendChild(item);
+        wrapper.appendChild(item);
+        wrapper.appendChild(repliesWrap);
+        listEl.appendChild(wrapper);
       });
+      var csInput = document.getElementById('comment-search');
+      if (csInput && csInput.value) window.filterComments(csInput.value);
       requestAnimationFrame(function () {
         window.scrollTo(0, scrollY);
       });
@@ -1138,7 +1232,10 @@
 
       postTitleEl.textContent = data.title || 'Untitled';
       const catKey = data.category || '';
-      postCategoryTagEl.textContent = CATEGORY_LABELS[catKey] || catKey || '';
+      const catLabel = CATEGORY_LABELS[catKey] || catKey || '';
+      postCategoryTagEl.className = 'post-badge';
+      postCategoryTagEl.style.cssText = 'margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;flex-shrink:0;' + getCategoryStyle(catLabel);
+      postCategoryTagEl.textContent = catLabel;
       postAuthorNameEl.textContent = ap.username || 'Member';
       postTimestampEl.textContent = data.createdAt ? '· ' + formatRelativeTime(data.createdAt) : '';
 
