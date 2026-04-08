@@ -345,6 +345,12 @@ nav {
           </ul>
         </div>
         <div id="signin-error" class="auth-error" role="alert"></div>
+        <div class="form-group" style="margin-top:4px;">
+          <label for="remember-me" style="display:flex;align-items:center;gap:8px;font-size:0.86rem;color:var(--muted-dark);font-weight:500;">
+            <input id="remember-me" type="checkbox" checked />
+            Remember me
+          </label>
+        </div>
         <button type="button" class="btn-auth-primary" id="signin-btn">Log in</button>
         <div class="auth-divider" role="presentation"><span>or</span></div>
         <button type="button" class="btn-google google-btn" id="btnGoogleSignin" aria-label="Continue with Google">
@@ -362,7 +368,8 @@ nav {
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword,
     signInWithEmailAndPassword, GoogleAuthProvider,
-    signInWithRedirect, getRedirectResult, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    signInWithRedirect, getRedirectResult, sendPasswordResetEmail,
+    setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -562,6 +569,15 @@ nav {
 
   const signupErrorEl = document.getElementById('signup-error');
   const signinErrorEl = document.getElementById('signin-error');
+  const rememberMeEl = document.getElementById('remember-me');
+  const REMEMBER_KEY = 'livvo_remember_me';
+  if (rememberMeEl) {
+    var savedRemember = localStorage.getItem(REMEMBER_KEY);
+    rememberMeEl.checked = savedRemember !== '0';
+    rememberMeEl.addEventListener('change', function () {
+      localStorage.setItem(REMEMBER_KEY, rememberMeEl.checked ? '1' : '0');
+    });
+  }
   document.getElementById('signup-email').addEventListener('input', function () { hideError(signupErrorEl); });
   document.getElementById('signup-password').addEventListener('input', function () {
     hideError(signupErrorEl);
@@ -615,6 +631,10 @@ nav {
     const errorDiv = document.getElementById('signin-error');
     hideError(errorDiv);
     try {
+      await setPersistence(
+        auth,
+        (rememberMeEl && rememberMeEl.checked) ? browserLocalPersistence : browserSessionPersistence
+      );
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       showError(errorDiv, getFriendlyError(error.code));
