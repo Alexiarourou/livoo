@@ -965,6 +965,9 @@ nav {
         e.preventDefault();
         var nextCity = String(el.getAttribute('data-city') || '').trim();
         if (!nextCity) return;
+        if (nextCity === 'Madrid') {
+          alert('switching to Madrid');
+        }
         localStorage.setItem('livvo_city', nextCity);
         window.location.href = 'community-portal.html?city=' + encodeURIComponent(nextCity);
       });
