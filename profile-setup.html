@@ -361,7 +361,7 @@ textarea { min-height: 88px; resize: vertical; }
         var d = snap.data();
         document.getElementById('username').value = String(d.username || '').trim();
         document.getElementById('profession').value = String(d.profession || d.role || '');
-        document.getElementById('bio').value = String(d.bio || '').trim();
+        document.getElementById('bio').value = String(d.aboutMe || d.bio || '').trim();
         if (d.photoURL) {
           photoPreview.src = d.photoURL;
           photoPreview.hidden = false;
@@ -486,10 +486,11 @@ textarea { min-height: 88px; resize: vertical; }
       var payload = {
         username: username,
         profession: profession,
+        aboutMe: (bio.value || '').trim(),
         bio: (bio.value || '').trim(),
         city: localStorage.getItem('livvo_city') || 'Athens',
         email: user.email,
-        createdAt: new Date()
+        updatedAt: new Date()
       };
       if (photoURL) payload.photoURL = photoURL;
       await firebase.firestore().collection('users').doc(user.uid).set(payload, { merge: true });
@@ -501,6 +502,12 @@ textarea { min-height: 88px; resize: vertical; }
       completeBtn.disabled = false;
       completeBtn.removeAttribute('aria-busy');
       completeBtn.textContent = completeBtnDefaultText;
+    } finally {
+      if (!location.href.includes('community-portal.html')) {
+        completeBtn.disabled = false;
+        completeBtn.removeAttribute('aria-busy');
+        completeBtn.textContent = completeBtnDefaultText;
+      }
     }
   });
   });

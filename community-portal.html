@@ -715,10 +715,10 @@ nav {
       <div class="nav-profile-wrap">
         <button type="button" id="nav-profile-trigger" class="nav-profile-trigger" aria-label="Open profile menu"></button>
         <div id="nav-profile-menu" class="nav-profile-menu" hidden>
-          <button type="button" class="nav-profile-item" id="menu-my-profile">👤 My Profile</button>
-          <button type="button" class="nav-profile-item" id="menu-edit-profile">✏️ Edit Profile</button>
-          <button type="button" class="nav-profile-item" id="menu-switch-city">🏙️ Switch City</button>
-          <button type="button" class="nav-profile-item" id="menu-signout">🚪 Sign out</button>
+          <button type="button" class="nav-profile-item" id="menu-my-profile">My Profile</button>
+          <button type="button" class="nav-profile-item" id="menu-edit-profile">Edit Profile</button>
+          <button type="button" class="nav-profile-item" id="menu-switch-city">Switch City</button>
+          <button type="button" class="nav-profile-item" id="menu-signout">Sign out</button>
         </div>
       </div>
       <button type="button" class="nav-signout" id="nav-signout">Sign out</button>
@@ -858,6 +858,28 @@ nav {
     <div class="modal-actions" style="justify-content:flex-end;">
       <button type="button" class="btn-secondary" data-close="modal-delete-post">Cancel</button>
       <button type="button" class="btn-primary" id="confirm-delete-post" style="background:#b42318;border-color:#b42318;">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-switch-city" class="modal" hidden aria-modal="true" role="dialog" aria-labelledby="switch-city-title">
+  <div class="modal-backdrop" data-close="modal-switch-city"></div>
+  <div class="modal-panel" style="max-width:420px;">
+    <h2 id="switch-city-title">Switch city</h2>
+    <div class="city-list" style="margin-top:12px;">
+      <a href="#" class="city-chip city-modal-link" data-city="Athens">Athens</a>
+      <a href="#" class="city-chip city-modal-link" data-city="London">London</a>
+      <a href="#" class="city-chip city-modal-link" data-city="Paris">Paris</a>
+      <a href="#" class="city-chip city-modal-link" data-city="Madrid">Madrid</a>
+      <a href="#" class="city-chip city-modal-link" data-city="Barcelona">Barcelona</a>
+      <a href="#" class="city-chip city-modal-link" data-city="Lisbon">Lisbon</a>
+      <a href="#" class="city-chip city-modal-link" data-city="Berlin">Berlin</a>
+      <a href="#" class="city-chip city-modal-link" data-city="Amsterdam">Amsterdam</a>
+      <a href="#" class="city-chip city-modal-link" data-city="Rome">Rome</a>
+      <a href="#" class="city-chip city-modal-link" data-city="Prague">Prague</a>
+    </div>
+    <div class="modal-actions" style="justify-content:flex-end;margin-top:14px;">
+      <button type="button" class="btn-secondary" data-close="modal-switch-city">Cancel</button>
     </div>
   </div>
 </div>
@@ -1042,6 +1064,14 @@ nav {
     });
 
     document.querySelectorAll('.city-switch-link').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        var nextCity = String(el.getAttribute('data-city') || '').trim();
+        if (!nextCity) return;
+        window.location.href = 'community-portal.html?city=' + encodeURIComponent(nextCity);
+      });
+    });
+    document.querySelectorAll('.city-modal-link').forEach(function (el) {
       el.addEventListener('click', function (e) {
         e.preventDefault();
         var nextCity = String(el.getAttribute('data-city') || '').trim();
@@ -1839,7 +1869,8 @@ nav {
         window.location.href = 'profile-setup.html?city=' + encodeURIComponent(cityForFeedQuery()) + '&edit=1';
       });
       document.getElementById('menu-switch-city').addEventListener('click', function () {
-        window.location.href = 'community.html';
+        navProfileMenu.hidden = true;
+        openModal('modal-switch-city');
       });
       document.getElementById('menu-signout').addEventListener('click', function () {
         document.getElementById('nav-signout').click();
