@@ -846,11 +846,190 @@ nav {
   }
   .nav-city-email { max-width: 100%; }
   .page-wrap { padding: 108px 24px 64px; }
-  .portal-layout { grid-template-columns: 1fr; }
-  .left-sidebar { position: static; top: auto; }
+}
+
+/* ── MOBILE STYLES ── */
+@media (max-width: 768px) {
+
+  /* Hide left sidebar entirely */
+  .left-sidebar, #left-sidebar, [class*="sidebar-left"], [class*="left-col"] {
+    display: none !important;
+  }
+
+  /* Hide right sidebar entirely */
+  .right-sidebar, #right-sidebar, [class*="sidebar-right"], [class*="right-col"] {
+    display: none !important;
+  }
+
+  /* Main content takes full width */
+  .main-content, #main-content, [class*="main-col"], .main-column {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 12px !important;
+  }
+
+  /* Layout wrapper becomes single column */
+  .layout-wrapper, .three-col, [class*="grid"], .portal-layout {
+    display: block !important;
+    grid-template-columns: unset !important;
+  }
+
+  /* Navbar — hide city text label, keep logo + avatar */
+  .nav-city-label {
+    display: none !important;
+  }
+
+  /* City bar — shown only after portal is visible (see body.portal-ready) */
+  body.portal-ready #mobile-city-bar {
+    display: flex !important;
+  }
+}
+
+/* Mobile city bar — hidden on desktop */
+#mobile-city-bar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: white;
+  border-bottom: 1px solid #e8f0e8;
+}
+
+#mobile-city-bar .city-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a2e1a;
+}
+
+#mobile-city-bar select {
+  font-size: 12px;
+  border: 1.5px solid #d4e6d4;
+  border-radius: 8px;
+  padding: 4px 10px;
+  color: #2d6a2d;
+  background: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Floating action button — mobile only */
+#fab-new-post {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #2d6a2d;
+  color: white;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(45,106,45,0.35);
+  z-index: 999;
+  transition: transform 0.15s;
+  font-family: inherit;
+  line-height: 1;
+}
+
+#fab-new-post:active {
+  transform: scale(0.92);
+}
+
+@media (max-width: 768px) {
+  body.portal-ready #fab-new-post {
+    display: flex !important;
+  }
+
+  /* Hide the toolbar new post button on mobile */
+  body.portal-ready #new-post-btn {
+    display: none !important;
+  }
+
   .portal-main-toolbar { flex-direction: column; align-items: stretch; }
-  #new-post-btn { width: 100%; }
   #sort-select { width: 100%; }
+
+  /* Greeting tighter on mobile */
+  .greeting-section h1, #header-greeting {
+    font-size: 20px !important;
+  }
+
+  /* Tabs scroll horizontally */
+  #topic-tabs {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  #topic-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Post cards full width */
+  .post-card {
+    border-radius: 12px !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Action buttons smaller on mobile */
+  .post-card button {
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+  }
+
+  /* Community info card at bottom of feed */
+  body.portal-ready #mobile-community-card {
+    display: block !important;
+  }
+
+  /* Avoid overlap with FAB */
+  #back-to-top {
+    bottom: 88px !important;
+    right: 20px !important;
+  }
+}
+
+/* Mobile community card — hidden on desktop */
+#mobile-community-card {
+  display: none;
+  background: white;
+  border: 1px solid #e8f0e8;
+  border-radius: 14px;
+  padding: 16px;
+  margin: 8px 0 80px 0;
+}
+
+#mobile-community-card h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a2e1a;
+  margin-bottom: 2px;
+}
+
+#mobile-community-card .member-count {
+  font-size: 12px;
+  color: #6b8f6b;
+  margin-bottom: 12px;
+}
+
+#mobile-community-card .rules-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a2e1a;
+  margin-bottom: 8px;
+}
+
+#mobile-community-card ol {
+  font-size: 12px;
+  color: #5a7a5a;
+  padding-left: 16px;
+  line-height: 1.8;
 }
 </style>
 </head>
@@ -872,7 +1051,7 @@ nav {
     </div>
     <div class="nav-right">
       <div class="nav-city-email">
-        <span id="nav-city-label" class="nav-city" aria-live="polite"></span>
+        <span id="nav-city-label" class="nav-city nav-city-label" aria-live="polite"></span>
         <span id="nav-email" class="nav-email" aria-live="polite"></span>
       </div>
       <div class="nav-profile-wrap">
@@ -887,6 +1066,30 @@ nav {
     </div>
   </div>
 </nav>
+
+<!-- Mobile city bar -->
+<div id="mobile-city-bar">
+  <span class="city-name" id="mobile-city-name">Athens community</span>
+  <select onchange="switchCityFromDropdown(this.value)" id="mobile-city-switcher">
+    <option value="athens">Athens</option>
+    <option value="london">London</option>
+    <option value="paris">Paris</option>
+    <option value="madrid">Madrid</option>
+    <option value="barcelona">Barcelona</option>
+    <option value="lisbon">Lisbon</option>
+    <option value="berlin">Berlin</option>
+    <option value="amsterdam">Amsterdam</option>
+    <option value="rome">Rome</option>
+    <option value="prague">Prague</option>
+    <option value="milan">Milan</option>
+    <option value="vienna">Vienna</option>
+    <option value="zurich">Zurich</option>
+    <option value="copenhagen">Copenhagen</option>
+    <option value="dublin">Dublin</option>
+    <option value="dubai">Dubai</option>
+    <option value="new-york">New York</option>
+  </select>
+</div>
 
 <main id="portal-content" class="page-wrap" hidden>
   <div class="portal-layout">
@@ -965,8 +1168,8 @@ nav {
 
     <section class="main-column">
       <!-- Page header -->
-      <div style="margin-bottom: 24px;">
-        <h1 style="font-size: 26px; font-weight: 700; color: #1a2e1a; margin: 0 0 4px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+      <div class="greeting-section" style="margin-bottom: 24px;">
+        <h1 id="header-greeting" style="font-size: 26px; font-weight: 700; color: #1a2e1a; margin: 0 0 4px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
           Hi, <span id="header-username">there</span>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d6a2d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
         </h1>
@@ -1008,6 +1211,18 @@ nav {
       </div>
 
       <div id="posts-container" class="feed" aria-live="polite"></div>
+      <!-- Mobile community info — bottom of feed on mobile -->
+      <div id="mobile-community-card">
+        <h4 id="mobile-community-title">Athens Community</h4>
+        <div class="member-count"><span id="mobile-member-count">1</span> members</div>
+        <div class="rules-title">Community rules</div>
+        <ol>
+          <li>Be kind and respectful.</li>
+          <li>No spam or self-promo dumps.</li>
+          <li>Keep posts relevant to the city.</li>
+          <li>Protect personal information.</li>
+        </ol>
+      </div>
       <div id="load-more-container" style="display:none;text-align:center;padding:20px 0;">
         <button type="button" id="load-more-btn"
           style="border:1.5px solid #2d6a2d;background:white;color:#2d6a2d;border-radius:20px;padding:9px 28px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;">
@@ -1290,6 +1505,32 @@ nav {
         citySelect.value = selectVal;
       }
     }
+
+    function syncMobileCityBar() {
+      var mobileSelect = document.getElementById('mobile-city-switcher');
+      var mobileName = document.getElementById('mobile-city-name');
+      var mobileTitle = document.getElementById('mobile-community-title');
+      var feedCity = cityForFeedQuery();
+      if (mobileName) {
+        mobileName.textContent = feedCity + ' community';
+      }
+      if (mobileTitle) {
+        mobileTitle.textContent = feedCity + ' Community';
+      }
+      if (mobileSelect) {
+        var selectVal = String(rawCity || 'athens').toLowerCase().trim().replace(/\s+/g, '-');
+        if (selectVal === 'new york' || selectVal === 'newyork') selectVal = 'new-york';
+        if (Array.prototype.some.call(mobileSelect.options, function (o) { return o.value === selectVal; })) {
+          mobileSelect.value = selectVal;
+        }
+      }
+    }
+    syncMobileCityBar();
+
+    window.openNewPostModal = function openNewPostModal() {
+      var b = document.getElementById('new-post-btn');
+      if (b) b.click();
+    };
 
     let pendingDelete = null;
     const authorProfileCache = new Map();
@@ -1698,6 +1939,10 @@ nav {
         });
         document.getElementById('sidebar-member-count').textContent = String(uniqueAuthors.size || 0);
         document.getElementById('sidebar-city-name').textContent = feedCity + ' Community';
+        var mmc = document.getElementById('mobile-member-count');
+        if (mmc) mmc.textContent = String(uniqueAuthors.size || 0);
+        var mct = document.getElementById('mobile-community-title');
+        if (mct) mct.textContent = feedCity + ' Community';
       } catch (err) {
         console.error(err);
       }
@@ -2081,6 +2326,7 @@ nav {
       if (headerUsernameEl) headerUsernameEl.textContent = profileUsername;
       navCity.textContent = cityForUi + ' community';
       navEmail.textContent = '';
+      syncMobileCityBar();
       if (navProfileTrigger) {
         /* Firestore custom photo first, then Firebase Auth (e.g. Google), not post authorPhoto. */
         var navPhoto = String((profileData && profileData.photoURL) || '').trim()
@@ -2099,6 +2345,7 @@ nav {
       currentUser = user;
       currentProfileData = profileData || null;
       setWelcomeAndNav(profileData);
+      document.body.classList.add('portal-ready');
       navEl.removeAttribute('hidden');
       navEl.style.display = '';
       portalContent.removeAttribute('hidden');
@@ -2271,6 +2518,13 @@ nav {
       });
       document.getElementById('menu-switch-city').addEventListener('click', function () {
         navProfileMenu.hidden = true;
+        if (window.matchMedia && window.matchMedia('(max-width:768px)').matches) {
+          var mb = document.getElementById('mobile-city-bar');
+          var ms = document.getElementById('mobile-city-switcher');
+          if (mb) mb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          if (ms) ms.focus({ preventScroll: true });
+          return;
+        }
         var cs = document.getElementById('city-switcher');
         if (cs) {
           cs.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -2283,6 +2537,11 @@ nav {
     }
   }
 </script>
+
+<!-- Mobile floating action button -->
+<button type="button" id="fab-new-post" onclick="(function(){ var b=document.getElementById('new-post-btn'); if(b) b.click(); else if(typeof openNewPostModal==='function') openNewPostModal(); })()">
+  +
+</button>
 
 <button id="back-to-top" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})"
   style="display:none;position:fixed;bottom:24px;right:24px;width:40px;height:40px;border-radius:50%;background:#2d6a2d;color:white;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:999;font-family:inherit;line-height:1;padding:0;"
