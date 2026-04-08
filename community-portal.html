@@ -1203,21 +1203,27 @@ nav {
         const contentCol = document.createElement('div');
 
         const topRow = document.createElement('div');
-        topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:10px;';
+        topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:10px;';
 
-        const titleWrap = document.createElement('div');
-        const titleEl = document.createElement('strong');
-        titleEl.textContent = d.title || 'Untitled';
-        titleEl.style.cursor = 'pointer';
-        titleEl.tabIndex = 0;
-        titleEl.setAttribute('role', 'button');
-        titleWrap.appendChild(titleEl);
-
-        const catEl = document.createElement('span');
-        catEl.style.cssText = 'display:inline-block;color:#666;font-size:12px;margin-left:8px;';
-        catEl.textContent = d.category || '';
-        titleWrap.appendChild(catEl);
-        topRow.appendChild(titleWrap);
+        const authorRow = document.createElement('div');
+        authorRow.style.cssText = 'display:flex;align-items:center;gap:8px;min-width:0;';
+        const avatar = document.createElement('div');
+        avatar.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
+        if (authorProfile.photoUrl) {
+          const img = document.createElement('img');
+          img.src = authorProfile.photoUrl;
+          img.alt = authorProfile.username;
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+          avatar.appendChild(img);
+        } else {
+          avatar.textContent = authorProfile.initial || 'A';
+        }
+        const nameEl = document.createElement('small');
+        nameEl.style.cssText = 'color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+        nameEl.textContent = (authorProfile.username || 'Anonymous') + (d.createdAt ? ' · ' + formatRelativeTime(d.createdAt) : '');
+        authorRow.appendChild(avatar);
+        authorRow.appendChild(nameEl);
+        topRow.appendChild(authorRow);
 
           const canDelete = currentUser && authorUid && authorUid === currentUser.uid;
         if (canDelete) {
@@ -1238,6 +1244,20 @@ nav {
         }
         contentCol.appendChild(topRow);
 
+        const titleRow = document.createElement('div');
+        titleRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;';
+        const titleEl = document.createElement('strong');
+        titleEl.textContent = d.title || 'Untitled';
+        titleEl.style.cursor = 'pointer';
+        titleEl.tabIndex = 0;
+        titleEl.setAttribute('role', 'button');
+        const catEl = document.createElement('span');
+        catEl.style.cssText = 'display:inline-flex;align-items:center;color:#666;font-size:12px;padding:2px 8px;border-radius:999px;background:#f2f6f4;border:1px solid #e1ebe5;';
+        catEl.textContent = d.category || '';
+        titleRow.appendChild(titleEl);
+        titleRow.appendChild(catEl);
+        contentCol.appendChild(titleRow);
+
         const p = document.createElement('p');
         p.style.marginTop = '8px';
         const bodyText = (d.body != null && String(d.body).trim())
@@ -1246,29 +1266,9 @@ nav {
         p.textContent = bodyText || '';
         contentCol.appendChild(p);
 
-        const authorRow = document.createElement('div');
-        authorRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:10px;';
-        const avatar = document.createElement('div');
-        avatar.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
-        if (authorProfile.photoUrl) {
-          const img = document.createElement('img');
-          img.src = authorProfile.photoUrl;
-          img.alt = authorProfile.username;
-          img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-          avatar.appendChild(img);
-        } else {
-          avatar.textContent = authorProfile.initial || 'A';
-        }
-        const nameEl = document.createElement('small');
-        nameEl.style.color = '#666';
-        nameEl.textContent = (authorProfile.username || 'Anonymous') + (d.createdAt ? ' · ' + formatTime(d.createdAt) : '');
-        authorRow.appendChild(avatar);
-        authorRow.appendChild(nameEl);
-        contentCol.appendChild(authorRow);
-
         const actions = document.createElement('div');
         actions.className = 'feed-card-actions';
-        actions.style.marginTop = '10px';
+        actions.style.cssText = 'margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:nowrap;';
 
         const upBtn = document.createElement('button');
         upBtn.type = 'button';
