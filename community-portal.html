@@ -783,12 +783,13 @@ nav {
     <div class="thread-comments">
       <h3>Comments</h3>
       <div class="comment-form" style="margin-top:10px;">
-        <label for="thread-comment-input" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Your comment</label>
-        <textarea id="thread-comment-input" placeholder="Join the conversation" style="margin-bottom:6px;"></textarea>
+        <label for="thread-comment-input-preview" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Your comment</label>
+        <input id="thread-comment-input-preview" type="text" placeholder="Join the conversation..." style="margin-bottom:6px;" />
+        <textarea id="thread-comment-input" placeholder="Join the conversation..." style="margin-bottom:6px;display:none;" rows="4"></textarea>
         <div id="thread-replying-to" class="meta-pill" hidden></div>
-        <div class="modal-actions" style="margin-top:8px; justify-content:flex-end;">
+        <div class="modal-actions" id="thread-comment-actions" style="margin-top:8px; justify-content:flex-end; display:none;">
           <button type="button" class="btn-secondary" id="thread-reply-cancel" hidden>Cancel reply</button>
-          <button type="button" class="btn-primary" id="thread-comment-submit">Post comment</button>
+          <button type="button" class="btn-primary" id="thread-comment-submit">Comment</button>
         </div>
       </div>
       <div id="thread-comments-list"></div>
@@ -817,7 +818,7 @@ nav {
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
-    getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, doc, getDoc,
+    getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, doc, getDoc, getDocs,
     serverTimestamp, runTransaction, increment, writeBatch, deleteDoc
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   const CATEGORY_LABELS = {
@@ -871,6 +872,20 @@ nav {
     }
   }
 
+  function formatRelativeTime(ts) {
+    if (!ts || typeof ts.toDate !== 'function') return 'just now';
+    const then = ts.toDate().getTime();
+    if (!then) return 'just now';
+    const diffSec = Math.max(1, Math.floor((Date.now() - then) / 1000));
+    if (diffSec < 60) return diffSec + 's ago';
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return diffMin + 'm ago';
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return diffHr + 'h ago';
+    const diffDay = Math.floor(diffHr / 24);
+    return diffDay + 'd ago';
+  }
+
   const params = new URLSearchParams(location.search);
   let rawCity = params.get('city');
   if (!rawCity || !String(rawCity).trim()) rawCity = 'Athens';
@@ -915,6 +930,7 @@ nav {
     let replyingToUsername = '';
     let pendingDelete = null;
     const authorProfileCache = new Map();
+    let composerExpanded = false;
 
     function openModal(id) {
       document.getElementById(id).hidden = false;
@@ -923,6 +939,18 @@ nav {
     function closeModal(id) {
       document.getElementById(id).hidden = true;
       document.body.style.overflow = '';
+    }
+
+    function setThreadComposerExpanded(expanded) {
+      composerExpanded = !!expanded;
+      const preview = document.getElementById('thread-comment-input-preview');
+      const input = document.getElementById('thread-comment-input');
+      const actions = document.getElementById('thread-comment-actions');
+      if (!preview || !input || !actions) return;
+      preview.style.display = composerExpanded ? 'none' : '';
+      input.style.display = composerExpanded ? '' : 'none';
+      actions.style.display = composerExpanded ? 'flex' : 'none';
+      if (composerExpanded) input.focus();
     }
     document.querySelectorAll('[data-close]').forEach(function (el) {
       el.addEventListener('click', function () {
@@ -1375,7 +1403,9 @@ nav {
 
       const listEl = document.getElementById('thread-comments-list');
       listEl.innerHTML = '<p class="meta-pill">Loading…</p>';
+      document.getElementById('thread-comment-input-preview').value = '';
       document.getElementById('thread-comment-input').value = '';
+      setThreadComposerExpanded(false);
       replyingToCommentId = null;
       replyingToUsername = '';
       document.getElementById('thread-replying-to').hidden = true;
@@ -1391,58 +1421,51 @@ nav {
           listEl.innerHTML = '<p class="meta-pill">No comments yet.</p>';
           return;
         }
-        const rows = await Promise.all(csnap.docs.map(async function (cd) {
+        for (const cd of csnap.docs) {
           const c = cd.data() || {};
-          const profile = await getAuthorProfile(c.authorId || '', c.authorName || c.authorEmail || 'Member');
-          return { id: cd.id, c: c, profile: profile };
-        }));
-        const byParent = {};
-        rows.forEach(function (row) {
-          const pid = row.c.parentId || '__root__';
-          if (!byParent[pid]) byParent[pid] = [];
-          byParent[pid].push(row);
-        });
-
-        function drawComment(row, isNested) {
-          const c = row.c;
-          const profile = row.profile;
+          const profile = await getAuthorProfile(
+            c.authorUid || c.authorId || '',
+            c.authorUsername || c.authorName || c.authorEmail || 'Member'
+          );
+          const authorUsername = c.authorUsername || profile.username || 'Member';
+          const authorPhoto = c.authorPhoto || profile.photoUrl || '';
+          const authorInitial = String((authorUsername || 'A').charAt(0)).toUpperCase();
           const div = document.createElement('div');
           div.className = 'comment';
           div.style.display = 'flex';
           div.style.gap = '10px';
           div.style.alignItems = 'flex-start';
-          if (isNested) div.classList.add('nested-reply');
           const avatar = document.createElement('div');
           avatar.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
-          if (profile.photoUrl) {
+          if (authorPhoto) {
             const img = document.createElement('img');
-            img.src = profile.photoUrl;
-            img.alt = profile.username;
+            img.src = authorPhoto;
+            img.alt = authorUsername;
             img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
             avatar.appendChild(img);
           } else {
-            avatar.textContent = profile.initial || 'A';
+            avatar.textContent = authorInitial;
           }
           const content = document.createElement('div');
           content.style.flex = '1';
           const cm = document.createElement('div');
           cm.className = 'comment-meta';
-          cm.textContent = (profile.username || c.authorName || c.authorEmail || 'Member') + ' · ' + formatTime(c.createdAt);
+          cm.textContent = authorUsername + ' · ' + formatRelativeTime(c.createdAt);
           const cb = document.createElement('div');
           cb.className = 'comment-body';
-          cb.textContent = c.body || '';
+          cb.textContent = c.text || c.body || '';
           const replyBtn = document.createElement('button');
           replyBtn.type = 'button';
           replyBtn.className = 'comment-reply-btn';
           replyBtn.textContent = 'Reply';
           replyBtn.addEventListener('click', function () {
-            replyingToCommentId = row.id;
-            replyingToUsername = profile.username || c.authorName || 'Member';
+            replyingToCommentId = cd.id;
+            replyingToUsername = authorUsername;
             const replyInfo = document.getElementById('thread-replying-to');
             replyInfo.textContent = 'Replying to ' + replyingToUsername;
             replyInfo.hidden = false;
             document.getElementById('thread-reply-cancel').hidden = false;
-            document.getElementById('thread-comment-input').focus();
+            setThreadComposerExpanded(true);
           });
           content.appendChild(cm);
           content.appendChild(cb);
@@ -1450,17 +1473,61 @@ nav {
           div.appendChild(avatar);
           div.appendChild(content);
           listEl.appendChild(div);
-          const kids = byParent[row.id] || [];
-          kids.forEach(function (k) { drawComment(k, true); });
-        }
 
-        (byParent.__root__ || []).forEach(function (row) {
-          drawComment(row, false);
-        });
+          const repliesWrap = document.createElement('div');
+          repliesWrap.className = 'nested-reply';
+          repliesWrap.style.marginTop = '8px';
+          content.appendChild(repliesWrap);
+          const replyQ = query(
+            collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies'),
+            orderBy('createdAt', 'asc')
+          );
+          const replySnap = await getDocs(replyQ);
+          replySnap.docs.forEach(function (rd) {
+            const r = rd.data() || {};
+            const rName = String(r.authorUsername || r.authorName || 'Member').trim() || 'Member';
+            const rPhoto = String(r.authorPhoto || '').trim();
+            const row = document.createElement('div');
+            row.className = 'comment';
+            row.style.display = 'flex';
+            row.style.gap = '10px';
+            row.style.alignItems = 'flex-start';
+            row.style.marginTop = '10px';
+
+            const rav = document.createElement('div');
+            rav.style.cssText = 'width:28px;height:28px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;';
+            if (rPhoto) {
+              const img = document.createElement('img');
+              img.src = rPhoto;
+              img.alt = rName;
+              img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+              rav.appendChild(img);
+            } else {
+              rav.textContent = String((rName || 'A').charAt(0)).toUpperCase();
+            }
+            const rc = document.createElement('div');
+            rc.style.flex = '1';
+            const rm = document.createElement('div');
+            rm.className = 'comment-meta';
+            rm.textContent = rName + ' · ' + formatRelativeTime(r.createdAt);
+            const rb = document.createElement('div');
+            rb.className = 'comment-body';
+            rb.textContent = r.text || '';
+            rc.appendChild(rm);
+            rc.appendChild(rb);
+            row.appendChild(rav);
+            row.appendChild(rc);
+            repliesWrap.appendChild(row);
+          });
+        }
       });
 
       openModal('modal-thread');
     }
+
+    document.getElementById('thread-comment-input-preview').addEventListener('focus', function () {
+      setThreadComposerExpanded(true);
+    });
 
     document.getElementById('thread-comment-submit').addEventListener('click', async function () {
       if (!currentUser || !openThreadId) return;
@@ -1468,25 +1535,45 @@ nav {
       const text = (input.value || '').trim();
       if (!text) return;
       const postRef = doc(db, 'communityPosts', openThreadId);
-      const cref = collection(postRef, 'comments');
       const batch = writeBatch(db);
-      const newRef = doc(cref);
-      batch.set(newRef, {
-        authorId: currentUser.uid,
-        authorEmail: currentUser.email || '',
-        authorName: currentUser.displayName || currentUser.email || 'Member',
-        body: text,
-        parentId: replyingToCommentId || null,
-        createdAt: serverTimestamp()
-      });
+      if (replyingToCommentId) {
+        const replyRef = doc(collection(db, 'communityPosts', openThreadId, 'comments', replyingToCommentId, 'replies'));
+        batch.set(replyRef, {
+          text: text,
+          authorUid: currentUser.uid,
+          authorUsername: (currentProfileData && String(currentProfileData.username || '').trim())
+            || currentUser.displayName
+            || (currentUser.email ? currentUser.email.split('@')[0] : '')
+            || 'Member',
+          authorPhoto: (currentProfileData && String(currentProfileData.photoURL || '').trim()) || '',
+          createdAt: serverTimestamp()
+        });
+      } else {
+        const newRef = doc(collection(db, 'communityPosts', openThreadId, 'comments'));
+        batch.set(newRef, {
+          text: text,
+          authorUid: currentUser.uid,
+          authorUsername: (currentProfileData && String(currentProfileData.username || '').trim())
+            || currentUser.displayName
+            || (currentUser.email ? currentUser.email.split('@')[0] : '')
+            || 'Member',
+          authorPhoto: (currentProfileData && String(currentProfileData.photoURL || '').trim()) || '',
+          createdAt: serverTimestamp()
+        });
+      }
       batch.update(postRef, { commentCount: increment(1) });
       try {
         await batch.commit();
+        const totalEl = document.getElementById('thread-comment-total');
+        const prev = Number((totalEl.textContent || '0').split(' ')[0] || 0);
+        const next = prev + 1;
+        totalEl.textContent = next + ' comment' + (next === 1 ? '' : 's');
         input.value = '';
         replyingToCommentId = null;
         replyingToUsername = '';
         document.getElementById('thread-replying-to').hidden = true;
         document.getElementById('thread-reply-cancel').hidden = true;
+        setThreadComposerExpanded(false);
       } catch (err) {
         console.error(err);
       }
@@ -1497,6 +1584,7 @@ nav {
       replyingToUsername = '';
       document.getElementById('thread-replying-to').hidden = true;
       document.getElementById('thread-reply-cancel').hidden = true;
+      setThreadComposerExpanded(false);
     });
 
     document.getElementById('btn-new-post').addEventListener('click', function () {
