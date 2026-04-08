@@ -447,7 +447,8 @@ nav {
       var result = await signInWithPopup(auth, provider);
       goToCommunityPortal();
     } catch (err) {
-      alert('Google sign-in error: ' + err.message);
+      console.error('Google sign-in error:', err);
+      showError(document.getElementById('signin-error'), getFriendlyError(err && err.code));
     }
   }
 
