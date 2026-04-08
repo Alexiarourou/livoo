@@ -1508,12 +1508,6 @@ nav {
       welcomeEl.textContent = 'Hi, ' + profileUsername + ' · ' + cityForUi;
       navCity.textContent = cityForUi + ' community';
       navEmail.textContent = '';
-      const emojiSpan = document.createElement('span');
-      emojiSpan.className = 'nav-user-emoji';
-      emojiSpan.setAttribute('aria-hidden', 'true');
-      emojiSpan.textContent = '\u{1F33F}';
-      navEmail.appendChild(emojiSpan);
-      navEmail.appendChild(document.createTextNode(profileUsername));
     }
 
     function showPortal(user, profileData) {
