@@ -470,13 +470,48 @@
     window.expandComposer = expandComposer;
     window.collapseComposer = collapseComposer;
     window.showToast = showToast;
-    window.sharePost = function () {
+    window.sharePost = async function () {
       var href = (location.origin || '') + location.pathname + location.search;
-      navigator.clipboard.writeText(href).then(function () {
+
+      function copyViaExecCommand(text) {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          return ok;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      var copied = false;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(href);
+          copied = true;
+        } catch (e) {}
+      }
+      if (!copied) copied = copyViaExecCommand(href);
+      if (copied) {
         showToast('Link copied!');
-      }).catch(function () {
-        showToast('Copy this link from the address bar');
-      });
+        return;
+      }
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'Livvo', text: 'Open this thread', url: href });
+          showToast('Thanks for sharing!');
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;
+        }
+      }
+      showToast('Could not copy — copy the URL from the address bar');
     };
     window.sortComments = function (value) {
       if (sortSelect && value) sortSelect.value = value;

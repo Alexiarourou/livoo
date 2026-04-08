@@ -1423,12 +1423,53 @@ nav {
       showPortalToast('Post reported — thank you');
     };
 
-    window.sharePost = function (postId) {
-      const base = (location.origin || '').replace(/\/$/, '');
-      const u = base + '/community-post.html?postId=' + encodeURIComponent(postId) + '&city=' + encodeURIComponent(cityForFeedQuery());
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(u).catch(function () {});
+    window.sharePost = async function (postId) {
+      var base = (location.origin || '').replace(/\/$/, '');
+      var u = base + '/community-post.html?postId=' + encodeURIComponent(postId) + '&city=' + encodeURIComponent(cityForFeedQuery());
+
+      function copyViaExecCommand(text) {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          return ok;
+        } catch (e) {
+          return false;
+        }
       }
+
+      var copied = false;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(u);
+          copied = true;
+        } catch (e) { /* fallback below */ }
+      }
+      if (!copied) {
+        copied = copyViaExecCommand(u);
+      }
+      if (copied) {
+        showPortalToast('Link copied!');
+        return;
+      }
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'Livvo', text: 'Open this thread', url: u });
+          showPortalToast('Thanks for sharing!');
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;
+        }
+      }
+
+      showPortalToast('Could not copy — try again or open the post to copy the URL');
     };
     window.togglePostMenu = function (event, postId) {
       if (event) {
