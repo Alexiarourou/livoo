@@ -156,7 +156,10 @@
     .meta-pill { text-align: left; padding: 0; font-size: 0.88rem; }
     #post-like-btn.liked svg path { fill: #e53e3e; stroke: #e53e3e; }
     #post-like-btn.liked { color: #e53e3e !important; background: #fff0f0 !important; }
-    #post-author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    #post-avatar { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #059669; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+    #post-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    #composer-avatar-small { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; background: #2d6a2d; color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    #composer-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
   </style>
 </head>
 <body>
@@ -169,20 +172,19 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
           Back
         </a>
-        <div style="background: white; border: 1px solid #e8f0e8; border-radius: 16px; padding: 24px; margin-bottom: 16px;">
+        <div style="background: white; border: 1px solid #e8f0e8; border-radius: 16px; padding: 24px; margin-bottom: 12px;">
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-            <div id="post-author-avatar" style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #059669; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;"></div>
+            <div id="post-avatar"></div>
             <div style="flex: 1; min-width: 0;">
-              <span style="font-size: 13px; font-weight: 600; color: #1a2e1a;" id="post-author-name"></span>
-              <span style="font-size: 12px; color: #9ab09a; margin-left: 6px;" id="post-timestamp"></span>
+              <span style="font-size: 13px; font-weight: 700; color: #1a2e1a;" id="post-author"></span>
+              <span style="font-size: 12px; color: #9ab09a; margin-left: 6px;" id="post-time"></span>
             </div>
-            <span id="post-category-tag" style="margin-left: auto; font-size: 11px; background: #f0f7f0; color: #2d6a2d; padding: 3px 10px; border-radius: 20px; font-weight: 600; flex-shrink: 0;"></span>
+            <span id="post-category" style="margin-left: auto; font-size: 11px; background: #f0f7f0; color: #2d6a2d; padding: 3px 10px; border-radius: 20px; font-weight: 600; flex-shrink: 0;"></span>
           </div>
           <h1 style="font-size: 22px; font-weight: 800; color: #1a2e1a; margin: 0 0 8px 0; line-height: 1.3;" id="post-title"></h1>
           <p style="font-size: 15px; color: #3d5a3d; line-height: 1.7; margin: 0 0 20px 0; white-space: pre-wrap;" id="post-body"></p>
           <div style="display: flex; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid #f0f5f0;">
-            <button type="button" id="post-like-btn" onclick="likePost()"
-              style="display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; cursor: pointer; font-size: 13px; color: #5a7a5a; transition: all 0.15s;">
+            <button type="button" id="post-like-btn" onclick="likePost()" style="display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; cursor: pointer; font-size: 13px; color: #5a7a5a; transition: all 0.15s;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
               <span id="post-like-count">0</span>
             </button>
@@ -190,23 +192,29 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               <span id="post-comment-count">0</span> comments
             </span>
+            <button type="button" onclick="sharePost()" style="margin-left: auto; display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; cursor: pointer; font-size: 13px; color: #5a7a5a;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Share
+            </button>
           </div>
         </div>
-        <div style="background: white; border: 1px solid #e8f0e8; border-radius: 16px; padding: 16px; margin-bottom: 24px;">
-          <textarea id="comment-input" placeholder="Share your thoughts..."
-            style="width: 100%; border: none; outline: none; font-size: 14px; color: #1a2e1a; resize: none; min-height: 80px; font-family: inherit; background: transparent; box-sizing: border-box;"
-            oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+        <div id="composer-collapsed" style="background: white; border: 1px solid #e8f0e8; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; cursor: text;" onclick="expandComposer()">
+          <div id="composer-avatar-small"></div>
+          <div style="flex: 1; font-size: 14px; color: #9ab09a;">Share your thoughts...</div>
+        </div>
+        <div id="composer-expanded" style="display: none; background: white; border: 1px solid #2d6a2d; border-radius: 12px; padding: 16px; margin-bottom: 20px; box-shadow: 0 0 0 3px rgba(45, 106, 45, 0.08);">
+          <textarea id="comment-input" placeholder="Share your thoughts..." style="width: 100%; border: none; outline: none; font-size: 14px; color: #1a2e1a; resize: none; min-height: 80px; font-family: inherit; background: transparent; box-sizing: border-box; line-height: 1.6;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
           <div style="display: flex; justify-content: flex-end; gap: 8px; padding-top: 10px; border-top: 1px solid #f0f5f0; margin-top: 8px;">
-            <button type="button" onclick="cancelComment()" style="border: 1px solid #e8f0e8; background: white; border-radius: 20px; padding: 7px 16px; font-size: 13px; color: #5a7a5a; cursor: pointer;">Cancel</button>
-            <button type="button" onclick="submitComment()" style="border: none; background: #2d6a2d; color: white; border-radius: 20px; padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer;">Comment</button>
+            <button type="button" onclick="collapseComposer()" style="border: 1px solid #e8f0e8; background: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; color: #5a7a5a; cursor: pointer;">Cancel</button>
+            <button type="button" onclick="submitComment()" style="border: none; background: #2d6a2d; color: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer;">Comment</button>
           </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-          <span style="font-size: 13px; font-weight: 600; color: #1a2e1a;">Sort:</span>
-          <select id="sort-comments" style="font-size: 13px; border: 1.5px solid #e8f0e8; border-radius: 20px; padding: 5px 12px; color: #1a2e1a; background: white; cursor: pointer;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f5f0;">
+          <span style="font-size: 13px; font-weight: 700; color: #1a2e1a;" id="comment-count-label">0 comments</span>
+          <select id="sort-comments" onchange="sortComments(this.value)" style="font-size: 12px; border: 1.5px solid #e8f0e8; border-radius: 20px; padding: 4px 10px; color: #5a7a5a; background: white; cursor: pointer;">
             <option value="best">Best</option>
-            <option value="new">Newest</option>
-            <option value="old">Oldest</option>
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
           </select>
         </div>
         <div id="comments-container"></div>
@@ -383,32 +391,175 @@
     const errEl = document.getElementById('err-msg');
     const shell = document.getElementById('post-shell');
     const postTitleEl = document.getElementById('post-title');
-    const postCategoryTagEl = document.getElementById('post-category-tag');
-    const postAuthorNameEl = document.getElementById('post-author-name');
-    const postTimestampEl = document.getElementById('post-timestamp');
-    const postAuthorAvatarEl = document.getElementById('post-author-avatar');
+    const postCategoryTagEl = document.getElementById('post-category');
+    const postAuthorNameEl = document.getElementById('post-author');
+    const postTimestampEl = document.getElementById('post-time');
+    const postAuthorAvatarEl = document.getElementById('post-avatar');
     const postBodyEl = document.getElementById('post-body');
     const postLikeBtn = document.getElementById('post-like-btn');
     const sortSelect = document.getElementById('sort-comments');
     const listEl = document.getElementById('comments-container');
     const commentInputEl = document.getElementById('comment-input');
+    const composerAvatarSmallEl = document.getElementById('composer-avatar-small');
 
     let latestComments = [];
-    let activeReplyBox = null;
+
+    function updateCommentCountLabel() {
+      const el = document.getElementById('post-comment-count');
+      const label = document.getElementById('comment-count-label');
+      if (!el || !label) return;
+      const n = Math.max(0, parseInt(el.textContent, 10) || 0);
+      label.textContent = String(n) + ' comment' + (n === 1 ? '' : 's');
+    }
 
     function bumpThreadCommentCount(delta) {
       const el = document.getElementById('post-comment-count');
       if (!el) return;
       const n = Math.max(0, (parseInt(el.textContent, 10) || 0) + delta);
       el.textContent = String(n);
+      updateCommentCountLabel();
     }
+
+    function fillComposerAvatar() {
+      if (!composerAvatarSmallEl || !currentUser) return;
+      composerAvatarSmallEl.innerHTML = '';
+      const ph = (currentProfileData && String(currentProfileData.photoURL || '').trim()) || String(currentUser.photoURL || '').trim();
+      const un = (currentProfileData && String(currentProfileData.username || '').trim())
+        || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : '') || 'M';
+      if (ph) {
+        const img = document.createElement('img');
+        img.src = ph;
+        img.alt = '';
+        composerAvatarSmallEl.appendChild(img);
+      } else {
+        composerAvatarSmallEl.textContent = un.charAt(0).toUpperCase();
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.textContent = msg;
+      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2e1a;color:white;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity 0.2s;';
+      document.body.appendChild(t);
+      setTimeout(function () { t.style.opacity = '1'; }, 10);
+      setTimeout(function () {
+        t.style.opacity = '0';
+        setTimeout(function () { t.remove(); }, 200);
+      }, 2500);
+    }
+
+    function expandComposer() {
+      var collapsed = document.getElementById('composer-collapsed');
+      var expanded = document.getElementById('composer-expanded');
+      if (collapsed) collapsed.style.display = 'none';
+      if (expanded) expanded.style.display = 'block';
+      if (commentInputEl) commentInputEl.focus();
+    }
+
+    function collapseComposer() {
+      var collapsed = document.getElementById('composer-collapsed');
+      var expanded = document.getElementById('composer-expanded');
+      if (expanded) expanded.style.display = 'none';
+      if (collapsed) collapsed.style.display = 'flex';
+      if (commentInputEl) {
+        commentInputEl.value = '';
+        commentInputEl.style.height = '';
+      }
+    }
+
+    window.expandComposer = expandComposer;
+    window.collapseComposer = collapseComposer;
+    window.showToast = showToast;
+    window.sharePost = function () {
+      var href = (location.origin || '') + location.pathname + location.search;
+      navigator.clipboard.writeText(href).then(function () {
+        showToast('Link copied!');
+      }).catch(function () {
+        showToast('Copy this link from the address bar');
+      });
+    };
+    window.sortComments = function (value) {
+      if (sortSelect && value) sortSelect.value = value;
+      renderComments();
+    };
+
+    window.toggleReplyBox = function (commentId) {
+      var box = document.getElementById('reply-box-' + commentId);
+      if (!box) return;
+      var show = box.style.display !== 'block';
+      box.style.display = show ? 'block' : 'none';
+      if (show) {
+        var ta = document.getElementById('reply-input-' + commentId);
+        if (ta) ta.focus();
+      }
+    };
+
+    window.toggleCommentMenu = function (event, commentId) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      var menu = document.getElementById('comment-menu-' + commentId);
+      if (!menu) return;
+      listEl.querySelectorAll('.comment-more-menu').forEach(function (m) {
+        if (m.id !== 'comment-menu-' + commentId) m.hidden = true;
+      });
+      menu.hidden = !menu.hidden;
+    };
+
+    window.likeComment = async function (commentId) {
+      if (!currentUser) return;
+      var likeBtn = document.getElementById('clb-' + commentId);
+      if (!likeBtn) return;
+      var ref = doc(db, 'communityPosts', postId, 'comments', commentId, 'likes', currentUser.uid);
+      var cLikeSnap = await getDoc(ref);
+      var wasLiked = cLikeSnap.exists();
+      try {
+        if (wasLiked) {
+          await deleteDoc(ref);
+          await updateDoc(doc(db, 'communityPosts', postId, 'comments', commentId), { likes: increment(-1) });
+        } else {
+          await setDoc(ref, { uid: currentUser.uid, createdAt: serverTimestamp() });
+          await updateDoc(doc(db, 'communityPosts', postId, 'comments', commentId), { likes: increment(1) });
+        }
+        var latest = await getDoc(doc(db, 'communityPosts', postId, 'comments', commentId));
+        var safeLikes = Math.max(0, Number(latest.exists() ? (latest.data() || {}).likes || 0 : 0));
+        var countEl = document.getElementById('clc-' + commentId);
+        if (countEl) countEl.textContent = String(safeLikes);
+        likeBtn.style.color = wasLiked ? '' : 'var(--btn-green)';
+      } catch (err) {
+        console.error('Comment like failed:', err);
+      }
+    };
+
+    window.submitReply = async function (parentCommentId) {
+      if (!currentUser) return;
+      var ta = document.getElementById('reply-input-' + parentCommentId);
+      var replyText = ta ? (ta.value || '').trim() : '';
+      if (!replyText) return;
+      var authorUsername = (currentProfileData && String(currentProfileData.username || '').trim())
+        || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : '') || 'Member';
+      var authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim()) || currentUser.photoURL || '';
+      try {
+        var replyCol = collection(db, 'communityPosts', postId, 'comments', parentCommentId, 'replies');
+        await setDoc(doc(replyCol), {
+          text: replyText,
+          authorUid: currentUser.uid,
+          authorUsername: authorUsername,
+          authorPhotoURL: authorPhoto || null,
+          authorPhoto: authorPhoto,
+          createdAt: serverTimestamp()
+        });
+        await updateDoc(doc(db, 'communityPosts', postId), { commentCount: increment(1) });
+        bumpThreadCommentCount(1);
+        if (ta) ta.value = '';
+        window.toggleReplyBox(parentCommentId);
+      } catch (err) {
+        console.error('Reply failed:', err);
+      }
+    };
 
     const heartStrokeSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
-
-    function setCommentLikeButtonUi(btn, count, liked) {
-      btn.innerHTML = heartStrokeSvg + '<span class="c-like-n">' + String(count) + '</span>';
-      btn.style.color = liked ? 'var(--btn-green)' : '';
-    }
 
     function closeAllCommentMenus() {
       listEl.querySelectorAll('.comment-more-menu').forEach(function (m) { m.hidden = true; });
@@ -423,13 +574,14 @@
       threadRepliesUnsubs = [];
 
       let docs = latestComments.slice();
-      if (sortSelect.value === 'best') {
+      const sortVal = sortSelect ? sortSelect.value : 'best';
+      if (sortVal === 'best') {
         docs.sort(function (a, b) {
           const ad = a.data() || {}, bd = b.data() || {};
           return Number(bd.likes || bd.likeCount || 0) - Number(ad.likes || ad.likeCount || 0)
             || getMillis(bd.createdAt) - getMillis(ad.createdAt);
         });
-      } else if (sortSelect.value === 'new') {
+      } else if (sortVal === 'newest') {
         docs.sort(function (a, b) { return getMillis((b.data() || {}).createdAt) - getMillis((a.data() || {}).createdAt); });
       } else {
         docs.sort(function (a, b) { return getMillis((a.data() || {}).createdAt) - getMillis((b.data() || {}).createdAt); });
@@ -445,11 +597,10 @@
         const username = String(c.authorUsername || 'Member').trim() || 'Member';
         const photo = String(c.authorPhotoURL || c.authorPhoto || '').trim();
         const item = document.createElement('div');
-        item.className = 'comment-item';
-        item.style.cssText = 'display:flex;gap:12px;margin-bottom:20px;align-items:flex-start;';
+        item.style.cssText = 'display:flex;gap:10px;margin-bottom:20px;align-items:flex-start;';
 
         const av = document.createElement('div');
-        av.style.cssText = 'flex-shrink:0;width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;';
+        av.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;overflow:hidden;background:#2d6a2d;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;';
         if (photo) {
           const img = document.createElement('img');
           img.src = photo;
@@ -459,46 +610,55 @@
         } else av.textContent = username.charAt(0).toUpperCase();
 
         const right = document.createElement('div');
-        right.style.flex = '1';
+        right.style.cssText = 'flex:1;min-width:0;';
         const meta = document.createElement('div');
-        meta.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px;';
+        meta.style.cssText = 'display:flex;align-items:baseline;gap:6px;margin-bottom:3px;';
         const nameSpan = document.createElement('span');
-        nameSpan.style.cssText = 'font-size:13px;font-weight:600;color:#1a2e1a;';
+        nameSpan.style.cssText = 'font-size:13px;font-weight:700;color:#1a2e1a;';
         nameSpan.textContent = username;
         const timeSpan = document.createElement('span');
-        timeSpan.style.cssText = 'font-size:11px;color:#9ab09a;';
-        timeSpan.textContent = '· ' + formatRelativeTime(c.createdAt);
+        timeSpan.style.cssText = 'font-size:11px;color:#b0c8b0;';
+        timeSpan.textContent = formatRelativeTime(c.createdAt);
         meta.appendChild(nameSpan);
         meta.appendChild(timeSpan);
         const textEl = document.createElement('p');
-        textEl.style.cssText = 'font-size:14px;color:#3d5a3d;margin:0 0 8px 0;line-height:1.6;';
+        textEl.style.cssText = 'font-size:14px;color:#2d4a2d;line-height:1.6;margin:0 0 8px 0;word-break:break-word;';
         textEl.innerHTML = linkify(c.text || '');
 
         const actionRow = document.createElement('div');
-        actionRow.style.cssText = 'display:flex;align-items:center;gap:12px;';
+        actionRow.style.cssText = 'display:flex;align-items:center;gap:14px;';
+        const initialCommentLikes = Number(c.likes || c.likeCount || 0);
         const likeBtn = document.createElement('button');
         likeBtn.type = 'button';
-        likeBtn.style.cssText = 'border:none;background:none;font-size:12px;color:#9ab09a;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;';
-        const initialCommentLikes = Number(c.likes || c.likeCount || 0);
-        setCommentLikeButtonUi(likeBtn, initialCommentLikes, false);
+        likeBtn.id = 'clb-' + cd.id;
+        likeBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#9ab09a;display:flex;align-items:center;gap:4px;';
+        likeBtn.innerHTML = heartStrokeSvg + '<span id="clc-' + cd.id + '">' + String(initialCommentLikes) + '</span>';
+        likeBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          window.likeComment(cd.id);
+        });
         const replyBtn = document.createElement('button');
         replyBtn.type = 'button';
-        replyBtn.style.cssText = 'border:none;background:none;font-size:12px;color:#9ab09a;cursor:pointer;padding:0;';
+        replyBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#9ab09a;font-weight:500;';
         replyBtn.textContent = 'Reply';
+        replyBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          window.toggleReplyBox(cd.id);
+        });
 
         const moreWrap = document.createElement('span');
         moreWrap.className = 'comment-more-wrap';
         const moreMenu = document.createElement('div');
+        moreMenu.id = 'comment-menu-' + cd.id;
         moreMenu.className = 'comment-more-menu';
         moreMenu.hidden = true;
         moreMenu.addEventListener('click', function (e) { e.stopPropagation(); });
         const moreBtn = document.createElement('button');
         moreBtn.type = 'button';
-        moreBtn.style.cssText = 'border:none;background:none;font-size:12px;color:#9ab09a;cursor:pointer;padding:0;';
+        moreBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:14px;color:#c0d4c0;';
         moreBtn.textContent = '···';
         moreBtn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          moreMenu.hidden = !moreMenu.hidden;
+          window.toggleCommentMenu(e, cd.id);
         });
         if (currentUser && c.authorUid && c.authorUid === currentUser.uid) {
           const delOpt = document.createElement('button');
@@ -531,54 +691,46 @@
 
         if (currentUser) {
           getDoc(doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid)).then(function (ls) {
-            if (ls.exists()) setCommentLikeButtonUi(likeBtn, initialCommentLikes, true);
+            if (ls.exists()) likeBtn.style.color = 'var(--btn-green)';
           }).catch(function () {});
         }
-        likeBtn.addEventListener('click', async function (e) {
+
+        const replyBox = document.createElement('div');
+        replyBox.id = 'reply-box-' + cd.id;
+        replyBox.style.cssText = 'display:none;margin-top:10px;';
+        const replyInner = document.createElement('div');
+        replyInner.style.cssText = 'background:#f8fdf8;border:1px solid #e8f0e8;border-radius:10px;padding:10px;';
+        const replyTa = document.createElement('textarea');
+        replyTa.id = 'reply-input-' + cd.id;
+        replyTa.placeholder = 'Write a reply...';
+        replyTa.style.cssText = 'width:100%;border:none;outline:none;font-size:13px;color:#1a2e1a;resize:none;min-height:56px;font-family:inherit;background:transparent;box-sizing:border-box;';
+        const replyAct = document.createElement('div');
+        replyAct.style.cssText = 'display:flex;justify-content:flex-end;gap:6px;margin-top:6px;';
+        const replyCancel = document.createElement('button');
+        replyCancel.type = 'button';
+        replyCancel.textContent = 'Cancel';
+        replyCancel.style.cssText = 'border:1px solid #e8f0e8;background:white;border-radius:20px;padding:5px 12px;font-size:12px;color:#5a7a5a;cursor:pointer;';
+        replyCancel.addEventListener('click', function (e) {
           e.stopPropagation();
-          if (!currentUser) return;
-          const ref = doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid);
-          const cLikeSnap = await getDoc(ref);
-          const wasLiked = cLikeSnap.exists();
-          try {
-            if (wasLiked) {
-              await deleteDoc(ref);
-              await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likes: increment(-1) });
-            } else {
-              await setDoc(ref, { uid: currentUser.uid, createdAt: serverTimestamp() });
-              await updateDoc(doc(db, 'communityPosts', postId, 'comments', cd.id), { likes: increment(1) });
-            }
-            const latest = await getDoc(doc(db, 'communityPosts', postId, 'comments', cd.id));
-            const safeLikes = Math.max(0, Number(latest.exists() ? (latest.data() || {}).likes || 0 : 0));
-            setCommentLikeButtonUi(likeBtn, safeLikes, !wasLiked);
-          } catch (err) {
-            console.error('Comment like failed:', err);
-          }
+          window.toggleReplyBox(cd.id);
         });
+        const replyGo = document.createElement('button');
+        replyGo.type = 'button';
+        replyGo.textContent = 'Reply';
+        replyGo.style.cssText = 'border:none;background:#2d6a2d;color:white;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;';
+        replyGo.addEventListener('click', function (e) {
+          e.stopPropagation();
+          window.submitReply(cd.id);
+        });
+        replyAct.appendChild(replyCancel);
+        replyAct.appendChild(replyGo);
+        replyInner.appendChild(replyTa);
+        replyInner.appendChild(replyAct);
+        replyBox.appendChild(replyInner);
 
         const repliesWrap = document.createElement('div');
-        repliesWrap.className = 'nested-reply';
-
-        const inlineReplyWrap = document.createElement('div');
-        inlineReplyWrap.className = 'nested-reply thread-composer-panel';
-        inlineReplyWrap.hidden = true;
-        const inlineReplyInput = document.createElement('textarea');
-        inlineReplyInput.className = 'thread-composer-text';
-        inlineReplyInput.placeholder = 'Reply to u/' + username;
-        const inlineActions = document.createElement('div');
-        inlineActions.className = 'reply-actions-row';
-        const inlineReplyCancel = document.createElement('button');
-        inlineReplyCancel.type = 'button';
-        inlineReplyCancel.className = 'reply-cancel-link';
-        inlineReplyCancel.textContent = 'Cancel';
-        const inlineReplySubmit = document.createElement('button');
-        inlineReplySubmit.type = 'button';
-        inlineReplySubmit.className = 'btn-primary';
-        inlineReplySubmit.textContent = 'Reply';
-        inlineActions.appendChild(inlineReplyCancel);
-        inlineActions.appendChild(inlineReplySubmit);
-        inlineReplyWrap.appendChild(inlineReplyInput);
-        inlineReplyWrap.appendChild(inlineActions);
+        repliesWrap.id = 'replies-' + cd.id;
+        repliesWrap.style.cssText = 'margin-top:12px;padding-left:12px;border-left:2px solid #e8f0e8;';
 
         const replyQ = query(collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies'), orderBy('createdAt', 'asc'));
         const unsubReplies = onSnapshot(replyQ, function (rsnap) {
@@ -587,26 +739,30 @@
             const r = rd.data() || {};
             const rName = String(r.authorUsername || 'Member').trim() || 'Member';
             const row = document.createElement('div');
-            row.className = 'comment-item';
-            row.style.marginTop = '6px';
+            row.style.cssText = 'display:flex;gap:10px;margin-bottom:12px;align-items:flex-start;';
             const rav = document.createElement('div');
-            rav.className = 'post-author-av';
-            rav.style.width = '26px';
-            rav.style.height = '26px';
-            rav.style.fontSize = '11px';
+            rav.style.cssText = 'flex-shrink:0;width:28px;height:28px;border-radius:50%;overflow:hidden;background:#2d6a2d;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;';
             if (r.authorPhotoURL || r.authorPhoto) {
               const ri = document.createElement('img');
               ri.src = r.authorPhotoURL || r.authorPhoto;
               ri.alt = rName;
+              ri.style.cssText = 'width:100%;height:100%;object-fit:cover;';
               rav.appendChild(ri);
             } else rav.textContent = rName.charAt(0).toUpperCase();
             const rr = document.createElement('div');
-            rr.style.flex = '1';
+            rr.style.cssText = 'flex:1;min-width:0;';
             const rm = document.createElement('div');
-            rm.className = 'comment-meta';
-            rm.textContent = rName + ' · ' + formatRelativeTime(r.createdAt);
-            const rb = document.createElement('div');
-            rb.className = 'comment-body';
+            rm.style.cssText = 'display:flex;align-items:baseline;gap:6px;margin-bottom:3px;';
+            const rns = document.createElement('span');
+            rns.style.cssText = 'font-size:13px;font-weight:700;color:#1a2e1a;';
+            rns.textContent = rName;
+            const rts = document.createElement('span');
+            rts.style.cssText = 'font-size:11px;color:#b0c8b0;';
+            rts.textContent = formatRelativeTime(r.createdAt);
+            rm.appendChild(rns);
+            rm.appendChild(rts);
+            const rb = document.createElement('p');
+            rb.style.cssText = 'font-size:14px;color:#2d4a2d;line-height:1.6;margin:0;word-break:break-word;';
             rb.innerHTML = linkify(r.text || '');
             rr.appendChild(rm);
             rr.appendChild(rb);
@@ -617,51 +773,10 @@
         });
         threadRepliesUnsubs.push(unsubReplies);
 
-        replyBtn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          if (activeReplyBox && activeReplyBox !== inlineReplyWrap) activeReplyBox.hidden = true;
-          if (activeReplyBox && activeReplyBox.parentNode) activeReplyBox.parentNode.classList.remove('comment-highlight');
-          activeReplyBox = inlineReplyWrap;
-          item.classList.add('comment-highlight');
-          inlineReplyWrap.hidden = false;
-          inlineReplyInput.focus();
-        });
-        inlineReplyCancel.addEventListener('click', function () {
-          inlineReplyInput.value = '';
-          inlineReplyWrap.hidden = true;
-          item.classList.remove('comment-highlight');
-        });
-        inlineReplySubmit.addEventListener('click', async function () {
-          if (!currentUser) return;
-          const replyText = (inlineReplyInput.value || '').trim();
-          if (!replyText) return;
-          const authorUsername = (currentProfileData && String(currentProfileData.username || '').trim())
-            || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : '') || 'Member';
-          const authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim()) || currentUser.photoURL || '';
-          try {
-            const replyCol = collection(db, 'communityPosts', postId, 'comments', cd.id, 'replies');
-            await setDoc(doc(replyCol), {
-              text: replyText,
-              authorUid: currentUser.uid,
-              authorUsername: authorUsername,
-              authorPhotoURL: authorPhoto || null,
-              authorPhoto: authorPhoto,
-              createdAt: serverTimestamp()
-            });
-            await updateDoc(doc(db, 'communityPosts', postId), { commentCount: increment(1) });
-            bumpThreadCommentCount(1);
-            inlineReplyInput.value = '';
-            inlineReplyWrap.hidden = true;
-            item.classList.remove('comment-highlight');
-          } catch (err) {
-            console.error('Reply failed:', err);
-          }
-        });
-
         right.appendChild(meta);
         right.appendChild(textEl);
         right.appendChild(actionRow);
-        right.appendChild(inlineReplyWrap);
+        right.appendChild(replyBox);
         right.appendChild(repliesWrap);
         item.appendChild(av);
         item.appendChild(right);
@@ -694,6 +809,7 @@
         bumpThreadCommentCount(1);
         commentInputEl.value = '';
         commentInputEl.style.height = '';
+        collapseComposer();
       } catch (err) {
         console.error('Comment failed:', err);
         var pid = pendingDoc.id;
@@ -703,10 +819,7 @@
     }
 
     window.submitComment = function () { submitThreadComment(); };
-    window.cancelComment = function () {
-      commentInputEl.value = '';
-      commentInputEl.style.height = '';
-    };
+    window.cancelComment = function () { collapseComposer(); };
     window.likePost = function () { toggleLike(postId, postLikeBtn); };
 
     async function hydratePost(data) {
@@ -744,6 +857,9 @@
       }
       if (hasLiked) postLikeBtn.classList.add('liked');
       else postLikeBtn.classList.remove('liked');
+
+      updateCommentCountLabel();
+      fillComposerAvatar();
     }
 
     let commentsUnsub = null;
@@ -761,8 +877,6 @@
         listEl.innerHTML = '<p class="meta-pill">Could not load comments.</p>';
       });
     }
-
-    sortSelect.addEventListener('change', function () { renderComments(); });
 
     let postUnsub = null;
     let postHydrated = false;
@@ -792,6 +906,7 @@
           if (cc) cc.textContent = String(Number(pdata.commentCount || 0));
           const lc = document.getElementById('post-like-count');
           if (lc) lc.textContent = String(Number(pdata.upvoteCount || 0));
+          updateCommentCountLabel();
         }
       }, function () {
         loadingEl.hidden = true;
@@ -824,6 +939,7 @@
       } catch (e) {
         currentProfileData = null;
       }
+      fillComposerAvatar();
       startPostListener();
     });
   </script>

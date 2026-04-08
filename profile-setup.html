@@ -359,7 +359,11 @@ textarea { min-height: 88px; resize: vertical; }
       var snap = await firebase.firestore().collection('users').doc(user.uid).get();
       if (snap.exists) {
         var d = snap.data();
-        document.getElementById('username').value = String(d.username || '').trim();
+        var uname = String(d.username || '').trim();
+        if (!uname && user.displayName) {
+          uname = String(user.displayName || '').trim();
+        }
+        document.getElementById('username').value = uname;
         document.getElementById('profession').value = String(d.profession || d.role || '');
         document.getElementById('bio').value = String(d.aboutMe || d.bio || '').trim();
         if (d.photoURL) {
@@ -374,6 +378,10 @@ textarea { min-height: 88px; resize: vertical; }
         if (!isEditMode && name && cityVal && prof) {
           localStorage.setItem('livvo_city', cityDisplay);
           window.location.replace('community-portal.html?city=' + encodeURIComponent(cityDisplay));
+        }
+      } else {
+        if (user.displayName) {
+          document.getElementById('username').value = String(user.displayName || '').trim();
         }
       }
     } catch (e) {
@@ -474,6 +482,7 @@ textarea { min-height: 88px; resize: vertical; }
     completeBtn.textContent = 'Saving...';
 
     try {
+      await user.updateProfile({ displayName: username });
       var photoURL = '';
       if (photoInput.files && photoInput.files[0]) {
         var file = photoInput.files[0];
@@ -486,11 +495,12 @@ textarea { min-height: 88px; resize: vertical; }
       var payload = {
         username: username,
         profession: profession,
+        displayName: username,
         aboutMe: (bio.value || '').trim(),
         bio: (bio.value || '').trim(),
         city: localStorage.getItem('livvo_city') || 'Athens',
         email: user.email,
-        updatedAt: new Date()
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
       if (photoURL) payload.photoURL = photoURL;
       await firebase.firestore().collection('users').doc(user.uid).set(payload, { merge: true });
