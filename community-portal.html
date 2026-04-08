@@ -1009,11 +1009,11 @@ nav {
       return list.slice(0, 50);
     }
 
-    async function getAuthorProfile(authorUid, fallbackUsername) {
+    async function getAuthorProfile(authorUid, fallbackUsername, fallbackPhotoUrl) {
       if (!authorUid) {
         return {
           username: fallbackUsername || 'Anonymous',
-          photoUrl: '',
+          photoUrl: fallbackPhotoUrl || '',
           initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase()
         };
       }
@@ -1022,7 +1022,7 @@ nav {
       }
       let profile = {
         username: fallbackUsername || 'Anonymous',
-        photoUrl: '',
+        photoUrl: fallbackPhotoUrl || '',
         initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase()
       };
       try {
@@ -1086,7 +1086,7 @@ nav {
         const d = snap.data() || {};
         const authorUid = d.author || d.authorId || '';
         const fallbackUsername = d.authorUsername || d.authorName || d.authorEmail || 'Anonymous';
-        const authorProfile = await getAuthorProfile(authorUid, fallbackUsername);
+        const authorProfile = await getAuthorProfile(authorUid, fallbackUsername, d.authorPhoto || '');
         let hasUpvoted = false;
         if (currentUser) {
           try {
@@ -1111,16 +1111,8 @@ nav {
         const voteCount = document.createElement('div');
         voteCount.className = 'vote-count';
         voteCount.textContent = String(Number(d.upvoteCount || 0));
-        const downArrow = document.createElement('button');
-        downArrow.type = 'button';
-        downArrow.className = 'vote-arrow';
-        downArrow.textContent = '▼';
-        downArrow.title = 'Downvote disabled';
-        downArrow.disabled = true;
-        downArrow.style.opacity = '0.4';
         voteRail.appendChild(upArrow);
         voteRail.appendChild(voteCount);
-        voteRail.appendChild(downArrow);
         card.appendChild(voteRail);
 
         const contentCol = document.createElement('div');
@@ -1512,7 +1504,8 @@ nav {
             transaction.update(postRef, { upvoteCount: increment(1) });
           } else {
             transaction.delete(voteRef);
-            transaction.update(postRef, { upvoteCount: increment(-1) });
+            const currentCount = Number((postSnap.data() || {}).upvoteCount || 0);
+            transaction.update(postRef, { upvoteCount: Math.max(0, currentCount - 1) });
           }
         });
         const voteSnap = await getDoc(voteRef);
@@ -1610,6 +1603,9 @@ nav {
             || user.displayName
             || (user.email ? user.email.split('@')[0] : '')
             || 'Anonymous',
+          authorPhoto: (currentProfileData && String(currentProfileData.photoURL || '').trim())
+            || user.photoURL
+            || '',
           createdAt: new Date(),
           commentCount: 0,
           upvoteCount: 0,
