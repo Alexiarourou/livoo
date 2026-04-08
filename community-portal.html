@@ -896,9 +896,19 @@ nav {
         const authorUid = d.author || d.authorId || '';
         const fallbackUsername = d.authorUsername || d.authorName || d.authorEmail || 'Anonymous';
         const authorProfile = await getAuthorProfile(authorUid, fallbackUsername);
+        let hasUpvoted = false;
+        if (currentUser) {
+          try {
+            const voteState = await getDoc(doc(db, 'communityPosts', snap.id, 'upvotes', currentUser.uid));
+            hasUpvoted = voteState.exists;
+          } catch (e) {
+            hasUpvoted = false;
+          }
+        }
 
         const card = document.createElement('div');
-        card.style.cssText = 'background:white;padding:16px;margin-bottom:12px;border-radius:8px;border:1px solid #ddd;color:#1a2e24;text-align:left;';
+        card.className = 'feed-card';
+        card.style.cssText = 'padding:16px;color:#1a2e24;text-align:left;cursor:pointer;';
 
         const topRow = document.createElement('div');
         topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:10px;';
@@ -925,6 +935,9 @@ nav {
           delBtn.addEventListener('click', function () {
             pendingDelete = { postId: snap.id, card: card };
             openModal('modal-delete-post');
+          });
+          delBtn.addEventListener('keydown', function (e) {
+            e.stopPropagation();
           });
           topRow.appendChild(delBtn);
         }
@@ -953,10 +966,44 @@ nav {
         }
         const nameEl = document.createElement('small');
         nameEl.style.color = '#666';
-        nameEl.textContent = authorProfile.username || 'Anonymous';
+        nameEl.textContent = (authorProfile.username || 'Anonymous') + (d.createdAt ? ' · ' + formatTime(d.createdAt) : '');
         authorRow.appendChild(avatar);
         authorRow.appendChild(nameEl);
         card.appendChild(authorRow);
+
+        const actions = document.createElement('div');
+        actions.className = 'feed-card-actions';
+        actions.style.marginTop = '10px';
+
+        const upBtn = document.createElement('button');
+        upBtn.type = 'button';
+        upBtn.className = 'btn-upvote' + (hasUpvoted ? ' is-on' : '');
+        upBtn.innerHTML = '<span aria-hidden="true">👍</span> <span class="vote-label">' + (hasUpvoted ? 'Upvoted' : 'Upvote') + '</span> <span class="up-count">' + Number(d.upvoteCount || 0) + '</span>';
+        upBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleUpvote(snap.id, upBtn);
+        });
+
+        const commentPill = document.createElement('span');
+        commentPill.className = 'meta-pill';
+        commentPill.textContent = '💬 ' + Number(d.commentCount || 0);
+
+        actions.appendChild(upBtn);
+        actions.appendChild(commentPill);
+        card.appendChild(actions);
+
+        card.addEventListener('click', function () {
+          openThreadModal(snap.id, d);
+        });
+        card.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openThreadModal(snap.id, d);
+          }
+        });
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
 
         feedEl.appendChild(card);
       }
@@ -971,22 +1018,24 @@ nav {
           const postSnap = await transaction.get(postRef);
           const voteSnap = await transaction.get(voteRef);
           if (!postSnap.exists) throw new Error('missing post');
-          const delta = voteSnap.exists ? -1 : 1;
-          if (voteSnap.exists) {
-            transaction.delete(voteRef);
-          } else {
+          if (!voteSnap.exists) {
             transaction.set(voteRef, { createdAt: serverTimestamp() });
+            transaction.update(postRef, { upvoteCount: increment(1) });
           }
-          transaction.update(postRef, { upvoteCount: increment(delta) });
         });
         const voteSnap = await getDoc(voteRef);
         const on = voteSnap.exists;
-        btnEl.classList.toggle('is-on', on);
-        btnEl.querySelector('span:nth-child(2)').textContent = on ? 'Upvoted' : 'Upvote';
         const postSnap = await getDoc(postRef);
         const c = postSnap.exists ? (postSnap.data().upvoteCount || 0) : 0;
-        const cnt = btnEl.querySelector('.up-count');
-        if (cnt) cnt.textContent = String(c);
+        if (btnEl && btnEl.id === 'thread-upvote') {
+          syncThreadUpvoteUI(postId, on, c);
+        } else if (btnEl) {
+          btnEl.classList.toggle('is-on', on);
+          const label = btnEl.querySelector('.vote-label');
+          const cnt = btnEl.querySelector('.up-count');
+          if (label) label.textContent = on ? 'Upvoted' : 'Upvote';
+          if (cnt) cnt.textContent = String(c);
+        }
         if (openThreadId === postId) {
           syncThreadUpvoteUI(postId, on, c);
         }
@@ -1079,24 +1128,48 @@ nav {
         collection(db, 'communityPosts', postId, 'comments'),
         orderBy('createdAt', 'asc')
       );
-      threadCommentsUnsub = onSnapshot(cq, function (csnap) {
+      threadCommentsUnsub = onSnapshot(cq, async function (csnap) {
         listEl.innerHTML = '';
         if (!csnap.docs.length) {
           listEl.innerHTML = '<p class="meta-pill">No comments yet.</p>';
           return;
         }
-        csnap.docs.forEach(function (cd) {
-          const c = cd.data();
+        const rows = await Promise.all(csnap.docs.map(async function (cd) {
+          const c = cd.data() || {};
+          const profile = await getAuthorProfile(c.authorId || '', c.authorName || c.authorEmail || 'Member');
+          return { c: c, profile: profile };
+        }));
+        rows.forEach(function (row) {
+          const c = row.c;
+          const profile = row.profile;
           const div = document.createElement('div');
           div.className = 'comment';
+          div.style.display = 'flex';
+          div.style.gap = '10px';
+          div.style.alignItems = 'flex-start';
+          const avatar = document.createElement('div');
+          avatar.style.cssText = 'width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;';
+          if (profile.photoUrl) {
+            const img = document.createElement('img');
+            img.src = profile.photoUrl;
+            img.alt = profile.username;
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            avatar.appendChild(img);
+          } else {
+            avatar.textContent = profile.initial || 'A';
+          }
+          const content = document.createElement('div');
+          content.style.flex = '1';
           const cm = document.createElement('div');
           cm.className = 'comment-meta';
-          cm.textContent = (c.authorName || c.authorEmail) + ' · ' + formatTime(c.createdAt);
+          cm.textContent = (profile.username || c.authorName || c.authorEmail || 'Member') + ' · ' + formatTime(c.createdAt);
           const cb = document.createElement('div');
           cb.className = 'comment-body';
           cb.textContent = c.body || '';
-          div.appendChild(cm);
-          div.appendChild(cb);
+          content.appendChild(cm);
+          content.appendChild(cb);
+          div.appendChild(avatar);
+          div.appendChild(content);
           listEl.appendChild(div);
         });
       });
