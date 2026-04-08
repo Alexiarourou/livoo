@@ -1537,8 +1537,23 @@ nav {
           initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase()
         };
       }
-      if (authorProfileCache.has(authorUid)) {
+      var isSelf = !!(currentUser && authorUid === currentUser.uid);
+      if (!isSelf && authorProfileCache.has(authorUid)) {
         return authorProfileCache.get(authorUid);
+      }
+      if (isSelf && currentProfileData) {
+        var unSelf = String(currentProfileData.username || currentProfileData.displayName || fallbackUsername
+          || (currentUser && currentUser.displayName) || 'Anonymous').trim();
+        var phSelf = String(currentProfileData.photoURL || '').trim()
+          || String(currentUser && currentUser.photoURL ? currentUser.photoURL : '').trim()
+          || String(fallbackPhotoUrl || '').trim();
+        var profSelf = {
+          username: unSelf || 'Anonymous',
+          photoUrl: phSelf,
+          initial: String((unSelf || 'A').charAt(0)).toUpperCase()
+        };
+        authorProfileCache.set(authorUid, profSelf);
+        return profSelf;
       }
       let profile = {
         username: fallbackUsername || 'Anonymous',
@@ -1550,12 +1565,19 @@ nav {
         if (uSnap.exists()) {
           const ud = uSnap.data() || {};
           const username = String(ud.username || ud.displayName || fallbackUsername || 'Anonymous').trim();
-          const photoUrl = String(ud.photoURL || '').trim()
-            || String(fallbackPhotoUrl || '').trim();
+          var photoFromUserDoc = String(ud.photoURL || '').trim();
+          var photoFromAuth = (isSelf && currentUser) ? String(currentUser.photoURL || '').trim() : '';
+          const photoUrl = photoFromUserDoc || photoFromAuth || String(fallbackPhotoUrl || '').trim();
           profile = {
             username: username || 'Anonymous',
             photoUrl: photoUrl,
             initial: String((username || 'A').charAt(0)).toUpperCase()
+          };
+        } else if (isSelf && currentUser && String(currentUser.photoURL || '').trim()) {
+          profile = {
+            username: fallbackUsername || String(currentUser.displayName || 'Anonymous'),
+            photoUrl: String(currentUser.photoURL || '').trim(),
+            initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase()
           };
         }
       } catch (e) {
@@ -1940,10 +1962,12 @@ nav {
       navCity.textContent = cityForUi + ' community';
       navEmail.textContent = '';
       if (navProfileTrigger) {
-        const photo = String((profileData && profileData.photoURL) || (currentUser && currentUser.photoURL) || '').trim();
+        /* Firestore custom photo first, then Firebase Auth (e.g. Google), not post authorPhoto. */
+        var navPhoto = String((profileData && profileData.photoURL) || '').trim()
+          || String((currentUser && currentUser.photoURL) || '').trim();
         const initial = String((profileUsername || 'M').charAt(0)).toUpperCase();
-        if (photo) {
-          navProfileTrigger.innerHTML = '<img alt="" src="' + photo + '">';
+        if (navPhoto) {
+          navProfileTrigger.innerHTML = '<img id="nav-profile-photo" alt="" src="' + navPhoto + '">';
         } else {
           navProfileTrigger.innerHTML = '<span class="nav-profile-initial">' + initial + '</span>';
         }

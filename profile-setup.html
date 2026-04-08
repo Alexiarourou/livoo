@@ -485,8 +485,6 @@ textarea { min-height: 88px; resize: vertical; }
     roleErrorEl.hidden = true;
   });
 
-  var completeBtnDefaultText = completeBtn.textContent;
-
   async function saveProfile() {
     hideCompleteError();
     clearProfileFieldErrors();
@@ -526,7 +524,6 @@ textarea { min-height: 88px; resize: vertical; }
     completeBtn.disabled = true;
     completeBtn.setAttribute('aria-busy', 'true');
     completeBtn.textContent = 'Saving...';
-    var prevBg = completeBtn.style.background;
 
     try {
       var photoURL = '';
@@ -539,8 +536,9 @@ textarea { min-height: 88px; resize: vertical; }
       } else if (photoPreview && !photoPreview.hidden && photoPreview.src && !String(photoPreview.src).startsWith('blob:')) {
         photoURL = photoPreview.src;
       }
+      var finalPhotoURL = photoURL;
       var authUpdate = { displayName: displayName };
-      if (photoURL) authUpdate.photoURL = photoURL;
+      if (finalPhotoURL) authUpdate.photoURL = finalPhotoURL;
       await user.updateProfile(authUpdate);
       var payload = {
         username: displayName,
@@ -552,20 +550,14 @@ textarea { min-height: 88px; resize: vertical; }
         email: user.email,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
-      if (photoURL) payload.photoURL = photoURL;
+      if (finalPhotoURL) payload.photoURL = finalPhotoURL;
       await firebase.firestore().collection('users').doc(user.uid).set(payload, { merge: true });
 
-      if (isEditMode) {
-        completeBtn.textContent = 'Saved!';
-        completeBtn.style.background = '#2d6a2d';
-        setTimeout(function () {
-          completeBtn.textContent = completeBtnDefaultText;
-          completeBtn.style.background = prevBg;
-          completeBtn.disabled = false;
-          completeBtn.removeAttribute('aria-busy');
-        }, 2000);
+      var userCity = String(cityDisplay || localStorage.getItem('livvo_city') || '').trim();
+      if (userCity) {
+        window.location.href = 'community-portal.html?city=' + encodeURIComponent(userCity);
       } else {
-        window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityDisplay);
+        window.location.href = 'community-portal.html';
       }
     } catch (err) {
       console.error('Profile save error:', err);
