@@ -312,7 +312,8 @@ nav {
 .feed { display: flex; flex-direction: column; gap: 8px; width: 100%; }
 
 .post-card:active { transform: scale(0.995); }
-.upvote-btn.voted { color: #2d6a2d !important; font-weight: 700; background: #e8f5e8 !important; }
+.post-like-heart.liked svg path { fill: #e53e3e; stroke: #e53e3e; }
+.post-like-heart.liked { color: #e53e3e !important; background: #fff0f0 !important; }
 .feed-empty {
   text-align: center;
   color: var(--muted);
@@ -858,7 +859,7 @@ nav {
       <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <span class="logo-word">li<span>vv</span>o</span>
     </a>
-    <label for="nav-toggle" class="nav-burger" aria-label="Open menu"><span aria-hidden="true">☰</span></label>
+    <label for="nav-toggle" class="nav-burger" aria-label="Open menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></label>
   </div>
   <div class="portal-nav-end">
     <div class="nav-links">
@@ -948,8 +949,9 @@ nav {
     <section class="main-column">
       <!-- Page header -->
       <div style="margin-bottom: 24px;">
-        <h1 style="font-size: 26px; font-weight: 700; color: #1a2e1a; margin: 0 0 4px 0;">
-          Hi, <span id="header-username">there</span> 👋
+        <h1 style="font-size: 26px; font-weight: 700; color: #1a2e1a; margin: 0 0 4px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+          Hi, <span id="header-username">there</span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d6a2d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
         </h1>
         <p style="font-size: 14px; color: #5a7a5a; margin: 0;">
           Share tips, events, housing advice and connect with people in your city.
@@ -965,7 +967,7 @@ nav {
             <button type="button" class="cat-tab" data-category="events" role="tab" aria-selected="false">Events</button>
             <button type="button" class="cat-tab" data-category="flatmate" role="tab" aria-selected="false">Flatmate Search</button>
             <div class="cat-more-wrap">
-              <button type="button" class="cat-tab" id="cat-more-toggle" aria-expanded="false">More ▾</button>
+              <button type="button" class="cat-tab" id="cat-more-toggle" aria-expanded="false" style="display:inline-flex;align-items:center;gap:4px;">More <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
               <div class="cat-more-menu" id="cat-more-menu" hidden>
                 <button type="button" class="cat-tab" data-category="general" role="tab" aria-selected="false">General</button>
                 <button type="button" class="cat-tab" data-category="recommendations" role="tab" aria-selected="false" title="Restaurants, cafes, gyms, and more">Recommendations</button>
@@ -1007,13 +1009,18 @@ nav {
         </ul>
       </div>
       <div style="background:white;border:1px solid #e8f0e8;border-radius:12px;padding:16px;margin-top:12px;">
-        <h4 style="font-size:13px;font-weight:700;color:#1a2e1a;margin:0 0 10px 0;">📌 Quick links</h4>
+        <h4 style="font-size:13px;font-weight:700;color:#1a2e1a;margin:0 0 10px 0;display:flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z"/></svg>
+          Quick links
+        </h4>
         <div style="display:flex;flex-direction:column;gap:6px;">
           <a href="search-athens.html" style="font-size:13px;color:#2d6a2d;text-decoration:none;display:flex;align-items:center;gap:6px;">
-            🏠 Browse rentals
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Browse rentals
           </a>
           <a href="flatmate-connect.html" style="font-size:13px;color:#2d6a2d;text-decoration:none;display:flex;align-items:center;gap:6px;">
-            👥 Find a flatmate
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Find a flatmate
           </a>
         </div>
       </div>
@@ -1331,15 +1338,15 @@ nav {
       const btn = document.getElementById('like-btn-' + postId);
       const countEl = document.getElementById('like-count-' + postId);
       if (!btn || !countEl) return;
-      const alreadyLiked = btn.classList.contains('voted');
+      const alreadyLiked = btn.classList.contains('liked');
       const currentCount = parseInt(countEl.textContent, 10) || 0;
       if (alreadyLiked) {
-        btn.classList.remove('voted');
+        btn.classList.remove('liked');
         countEl.textContent = String(Math.max(0, currentCount - 1));
       } else {
-        btn.classList.add('voted');
+        btn.classList.add('liked');
         countEl.textContent = String(currentCount + 1);
-        btn.style.transform = 'scale(1.3)';
+        btn.style.transform = 'scale(1.06)';
         setTimeout(function () { btn.style.transform = 'scale(1)'; }, 150);
       }
       try {
@@ -1354,10 +1361,10 @@ nav {
       } catch (err) {
         console.error(err);
         if (alreadyLiked) {
-          btn.classList.add('voted');
+          btn.classList.add('liked');
           countEl.textContent = String(currentCount);
         } else {
-          btn.classList.remove('voted');
+          btn.classList.remove('liked');
           countEl.textContent = String(currentCount);
         }
       }
@@ -1459,9 +1466,9 @@ nav {
     function renderFeedEmptyState() {
       const wrap = document.createElement('div');
       wrap.style.cssText = 'text-align:center;padding:60px 20px;color:#6b8f6b;';
-      const emoji = document.createElement('div');
-      emoji.style.cssText = 'font-size:40px;margin-bottom:12px;';
-      emoji.textContent = '🌍';
+      const iconWrap = document.createElement('div');
+      iconWrap.style.cssText = 'display:flex;justify-content:center;margin-bottom:12px;';
+      iconWrap.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9ab09a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
       const h3 = document.createElement('h3');
       h3.style.cssText = 'font-size:16px;font-weight:700;color:#1a2e1a;margin:0 0 6px 0;';
       h3.textContent = 'No posts in this city yet';
@@ -1475,7 +1482,7 @@ nav {
       btn.addEventListener('click', function () {
         document.getElementById('new-post-btn').click();
       });
-      wrap.appendChild(emoji);
+      wrap.appendChild(iconWrap);
       wrap.appendChild(h3);
       wrap.appendChild(p);
       wrap.appendChild(btn);
@@ -1593,41 +1600,21 @@ nav {
         const actionBar = document.createElement('div');
         actionBar.style.cssText = 'display:flex;align-items:center;gap:4px;';
 
-        const voteShell = document.createElement('div');
-        voteShell.style.cssText = 'display:flex;align-items:center;background:#f5f5f5;border-radius:20px;overflow:hidden;';
-
-        const upBtn = document.createElement('button');
-        upBtn.type = 'button';
-        upBtn.id = 'like-btn-' + postId;
-        upBtn.className = 'upvote-btn' + (hasUpvoted ? ' voted' : '');
-        upBtn.style.cssText = 'border:none;background:transparent;padding:5px 8px;cursor:pointer;font-size:13px;color:#5a7a5a;display:flex;align-items:center;gap:4px;';
-        upBtn.appendChild(document.createTextNode('▲ '));
-        const countSpan = document.createElement('span');
-        countSpan.id = 'like-count-' + postId;
-        countSpan.textContent = String(Number(d.upvoteCount || 0));
-        upBtn.appendChild(countSpan);
-        upBtn.addEventListener('click', function (e) {
+        const likeBtn = document.createElement('button');
+        likeBtn.type = 'button';
+        likeBtn.id = 'like-btn-' + postId;
+        likeBtn.className = 'post-like-heart' + (hasUpvoted ? ' liked' : '');
+        likeBtn.style.cssText = 'display:flex;align-items:center;gap:5px;border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:13px;color:#5a7a5a;transition:all 0.15s;';
+        likeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span id="like-count-' + postId + '">' + String(Number(d.upvoteCount || 0)) + '</span>';
+        likeBtn.addEventListener('click', function (e) {
           window.likePost(e, postId);
         });
-
-        const divider = document.createElement('div');
-        divider.style.cssText = 'width:1px;height:16px;background:#e0e0e0;';
-
-        const downBtn = document.createElement('button');
-        downBtn.type = 'button';
-        downBtn.style.cssText = 'border:none;background:transparent;padding:5px 8px;cursor:pointer;font-size:13px;color:#5a7a5a;';
-        downBtn.textContent = '▼';
-        downBtn.addEventListener('click', function (e) { e.stopPropagation(); });
-
-        voteShell.appendChild(upBtn);
-        voteShell.appendChild(divider);
-        voteShell.appendChild(downBtn);
 
         const cc = Number(d.commentCount || 0);
         const commentBtn = document.createElement('button');
         commentBtn.type = 'button';
         commentBtn.style.cssText = 'border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:13px;color:#5a7a5a;display:flex;align-items:center;gap:5px;';
-        commentBtn.textContent = '💬 ' + cc + ' comment' + (cc === 1 ? '' : 's');
+        commentBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>' + cc + ' comment' + (cc === 1 ? '' : 's') + '</span>';
         commentBtn.addEventListener('click', function (e) {
           e.stopPropagation();
           window.openPost(postId);
@@ -1635,8 +1622,8 @@ nav {
 
         const shareBtn = document.createElement('button');
         shareBtn.type = 'button';
-        shareBtn.style.cssText = 'border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:13px;color:#5a7a5a;';
-        shareBtn.textContent = '↗ Share';
+        shareBtn.style.cssText = 'border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:13px;color:#5a7a5a;display:flex;align-items:center;gap:5px;';
+        shareBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span>Share</span>';
         shareBtn.addEventListener('click', function (e) {
           e.stopPropagation();
           window.sharePost(postId);
@@ -1649,8 +1636,8 @@ nav {
           const menuBtn = document.createElement('button');
           menuBtn.type = 'button';
           menuBtn.className = 'post-card-more-trigger';
-          menuBtn.style.cssText = 'border:none;background:transparent;padding:4px 8px;cursor:pointer;color:#9ab09a;font-size:18px;border-radius:50%;';
-          menuBtn.textContent = '···';
+          menuBtn.style.cssText = 'border:none;background:transparent;padding:4px 8px;cursor:pointer;color:#9ab09a;border-radius:50%;display:flex;align-items:center;justify-content:center;';
+          menuBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>';
           menuBtn.addEventListener('click', function (e) {
             window.togglePostMenu(e, postId);
           });
@@ -1678,7 +1665,7 @@ nav {
           menuHost.appendChild(menuWrap);
         }
 
-        actionBar.appendChild(voteShell);
+        actionBar.appendChild(likeBtn);
         actionBar.appendChild(commentBtn);
         actionBar.appendChild(shareBtn);
         actionBar.appendChild(menuHost);
@@ -1932,8 +1919,9 @@ nav {
 </script>
 
 <button id="back-to-top" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})"
-  style="display:none;position:fixed;bottom:24px;right:24px;width:40px;height:40px;border-radius:50%;background:#2d6a2d;color:white;border:none;cursor:pointer;font-size:18px;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:999;font-family:inherit;line-height:1;">
-  ↑
+  style="display:none;position:fixed;bottom:24px;right:24px;width:40px;height:40px;border-radius:50%;background:#2d6a2d;color:white;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:999;font-family:inherit;line-height:1;padding:0;"
+  aria-label="Back to top">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 <script>
 window.addEventListener('scroll', function () {
