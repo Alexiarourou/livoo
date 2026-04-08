@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Your Profile — Livvo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #059669; --green-light: #10b981; --green-dark: #047857;
+  --bg-dark: #f0f7f2; --surface-dark: #ffffff; --border-dark: #d4e5dc;
+  --text-dark: #1a2e24; --muted-dark: #4a7c5e;
+}
+body { background: var(--bg-dark); color: var(--text-dark); font-family: "DM Sans", sans-serif; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px; padding: 0 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-dark);
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
+.logo-word span { color: var(--green); }
+
+.page { max-width: 560px; margin: 0 auto; padding: 100px 24px 80px; }
+.page h1 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.8rem; letter-spacing: -0.03em; margin-bottom: 8px; }
+.page .sub { font-size: 0.95rem; color: var(--muted-dark); margin-bottom: 36px; line-height: 1.6; }
+
+.form-group { margin-bottom: 24px; }
+.form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted-dark); margin-bottom: 8px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; background: #ffffff;
+  border: 1px solid var(--border-dark);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: "DM Sans", sans-serif; font-size: 0.95rem;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-group input::placeholder, .form-group textarea::placeholder { color: var(--muted-dark); opacity: 0.7; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); }
+.form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%236b9e82' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  padding-right: 40px; cursor: pointer;
+}
+.form-group select option { background: #fff; color: #0a1f14; }
+.form-group textarea { min-height: 100px; resize: vertical; }
+
+.photo-upload {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+}
+.photo-preview {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--surface-dark); border: 2px dashed var(--border-dark);
+  overflow: hidden; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-preview svg { color: var(--muted-dark); }
+.photo-actions { display: flex; flex-direction: column; gap: 8px; }
+.photo-actions label {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(5,150,105,0.06); border: 1px solid var(--border-dark);
+  border-radius: 8px; padding: 10px 16px;
+  font-size: 0.88rem; cursor: pointer; color: var(--text-dark);
+}
+.photo-actions label:hover { border-color: var(--green); }
+.photo-actions input[type="file"] { display: none; }
+.photo-remove { font-size: 0.82rem; color: var(--muted-dark); background: none; border: none; cursor: pointer; text-decoration: underline; }
+.photo-remove:hover { color: var(--green); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 500px) { .two-col { grid-template-columns: 1fr; } }
+
+.btn-primary {
+  width: 100%; background: var(--green);
+  color: white; border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-family: "DM Sans", sans-serif; font-size: 0.95rem; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 16px;
+}
+.btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="logo-word">li<span>vv</span>o</span>
+  </a>
+</nav>
+
+<div class="page">
+  <h1>Create your flatmate profile</h1>
+  <p class="sub">Tell us about yourself so we can match you with compatible people. Budget, lifestyle, nationality and move-in date help find your perfect flatmate.</p>
+
+  <form id="profileForm">
+    <div class="form-group">
+      <label>Profile picture (optional)</label>
+      <div class="photo-upload">
+        <div class="photo-preview" id="photoPreview">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </div>
+        <div class="photo-actions">
+          <label for="photoInput">Choose photo</label>
+          <input type="file" id="photoInput" accept="image/*">
+          <button type="button" class="photo-remove" id="photoRemove" style="display:none">Remove photo</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="form-group">
+        <label>First name</label>
+        <input type="text" id="firstName" placeholder="e.g. Marie" required />
+      </div>
+      <div class="form-group">
+        <label>Last name</label>
+        <input type="text" id="lastName" placeholder="e.g. Dupont" required />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>City you're moving to</label>
+      <select id="city" required>
+        <option value="">Select city</option>
+        <option value="athens">Athens</option>
+        <option value="paris">Paris</option>
+        <option value="london">London</option>
+        <option value="barcelona">Barcelona</option>
+        <option value="berlin">Berlin</option>
+        <option value="amsterdam">Amsterdam</option>
+        <option value="madrid">Madrid</option>
+        <option value="milan">Milan</option>
+        <option value="lisbon">Lisbon</option>
+        <option value="dublin">Dublin</option>
+      </select>
+    </div>
+
+    <div class="two-col">
+      <div class="form-group">
+        <label>Move-in date</label>
+        <input type="date" id="moveIn" required />
+      </div>
+      <div class="form-group">
+        <label>Budget (€/month)</label>
+        <input type="number" id="budget" placeholder="e.g. 600" min="1" step="50" required />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>I am a</label>
+      <select id="lifestyle">
+        <option value="student">Student (Erasmus / exchange)</option>
+        <option value="intern">Intern / Young professional</option>
+        <option value="nomad">Digital nomad</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Nationality</label>
+      <input type="text" id="nationality" placeholder="e.g. French" required />
+    </div>
+
+    <div class="form-group">
+      <label>About you</label>
+      <textarea id="about" placeholder="A few lines about you — interests, what you're looking for in a flatmate, study or work..." maxlength="500"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Lifestyle preference</label>
+      <select id="preference">
+        <option value="balanced">Balanced — chill some nights, out others</option>
+        <option value="quiet">Quiet — focused on study/work</option>
+        <option value="sociable">Sociable — love meeting people & going out</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn-primary">Save profile & find flatmates</button>
+  </form>
+</div>
+
+<script>
+  (function checkAuth() {
+    if (localStorage.getItem('livvo_flatmate_logged_in')) return;
+    window.location.href = 'flatmate-signup.html';
+  })();
+
+  let photoDataUrl = null;
+  const photoInput = document.getElementById('photoInput');
+  const photoPreview = document.getElementById('photoPreview');
+  const photoRemove = document.getElementById('photoRemove');
+
+  photoInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    const r = new FileReader();
+    r.onload = function() {
+      photoDataUrl = r.result;
+      photoPreview.innerHTML = '<img src="' + photoDataUrl + '" alt="Profile">';
+      photoRemove.style.display = 'inline';
+    };
+    r.readAsDataURL(file);
+  });
+
+  photoRemove.addEventListener('click', function() {
+    photoDataUrl = null;
+    photoInput.value = '';
+    photoPreview.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>';
+    photoRemove.style.display = 'none';
+  });
+
+  const saved = JSON.parse(localStorage.getItem('livvo_flatmate_profile') || '{}');
+  if (saved.photo) {
+    photoDataUrl = saved.photo;
+    photoPreview.innerHTML = '<img src="' + saved.photo + '" alt="Profile">';
+    photoRemove.style.display = 'inline';
+  }
+
+  document.getElementById('profileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const profile = {
+      firstName: document.getElementById('firstName').value,
+      lastName: document.getElementById('lastName').value,
+      city: document.getElementById('city').value,
+      moveIn: document.getElementById('moveIn').value,
+      budget: document.getElementById('budget').value,
+      lifestyle: document.getElementById('lifestyle').value,
+      nationality: document.getElementById('nationality').value,
+      about: document.getElementById('about').value,
+      preference: document.getElementById('preference').value,
+      email: localStorage.getItem('livvo_flatmate_email'),
+      photo: photoDataUrl || null
+    };
+    localStorage.setItem('livvo_flatmate_profile', JSON.stringify(profile));
+    window.location.href = 'flatmate-connect.html';
+  });
+</script>
+</body>
+</html>

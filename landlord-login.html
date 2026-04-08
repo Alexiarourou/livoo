@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in — Livvo Landlord</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #059669; --green-light: #10b981; --green-dark: #047857;
+  --bg-dark: #f0f7f2; --surface-dark: #ffffff; --border-dark: #d4e5dc;
+  --bg-light: #ffffff; --surface-light: #f7faf8; --border-light: #e4ede8;
+  --text-dark: #1a2e24; --text-light: #1a2e24; --muted-dark: #4a7c5e; --muted-light: #4a7c5e;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg-dark); color: var(--text-dark); font-family: "DM Sans", sans-serif; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px; padding: 0 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-dark);
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
+.logo-word span { color: var(--green); }
+.nav-back { font-size: 0.83rem; color: var(--muted-dark); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.nav-back:hover { color: var(--text-dark); }
+
+.page { min-height: 100vh; padding: 100px 24px 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.auth-card {
+  width: 100%; max-width: 420px;
+  background: var(--surface-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 20px;
+  padding: 40px 36px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.06);
+}
+.auth-card h1 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.03em; margin-bottom: 8px; }
+.auth-card .sub { font-size: 0.88rem; color: var(--muted-dark); margin-bottom: 28px; }
+.forgot-link { display: block; text-align: right; font-size: 0.82rem; margin-top: 8px; margin-bottom: 0; }
+.forgot-link a { color: var(--green); text-decoration: none; }
+.forgot-link a:hover { text-decoration: underline; }
+
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted-dark); margin-bottom: 8px; }
+.form-group input {
+  width: 100%; background: #ffffff;
+  border: 1px solid var(--border-dark); border-radius: 10px;
+  padding: 14px 16px; font-family: "DM Sans", sans-serif; font-size: 0.95rem;
+  color: var(--text-dark); outline: none; transition: border-color 0.2s;
+}
+.form-group input::placeholder { color: var(--muted-dark); opacity: 0.7; }
+.form-group input:focus { border-color: var(--green); }
+
+.btn-primary {
+  width: 100%; background: var(--green);
+  color: white; border: none; border-radius: 10px;
+  padding: 14px; font-family: "DM Sans", sans-serif; font-size: 0.95rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; margin-top: 8px;
+}
+.btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+.auth-footer { margin-top: 24px; text-align: center; font-size: 0.85rem; color: var(--muted-dark); }
+.auth-footer a { color: var(--green); text-decoration: none; font-weight: 600; }
+.auth-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="logo-word">li<span>vv</span>o</span>
+  </a>
+  <a href="index.html" class="nav-back">← Back to Livvo</a>
+</nav>
+
+<div class="page">
+  <div class="auth-card">
+    <h1>Log in to your account</h1>
+    <p class="sub">Manage your properties and bookings.</p>
+    <div id="authMsg" style="display:none;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:0.9rem"></div>
+    <form id="loginForm" onsubmit="return false;">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input id="login-email" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input id="login-password" type="password" name="password" placeholder="Your password" required autocomplete="current-password" />
+        <div class="forgot-link"><a href="landlord-forgot-password.html">Forgot password?</a></div>
+      </div>
+      <button type="button" class="btn-primary" id="btnSubmit">Log in</button>
+    </form>
+  </div>
+  <p class="auth-footer">Don't have an account? <a href="landlord-signup.html">Sign up to list a property</a></p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
+    authDomain: "livvo-573e1.firebaseapp.com",
+    projectId: "livvo-573e1",
+    storageBucket: "livvo-573e1.firebasestorage.app",
+    messagingSenderId: "438563892670",
+    appId: "1:438563892670:web:c038316d9d3fcbee065def"
+  };
+
+  const auth = getAuth(initializeApp(firebaseConfig));
+  const form = document.getElementById('loginForm');
+  const authMsg = document.getElementById('authMsg');
+  const btn = document.getElementById('btnSubmit');
+
+  function getFriendlyError(code) {
+    const errors = {
+      'auth/invalid-email': 'Please enter a valid email address.',
+      'auth/user-not-found': 'No account found with this email.',
+      'auth/wrong-password': 'Incorrect password. Please try again.',
+      'auth/invalid-credential': 'Incorrect email or password. Please try again.',
+      'auth/too-many-requests': 'Too many attempts. Please try again later.'
+    };
+    return errors[code] || 'Something went wrong. Please try again.';
+  }
+
+  btn.addEventListener('click', async function () {
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    authMsg.style.display = 'none';
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    btn.disabled = true;
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      localStorage.setItem('livvo_landlord_email', email);
+      localStorage.setItem('livvo_landlord_logged_in', '1');
+      window.location.href = 'landlord-dashboard.html';
+    } catch (err) {
+      authMsg.textContent = getFriendlyError(err.code);
+      authMsg.style.display = 'block';
+      authMsg.style.background = 'rgba(239,68,68,0.1)';
+      authMsg.style.border = '1px solid rgba(239,68,68,0.2)';
+      authMsg.style.color = '#b91c1c';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

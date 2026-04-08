@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find a Flatmate — Livvo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #059669; --green-light: #10b981; --green-dark: #047857;
+  --bg-dark: #f0f7f2; --surface-dark: #ffffff; --border-dark: #d4e5dc;
+  --text-dark: #1a2e24; --muted-dark: #4a7c5e;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg-dark); color: var(--text-dark); font-family: "DM Sans", sans-serif; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px; padding: 0 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-dark);
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
+.logo-word span { color: var(--green); }
+.nav-back { font-size: 0.83rem; color: var(--muted-dark); text-decoration: none; }
+.nav-back:hover { color: var(--text-dark); }
+
+.page { min-height: 100vh; padding: 100px 24px 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.auth-card {
+  width: 100%; max-width: 420px;
+  background: var(--surface-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 20px;
+  padding: 40px 36px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.06);
+}
+.auth-card h1 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.03em; margin-bottom: 8px; }
+.auth-card .sub { font-size: 0.88rem; color: var(--muted-dark); margin-bottom: 28px; line-height: 1.5; }
+
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted-dark); margin-bottom: 8px; }
+.form-group input {
+  width: 100%; background: #ffffff;
+  border: 1px solid var(--border-dark);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: "DM Sans", sans-serif; font-size: 0.95rem;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-group input::placeholder { color: var(--muted-dark); opacity: 0.7; }
+.form-group input:focus { border-color: var(--green); }
+
+.btn-primary {
+  width: 100%; background: var(--green);
+  color: white; border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-family: "DM Sans", sans-serif; font-size: 0.95rem; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+.auth-footer { margin-top: 24px; text-align: center; font-size: 0.85rem; color: var(--muted-dark); }
+.auth-footer a { color: var(--green); text-decoration: none; font-weight: 600; }
+.auth-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="logo-word">li<span>vv</span>o</span>
+  </a>
+  <a href="index.html" class="nav-back" id="navBack">← Back to home</a>
+</nav>
+
+<div class="page">
+  <div class="auth-card">
+    <h1 id="authTitle">Find your flatmate</h1>
+    <p class="sub" id="authSub">Create a free account to match with compatible people based on budget, lifestyle, nationality and move-in date.</p>
+    <form id="signupForm" onsubmit="return false;">
+      <div class="form-group">
+        <label for="signup-email">Email</label>
+        <input id="signup-email" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="signup-password">Password</label>
+        <input id="signup-password" type="password" name="password" placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password" />
+      </div>
+      <div id="signup-error" style="display:none;padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:0.9rem;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#b91c1c;"></div>
+      <button type="button" class="btn-primary" id="signup-btn">Create account</button>
+    </form>
+    <p id="formSuccess" style="display:none;padding:16px;border-radius:10px;background:rgba(5,150,105,0.1);border:1px solid rgba(5,150,105,0.2);color:var(--green-dark);font-size:0.95rem;line-height:1.5;text-align:center;margin-top:8px;">Account created! You&apos;re signed in.</p>
+  </div>
+  <p class="auth-footer">Already have an account? <a href="flatmate-login.html">Log in</a></p>
+</div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const redirect = params.get('redirect') || '';
+  const isCommunity = redirect.includes('community-feed') || params.get('source') === 'community';
+  if (isCommunity) {
+    document.title = 'Join the Community — Livvo';
+    document.getElementById('authTitle').textContent = 'Join the community';
+    document.getElementById('authSub').textContent = 'Create a free account to join the forum, chat with others, and connect with people in your city.';
+    document.getElementById('navBack').textContent = '← Back to cities';
+    document.getElementById('navBack').href = params.get('city') ? 'signup.html?city=' + encodeURIComponent(params.get('city')) : 'community.html';
+  }
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
+    authDomain: "livvo-573e1.firebaseapp.com",
+    projectId: "livvo-573e1",
+    storageBucket: "livvo-573e1.firebasestorage.app",
+    messagingSenderId: "438563892670",
+    appId: "1:438563892670:web:c038316d9d3fcbee065def"
+  };
+
+  const auth = getAuth(initializeApp(firebaseConfig));
+  const form = document.getElementById('signupForm');
+  const successEl = document.getElementById('formSuccess');
+  const errorEl = document.getElementById('signup-error');
+  const btn = document.getElementById('signup-btn');
+  const q = new URLSearchParams(location.search);
+
+  function getFriendlyError(code) {
+    const errors = {
+      'auth/email-already-in-use': 'An account with this email already exists. Try logging in instead.',
+      'auth/invalid-email': 'Please enter a valid email address.',
+      'auth/weak-password': 'Password is too weak. Use at least 8 characters.',
+      'auth/too-many-requests': 'Too many attempts. Please try again later.'
+    };
+    return errors[code] || 'Something went wrong. Please try again.';
+  }
+
+  btn.addEventListener('click', async function () {
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    errorEl.style.display = 'none';
+    errorEl.textContent = '';
+    const email = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    btn.disabled = true;
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      localStorage.setItem('livvo_flatmate_email', email);
+      localStorage.setItem('livvo_flatmate_logged_in', '1');
+      const redir = q.get('redirect');
+      if (redir && redir.indexOf(':') === -1 && redir.indexOf('//') !== 0) {
+        window.location.href = redir;
+        return;
+      }
+      form.style.display = 'none';
+      successEl.style.display = 'block';
+    } catch (err) {
+      errorEl.textContent = getFriendlyError(err.code);
+      errorEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

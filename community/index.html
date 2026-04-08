@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community | Livvo</title>
+<script>
+(function () {
+  var c = new URLSearchParams(window.location.search).get('city') || localStorage.getItem('livvo_city') || '';
+  var dest = '../community-portal.html' + (c ? '?city=' + encodeURIComponent(c) : '');
+  window.location.replace(dest);
+})();
+</script>
+</head>
+<body>
+<p>Loading community…</p>
+</body>
+</html>

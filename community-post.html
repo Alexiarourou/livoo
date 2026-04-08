@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post — Livvo Community</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --green: #059669; --green-dark: #047857; --bg: #f0f7f2; --surface: #ffffff; --border: #d4e5dc; --text: #1a2e24; --muted: #4a7c5e; }
+body { background: var(--bg); color: var(--text); font-family: "DM Sans", sans-serif; }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.98); border-bottom: 1px solid var(--border); }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, var(--green), #10b981); }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.1rem; }
+.logo-word span { color: var(--green); }
+.nav-back { font-size: 0.85rem; color: var(--muted); text-decoration: none; }
+.nav-back:hover { color: var(--green); }
+.page { max-width: 720px; margin: 0 auto; padding: 80px 24px 60px; }
+.post-full { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+.post-meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 12px; }
+.post-title { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.5rem; line-height: 1.3; margin-bottom: 16px; }
+.post-body { font-size: 1rem; line-height: 1.7; color: var(--text); }
+.post-vote-row { display: flex; align-items: center; gap: 16px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+.post-vote-row button { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1.1rem; padding: 4px; }
+.post-vote-row button:hover { color: var(--green); }
+.comments-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+.comments-section h3 { font-family: "Outfit", sans-serif; font-size: 1rem; margin-bottom: 20px; }
+.comment { padding: 14px 0; border-bottom: 1px solid var(--border); }
+.comment:last-child { border-bottom: none; }
+.comment-meta { font-size: 0.75rem; color: var(--muted); margin-bottom: 6px; }
+.comment-meta strong { color: var(--text); }
+.comment-body { font-size: 0.9rem; line-height: 1.6; }
+.comment-form { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
+.comment-form label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 8px; }
+.comment-form input, .comment-form textarea { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.95rem; margin-bottom: 12px; }
+.comment-form input:focus, .comment-form textarea:focus { outline: none; border-color: var(--green); }
+.comment-form textarea { min-height: 100px; resize: vertical; }
+.btn-submit { background: var(--green); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+.btn-submit:hover { background: var(--green-dark); }
+.msg-success { display: none; background: rgba(5,150,105,0.1); border: 1px solid rgba(5,150,105,0.3); border-radius: 10px; padding: 14px; color: var(--green); font-size: 0.9rem; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo"><div class="logo-icon"></div><span class="logo-word">li<span>vv</span>o</span></a>
+  <a href="#" class="nav-back" id="backLink">← Back to feed</a>
+</nav>
+<div class="page">
+  <div id="postContainer" class="post-full"></div>
+  <div class="comments-section">
+    <h3 id="commentsTitle">Comments</h3>
+    <div id="commentsList"></div>
+    <form class="comment-form" id="commentForm" onsubmit="return false;">
+      <input type="hidden" name="post_id" id="postIdField" value="" />
+      <div class="msg-success" id="successMsg">Thanks! Your comment has been submitted.</div>
+      <label for="commentName">Your name</label>
+      <input type="text" name="name" id="commentName" placeholder="e.g. Alexia R." required />
+      <label for="commentEmail">Your email</label>
+      <input type="email" name="email" id="commentEmail" placeholder="your@email.com" required />
+      <label for="commentBody">Your comment</label>
+      <textarea name="message" id="commentBody" placeholder="Write your comment..." required></textarea>
+      <button type="button" class="btn-submit" id="commentPostBtn">Post comment</button>
+    </form>
+  </div>
+</div>
+<script>
+  const POSTS = {
+    'flatmate-exarchia': {
+      author: 'Maria K. (Erasmus, Universitat Barcelona)',
+      time: '2h ago',
+      title: 'Looking for a flatmate in Exarchia — 2BR, 650€ total, move-in Sept 1',
+      body: 'Found a great flat on Zoodochou Pigis, 5 min walk from Exarchia square. Two bedrooms, shared kitchen and bathroom. Landlord is super chill. I\'m coming for Erasmus at NKUA. Looking for a female flatmate, non-smoker. Deposit is 1 month rent. Message me if you want to video call and see the place!',
+      votes: 24,
+      comments: [
+        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '1h ago', body: 'Hi Maria! I\'m also doing Erasmus at NKUA from September. The area sounds perfect — I\'ve heard Exarchia has a really cool vibe. Is the flat still available? Would love to organise a call this week.' },
+        { author: 'Maria K.', time: '45m ago', body: 'Yes still available! Sent you a DM with my WhatsApp. Let\'s chat tomorrow?', reply: true },
+        { author: 'Sophie M.', time: '30m ago', body: 'Exarchia is amazing, lived there last year. Pro tip: the weekly market on Friday morning has the best cheap fruit & veg. Good luck with the search!' }
+      ]
+    },
+    'coworking-athens': {
+      author: 'Alex K.', time: '5h ago',
+      title: 'Best coworking spots in Athens? Good WiFi + coffee near Monastiraki',
+      body: 'Just landed in Athens for 2 months. Working remotely for a German startup. Need somewhere reliable with fast internet for video calls. Prefer cafes or shared spaces — not a fan of silent offices. Any nomads here with tips?',
+      votes: 18,
+      comments: [
+        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '4h ago', body: 'Taf Coffee in Psiri has solid WiFi and great coffee. They\'re used to people working there. Another option is The Works in Metaxourgeio — it\'s a proper coworking but has a chill vibe, day pass is 12€.' },
+        { author: 'Nikolas', time: '3h ago', body: '+1 for Taf. Also try Communitism in Kerameikos — it\'s a creative space, free WiFi, you can sit with a coffee for hours. Very nomad-friendly.' }
+      ]
+    },
+    'erasmus-meetup': {
+      author: 'Sophie L.', time: '1d ago',
+      title: 'Erasmus Athens meetup — Saturday 7pm at Six d.o.g.s (Psiri)',
+      body: 'Hey everyone! A few of us from the Erasmus group are organising a casual meetup this Saturday. Six d.o.g.s is a bar/cafe with a nice courtyard — easy to find, good for groups. Come say hi if you\'re new in Athens or want to meet other students. No pressure, just vibes. DM me if you need the exact address or have questions.',
+      votes: 31,
+      comments: [
+        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '20h ago', body: 'I\'ll be there! Really looking forward to meeting everyone. I arrive in Athens on Thursday so perfect timing.' },
+        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '18h ago', body: 'For anyone wondering — Six d.o.g.s is on Avramiotou 6, right by Monastiraki metro. The courtyard is at the back, we\'ll probably be there. Look for the Livvo crowd!' },
+        { author: 'Lucas', time: '12h ago', body: 'Count me in! First week here, need to make some friends haha' }
+      ]
+    },
+    'pwc-internship': {
+      author: 'Lucas T.', time: '2d ago',
+      title: 'PWC Athens internship — where to live? Budget 500–600€, office near Syntagma',
+      body: 'Starting a 6-month audit internship in September. Office is on Stadiou street. Looking for a room in a shared flat — budget around 500–600 all in. Prefer somewhere safe and max 30 min commute. Kolonaki? Pagrati? Any interns who\'ve been through this with tips?',
+      votes: 15,
+      comments: [
+        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '1d ago', body: 'Pagrati and Kypseli are both within your budget and on the metro line to Syntagma. Kypseli is cheaper and has a lot of young people. Avoid living too far north — the commute can get long. Good luck with the internship!' }
+      ]
+    },
+    'beaches-weekend': {
+      author: 'Julia M.', time: '3d ago',
+      title: 'Weekend beach trip from Athens — best spots by bus/train?',
+      body: 'In Athens for a few weeks, want to get out to the coast for a weekend. Looking for somewhere easy to reach without a car — KTEL bus or train. Clean water, maybe a few cafes. Heard about Sounio and Rafina — any comparisons? Or other suggestions?',
+      votes: 9,
+      comments: [
+        { author: 'Alexia R.', email: 'alexiaroumpou@gmail.com', time: '2d ago', body: 'Sounio is stunning — the temple at sunset is worth it. Beach is ok, a bit rocky. For proper swimming I\'d recommend taking the ferry from Rafina to Andros or Evia. Rafina port is 45 min by bus from Athens. Hydra is also doable as a day trip if you leave early.' }
+      ]
+    }
+  };
+
+  const params = new URLSearchParams(location.search);
+  const postId = params.get('id') || 'flatmate-exarchia';
+  const city = params.get('city') || 'athens';
+  let post = POSTS[postId];
+  if (!post && postId.startsWith('user-')) {
+    const stored = localStorage.getItem('livvo_posts') || '[]';
+    const userPosts = JSON.parse(stored).filter(p => p.id === postId);
+    post = userPosts[0] ? { author: userPosts[0].author, time: userPosts[0].time, title: userPosts[0].title, body: userPosts[0].body, votes: userPosts[0].votes || 0, comments: userPosts[0].comments || [] } : null;
+  }
+  if (!post) post = POSTS['flatmate-exarchia'];
+
+  document.getElementById('backLink').href = 'community-feed.html?city=' + city;
+  const cityNamesMap = { paris: 'Paris', athens: 'Athens', london: 'London' };
+  document.getElementById('postIdField').value = postId + ' (' + (cityNamesMap[city] || city) + ')';
+
+  function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  const bodyEscaped = esc(post.body).replace(/\n/g, '<br>');
+  const container = document.getElementById('postContainer');
+  container.innerHTML = `
+    <div class="post-meta">${esc(post.author)} · ${esc(post.time)}</div>
+    <h1 class="post-title">${esc(post.title)}</h1>
+    <div class="post-body">${bodyEscaped}</div>
+    <div class="post-vote-row">
+      <button type="button">&#9650;</button><span>${post.votes}</span><button type="button">&#9660;</button>
+    </div>
+  `;
+
+  const commentsList = document.getElementById('commentsList');
+  let allComments = [...(post.comments || [])];
+  const stored = localStorage.getItem('livvo_comments_' + postId);
+  if (stored) try { allComments = allComments.concat(JSON.parse(stored)); } catch(e) {}
+
+  function renderComments() {
+    commentsList.innerHTML = allComments.map(c => `
+      <div class="comment" ${c.reply ? 'style="margin-left:20px;padding-left:16px;border-left:2px solid var(--border)"' : ''}>
+        <div class="comment-meta"><strong>${esc(c.author)}</strong> · ${esc(c.time)}</div>
+        <div class="comment-body">${c.body}</div>
+      </div>
+    `).join('');
+  }
+  renderComments();
+
+  function postComment() {
+    const form = document.getElementById('commentForm');
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    const formData = new FormData(form);
+    formData.append('post', postId);
+    const newComment = { author: formData.get('name'), email: formData.get('email'), time: 'Just now', body: formData.get('message') };
+    allComments.push(newComment);
+    const stored = localStorage.getItem('livvo_comments_' + postId);
+    const arr = stored ? JSON.parse(stored) : [];
+    arr.push(newComment);
+    localStorage.setItem('livvo_comments_' + postId, JSON.stringify(arr));
+    renderComments();
+    document.getElementById('successMsg').style.display = 'block';
+    form.reset();
+  }
+  document.getElementById('commentPostBtn').addEventListener('click', postComment);
+</script>
+</body>
+</html>

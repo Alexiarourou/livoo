@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landlord Dashboard — Livvo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #059669; --green-light: #10b981; --green-dark: #047857;
+  --bg-dark: #f0f7f2; --surface-dark: #ffffff; --border-dark: #d4e5dc;
+  --bg-light: #ffffff; --surface-light: #f7faf8; --border-light: #e4ede8;
+  --text-dark: #1a2e24; --text-light: #1a2e24; --muted-dark: #4a7c5e; --muted-light: #4a7c5e;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg-dark); color: var(--text-dark); font-family: "DM Sans", sans-serif; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px; padding: 0 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-dark);
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.04em; color: var(--text-dark); }
+.logo-word span { color: var(--green); }
+.nav-links { display: flex; align-items: center; gap: 20px; }
+.nav-links a { font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.nav-links a:hover { color: var(--text-dark); }
+.notif-badge { background: var(--green); color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 100px; min-width: 18px; text-align: center; }
+
+.page { max-width: 1200px; margin: 0 auto; padding: 100px 24px 80px; }
+.dash-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 40px; }
+.dash-header h1 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.8rem; letter-spacing: -0.03em; }
+.dash-header .btn-add { background: var(--green); color: white; padding: 12px 24px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+.dash-header .btn-add:hover { background: var(--green-dark); }
+
+/* Tabs */
+.dash-tabs-wrap { display: flex; align-items: center; gap: 20px; margin-bottom: 32px; border-bottom: 1px solid var(--border-dark); }
+.back-dash { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; padding: 8px 0; transition: color 0.2s; flex-shrink: 0; min-width: 120px; }
+.back-dash:hover { color: var(--green); }
+.back-dash svg { width: 18px; height: 18px; flex-shrink: 0; }
+.dash-tabs { display: flex; gap: 4px; flex: 1; }
+.dash-tab { padding: 12px 20px; font-size: 0.9rem; color: var(--muted-dark); background: none; border: none; font-family: inherit; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
+.dash-tab:hover { color: var(--text-dark); }
+.dash-tab.active { color: var(--green); border-bottom-color: var(--green); font-weight: 600; }
+.dash-panel { display: none; }
+.dash-panel.active { display: block; }
+
+/* Cards grid */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.25s;
+}
+.card:hover { border-color: rgba(52,211,153,0.3); }
+.card-img { aspect-ratio: 16/10; background: #0d2a18; position: relative; overflow: hidden; }
+.card-img img { width: 100%; height: 100%; object-fit: cover; }
+.card-img .status { position: absolute; top: 12px; left: 12px; padding: 4px 12px; border-radius: 100px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+.card-edit-btn {
+  position: absolute; top: 12px; right: 12px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.95); border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--green); transition: all 0.2s;
+}
+.card-edit-btn:hover { background: white; transform: scale(1.08); }
+.card-edit-btn svg { width: 18px; height: 18px; }
+.status.live { background: var(--green); color: white; }
+.status.rented { background: #f59e0b; color: white; }
+.status.draft { background: var(--muted-dark); color: var(--text-dark); }
+.status.archived { background: #9ca3af; color: white; }
+.card.archived { opacity: 0.9; }
+.card.archived .card-img img { filter: grayscale(0.3); }
+.card-body { padding: 20px; }
+.card-more-actions { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-dark); display: flex; gap: 12px; flex-wrap: wrap; }
+.card-more-actions a, .card-more-actions button { font-size: 0.78rem; color: var(--muted-dark); background: none; border: none; cursor: pointer; padding: 0; font-family: inherit; text-decoration: none; transition: color 0.2s; }
+.card-more-actions a:hover, .card-more-actions button:hover { color: var(--green); }
+.card-more-actions .link-delete:hover { color: #ef4444; }
+.card-title { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; }
+.card-meta { font-size: 0.83rem; color: var(--muted-dark); margin-bottom: 16px; }
+.card-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.card-actions .btn { padding: 8px 16px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s; }
+.card-actions .btn-primary { background: var(--green); color: white; border: none; cursor: pointer; }
+.card-actions .btn-primary:hover { background: var(--green-dark); }
+.card-actions .btn-outline { background: transparent; color: var(--muted-dark); border: 1px solid var(--border-dark); }
+.card-actions .btn-outline:hover { border-color: var(--green); color: var(--text-dark); }
+
+/* Notifications */
+.notif-list { display: flex; flex-direction: column; gap: 0; }
+.notif-item {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-dark);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.notif-item:hover { background: rgba(5,150,105,0.06); }
+.notif-item.unread { background: rgba(5,150,105,0.04); }
+.notif-item:last-child { border-bottom: none; }
+.notif-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+.notif-star {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--border-dark); transition: all 0.2s;
+}
+.notif-star:hover { color: #f59e0b; transform: scale(1.1); }
+.notif-star.starred { color: #f59e0b; }
+.notif-star svg { width: 20px; height: 20px; }
+.notif-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.notif-mark-read { font-size: 0.7rem; color: var(--muted-dark); background: none; border: none; cursor: pointer; padding: 6px 10px; border-radius: 8px; transition: all 0.2s; font-family: inherit; }
+.notif-mark-read:hover { color: var(--green); background: rgba(5,150,105,0.08); }
+.notif-delete { width: 32px; height: 32px; border-radius: 50%; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted-dark); transition: all 0.2s; }
+.notif-delete:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+.notif-star *, .notif-delete * { pointer-events: none; }
+.notif-body { flex: 1; min-width: 0; }
+.notif-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+.notif-text { font-size: 0.85rem; color: var(--muted-dark); line-height: 1.5; margin-bottom: 6px; }
+.notif-time { font-size: 0.75rem; color: var(--muted-dark); opacity: 0.8; }
+.empty-state { text-align: center; padding: 64px 24px; color: var(--muted-dark); }
+.empty-state h3 { font-family: "Outfit", sans-serif; font-size: 1.1rem; color: var(--text-dark); margin-bottom: 8px; }
+
+/* Delete confirmation modal */
+.delete-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 24px; }
+.delete-modal-overlay.open { display: flex; }
+.delete-modal { background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 16px; padding: 28px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+.delete-modal h4 { font-family: "Outfit", sans-serif; font-size: 1.15rem; margin-bottom: 10px; color: var(--text-dark); }
+.delete-modal p { font-size: 0.9rem; color: var(--muted-dark); margin-bottom: 24px; line-height: 1.5; }
+.delete-modal-btns { display: flex; gap: 12px; justify-content: flex-end; }
+.delete-modal-btns .btn-cancel { background: transparent; color: var(--muted-dark); border: 1px solid var(--border-dark); padding: 10px 20px; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.delete-modal-btns .btn-cancel:hover { border-color: var(--green); color: var(--text-dark); }
+.delete-modal-btns .btn-delete { background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.delete-modal-btns .btn-delete:hover { background: #dc2626; }
+
+/* Messages */
+.msg-panel { display: flex; gap: 0; min-height: 480px; border: 1px solid var(--border-dark); border-radius: 16px; overflow: hidden; background: var(--surface-dark); }
+.msg-list-wrap { width: 300px; flex-shrink: 0; border-right: 1px solid var(--border-dark); display: flex; flex-direction: column; }
+.msg-list { display: flex; flex-direction: column; gap: 0; flex: 1; overflow-y: auto; }
+.msg-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-dark);
+  cursor: pointer;
+  transition: background 0.2s;
+  text-decoration: none; color: inherit;
+}
+.msg-item:hover { background: rgba(5,150,105,0.06); }
+.msg-item.active { background: rgba(5,150,105,0.08); }
+.msg-delete { width: 28px; height: 28px; border-radius: 50%; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted-dark); opacity: 0.6; transition: all 0.2s; flex-shrink: 0; }
+.msg-delete:hover { color: #ef4444; opacity: 1; background: rgba(239,68,68,0.1); }
+.chat-delete { width: 36px; height: 36px; border-radius: 50%; background: rgba(239,68,68,0.1); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted-dark); flex-shrink: 0; transition: all 0.2s; }
+.chat-delete:hover { color: #ef4444; background: rgba(239,68,68,0.2); }
+.msg-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; flex-shrink: 0; }
+.msg-body { flex: 1; min-width: 0; }
+.msg-name { font-weight: 600; font-size: 0.92rem; margin-bottom: 2px; }
+.msg-preview { font-size: 0.83rem; color: var(--muted-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.msg-time { font-size: 0.75rem; color: var(--muted-dark); }
+.msg-unread { width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-left: 8px; display: inline-block; }
+
+.chat-wrap { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.chat-placeholder { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--muted-dark); font-size: 0.95rem; padding: 40px; text-align: center; }
+.chat-view { flex: 1; display: none; flex-direction: column; }
+.chat-view.open { display: flex; }
+.chat-header { padding: 16px 24px; border-bottom: 1px solid var(--border-dark); display: flex; align-items: center; gap: 16px; }
+.chat-back { width: 36px; height: 36px; border-radius: 50%; background: rgba(5,150,105,0.1); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--green); flex-shrink: 0; transition: all 0.2s; }
+.chat-back:hover { background: rgba(5,150,105,0.18); }
+.chat-header .msg-avatar { width: 40px; height: 40px; font-size: 0.9rem; }
+.chat-header-info { flex: 1; }
+.chat-header-name { font-weight: 700; font-size: 1rem; }
+.chat-header-meta { font-size: 0.8rem; color: var(--muted-dark); }
+.chat-messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.chat-msg { max-width: 75%; padding: 12px 18px; border-radius: 16px; font-size: 0.92rem; line-height: 1.5; }
+.chat-msg.them { align-self: flex-start; background: rgba(5,150,105,0.08); border: 1px solid rgba(5,150,105,0.15); }
+.chat-msg.you { align-self: flex-end; background: var(--green); color: white; }
+.chat-msg .time { font-size: 0.7rem; opacity: 0.8; margin-top: 4px; }
+.chat-input-wrap { padding: 16px 24px; border-top: 1px solid var(--border-dark); display: flex; gap: 12px; align-items: flex-end; }
+.chat-input { flex: 1; background: var(--bg-dark); border: 1px solid var(--border-dark); border-radius: 12px; padding: 14px 18px; font-family: inherit; font-size: 0.95rem; color: var(--text-dark); resize: none; min-height: 48px; max-height: 120px; outline: none; }
+.chat-input:focus { border-color: var(--green); }
+.btn-send-msg { background: var(--green); color: white; border: none; border-radius: 12px; padding: 14px 24px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+.btn-send-msg:hover { background: var(--green-dark); }
+
+/* Property detail modal / inline */
+.prop-detail {
+  background: var(--surface-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+}
+.prop-detail h3 { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 20px; }
+.detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+@media (max-width: 600px) { .detail-grid { grid-template-columns: 1fr; } }
+.detail-field label { display: block; font-size: 0.75rem; color: var(--muted-dark); margin-bottom: 6px; }
+.detail-field input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border-dark); border-radius: 10px; padding: 12px 14px; color: var(--text-dark); font-family: inherit; font-size: 0.95rem; }
+.detail-field input:focus { outline: none; border-color: var(--green); }
+.discount-badge { display: inline-block; background: rgba(239,68,68,0.2); color: #f87171; padding: 4px 10px; border-radius: 100px; font-size: 0.78rem; font-weight: 600; margin-left: 8px; }
+.booking-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: rgba(5,150,105,0.08); border: 1px solid rgba(52,211,153,0.2); border-radius: 12px; margin-top: 16px; }
+.booking-row .dates { font-size: 0.9rem; font-weight: 600; }
+.booking-row .tenant { font-size: 0.83rem; color: var(--muted-dark); }
+.prop-detail .btn-save { background: var(--green); color: white; border: none; border-radius: 10px; padding: 14px 28px; font-family: "DM Sans", sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.prop-detail .btn-save:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+/* Landlord profile */
+.profile-card {
+  background: var(--surface-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.profile-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: linear-gradient(135deg, var(--green), var(--green-light)); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: white; font-family: "Outfit", sans-serif; flex-shrink: 0; overflow: hidden; }
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-info { flex: 1; min-width: 0; }
+.profile-name { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; margin-bottom: 4px; }
+.profile-email { font-size: 0.88rem; color: var(--muted-dark); }
+.profile-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 6px 12px; background: rgba(5,150,105,0.1); border: 1px solid rgba(5,150,105,0.2); border-radius: 100px; font-size: 0.78rem; font-weight: 600; color: var(--green); }
+.profile-edit-btn { margin-left: auto; font-size: 0.83rem; color: var(--green); background: none; border: 1px solid var(--green); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
+.profile-edit-btn:hover { background: var(--green); color: white; }
+.profile-edit-preview { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: #e5e7eb; margin: 0 auto 16px; display: block; }
+.profile-edit-zone { border: 2px dashed var(--border-dark); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+.profile-edit-zone:hover { border-color: var(--green); background: rgba(5,150,105,0.06); }
+.profile-edit-zone input { display: none; }
+
+/* Property stats */
+.card-stats { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+.card-stat { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--muted-dark); }
+.card-stat strong { color: var(--text-dark); font-weight: 600; }
+.card-stat svg { width: 14px; height: 14px; color: var(--green); flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="logo-word">li<span>vv</span>o</span>
+  </a>
+  <div class="nav-links">
+    <a href="landlord-dashboard.html" id="navDashboard" onclick="navToTab(event,'properties')">Dashboard</a>
+    <a href="landlord-dashboard.html#notifications" id="navNotifications" onclick="navToTab(event,'notifications')">Notifications <span class="notif-badge" id="notifCount">2</span></a>
+    <a href="landlord-dashboard.html#messages" id="navMessages" onclick="navToTab(event,'messages')">Messages</a>
+    <a href="landlord-list-property.html" class="btn-add">+ List property</a>
+    <a href="#" id="logoutLink">Log out</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="dash-header">
+    <h1>Your properties</h1>
+    <a href="landlord-list-property.html" class="btn-add">+ List a property</a>
+  </div>
+
+  <div class="dash-tabs-wrap">
+    <a href="#" class="back-dash" id="backToDashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Dashboard
+    </a>
+    <div class="dash-tabs">
+      <button class="dash-tab active" onclick="switchTab('properties')">Properties</button>
+      <button class="dash-tab" onclick="switchTab('notifications')">Notifications</button>
+      <button class="dash-tab" onclick="switchTab('messages')">Messages</button>
+    </div>
+  </div>
+
+  <!-- Panel: Properties -->
+  <div class="dash-panel active" id="panel-properties">
+    <div class="profile-card" id="landlordProfile">
+      <div class="profile-avatar" id="profileAvatar">A</div>
+      <div class="profile-info">
+        <div class="profile-name" id="profileName">Your profile</div>
+        <div class="profile-email" id="profileEmail">—</div>
+        <span class="profile-badge">Livvo verified landlord</span>
+      </div>
+      <button type="button" class="profile-edit-btn" onclick="openEditProfile()">Edit profile</button>
+    </div>
+    <div class="cards-grid" id="propertiesGrid">
+      <!-- Filled by JS -->
+    </div>
+    <div id="propDetail" class="prop-detail" style="display:none">
+      <h3 id="propDetailTitle">Property details</h3>
+      <div class="detail-grid">
+        <div class="detail-field">
+          <label>Price (€/month)</label>
+          <input type="number" id="editPrice" min="1" />
+        </div>
+        <div class="detail-field">
+          <label>Discount % (optional)</label>
+          <input type="number" id="editDiscount" placeholder="0" min="0" max="50" />
+        </div>
+      </div>
+      <div id="bookingInfo" style="margin-top:20px"></div>
+      <div style="margin-top:24px">
+        <button type="button" class="btn-save" onclick="savePrice()">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: Notifications -->
+  <div class="dash-panel" id="panel-notifications">
+    <div class="notif-list" id="notifList">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+  <!-- Panel: Messages -->
+  <div class="dash-panel" id="panel-messages">
+    <div class="msg-panel">
+      <div class="msg-list-wrap">
+        <div class="msg-list" id="msgConversationList"></div>
+      </div>
+      <div class="chat-wrap">
+        <div class="chat-placeholder" id="chatPlaceholder">
+          <p>Select a conversation to view messages and reply to potential tenants.<br>All conversations happen through Livvo.</p>
+        </div>
+        <div class="chat-view" id="chatView">
+          <div class="chat-header" id="chatHeader"></div>
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input-wrap">
+            <textarea class="chat-input" id="chatInput" placeholder="Type your message..." rows="1"></textarea>
+            <button class="btn-send-msg" id="btnSendMsg">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="delete-modal-overlay" id="deleteModalOverlay">
+  <div class="delete-modal">
+    <h4 id="deleteModalTitle">Delete notification?</h4>
+    <p id="deleteModalText">This cannot be undone.</p>
+    <div class="delete-modal-btns">
+      <button type="button" class="btn-cancel" id="deleteModalCancel">Cancel</button>
+      <button type="button" class="btn-delete" id="deleteModalConfirm">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="delete-modal-overlay" id="profileEditOverlay">
+  <div class="delete-modal" style="max-width: 420px;">
+    <h4>Edit profile</h4>
+    <p style="font-size: 0.9rem; color: var(--muted-dark); margin-bottom: 20px;">Update your name and profile picture.</p>
+    <div class="profile-edit-zone" id="profilePhotoZone" onclick="document.getElementById('profilePhotoInput').click()">
+      <img class="profile-edit-preview" id="profilePhotoPreview" src="" alt="" style="display:none" />
+      <span id="profilePhotoPlaceholder" style="font-size: 0.9rem; color: var(--muted-dark);">Click to change photo</span>
+    </div>
+    <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" />
+    <div class="detail-field" style="margin-bottom: 20px;">
+      <label>Name</label>
+      <input type="text" id="profileEditName" placeholder="Your name" style="width: 100%;" />
+    </div>
+    <div class="delete-modal-btns" style="margin-top: 24px;">
+      <button class="btn-cancel" onclick="closeEditProfile()">Cancel</button>
+      <button class="btn-primary" style="background: var(--green); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer;" onclick="saveProfile()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function checkAuth() {
+    if (localStorage.getItem('livvo_landlord_verified') || localStorage.getItem('livvo_landlord_logged_in')) return;
+    window.location.href = 'landlord-login.html';
+  })();
+
+  document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    localStorage.removeItem('livvo_landlord_logged_in');
+    localStorage.removeItem('livvo_landlord_email');
+    localStorage.removeItem('livvo_landlord_password');
+    localStorage.removeItem('livvo_landlord_verified');
+    window.location.href = 'landlord-login.html';
+  });
+
+  function switchTab(id) {
+    document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('.dash-tab[onclick*="'+id+'"]').classList.add('active');
+    document.getElementById('panel-'+id).classList.add('active');
+    if (id !== 'messages') closeChat();
+    location.hash = id === 'properties' ? '' : id;
+  }
+
+  function navToTab(e, id) {
+    if (location.pathname.includes('landlord-dashboard') || location.pathname === '/' || location.pathname.endsWith('/')) {
+      e.preventDefault();
+      switchTab(id);
+    }
+  }
+
+  document.getElementById('backToDashboard').addEventListener('click', function(e) {
+    e.preventDefault();
+    switchTab('properties');
+  });
+
+  let properties = JSON.parse(localStorage.getItem('livvo_properties') || '[]');
+  if (properties.length === 0) {
+    properties = [{
+      id: 'demo1',
+      title: 'Stylish 2-Bed Apartment with Terrace',
+      price: 700,
+      city: 'athens',
+      address: 'Platia Viktoria, Athens 104 38',
+      status: 'live',
+      discount: 0,
+      views: 0,
+      enquiries: 0,
+      booking: { tenant: 'Lucas M.', from: 'Apr 1, 2026', to: 'Sep 30, 2026', months: 6 }
+    }];
+  }
+  properties.forEach(p => {
+    p.views = typeof p.views === 'number' ? p.views : (parseInt(p.views) || 0);
+    p.enquiries = typeof p.enquiries === 'number' ? p.enquiries : (parseInt(p.enquiries) || (p.booking ? 2 : 0));
+  });
+
+  function renderProfile() {
+    const name = localStorage.getItem('livvo_landlord_name') || (localStorage.getItem('livvo_landlord_email') || '').split('@')[0] || 'Landlord';
+    const email = localStorage.getItem('livvo_landlord_email') || '';
+    const photo = localStorage.getItem('livvo_landlord_photo');
+    const avatarEl = document.getElementById('profileAvatar');
+    if (photo) {
+      avatarEl.innerHTML = '<img src="'+photo+'" alt=""/>';
+    } else {
+      avatarEl.textContent = (name || 'L').charAt(0).toUpperCase();
+    }
+    document.getElementById('profileName').textContent = name || 'Your profile';
+    document.getElementById('profileEmail').textContent = email || '—';
+  }
+  renderProfile();
+
+  let profileEditPhotoData = null;
+  function openEditProfile() {
+    const name = localStorage.getItem('livvo_landlord_name') || (localStorage.getItem('livvo_landlord_email') || '').split('@')[0] || '';
+    const photo = localStorage.getItem('livvo_landlord_photo');
+    document.getElementById('profileEditName').value = name;
+    profileEditPhotoData = null;
+    const preview = document.getElementById('profilePhotoPreview');
+    const placeholder = document.getElementById('profilePhotoPlaceholder');
+    if (photo) {
+      preview.src = photo;
+      preview.style.display = 'block';
+      placeholder.style.display = 'none';
+    } else {
+      preview.style.display = 'none';
+      placeholder.style.display = 'inline';
+    }
+    document.getElementById('profilePhotoInput').value = '';
+    document.getElementById('profileEditOverlay').classList.add('open');
+  }
+  function closeEditProfile() {
+    document.getElementById('profileEditOverlay').classList.remove('open');
+  }
+  function saveProfile() {
+    const name = document.getElementById('profileEditName').value.trim();
+    if (name) localStorage.setItem('livvo_landlord_name', name);
+    if (profileEditPhotoData) localStorage.setItem('livvo_landlord_photo', profileEditPhotoData);
+    else if (!profileEditPhotoData && document.getElementById('profilePhotoInput').files.length === 0) { /* keep existing */ }
+    renderProfile();
+    closeEditProfile();
+  }
+  document.getElementById('profilePhotoInput').addEventListener('change', function() {
+    const f = this.files[0];
+    if (!f || !f.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = function() {
+      profileEditPhotoData = reader.result;
+      document.getElementById('profilePhotoPreview').src = profileEditPhotoData;
+      document.getElementById('profilePhotoPreview').style.display = 'block';
+      document.getElementById('profilePhotoPlaceholder').style.display = 'none';
+    };
+    reader.readAsDataURL(f);
+  });
+  document.getElementById('profileEditOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeEditProfile();
+  });
+
+  const grid = document.getElementById('propertiesGrid');
+  const detail = document.getElementById('propDetail');
+  let editingId = null;
+
+  function renderProperties() {
+    grid.innerHTML = properties.map(p => {
+      const views = p.views || 0;
+      const enquiries = p.enquiries || 0;
+      const isArchived = p.status === 'archived';
+      const statusLabel = isArchived ? 'Archived' : (p.booking ? 'Rented' : 'Live');
+      const statusClass = isArchived ? 'archived' : (p.status || 'live');
+      return `
+      <div class="card ${isArchived ? 'archived' : ''}">
+        <div class="card-img">${(p.photos && p.photos[0]) ? '<img src="'+p.photos[0]+'" alt=""/>' : ''}<span class="status ${statusClass}">${statusLabel}</span><a href="landlord-edit-property.html?id=${p.id}" class="card-edit-btn" title="Edit property – photos, details, amenities"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a></div>
+        <div class="card-body">
+          <div class="card-title">${p.title}</div>
+          <div class="card-stats">
+            <span class="card-stat" title="Listing views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><strong>${views}</strong> views</span>
+            <span class="card-stat" title="Enquiries received"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><strong>${enquiries}</strong> enquiries</span>
+          </div>
+          <div class="card-meta">€${p.price}/mo ${p.discount ? '<span class="discount-badge">-' + p.discount + '%</span>' : ''} · ${p.city}</div>
+          ${p.booking ? `<div class="card-meta">Rented until ${p.booking.to}</div>` : ''}
+          <div class="card-actions">
+            <button class="btn btn-primary" onclick="editProperty('${p.id}')">Manage pricing</button>
+            <a href="listing-athens.html?id=${p.id}" class="btn btn-outline">View listing</a>
+          </div>
+          <div class="card-more-actions">
+            ${isArchived ? '<button onclick="unarchiveProperty(\''+p.id+'\')">Unarchive</button>' : '<button onclick="archiveProperty(\''+p.id+'\')">Archive</button>'}
+            <button class="link-delete" onclick="deleteProperty(\''+p.id+'\')">Delete</button>
+          </div>
+        </div>
+      </div>
+    `}).join('');
+  }
+
+  function archiveProperty(id) {
+    const p = properties.find(x => x.id === id);
+    if (!p) return;
+    p.status = 'archived';
+    localStorage.setItem('livvo_properties', JSON.stringify(properties));
+    renderProperties();
+  }
+  window.archiveProperty = archiveProperty;
+
+  function unarchiveProperty(id) {
+    const p = properties.find(x => x.id === id);
+    if (!p) return;
+    p.status = 'live';
+    localStorage.setItem('livvo_properties', JSON.stringify(properties));
+    renderProperties();
+  }
+  window.unarchiveProperty = unarchiveProperty;
+
+  function deleteProperty(id) {
+    const p = properties.find(x => x.id === id);
+    if (!p) return;
+    if (!confirm('Delete listing? This will permanently remove "' + (p.title || 'this property') + '" from your dashboard. This cannot be undone.')) return;
+    properties = properties.filter(x => x.id !== id);
+    localStorage.setItem('livvo_properties', JSON.stringify(properties));
+    renderProperties();
+    if (editingId === id) { detail.style.display = 'none'; editingId = null; }
+  }
+  window.deleteProperty = deleteProperty;
+
+  function editProperty(id) {
+    const p = properties.find(x => x.id === id);
+    if (!p) return;
+    editingId = id;
+    document.getElementById('editPrice').value = p.price;
+    document.getElementById('editDiscount').value = p.discount || 0;
+    document.getElementById('propDetailTitle').textContent = p.title;
+    const bookEl = document.getElementById('bookingInfo');
+    if (p.booking) {
+      bookEl.innerHTML = `<div class="booking-row">
+        <span class="dates">${p.booking.from} – ${p.booking.to}</span>
+        <span class="tenant">${p.booking.tenant} · ${p.booking.months} months</span>
+      </div>`;
+      bookEl.style.display = 'block';
+    } else {
+      bookEl.innerHTML = '';
+      bookEl.style.display = 'none';
+    }
+    detail.style.display = 'block';
+    detail.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function savePrice() {
+    if (!editingId) return;
+    const p = properties.find(x => x.id === editingId);
+    if (!p) return;
+    p.price = parseInt(document.getElementById('editPrice').value) || p.price;
+    p.discount = parseInt(document.getElementById('editDiscount').value) || 0;
+    localStorage.setItem('livvo_properties', JSON.stringify(properties));
+    renderProperties();
+    detail.style.display = 'none';
+    editingId = null;
+  }
+  window.editProperty = editProperty;
+  window.savePrice = savePrice;
+
+  renderProperties();
+
+  // Notifications with star
+  const DEMO_NOTIFICATIONS = [
+    { id: 'n1', avatar: 'M', title: 'New booking request', text: 'Marie is interested in your Stylish 2-Bed Apartment. She wants to stay from Mar 15 – Jun 15 (3 months).', time: '2 hours ago', unread: true },
+    { id: 'n2', avatar: 'J', title: 'Message from Jakob', text: '"Hi! Is the terrace private? And is there parking nearby?"', time: '5 hours ago', unread: true },
+    { id: 'n3', avatar: 'L', title: 'Booking confirmed', text: 'Lucas has booked your Athens apartment for 6 months (Apr 1 – Sep 30).', time: 'Yesterday', unread: false }
+  ];
+  let notifications = JSON.parse(localStorage.getItem('livvo_landlord_notifications') || 'null');
+  if (!notifications || notifications.length === 0) {
+    notifications = JSON.parse(JSON.stringify(DEMO_NOTIFICATIONS));
+  }
+  let starredIds = JSON.parse(localStorage.getItem('livvo_landlord_starred_notifications') || '[]');
+
+  function toggleStarNotif(id) {
+    const sid = String(id);
+    const idx = starredIds.indexOf(sid);
+    if (idx >= 0) starredIds.splice(idx, 1);
+    else starredIds.push(sid);
+    localStorage.setItem('livvo_landlord_starred_notifications', JSON.stringify(starredIds));
+    renderNotifications();
+  }
+  window.toggleStarNotif = toggleStarNotif;
+
+  function markAsReadNotif(id) {
+    const n = notifications.find(x => x.id === id);
+    if (n) { n.unread = false; localStorage.setItem('livvo_landlord_notifications', JSON.stringify(notifications)); renderNotifications(); updateNotifBadge(); }
+  }
+  window.markAsReadNotif = markAsReadNotif;
+
+  let deleteModalCallback = null;
+
+  function openDeleteModal(title, text, onConfirm) {
+    document.getElementById('deleteModalTitle').textContent = title;
+    document.getElementById('deleteModalText').textContent = text;
+    deleteModalCallback = onConfirm;
+    document.getElementById('deleteModalOverlay').classList.add('open');
+  }
+  function closeDeleteModal() {
+    document.getElementById('deleteModalOverlay').classList.remove('open');
+    deleteModalCallback = null;
+  }
+  document.getElementById('deleteModalCancel').onclick = closeDeleteModal;
+  document.getElementById('deleteModalConfirm').onclick = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (deleteModalCallback) {
+      deleteModalCallback();
+      deleteModalCallback = null;
+    }
+    closeDeleteModal();
+  };
+  document.getElementById('deleteModalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteModal();
+  });
+  document.querySelector('#deleteModalOverlay .delete-modal').addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+
+  function deleteNotif(id) {
+    const sid = String(id);
+    openDeleteModal('Delete notification?', 'This notification will be removed. This cannot be undone.', function() {
+      notifications = notifications.filter(n => String(n.id) !== sid);
+      starredIds = starredIds.filter(s => s !== sid);
+      localStorage.setItem('livvo_landlord_notifications', JSON.stringify(notifications));
+      localStorage.setItem('livvo_landlord_starred_notifications', JSON.stringify(starredIds));
+      renderNotifications();
+      updateNotifBadge();
+    });
+  }
+  window.deleteNotif = deleteNotif;
+
+  function updateNotifBadge() {
+    const count = notifications.filter(n => n.unread).length;
+    const el = document.getElementById('notifCount');
+    if (el) { el.textContent = count; el.style.display = count > 0 ? '' : 'none'; }
+  }
+
+  function renderNotifications() {
+    const list = document.getElementById('notifList');
+    list.innerHTML = notifications.map(n => {
+      const starred = starredIds.indexOf(String(n.id)) >= 0;
+      return `
+      <div class="notif-item ${n.unread ? 'unread' : ''}" data-id="${n.id}">
+        <div class="notif-avatar">${n.avatar}</div>
+        <div class="notif-body">
+          <div class="notif-title">${n.title}</div>
+          <div class="notif-text">${n.text}</div>
+          <div class="notif-time">${n.time}</div>
+        </div>
+        <div class="notif-actions">
+          ${n.unread ? '<button type="button" class="notif-mark-read" data-action="mark-read" data-id="'+n.id+'">Mark as read</button>' : ''}
+          <button type="button" class="notif-star ${starred ? 'starred' : ''}" data-action="star" data-id="${n.id}" title="${starred ? 'Unstar (remove from favourites)' : 'Star (add to favourites)'}">
+            <svg viewBox="0 0 24 24" fill="${starred ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="${starred ? '0' : '2'}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </button>
+          <button type="button" class="notif-delete" data-action="delete" data-id="${n.id}" title="Delete notification"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg></button>
+        </div>
+      </div>
+    `}).join('');
+    updateNotifBadge();
+  }
+  document.getElementById('notifList').addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-action][data-id]');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+    if (action === 'mark-read') markAsReadNotif(id);
+    else if (action === 'star') toggleStarNotif(id);
+    else if (action === 'delete') deleteNotif(id);
+  });
+  renderNotifications();
+
+  // Hash routing - load correct tab from URL
+  if (location.hash === '#notifications') switchTab('notifications');
+  else if (location.hash === '#messages') switchTab('messages');
+  window.addEventListener('hashchange', function() {
+    if (location.hash === '#notifications') switchTab('notifications');
+    else if (location.hash === '#messages') switchTab('messages');
+    else if (!location.hash || location.hash === '#') switchTab('properties');
+  });
+
+  // Messages / Chat
+  const DEMO_CONVERSATIONS = [
+    { id: 'marie', name: 'Marie L.', initial: 'M', preview: "Hi! I'm an Erasmus student, very interested in your apartment…", time: '2h ago', unread: true, property: 'Stylish 2-Bed Apartment' },
+    { id: 'jakob', name: 'Jakob K.', initial: 'J', preview: "Thanks for the info! I'll confirm my dates and send the booking...", time: '5h ago', unread: false, property: 'Stylish 2-Bed Apartment' }
+  ];
+  const DEMO_MESSAGES = {
+    marie: [
+      { text: "Hi! I'm an Erasmus student from France, very interested in your Stylish 2-Bed Apartment. Is it still available for March?", them: true, time: '2h ago' },
+      { text: "Yes, it's available! March works. The terrace is private and there's street parking nearby.", them: false, time: '1h ago' },
+      { text: "Perfect! Is the terrace private? And is there parking nearby? I'm looking for 3 months.", them: true, time: '45m ago' }
+    ],
+    jakob: [
+      { text: "Hi! I saw your Athens apartment. Is the terrace private?", them: true, time: '5h ago' },
+      { text: "Yes, the terrace is fully private. Great for working or relaxing.", them: false, time: '4h ago' },
+      { text: "Thanks for the info! I'll confirm my dates and send the booking request.", them: true, time: '5h ago' }
+    ]
+  };
+
+  let conversations = JSON.parse(localStorage.getItem('livvo_landlord_conversations') || 'null');
+  let chatMessages = JSON.parse(localStorage.getItem('livvo_landlord_chat_messages') || 'null');
+  if (!conversations || conversations.length === 0) {
+    conversations = JSON.parse(JSON.stringify(DEMO_CONVERSATIONS));
+    chatMessages = JSON.parse(JSON.stringify(DEMO_MESSAGES));
+  }
+  if (!chatMessages || typeof chatMessages !== 'object') {
+    chatMessages = JSON.parse(JSON.stringify(DEMO_MESSAGES));
+  }
+
+  let activeChatId = null;
+
+  function saveChatData() {
+    localStorage.setItem('livvo_landlord_conversations', JSON.stringify(conversations));
+    localStorage.setItem('livvo_landlord_chat_messages', JSON.stringify(chatMessages));
+  }
+
+  function deleteChat(id) {
+    const conv = conversations.find(c => c.id === id);
+    const name = conv ? conv.name : 'this conversation';
+    openDeleteModal('Delete conversation?', 'Remove your chat with ' + name + '? This cannot be undone.', function() {
+      const wasActive = activeChatId === id;
+      conversations = conversations.filter(c => c.id !== id);
+      delete chatMessages[id];
+      if (wasActive) closeChat();
+      saveChatData();
+      renderConversationList();
+    });
+  }
+  window.deleteChat = deleteChat;
+
+  function renderConversationList() {
+    const list = document.getElementById('msgConversationList');
+    list.innerHTML = conversations.map(c => `
+      <div class="msg-item ${activeChatId === c.id ? 'active' : ''}" data-id="${c.id}">
+        <div class="msg-avatar">${c.initial}</div>
+        <div class="msg-body">
+          <div class="msg-name">${c.name} ${c.unread ? '<span class="msg-unread"></span>' : ''}</div>
+          <div class="msg-preview">${c.preview || 'No messages yet'}</div>
+        </div>
+        <div class="msg-meta">
+          <span class="msg-time">${c.time || ''}</span>
+          <button class="msg-delete" onclick="event.stopPropagation();deleteChat('${c.id}')" title="Delete conversation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg></button>
+        </div>
+      </div>
+    `).join('');
+    list.querySelectorAll('.msg-item').forEach(el => {
+      el.addEventListener('click', (e) => { if (!e.target.closest('.msg-delete')) openChat(el.dataset.id); });
+    });
+  }
+
+  function closeChat() {
+    activeChatId = null;
+    document.getElementById('chatPlaceholder').style.display = 'flex';
+    document.getElementById('chatView').classList.remove('open');
+    renderConversationList();
+  }
+
+  function openChat(id) {
+    activeChatId = id;
+    const conv = conversations.find(c => c.id === id);
+    if (!conv) return;
+    conv.unread = false;
+    document.getElementById('chatPlaceholder').style.display = 'none';
+    document.getElementById('chatView').classList.add('open');
+    document.getElementById('chatHeader').innerHTML = `
+      <button class="chat-back" onclick="closeChat()" aria-label="Back to dashboard" title="Back to dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="msg-avatar">${conv.initial}</div>
+      <div class="chat-header-info">
+        <div class="chat-header-name">${conv.name}</div>
+        <div class="chat-header-meta">${conv.property || 'Potential tenant'}</div>
+      </div>
+      <button class="chat-delete" onclick="deleteChat('${conv.id}')" title="Delete conversation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg></button>
+    `;
+    if (!chatMessages[id]) chatMessages[id] = [];
+    renderChatMessages();
+    renderConversationList();
+    saveChatData();
+  }
+
+  function renderChatMessages() {
+    const el = document.getElementById('chatMessages');
+    const msgs = chatMessages[activeChatId] || [];
+    el.innerHTML = msgs.map(m => `
+      <div class="chat-msg ${m.them ? 'them' : 'you'}">
+        ${m.text.replace(/\n/g, '<br>')}
+        <div class="time">${m.time || ''}</div>
+      </div>
+    `).join('');
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text || !activeChatId) return;
+    const now = new Date();
+    const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    if (!chatMessages[activeChatId]) chatMessages[activeChatId] = [];
+    chatMessages[activeChatId].push({ text, them: false, time });
+    const conv = conversations.find(c => c.id === activeChatId);
+    if (conv) {
+      conv.preview = text.length > 50 ? text.slice(0,50) + '…' : text;
+      conv.time = 'Just now';
+    }
+    input.value = '';
+    input.style.height = 'auto';
+    renderChatMessages();
+    renderConversationList();
+    saveChatData();
+  }
+
+  document.getElementById('btnSendMsg').addEventListener('click', sendMessage);
+  document.getElementById('chatInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+  document.getElementById('chatInput').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+
+  renderConversationList();
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Feed — Livvo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --green: #059669; --green-light: #10b981; --green-dark: #047857; --bg: #f0f7f2; --surface: #ffffff; --border: #d4e5dc; --text: #1a2e24; --muted: #4a7c5e; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: "DM Sans", sans-serif; }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.98); border-bottom: 1px solid var(--border); }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-icon { width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, var(--green), var(--green-light)); }
+.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--text); }
+.logo-word span { color: var(--green); }
+.nav-center { display: flex; gap: 8px; }
+.nav-tab { padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; color: var(--muted); text-decoration: none; font-weight: 500; }
+.nav-tab:hover, .nav-tab.active { color: var(--green); background: rgba(5,150,105,0.08); }
+.feed-layout { display: flex; padding-top: 56px; max-width: 1200px; margin: 0 auto; min-height: 100vh; }
+.sidebar { width: 280px; flex-shrink: 0; padding: 24px 16px; border-right: 1px solid var(--border); background: var(--surface); }
+.sidebar h2 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; }
+.sidebar .members { font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; }
+.sidebar .topics { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.sidebar .topic { display: block; padding: 10px 14px; border-radius: 8px; font-size: 0.88rem; color: var(--text); text-decoration: none; margin-bottom: 4px; }
+.sidebar .topic:hover { background: rgba(5,150,105,0.08); color: var(--green); }
+.main { flex: 1; padding: 24px; min-width: 0; }
+.post { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; display: flex; transition: all 0.2s; }
+.post:hover { border-color: var(--green); box-shadow: 0 4px 16px rgba(5,150,105,0.08); }
+.post-vote { width: 48px; flex-shrink: 0; background: rgba(5,150,105,0.04); display: flex; flex-direction: column; align-items: center; padding: 8px 0; }
+.post-vote button { background: none; border: none; cursor: pointer; padding: 4px; color: var(--muted); font-size: 1.2rem; line-height: 1; }
+.post-vote button:hover { color: var(--green); }
+.post-vote span { font-size: 0.75rem; font-weight: 700; color: var(--text); margin: 4px 0; }
+.post-body { flex: 1; padding: 16px 20px; }
+.post-meta { font-size: 0.75rem; color: var(--muted); margin-bottom: 8px; }
+.post-meta span { margin-right: 12px; }
+.post-title { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1rem; line-height: 1.4; margin-bottom: 8px; }
+.post-title a { color: var(--text); text-decoration: none; }
+.post-title a:hover { color: var(--green); }
+.post-excerpt { font-size: 0.88rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+.post-actions { display: flex; gap: 16px; font-size: 0.78rem; }
+.post-actions a, .post-actions button { color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; padding: 0; }
+.post-actions a:hover, .post-actions button:hover { color: var(--green); }
+.new-post { background: var(--green); color: white; padding: 10px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+.new-post:hover { background: var(--green-dark); }
+.post-comments { display: none; padding: 16px 20px; background: var(--bg); border-top: 1px solid var(--border); }
+.post-comments.open { display: block; }
+.comment { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.comment:last-child { border-bottom: none; }
+.comment-meta { font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; }
+.comment-meta strong { color: var(--text); font-weight: 600; }
+.comment-body { font-size: 0.88rem; line-height: 1.55; color: var(--text); }
+.comment-reply { margin-left: 20px; margin-top: 8px; padding-left: 16px; border-left: 2px solid var(--border); }
+@media (max-width: 900px) { .sidebar { display: none; } .feed-layout { flex-direction: column; } }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo"><div class="logo-icon"></div><span class="logo-word">li<span>vv</span>o</span></a>
+  <div class="nav-center">
+    <a href="community.html" class="nav-tab">Cities</a>
+    <a href="#" class="nav-tab active" id="cityTab">Athens</a>
+  </div>
+  <a href="community-new-post.html?city=athens" class="new-post" style="margin:0">+ New post</a>
+</nav>
+<div class="feed-layout">
+  <aside class="sidebar">
+    <h2 id="sidebarCity">Athens</h2>
+    <p class="members">128 members</p>
+    <div class="topics">Topics</div>
+    <a href="#" class="topic">Housing & flatshares</a>
+    <a href="#" class="topic">Flatmate search</a>
+    <a href="#" class="topic">Local tips</a>
+    <a href="#" class="topic">Events & meetups</a>
+    <a href="#" class="topic">Questions & advice</a>
+  </aside>
+  <main class="main">
+    <a href="community-new-post.html?city=athens" class="new-post">+ New post</a>
+    <div id="userPosts"></div>
+    <div class="post">
+      <div class="post-vote"><button>&#9650;</button><span>24</span><button>&#9660;</button></div>
+      <div class="post-body">
+        <div class="post-meta"><span>Maria K. (Erasmus, Universitat Barcelona)</span><span>2h ago</span></div>
+        <h3 class="post-title"><a href="community-post.html?id=flatmate-exarchia&city=athens">Looking for a flatmate in Exarchia — 2BR, 650€ total, move-in Sept 1</a></h3>
+        <p class="post-excerpt">Found a great flat on Zoodochou Pigis, 5 min walk from Exarchia square. Two bedrooms, shared kitchen and bathroom. Landlord is super chill. I'm coming for Erasmus at NKUA. Looking for a female flatmate, non-smoker. Deposit is 1 month rent. Message me if you want to video call and see the place!</p>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">12 comments</button><a href="#" onclick="sharePost('community-post.html?id=flatmate-exarchia&city=athens'); return false;">Share</a></div>
+        <div class="post-comments">
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 1h ago</div>
+            <div class="comment-body">Hi Maria! I'm also doing Erasmus at NKUA from September. The area sounds perfect — I've heard Exarchia has a really cool vibe. Is the flat still available? Would love to organise a call this week.</div>
+          </div>
+          <div class="comment comment-reply">
+            <div class="comment-meta"><strong>Maria K.</strong> · 45m ago</div>
+            <div class="comment-body">Yes still available! Sent you a DM with my WhatsApp. Let's chat tomorrow?</div>
+          </div>
+          <div class="comment">
+            <div class="comment-meta"><strong>Sophie M.</strong> · 30m ago</div>
+            <div class="comment-body">Exarchia is amazing, lived there last year. Pro tip: the weekly market on Friday morning has the best cheap fruit & veg. Good luck with the search!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="post">
+      <div class="post-vote"><button>&#9650;</button><span>18</span><button>&#9660;</button></div>
+      <div class="post-body">
+        <div class="post-meta"><span>Alex K.</span><span>5h ago</span></div>
+        <h3 class="post-title"><a href="community-post.html?id=coworking-athens&city=athens">Best coworking spots in Athens? Good WiFi + coffee near Monastiraki</a></h3>
+        <p class="post-excerpt">Just landed in Athens for 2 months. Working remotely for a German startup. Need somewhere reliable with fast internet for video calls. Prefer cafes or shared spaces — not a fan of silent offices. Any nomads here with tips?</p>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">8 comments</button><a href="#" onclick="sharePost('community-post.html?id=coworking-athens&city=athens'); return false;">Share</a></div>
+        <div class="post-comments">
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 4h ago</div>
+            <div class="comment-body">Taf Coffee in Psiri has solid WiFi and great coffee. They're used to people working there. Another option is The Works in Metaxourgeio — it's a proper coworking but has a chill vibe, day pass is 12€.</div>
+          </div>
+          <div class="comment">
+            <div class="comment-meta"><strong>Nikolas</strong> · 3h ago</div>
+            <div class="comment-body">+1 for Taf. Also try Communitism in Kerameikos — it's a creative space, free WiFi, you can sit with a coffee for hours. Very nomad-friendly.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="post">
+      <div class="post-vote"><button>&#9650;</button><span>31</span><button>&#9660;</button></div>
+      <div class="post-body">
+        <div class="post-meta"><span>Sophie L.</span><span>1d ago</span></div>
+        <h3 class="post-title"><a href="community-post.html?id=erasmus-meetup&city=athens">Erasmus Athens meetup — Saturday 7pm at Six d.o.g.s (Psiri)</a></h3>
+        <p class="post-excerpt">Hey everyone! A few of us from the Erasmus group are organising a casual meetup this Saturday. Six d.o.g.s is a bar/cafe with a nice courtyard — easy to find, good for groups. Come say hi if you're new in Athens or want to meet other students. No pressure, just vibes. DM me if you need the exact address or have questions.</p>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">24 comments</button><a href="#" onclick="sharePost('community-post.html?id=erasmus-meetup&city=athens'); return false;">Share</a></div>
+        <div class="post-comments">
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 20h ago</div>
+            <div class="comment-body">I'll be there! Really looking forward to meeting everyone. I arrive in Athens on Thursday so perfect timing.</div>
+          </div>
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 18h ago</div>
+            <div class="comment-body">For anyone wondering — Six d.o.g.s is on Avramiotou 6, right by Monastiraki metro. The courtyard is at the back, we'll probably be there. Look for the Livvo crowd!</div>
+          </div>
+          <div class="comment">
+            <div class="comment-meta"><strong>Lucas</strong> · 12h ago</div>
+            <div class="comment-body">Count me in! First week here, need to make some friends haha</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="post">
+      <div class="post-vote"><button>&#9650;</button><span>15</span><button>&#9660;</button></div>
+      <div class="post-body">
+        <div class="post-meta"><span>Lucas T.</span><span>2d ago</span></div>
+        <h3 class="post-title"><a href="community-post.html?id=pwc-internship&city=athens">PWC Athens internship — where to live? Budget 500–600€, office near Syntagma</a></h3>
+        <p class="post-excerpt">Starting a 6-month audit internship in September. Office is on Stadiou street. Looking for a room in a shared flat — budget around 500–600 all in. Prefer somewhere safe and max 30 min commute. Kolonaki? Pagrati? Any interns who've been through this with tips?</p>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">11 comments</button><a href="#">Share</a></div>
+        <div class="post-comments">
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 1d ago</div>
+            <div class="comment-body">Pagrati and Kypseli are both within your budget and on the metro line to Syntagma. Kypseli is cheaper and has a lot of young people. Avoid living too far north — the commute can get long. Good luck with the internship!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="post">
+      <div class="post-vote"><button>&#9650;</button><span>9</span><button>&#9660;</button></div>
+      <div class="post-body">
+        <div class="post-meta"><span>Julia M.</span><span>3d ago</span></div>
+        <h3 class="post-title"><a href="community-post.html?id=beaches-weekend&city=athens">Weekend beach trip from Athens — best spots by bus/train?</a></h3>
+        <p class="post-excerpt">In Athens for a few weeks, want to get out to the coast for a weekend. Looking for somewhere easy to reach without a car — KTEL bus or train. Clean water, maybe a few cafes. Heard about Sounio and Rafina — any comparisons? Or other suggestions?</p>
+        <div class="post-actions"><button type="button" onclick="toggleComments(this)">6 comments</button><a href="#" onclick="sharePost('community-post.html?id=beaches-weekend&city=athens'); return false;">Share</a></div>
+        <div class="post-comments">
+          <div class="comment">
+            <div class="comment-meta"><strong>Alexia R.</strong> (alexiaroumpou@gmail.com) · 2d ago</div>
+            <div class="comment-body">Sounio is stunning — the temple at sunset is worth it. Beach is ok, a bit rocky. For proper swimming I'd recommend taking the ferry from Rafina to Andros or Evia. Rafina port is 45 min by bus from Athens. Hydra is also doable as a day trip if you leave early.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  const params = new URLSearchParams(location.search);
+  const city = (params.get('city') || 'athens').toLowerCase();
+  const cityNames = { paris: 'Paris', athens: 'Athens', london: 'London' };
+  const cityName = cityNames[city] || city;
+  document.getElementById('cityTab').textContent = cityName;
+  document.getElementById('sidebarCity').textContent = cityName;
+  document.querySelectorAll('.new-post').forEach(a => a.href = 'community-new-post.html?city=' + city);
+  const userPostsEl = document.getElementById('userPosts');
+  const stored = localStorage.getItem('livvo_posts') || '[]';
+  function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  try {
+    const userPosts = JSON.parse(stored).filter(p => (p.city || 'athens') === city);
+    userPosts.forEach(p => {
+      const excerpt = (p.body || '').slice(0, 180) + (p.body && p.body.length > 180 ? '...' : '');
+      let allC = [...(p.comments || [])];
+      try { const pc = localStorage.getItem('livvo_comments_' + p.id); if (pc) allC = allC.concat(JSON.parse(pc)); } catch(e) {}
+      const commentCount = allC.length;
+      const commentsHtml = allC.map(c => `<div class="comment"><div class="comment-meta"><strong>${esc(c.author)}</strong> · ${esc(c.time)}</div><div class="comment-body">${esc(c.body)}</div></div>`).join('');
+      const postDiv = document.createElement('div');
+      postDiv.className = 'post';
+      postDiv.innerHTML = `
+        <div class="post-vote"><button>&#9650;</button><span>${p.votes || 0}</span><button>&#9660;</button></div>
+        <div class="post-body">
+          <div class="post-meta"><span>${esc(p.author) || 'Anonymous'}</span><span>${esc(p.time) || 'Just now'}</span></div>
+          <h3 class="post-title"><a href="community-post.html?id=${encodeURIComponent(p.id)}&city=${city}">${esc(p.title) || 'Untitled'}</a></h3>
+          <p class="post-excerpt">${esc(excerpt) || 'No content'}</p>
+          <div class="post-actions"><button type="button" onclick="toggleComments(this)">${commentCount} comment${commentCount !== 1 ? 's' : ''}</button><a href="#" onclick="sharePost('community-post.html?id=${encodeURIComponent(p.id)}&city=${city}'); return false;">Share</a></div>
+          <div class="post-comments">${commentsHtml}</div>
+        </div>
+      `;
+      userPostsEl.appendChild(postDiv);
+    });
+  } catch(e) {}
+  function sharePost(path) {
+    const url = new URL(path, location.href).href;
+    if (navigator.share) {
+      navigator.share({ title: 'Livvo Community', url }).catch(() => {});
+    }
+    navigator.clipboard?.writeText(url).then(() => {}).catch(() => {});
+  }
+  function toggleComments(btn) {
+    const post = btn.closest('.post-body');
+    const comments = post.querySelector('.post-comments');
+    const count = comments ? comments.querySelectorAll('.comment').length : 0;
+    const isOpen = comments.classList.toggle('open');
+    btn.textContent = isOpen ? 'Hide comments' : (count + ' comments');
+  }
+</script>
+</body>
+</html>
