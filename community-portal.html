@@ -1563,9 +1563,12 @@ nav {
       } catch (err) {
         hidePostSkeleton();
         console.error('Error loading posts:', err);
-        var hint = (err && err.code === 'permission-denied')
-          ? 'You do not have permission to read posts.'
-          : 'Could not load posts. Please try again in a moment.';
+        var hint = 'Could not load posts. Please try again in a moment.';
+        if (err && err.code === 'permission-denied') {
+          hint = 'You do not have permission to read posts.';
+        } else if (err && (err.code === 'failed-precondition' || (String(err.message || '').toLowerCase().indexOf('index') >= 0))) {
+          hint = 'Feed query needs a Firestore composite index (city + sort field). Open the browser console — Firebase prints a link to create it — or run: firebase deploy --only firestore:indexes';
+        }
         if (reset || !feedEl.querySelector('.post-card')) {
           feedEl.innerHTML = '<p class="feed-empty">' + hint + '</p>';
         }
