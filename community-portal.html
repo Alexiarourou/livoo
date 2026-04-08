@@ -902,9 +902,9 @@ nav {
             <option value="milan">Milan</option>
             <option value="vienna">Vienna</option>
             <option value="zurich">Zurich</option>
+            <option value="copenhagen">Copenhagen</option>
+            <option value="dublin">Dublin</option>
             <option value="dubai">Dubai</option>
-            <option value="bangkok">Bangkok</option>
-            <option value="bali">Bali</option>
             <option value="new-york">New York</option>
           </select>
         </div>
@@ -1054,16 +1054,17 @@ nav {
     things_to_do: 'Things to Do'
   };
 
+  /* URL slug → display name; master 17 cities + legacy slugs for old links */
   const cityNames = {
-    paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milan: 'Milan',
-    barcelona: 'Barcelona', berlin: 'Berlin', amsterdam: 'Amsterdam', lisbon: 'Lisbon',
-    prague: 'Prague', budapest: 'Budapest', vienna: 'Vienna', copenhagen: 'Copenhagen',
-    stockholm: 'Stockholm', dublin: 'Dublin', brussels: 'Brussels', valencia: 'Valencia',
-    seville: 'Seville', porto: 'Porto', rome: 'Rome', florence: 'Florence', bologna: 'Bologna',
-    munich: 'Munich', hamburg: 'Hamburg', zurich: 'Zurich', geneva: 'Geneva', rotterdam: 'Rotterdam',
+    athens: 'Athens', london: 'London', paris: 'Paris', madrid: 'Madrid', barcelona: 'Barcelona',
+    lisbon: 'Lisbon', berlin: 'Berlin', amsterdam: 'Amsterdam', rome: 'Rome', prague: 'Prague',
+    milan: 'Milan', vienna: 'Vienna', zurich: 'Zurich', copenhagen: 'Copenhagen', dublin: 'Dublin',
+    dubai: 'Dubai', newyork: 'New York',
+    budapest: 'Budapest', stockholm: 'Stockholm', brussels: 'Brussels', valencia: 'Valencia',
+    seville: 'Seville', porto: 'Porto', florence: 'Florence', bologna: 'Bologna',
+    munich: 'Munich', hamburg: 'Hamburg', geneva: 'Geneva', rotterdam: 'Rotterdam',
     ghent: 'Ghent', krakow: 'Krakow', warsaw: 'Warsaw', tallinn: 'Tallinn', riga: 'Riga', tbilisi: 'Tbilisi',
-    bucharest: 'Bucharest', sofia: 'Sofia', zagreb: 'Zagreb',
-    newyork: 'New York', dubai: 'Dubai', bangkok: 'Bangkok', bali: 'Bali'
+    bucharest: 'Bucharest', sofia: 'Sofia', zagreb: 'Zagreb', bangkok: 'Bangkok', bali: 'Bali'
   };
 
   window.switchCityFromDropdown = function switchCityFromDropdown(city) {
