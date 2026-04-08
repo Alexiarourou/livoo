@@ -1761,53 +1761,46 @@ nav {
       }
     };
 
-    window.sharePost = async function (postId) {
+    window.sharePost = function (postId) {
       var base = (location.origin || '').replace(/\/$/, '');
       var u = base + '/community-post.html?postId=' + encodeURIComponent(postId) + '&city=' + encodeURIComponent(cityForFeedQuery());
 
-      function copyViaExecCommand(text) {
-        try {
-          var ta = document.createElement('textarea');
-          ta.value = text;
-          ta.setAttribute('readonly', '');
-          ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
-          document.body.appendChild(ta);
-          ta.focus();
-          ta.select();
-          var ok = document.execCommand('copy');
-          document.body.removeChild(ta);
-          return ok;
-        } catch (e) {
-          return false;
-        }
+      function closePostMenus() {
+        document.querySelectorAll('[id^="post-menu-"]').forEach(function (m) {
+          m.style.display = 'none';
+        });
       }
 
-      var copied = false;
+      function finishOk() {
+        showToast('Link copied!');
+        closePostMenus();
+      }
+
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        try {
-          await navigator.clipboard.writeText(u);
-          copied = true;
-        } catch (e) { /* fallback below */ }
-      }
-      if (!copied) {
-        copied = copyViaExecCommand(u);
-      }
-      if (copied) {
-        showPortalToast('Link copied!');
+        navigator.clipboard.writeText(u).then(finishOk).catch(finishOk);
         return;
       }
 
-      if (navigator.share) {
-        try {
-          await navigator.share({ title: 'Livvo', text: 'Open this thread', url: u });
-          showPortalToast('Thanks for sharing!');
-          return;
-        } catch (e) {
-          if (e && e.name === 'AbortError') return;
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = u;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        if (ok) {
+          finishOk();
+        } else {
+          showToast('Could not copy link');
+          closePostMenus();
         }
+      } catch (e) {
+        showToast('Could not copy link');
+        closePostMenus();
       }
-
-      showPortalToast('Could not copy — try again or open the post to copy the URL');
     };
     window.togglePostMenu = function (event, postId) {
       if (event) {
@@ -2196,6 +2189,7 @@ nav {
         shareBtn.type = 'button';
         shareBtn.removeAttribute('title');
         shareBtn.removeAttribute('aria-label');
+        shareBtn.removeAttribute('data-tooltip');
         shareBtn.style.cssText = 'border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:13px;color:#5a7a5a;display:flex;align-items:center;gap:5px;';
         shareBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span>Share</span>';
         shareBtn.addEventListener('click', function (e) {
