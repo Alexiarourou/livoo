@@ -219,7 +219,7 @@ textarea { min-height: 88px; resize: vertical; }
 
 <div class="setup-wrap">
   <div class="setup-card">
-    <h1>Complete your profile</h1>
+    <h1 id="profile-setup-heading">Complete your profile</h1>
     <p class="setup-sub">A quick intro so people in your city know who you are.</p>
     <form id="profile-form" novalidate action="#" onsubmit="return false;">
       <div class="photo-block">
@@ -241,8 +241,8 @@ textarea { min-height: 88px; resize: vertical; }
       </div>
 
       <div class="form-row">
-        <label for="username">Username <span style="color: red;">*</span></label>
-        <input type="text" id="username" name="username" maxlength="40" autocomplete="username" placeholder="How you want to appear" />
+        <label for="profile-name">Display name <span style="color: red;">*</span></label>
+        <input type="text" id="profile-name" name="username" maxlength="40" autocomplete="username" placeholder="How you want to appear" />
         <p id="username-error" class="field-error" role="alert" hidden></p>
       </div>
 
@@ -261,12 +261,12 @@ textarea { min-height: 88px; resize: vertical; }
       </div>
 
       <div class="form-row">
-        <label for="bio">About me <span style="font-weight:400;color:var(--muted);">(optional)</span></label>
-        <textarea id="bio" name="bio" maxlength="150" placeholder="Tell people a little about you…"></textarea>
+        <label for="profile-bio">About me <span style="font-weight:400;color:var(--muted);">(optional)</span></label>
+        <textarea id="profile-bio" name="bio" maxlength="150" placeholder="Tell people a little about you…"></textarea>
         <div class="char-count" id="bio-count"><span id="bio-count-num">0</span> / 150</div>
       </div>
 
-      <button type="button" class="btn-complete" id="complete-btn">Complete my profile</button>
+      <button type="button" class="btn-complete" id="save-profile-btn">Complete my profile</button>
       <p id="complete-error" class="field-error" role="alert" style="text-align:center;margin-top:10px;" hidden></p>
     </form>
     <p class="back-link"><a href="community.html">← Back to cities</a></p>
@@ -355,17 +355,20 @@ textarea { min-height: 88px; resize: vertical; }
       window.location.href = 'signup.html?redirect=community&city=' + encodeURIComponent(cityDisplay);
       return;
     }
+    if (document.getElementById('profile-name')) {
+      document.getElementById('profile-name').value = String(user.displayName || '').trim();
+    }
     try {
       var snap = await firebase.firestore().collection('users').doc(user.uid).get();
       if (snap.exists) {
         var d = snap.data();
-        var uname = String(d.username || '').trim();
+        var uname = String(d.username || d.displayName || '').trim();
         if (!uname && user.displayName) {
           uname = String(user.displayName || '').trim();
         }
-        document.getElementById('username').value = uname;
+        document.getElementById('profile-name').value = uname;
         document.getElementById('profession').value = String(d.profession || d.role || '');
-        document.getElementById('bio').value = String(d.aboutMe || d.bio || '').trim();
+        document.getElementById('profile-bio').value = String(d.aboutMe || d.bio || '').trim();
         if (d.photoURL) {
           photoPreview.src = d.photoURL;
           photoPreview.hidden = false;
@@ -379,21 +382,24 @@ textarea { min-height: 88px; resize: vertical; }
           localStorage.setItem('livvo_city', cityDisplay);
           window.location.replace('community-portal.html?city=' + encodeURIComponent(cityDisplay));
         }
-      } else {
-        if (user.displayName) {
-          document.getElementById('username').value = String(user.displayName || '').trim();
-        }
       }
     } catch (e) {
       console.error(e);
     }
   });
 
+  if (isEditMode) {
+    var ph = document.getElementById('profile-setup-heading');
+    if (ph) ph.textContent = 'Edit your profile';
+    var sv = document.getElementById('save-profile-btn');
+    if (sv) sv.textContent = 'Save changes';
+  }
+
   var photoInput = document.getElementById('photo-input');
   var photoPreview = document.getElementById('photo-preview');
   var photoLabel = document.getElementById('photo-label');
   var photoErrorEl = document.getElementById('photo-error');
-  var bio = document.getElementById('bio');
+  var bio = document.getElementById('profile-bio');
   var bioCountNum = document.getElementById('bio-count-num');
   var bioCountRow = document.getElementById('bio-count');
 
@@ -416,11 +422,11 @@ textarea { min-height: 88px; resize: vertical; }
   bio.addEventListener('input', updateBioCount);
   updateBioCount();
 
-  var completeBtn = document.getElementById('complete-btn');
+  var completeBtn = document.getElementById('save-profile-btn');
   var completeErrorEl = document.getElementById('complete-error');
   var usernameErrorEl = document.getElementById('username-error');
   var roleErrorEl = document.getElementById('role-error');
-  var usernameInputEl = document.getElementById('username');
+  var usernameInputEl = document.getElementById('profile-name');
   var professionSelectEl = document.getElementById('profession');
 
   function hideCompleteError() {
@@ -439,7 +445,7 @@ textarea { min-height: 88px; resize: vertical; }
   }
 
   if (!completeBtn) {
-    console.error('complete-btn element not found');
+    console.error('save-profile-btn element not found');
     return;
   }
 
@@ -454,18 +460,21 @@ textarea { min-height: 88px; resize: vertical; }
 
   var completeBtnDefaultText = completeBtn.textContent;
 
-  completeBtn.addEventListener('click', async function () {
+  async function saveProfile() {
     hideCompleteError();
     clearProfileFieldErrors();
 
-    var username = usernameInputEl.value.trim();
+    var displayName = usernameInputEl.value.trim();
     var profession = professionSelectEl.value;
+    var bioVal = (bio.value || '').trim();
 
-    if (!username) {
-      showFieldErr(usernameErrorEl, 'Please enter a username');
+    if (!displayName) {
+      usernameInputEl.style.borderColor = '#e53e3e';
+      showFieldErr(usernameErrorEl, 'Please enter a display name');
       return;
     }
-    if (!profession) {
+    usernameInputEl.style.borderColor = '';
+    if (!isEditMode && !profession) {
       showFieldErr(roleErrorEl, 'Please select what describes you');
       return;
     }
@@ -480,45 +489,58 @@ textarea { min-height: 88px; resize: vertical; }
     completeBtn.disabled = true;
     completeBtn.setAttribute('aria-busy', 'true');
     completeBtn.textContent = 'Saving...';
+    var prevBg = completeBtn.style.background;
 
     try {
-      await user.updateProfile({ displayName: username });
+      await user.updateProfile({ displayName: displayName });
       var photoURL = '';
       if (photoInput.files && photoInput.files[0]) {
         var file = photoInput.files[0];
         var path = 'profilePhotos/' + user.uid + '/' + Date.now() + '_' + file.name.replace(/\s+/g, '_');
         var snapUpload = await firebase.storage().ref(path).put(file);
         photoURL = await snapUpload.ref.getDownloadURL();
-      } else if (photoPreview && !photoPreview.hidden && photoPreview.src) {
+      } else if (photoPreview && !photoPreview.hidden && photoPreview.src && !String(photoPreview.src).startsWith('blob:')) {
         photoURL = photoPreview.src;
       }
       var payload = {
-        username: username,
-        profession: profession,
-        displayName: username,
-        aboutMe: (bio.value || '').trim(),
-        bio: (bio.value || '').trim(),
+        username: displayName,
+        profession: profession || '',
+        displayName: displayName,
+        aboutMe: bioVal,
+        bio: bioVal,
         city: localStorage.getItem('livvo_city') || 'Athens',
         email: user.email,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
       if (photoURL) payload.photoURL = photoURL;
       await firebase.firestore().collection('users').doc(user.uid).set(payload, { merge: true });
-      window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityDisplay);
+
+      if (isEditMode) {
+        completeBtn.textContent = 'Saved!';
+        completeBtn.style.background = '#2d6a2d';
+        setTimeout(function () {
+          completeBtn.textContent = completeBtnDefaultText;
+          completeBtn.style.background = prevBg;
+          completeBtn.disabled = false;
+          completeBtn.removeAttribute('aria-busy');
+        }, 2000);
+      } else {
+        window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityDisplay);
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Profile save error:', err);
       completeErrorEl.textContent = 'Something went wrong. Please try again.';
       completeErrorEl.hidden = false;
+      completeBtn.textContent = 'Error — try again';
       completeBtn.disabled = false;
       completeBtn.removeAttribute('aria-busy');
-      completeBtn.textContent = completeBtnDefaultText;
-    } finally {
-      if (!location.href.includes('community-portal.html')) {
-        completeBtn.disabled = false;
-        completeBtn.removeAttribute('aria-busy');
-        completeBtn.textContent = completeBtnDefaultText;
-      }
     }
+  }
+
+  window.saveProfile = saveProfile;
+
+  completeBtn.addEventListener('click', function () {
+    saveProfile();
   });
   });
 })();
