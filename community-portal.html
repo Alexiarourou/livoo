@@ -1032,7 +1032,7 @@ nav {
     <h2 id="modal-new-title">New post</h2>
     <div class="form-row">
       <label for="post-title">Title</label>
-      <input type="text" id="post-title" maxlength="200" autocomplete="off" />
+      <input type="text" id="post-title" maxlength="200" autocomplete="off" placeholder="Title" />
     </div>
     <div class="form-row">
       <label for="post-category">Category</label>
@@ -1053,7 +1053,7 @@ nav {
     </div>
     <div class="modal-actions">
       <button type="button" class="btn-secondary" data-close="modal-new-post">Cancel</button>
-      <button type="button" class="btn-primary" id="post-submit">Submit</button>
+      <button type="button" id="submit-post-btn" class="btn-primary" onclick="submitPost()">Submit</button>
     </div>
   </div>
 </div>
@@ -1753,13 +1753,44 @@ nav {
       subscribeFeed();
     }
 
-    document.getElementById('post-submit').addEventListener('click', async function () {
+    document.getElementById('post-title').addEventListener('input', function () {
+      this.style.borderColor = '';
+    });
+    document.getElementById('post-category').addEventListener('change', function () {
+      this.style.borderColor = '';
+    });
+
+    window.submitPost = async function submitPost() {
+      const titleVal = document.getElementById('post-title').value.trim();
+      const categoryVal = document.getElementById('post-category').value;
+
+      if (!titleVal) {
+        document.getElementById('post-title').focus();
+        document.getElementById('post-title').style.borderColor = '#e53e3e';
+        document.getElementById('post-title').placeholder = 'Please add a title';
+        setTimeout(() => {
+          document.getElementById('post-title').style.borderColor = '';
+          document.getElementById('post-title').placeholder = 'Title';
+        }, 3000);
+        return;
+      }
+
+      if (!categoryVal || categoryVal === '' || categoryVal === 'select') {
+        document.getElementById('post-category').style.borderColor = '#e53e3e';
+        setTimeout(() => {
+          document.getElementById('post-category').style.borderColor = '';
+        }, 3000);
+        return;
+      }
+
       const user = auth.currentUser;
       if (!user) {
         console.error('Post submit blocked: user not logged in');
         return;
       }
       const city = cityForFeedQuery();
+      const submitBtn = document.getElementById('submit-post-btn');
+      if (submitBtn) submitBtn.disabled = true;
       try {
         await addDoc(collection(db, 'communityPosts'), {
           title: document.getElementById('post-title').value,
@@ -1784,8 +1815,9 @@ nav {
         location.reload();
       } catch (err) {
         console.error('Post create failed:', err);
+        if (submitBtn) submitBtn.disabled = false;
       }
-    });
+    };
 
     const city = cityDisplay;
     let pendingAuthRedirectTimer = null;
