@@ -323,6 +323,7 @@ textarea { min-height: 88px; resize: vertical; }
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 <script>
 (function () {
   function whenReady(fn) {
@@ -337,6 +338,7 @@ textarea { min-height: 88px; resize: vertical; }
     return;
   }
   var cityDisplay = window.__livvoCityDisplay;
+  var isEditMode = new URLSearchParams(location.search).get('edit') === '1';
 
   var firebaseConfig = {
     apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
@@ -357,10 +359,19 @@ textarea { min-height: 88px; resize: vertical; }
       var snap = await firebase.firestore().collection('users').doc(user.uid).get();
       if (snap.exists) {
         var d = snap.data();
+        document.getElementById('username').value = String(d.username || '').trim();
+        document.getElementById('profession').value = String(d.profession || d.role || '');
+        document.getElementById('bio').value = String(d.bio || '').trim();
+        if (d.photoURL) {
+          photoPreview.src = d.photoURL;
+          photoPreview.hidden = false;
+          photoLabel.classList.add('has-image');
+        }
+        updateBioCount();
         var name = String(d.username || d.displayName || '').trim();
         var cityVal = String(d.city || '').trim();
         var prof = String(d.profession || d.role || '').trim();
-        if (name && cityVal && prof) {
+        if (!isEditMode && name && cityVal && prof) {
           localStorage.setItem('livvo_city', cityDisplay);
           window.location.replace('community-portal.html?city=' + encodeURIComponent(cityDisplay));
         }
@@ -463,13 +474,25 @@ textarea { min-height: 88px; resize: vertical; }
     completeBtn.textContent = 'Saving...';
 
     try {
-      await firebase.firestore().collection('users').doc(user.uid).set({
+      var photoURL = '';
+      if (photoInput.files && photoInput.files[0]) {
+        var file = photoInput.files[0];
+        var path = 'profilePhotos/' + user.uid + '/' + Date.now() + '_' + file.name.replace(/\s+/g, '_');
+        var snapUpload = await firebase.storage().ref(path).put(file);
+        photoURL = await snapUpload.ref.getDownloadURL();
+      } else if (photoPreview && !photoPreview.hidden && photoPreview.src) {
+        photoURL = photoPreview.src;
+      }
+      var payload = {
         username: username,
         profession: profession,
+        bio: (bio.value || '').trim(),
         city: localStorage.getItem('livvo_city') || 'Athens',
         email: user.email,
         createdAt: new Date()
-      });
+      };
+      if (photoURL) payload.photoURL = photoURL;
+      await firebase.firestore().collection('users').doc(user.uid).set(payload, { merge: true });
       window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityDisplay);
     } catch (err) {
       console.error(err);
