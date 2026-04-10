@@ -782,6 +782,37 @@ nav {
   margin-bottom: 12px;
   letter-spacing: -0.02em;
 }
+.new-post-modal-panel h2 {
+  padding-right: 40px;
+}
+.modal-close-x {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-family: inherit;
+}
+.modal-close-x:hover {
+  color: #64748b;
+  background: rgba(148, 163, 184, 0.12);
+}
+.modal-close-x:focus-visible {
+  outline: 2px solid #059669;
+  outline-offset: 2px;
+}
 .new-post-type-tabs {
   display: flex;
   gap: 0;
@@ -1393,7 +1424,8 @@ nav {
 
 <div id="modal-new-post" class="modal" hidden aria-modal="true" role="dialog" aria-labelledby="modal-new-title">
   <div class="modal-backdrop" data-close="modal-new-post"></div>
-  <div class="modal-panel">
+  <div class="modal-panel new-post-modal-panel">
+    <button type="button" class="modal-close-x" data-close="modal-new-post" aria-label="Close new post dialog">×</button>
     <h2 id="modal-new-title">New post</h2>
     <div class="new-post-type-tabs" role="tablist" aria-label="Post type">
       <button type="button" class="new-post-type-tab active" id="tab-post-type-post" role="tab" aria-selected="true" data-post-type="post">Post</button>
@@ -1832,9 +1864,36 @@ nav {
       document.getElementById(id).hidden = false;
       document.body.style.overflow = 'hidden';
     }
+    function resetNewPostModal() {
+      var titleIn = document.getElementById('post-title');
+      var bodyIn = document.getElementById('post-body');
+      var catEl = document.getElementById('post-category');
+      if (titleIn) {
+        titleIn.value = '';
+        titleIn.style.borderColor = '';
+      }
+      if (bodyIn) {
+        bodyIn.value = '';
+        bodyIn.style.height = '';
+      }
+      if (catEl) {
+        catEl.style.borderColor = '';
+        catEl.value = activeCategory === 'all' ? 'housing' : activeCategory;
+      }
+      if (typeof window.removePostImage === 'function') window.removePostImage();
+      if (typeof window.updateCounter === 'function') {
+        window.updateCounter('title-counter', 40, 10);
+        window.updateCounter('body-counter', 500, 50);
+      }
+      setNewPostContentType('post');
+      var submitBtn = document.getElementById('submit-post-btn');
+      if (submitBtn) submitBtn.disabled = false;
+    }
     function closeModal(id) {
-      document.getElementById(id).hidden = true;
+      var el = document.getElementById(id);
+      if (el) el.hidden = true;
       document.body.style.overflow = '';
+      if (id === 'modal-new-post') resetNewPostModal();
     }
 
     document.querySelectorAll('[data-close]').forEach(function (el) {
