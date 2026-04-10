@@ -203,27 +203,90 @@ nav {
 
 .city-feature-card {
   display: block;
-  background: #fff;
+  position: relative;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   text-decoration: none;
   color: inherit;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 .city-feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 28px rgba(5, 150, 105, 0.14);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(5, 150, 105, 0.22);
 }
-.city-feature-card .city-feature-card-body {
+.city-feature-card:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+}
+.city-feature-card-media {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+.city-feature-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.city-feature-card-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 100%);
+  pointer-events: none;
+}
+.city-feature-card-labels {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 14px 16px 16px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  pointer-events: none;
+}
+.city-feature-name {
+  font-family: "Outfit", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  margin: 0;
+}
+.city-feature-rent {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.3;
+}
+.city-feature-hover-cta {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 150, 105, 0.9);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  z-index: 2;
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
   padding: 16px;
   text-align: center;
+  pointer-events: none;
 }
-.city-feature-card-cta {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--green);
-  margin: 4px 0 0;
+.city-feature-card:hover .city-feature-hover-cta,
+.city-feature-card:focus-visible .city-feature-hover-cta {
+  opacity: 1;
 }
 
 .cities-featured-grid {
@@ -678,107 +741,91 @@ button.cities-request-cta {
   </div>
   <div class="cities-featured-grid">
     <a href="community-portal.html?city=athens" class="city-feature-card">
-      <div style="position:relative;">
-        <img src="https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80" alt="Athens" style="width:100%;height:180px;object-fit:cover;display:block;">
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
-          <span style="color:white;font-size:18px;font-weight:800;">Athens</span>
+      <div class="city-feature-card-media">
+        <img src="https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80" alt="Athens">
+        <div class="city-feature-card-gradient" aria-hidden="true"></div>
+        <div class="city-feature-card-labels">
+          <span class="city-feature-name">Athens</span>
+          <span class="city-feature-rent">from €600/mo</span>
         </div>
-      </div>
-      <div class="city-feature-card-body">
-        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Sun, history and one of Europe's most welcoming cities.</p>
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €600/mo</p>
-        <p class="city-feature-card-cta">View community →</p>
+        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
       </div>
     </a>
     <a href="community-portal.html?city=london" class="city-feature-card">
-      <div style="position:relative;">
-        <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&q=80" alt="London" style="width:100%;height:180px;object-fit:cover;display:block;">
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
-          <span style="color:white;font-size:18px;font-weight:800;">London</span>
+      <div class="city-feature-card-media">
+        <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&q=80" alt="London">
+        <div class="city-feature-card-gradient" aria-hidden="true"></div>
+        <div class="city-feature-card-labels">
+          <span class="city-feature-name">London</span>
+          <span class="city-feature-rent">from £1,400/mo</span>
         </div>
-      </div>
-      <div class="city-feature-card-body">
-        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">The ultimate first move abroad for ambitious expats.</p>
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from £1,400/mo</p>
-        <p class="city-feature-card-cta">View community →</p>
+        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
       </div>
     </a>
     <a href="community-portal.html?city=paris" class="city-feature-card">
-      <div style="position:relative;">
-        <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80" alt="Paris" style="width:100%;height:180px;object-fit:cover;display:block;">
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
-          <span style="color:white;font-size:18px;font-weight:800;">Paris</span>
+      <div class="city-feature-card-media">
+        <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80" alt="Paris">
+        <div class="city-feature-card-gradient" aria-hidden="true"></div>
+        <div class="city-feature-card-labels">
+          <span class="city-feature-name">Paris</span>
+          <span class="city-feature-rent">from €1,100/mo</span>
         </div>
-      </div>
-      <div class="city-feature-card-body">
-        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Art, culture and a fast-growing expat community.</p>
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €1,100/mo</p>
-        <p class="city-feature-card-cta">View community →</p>
+        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
       </div>
     </a>
     <a href="community-portal.html?city=madrid" class="city-feature-card">
-      <div style="position:relative;">
-        <img src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800" alt="Madrid" style="width:100%;height:180px;object-fit:cover;display:block;">
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
-          <span style="color:white;font-size:18px;font-weight:800;">Madrid</span>
+      <div class="city-feature-card-media">
+        <img src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800" alt="Madrid">
+        <div class="city-feature-card-gradient" aria-hidden="true"></div>
+        <div class="city-feature-card-labels">
+          <span class="city-feature-name">Madrid</span>
+          <span class="city-feature-rent">from €900/mo</span>
         </div>
-      </div>
-      <div class="city-feature-card-body">
-        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Warm nights, great food and an instant community.</p>
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €900/mo</p>
-        <p class="city-feature-card-cta">View community →</p>
+        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
       </div>
     </a>
     <a href="community-portal.html?city=barcelona" class="city-feature-card">
-      <div style="position:relative;">
-        <img src="https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800" alt="Barcelona" style="width:100%;height:180px;object-fit:cover;display:block;">
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
-          <span style="color:white;font-size:18px;font-weight:800;">Barcelona</span>
+      <div class="city-feature-card-media">
+        <img src="https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800" alt="Barcelona">
+        <div class="city-feature-card-gradient" aria-hidden="true"></div>
+        <div class="city-feature-card-labels">
+          <span class="city-feature-name">Barcelona</span>
+          <span class="city-feature-rent">from €1,000/mo</span>
         </div>
-      </div>
-      <div class="city-feature-card-body">
-        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Sunshine, culture and a vibrant expat scene.</p>
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €1,000/mo</p>
-        <p class="city-feature-card-cta">View community →</p>
+        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
       </div>
     </a>
     <a href="community-portal.html?city=berlin" class="city-feature-card">
-      <div style="position:relative;">
-        <img src="https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&q=80" alt="Berlin" style="width:100%;height:180px;object-fit:cover;display:block;">
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
-          <span style="color:white;font-size:18px;font-weight:800;">Berlin</span>
+      <div class="city-feature-card-media">
+        <img src="https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&q=80" alt="Berlin">
+        <div class="city-feature-card-gradient" aria-hidden="true"></div>
+        <div class="city-feature-card-labels">
+          <span class="city-feature-name">Berlin</span>
+          <span class="city-feature-rent">from €1,100/mo</span>
         </div>
-      </div>
-      <div class="city-feature-card-body">
-        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Creative, edgy and endlessly exciting to explore.</p>
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €1,100/mo</p>
-        <p class="city-feature-card-cta">View community →</p>
+        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
       </div>
     </a>
     <a href="community-portal.html?city=lisbon" class="city-feature-card">
-      <div style="position:relative;">
-        <img src="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=600&q=80" alt="Lisbon" style="width:100%;height:180px;object-fit:cover;display:block;">
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
-          <span style="color:white;font-size:18px;font-weight:800;">Lisbon</span>
+      <div class="city-feature-card-media">
+        <img src="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=600&q=80" alt="Lisbon">
+        <div class="city-feature-card-gradient" aria-hidden="true"></div>
+        <div class="city-feature-card-labels">
+          <span class="city-feature-name">Lisbon</span>
+          <span class="city-feature-rent">from €900/mo</span>
         </div>
-      </div>
-      <div class="city-feature-card-body">
-        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Warm, affordable and full of digital nomads.</p>
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €900/mo</p>
-        <p class="city-feature-card-cta">View community →</p>
+        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
       </div>
     </a>
     <a href="community-portal.html?city=amsterdam" class="city-feature-card">
-      <div style="position:relative;">
-        <img src="https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=600&q=80" alt="Amsterdam" style="width:100%;height:180px;object-fit:cover;display:block;">
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
-          <span style="color:white;font-size:18px;font-weight:800;">Amsterdam</span>
+      <div class="city-feature-card-media">
+        <img src="https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=600&q=80" alt="Amsterdam">
+        <div class="city-feature-card-gradient" aria-hidden="true"></div>
+        <div class="city-feature-card-labels">
+          <span class="city-feature-name">Amsterdam</span>
+          <span class="city-feature-rent">from €1,400/mo</span>
         </div>
-      </div>
-      <div class="city-feature-card-body">
-        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Bikes, canals and one of Europe's most international cities.</p>
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €1,400/mo</p>
-        <p class="city-feature-card-cta">View community →</p>
+        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
       </div>
     </a>
   </div>
