@@ -25,6 +25,19 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // community.html — public city interest form (no auth)
+    match /cityRequests/{docId} {
+      allow create: if request.resource.data.keys().hasOnly(['city', 'email', 'createdAt'])
+        && request.resource.data.city is string
+        && request.resource.data.email is string
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.city.size() > 0
+        && request.resource.data.city.size() < 200
+        && request.resource.data.email.size() > 3
+        && request.resource.data.email.size() < 320;
+      allow read, update, delete: if false;
+    }
+
     // Used by community-portal.html (modular Firestore client)
     match /communityPosts/{postId} {
       allow read: if request.auth != null;

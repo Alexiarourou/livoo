@@ -325,6 +325,165 @@ button.cities-search-dropdown-item {
 .cities-more-note a { color: var(--green); font-weight: 600; text-decoration: none; }
 .cities-more-note a:hover { text-decoration: underline; }
 
+.city-feature-card {
+  display: block;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.city-feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(5, 150, 105, 0.14);
+}
+.city-feature-card .city-feature-card-body {
+  padding: 16px;
+  text-align: center;
+}
+.city-feature-card-cta {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green);
+  margin: 4px 0 0;
+}
+
+.cities-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 32px;
+}
+@media (max-width: 1100px) {
+  .cities-featured-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .cities-featured-grid { grid-template-columns: 1fr; }
+}
+
+.btn-see-all-cities {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  background: #fff;
+  border: 1px solid var(--green);
+  border-radius: 999px;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-see-all-cities:hover {
+  background: rgba(5, 150, 105, 0.08);
+  border-color: var(--green-dark);
+}
+.btn-see-all-cities:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+.cr-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.cr-modal[hidden] { display: none !important; }
+.cr-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 46, 36, 0.5);
+  backdrop-filter: blur(4px);
+}
+.cr-modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #d4eadb;
+  padding: 28px 24px 24px;
+  box-shadow: 0 24px 64px rgba(13, 43, 26, 0.2);
+  z-index: 1;
+}
+.cr-modal-panel h2 {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--text-dark);
+  margin: 0 0 18px;
+  padding-right: 36px;
+}
+.cr-modal-x {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cr-modal-x:hover { color: #64748b; background: rgba(148, 163, 184, 0.12); }
+.cr-form-row { margin-bottom: 14px; }
+.cr-form-row label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted-dark);
+  margin-bottom: 6px;
+}
+.cr-form-row input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-dark);
+  border-radius: 10px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  box-sizing: border-box;
+}
+.cr-form-row input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+}
+.cr-modal-submit {
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  background: var(--green);
+  color: #fff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cr-modal-submit:hover { background: var(--green-dark); }
+.cr-modal-submit:disabled { opacity: 0.65; cursor: not-allowed; }
+.cr-modal-thanks {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  margin: 12px 0 0;
+  line-height: 1.5;
+}
+
 .cities-request-strip {
   width: 100%;
   background: #ecfdf5;
@@ -387,6 +546,11 @@ button.cities-search-dropdown-item {
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
+}
+button.cities-request-cta {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 .cities-request-cta:hover { color: white; }
 .cities-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; align-items: stretch; }
@@ -585,9 +749,6 @@ button.cities-search-dropdown-item {
   <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="community.html" class="active">Community</a>
-    <a href="community-portal.html" style="background:#059669;color:white;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:600;text-decoration:none;">
-      Join the community
-    </a>
   </div>
 </nav>
 
@@ -606,117 +767,115 @@ button.cities-search-dropdown-item {
     <h2 class="section-title">Choose your city</h2>
     <p class="section-sub">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:32px;">
-    <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+  <div class="cities-featured-grid">
+    <a href="community-portal.html?city=athens" class="city-feature-card">
       <div style="position:relative;">
         <img src="https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80" alt="Athens" style="width:100%;height:180px;object-fit:cover;display:block;">
         <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
           <span style="color:white;font-size:18px;font-weight:800;">Athens</span>
         </div>
       </div>
-      <div style="padding:16px;text-align:center;">
-        <p style="font-size:13px;color:#5a7a5a;margin-bottom:16px;line-height:1.5;">Sun, history and one of Europe's most welcoming cities.</p>
-        <!-- Athens -->
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0 0 12px 0;">avg rent from €600/mo</p>
-        <a href="community-portal.html?city=athens" style="display:block;background:#059669;color:white;padding:10px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Join community</a>
+      <div class="city-feature-card-body">
+        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Sun, history and one of Europe's most welcoming cities.</p>
+        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €600/mo</p>
+        <p class="city-feature-card-cta">View community →</p>
       </div>
-    </div>
-    <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+    </a>
+    <a href="community-portal.html?city=london" class="city-feature-card">
       <div style="position:relative;">
         <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&q=80" alt="London" style="width:100%;height:180px;object-fit:cover;display:block;">
         <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
           <span style="color:white;font-size:18px;font-weight:800;">London</span>
         </div>
       </div>
-      <div style="padding:16px;text-align:center;">
-        <p style="font-size:13px;color:#5a7a5a;margin-bottom:16px;line-height:1.5;">The ultimate first move abroad for ambitious expats.</p>
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0 0 12px 0;">avg rent from £1,400/mo</p>
-        <a href="community-portal.html?city=london" style="display:block;background:#059669;color:white;padding:10px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Join community</a>
+      <div class="city-feature-card-body">
+        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">The ultimate first move abroad for ambitious expats.</p>
+        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from £1,400/mo</p>
+        <p class="city-feature-card-cta">View community →</p>
       </div>
-    </div>
-    <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+    </a>
+    <a href="community-portal.html?city=paris" class="city-feature-card">
       <div style="position:relative;">
         <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80" alt="Paris" style="width:100%;height:180px;object-fit:cover;display:block;">
         <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
           <span style="color:white;font-size:18px;font-weight:800;">Paris</span>
         </div>
       </div>
-      <div style="padding:16px;text-align:center;">
-        <p style="font-size:13px;color:#5a7a5a;margin-bottom:16px;line-height:1.5;">Art, culture and a fast-growing expat community.</p>
-        <!-- Paris -->
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0 0 12px 0;">avg rent from €1,100/mo</p>
-        <a href="community-portal.html?city=paris" style="display:block;background:#059669;color:white;padding:10px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Join community</a>
+      <div class="city-feature-card-body">
+        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Art, culture and a fast-growing expat community.</p>
+        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €1,100/mo</p>
+        <p class="city-feature-card-cta">View community →</p>
       </div>
-    </div>
-    <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+    </a>
+    <a href="community-portal.html?city=madrid" class="city-feature-card">
       <div style="position:relative;">
-        <img src="https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=600&q=80" alt="Madrid" style="width:100%;height:180px;object-fit:cover;display:block;">
+        <img src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800" alt="Madrid" style="width:100%;height:180px;object-fit:cover;display:block;">
         <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
           <span style="color:white;font-size:18px;font-weight:800;">Madrid</span>
         </div>
       </div>
-      <div style="padding:16px;text-align:center;">
-        <p style="font-size:13px;color:#5a7a5a;margin-bottom:16px;line-height:1.5;">Warm nights, great food and an instant community.</p>
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0 0 12px 0;">avg rent from €900/mo</p>
-        <a href="community-portal.html?city=madrid" style="display:block;background:#059669;color:white;padding:10px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Join community</a>
+      <div class="city-feature-card-body">
+        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Warm nights, great food and an instant community.</p>
+        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €900/mo</p>
+        <p class="city-feature-card-cta">View community →</p>
       </div>
-    </div>
-    <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+    </a>
+    <a href="community-portal.html?city=barcelona" class="city-feature-card">
       <div style="position:relative;">
-        <img src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80" alt="Barcelona" style="width:100%;height:180px;object-fit:cover;display:block;">
+        <img src="https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800" alt="Barcelona" style="width:100%;height:180px;object-fit:cover;display:block;">
         <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
           <span style="color:white;font-size:18px;font-weight:800;">Barcelona</span>
         </div>
       </div>
-      <div style="padding:16px;text-align:center;">
-        <p style="font-size:13px;color:#5a7a5a;margin-bottom:16px;line-height:1.5;">Sunshine, culture and a vibrant expat scene.</p>
-        <!-- Barcelona -->
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0 0 12px 0;">avg rent from €1,000/mo</p>
-        <a href="community-portal.html?city=barcelona" style="display:block;background:#059669;color:white;padding:10px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Join community</a>
+      <div class="city-feature-card-body">
+        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Sunshine, culture and a vibrant expat scene.</p>
+        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €1,000/mo</p>
+        <p class="city-feature-card-cta">View community →</p>
       </div>
-    </div>
-    <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+    </a>
+    <a href="community-portal.html?city=berlin" class="city-feature-card">
       <div style="position:relative;">
         <img src="https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&q=80" alt="Berlin" style="width:100%;height:180px;object-fit:cover;display:block;">
         <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
           <span style="color:white;font-size:18px;font-weight:800;">Berlin</span>
         </div>
       </div>
-      <div style="padding:16px;text-align:center;">
-        <p style="font-size:13px;color:#5a7a5a;margin-bottom:16px;line-height:1.5;">Creative, edgy and endlessly exciting to explore.</p>
-        <!-- Berlin -->
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0 0 12px 0;">avg rent from €1,100/mo</p>
-        <a href="community-portal.html?city=berlin" style="display:block;background:#059669;color:white;padding:10px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Join community</a>
+      <div class="city-feature-card-body">
+        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Creative, edgy and endlessly exciting to explore.</p>
+        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €1,100/mo</p>
+        <p class="city-feature-card-cta">View community →</p>
       </div>
-    </div>
-    <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+    </a>
+    <a href="community-portal.html?city=lisbon" class="city-feature-card">
       <div style="position:relative;">
         <img src="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=600&q=80" alt="Lisbon" style="width:100%;height:180px;object-fit:cover;display:block;">
         <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
           <span style="color:white;font-size:18px;font-weight:800;">Lisbon</span>
         </div>
       </div>
-      <div style="padding:16px;text-align:center;">
-        <p style="font-size:13px;color:#5a7a5a;margin-bottom:16px;line-height:1.5;">Warm, affordable and full of digital nomads.</p>
-        <!-- Lisbon -->
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0 0 12px 0;">avg rent from €900/mo</p>
-        <a href="community-portal.html?city=lisbon" style="display:block;background:#059669;color:white;padding:10px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Join community</a>
+      <div class="city-feature-card-body">
+        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Warm, affordable and full of digital nomads.</p>
+        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €900/mo</p>
+        <p class="city-feature-card-cta">View community →</p>
       </div>
-    </div>
-    <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+    </a>
+    <a href="community-portal.html?city=amsterdam" class="city-feature-card">
       <div style="position:relative;">
         <img src="https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=600&q=80" alt="Amsterdam" style="width:100%;height:180px;object-fit:cover;display:block;">
         <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.65));">
           <span style="color:white;font-size:18px;font-weight:800;">Amsterdam</span>
         </div>
       </div>
-      <div style="padding:16px;text-align:center;">
-        <p style="font-size:13px;color:#5a7a5a;margin-bottom:16px;line-height:1.5;">Bikes, canals and one of Europe's most international cities.</p>
-        <!-- Amsterdam -->
-        <p style="font-size:12px;font-weight:700;color:#059669;margin:0 0 12px 0;">avg rent from €1,400/mo</p>
-        <a href="community-portal.html?city=amsterdam" style="display:block;background:#059669;color:white;padding:10px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Join community</a>
+      <div class="city-feature-card-body">
+        <p style="font-size:13px;color:#5a7a5a;margin:0 0 12px;line-height:1.5;">Bikes, canals and one of Europe's most international cities.</p>
+        <p style="font-size:12px;font-weight:700;color:#059669;margin:0;">avg rent from €1,400/mo</p>
+        <p class="city-feature-card-cta">View community →</p>
       </div>
-    </div>
+    </a>
+  </div>
+  <div class="cities-see-all-wrap" style="text-align:center;margin-top:28px;">
+    <button type="button" class="btn-see-all-cities" id="cities-see-all-btn" aria-expanded="false" aria-controls="cities-all-pills-panel">See all cities</button>
+    <div id="cities-all-pills-panel" class="cities-quick-pills cities-all-pills-panel" hidden style="margin-top:20px;max-width:920px;margin-left:auto;margin-right:auto;"></div>
   </div>
   <p class="cities-more-note"><a href="index.html#waitlist">Can&apos;t find your city? Join the waitlist →</a></p>
   <div class="cities-more-wrap">
@@ -776,16 +935,16 @@ button.cities-search-dropdown-item {
   <div style="padding:60px 0;text-align:center;">
     <p style="font-size:12px;font-weight:700;letter-spacing:0.1em;color:#059669;text-transform:uppercase;margin-bottom:8px;">WHAT IT LOOKS LIKE INSIDE</p>
     <h2 style="font-size:28px;font-weight:800;color:#064e3b;margin-bottom:8px;">Real conversations, real people</h2>
-    <p style="font-size:15px;color:#5a7a5a;margin-bottom:40px;">Here's what's happening in the Athens community right now.</p>
+    <p style="font-size:15px;color:#5a7a5a;margin-bottom:40px;">Here's what's happening in the London community right now.</p>
     <div style="max-width:680px;margin:0 auto;text-align:left;display:flex;flex-direction:column;gap:10px;">
       <div style="background:white;border:1px solid #e8f0e8;border-radius:14px;padding:18px;cursor:pointer;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
           <div style="width:32px;height:32px;border-radius:50%;background:#059669;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">R</div>
-          <span style="font-size:12px;color:#6b8f6b;">Romain · Athens · 2h ago</span>
-          <span style="margin-left:auto;font-size:10px;background:#fde8e8;color:#a81a1a;padding:2px 8px;border-radius:20px;font-weight:600;">Recommendations</span>
+          <span style="font-size:12px;color:#6b8f6b;">Romain · London · 2h ago</span>
+          <span style="margin-left:auto;font-size:10px;background:#fde8e8;color:#a81a1a;padding:2px 8px;border-radius:20px;font-weight:600;">Housing Tips</span>
         </div>
-        <div style="font-size:15px;font-weight:700;color:#064e3b;margin-bottom:4px;">Best souvlaki in Athens? 🙏</div>
-        <div style="font-size:13px;color:#5a7a5a;">Just moved here and need the real deal — not the tourist version near Syntagma...</div>
+        <div style="font-size:15px;font-weight:700;color:#064e3b;margin-bottom:4px;">Best areas for a first flat in London?</div>
+        <div style="font-size:13px;color:#5a7a5a;">Budget around £1,200–£1,500 — is Hackney still the sweet spot or should I look at zones 3–4 on the Overground?</div>
         <div style="display:flex;gap:12px;margin-top:10px;">
           <span style="font-size:12px;color:#9ab09a;">❤️ 12</span>
           <span style="font-size:12px;color:#9ab09a;">💬 8 comments</span>
@@ -794,11 +953,11 @@ button.cities-search-dropdown-item {
       <div style="background:white;border:1px solid #e8f0e8;border-radius:14px;padding:18px;cursor:pointer;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
           <div style="width:32px;height:32px;border-radius:50%;background:#4a4aaa;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">S</div>
-          <span style="font-size:12px;color:#6b8f6b;">Sofia · Athens · 5h ago</span>
-          <span style="margin-left:auto;font-size:10px;background:#e8f4fd;color:#1a6fa8;padding:2px 8px;border-radius:20px;font-weight:600;">Housing Tips</span>
+          <span style="font-size:12px;color:#6b8f6b;">Sofia · London · 5h ago</span>
+          <span style="margin-left:auto;font-size:10px;background:#e8f4fd;color:#1a6fa8;padding:2px 8px;border-radius:20px;font-weight:600;">General</span>
         </div>
-        <div style="font-size:15px;font-weight:700;color:#064e3b;margin-bottom:4px;">Exarchia vs Koukaki for a digital nomad?</div>
-        <div style="font-size:13px;color:#5a7a5a;">Looking for good cafes with wifi, safe at night, not too touristy. Which would you pick?</div>
+        <div style="font-size:15px;font-weight:700;color:#064e3b;margin-bottom:4px;">Oyster card vs contactless — what do you actually use?</div>
+        <div style="font-size:13px;color:#5a7a5a;">Trying to figure out daily caps and whether there's any reason left to buy an Oyster if my phone already has contactless...</div>
         <div style="display:flex;gap:12px;margin-top:10px;">
           <span style="font-size:12px;color:#9ab09a;">❤️ 6</span>
           <span style="font-size:12px;color:#9ab09a;">💬 14 comments</span>
@@ -807,21 +966,16 @@ button.cities-search-dropdown-item {
       <div style="background:white;border:1px solid #e8f0e8;border-radius:14px;padding:18px;cursor:pointer;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
           <div style="width:32px;height:32px;border-radius:50%;background:#d4820a;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">J</div>
-          <span style="font-size:12px;color:#6b8f6b;">James · Athens · 1d ago</span>
+          <span style="font-size:12px;color:#6b8f6b;">James · London · 1d ago</span>
           <span style="margin-left:auto;font-size:10px;background:#fdf3e8;color:#a86b1a;padding:2px 8px;border-radius:20px;font-weight:600;">Events</span>
         </div>
-        <div style="font-size:15px;font-weight:700;color:#064e3b;margin-bottom:4px;">Expat drinks this Friday — Monastiraki</div>
-        <div style="font-size:13px;color:#5a7a5a;">Organising a casual meetup for anyone new to Athens. All welcome, no awkward networking!</div>
+        <div style="font-size:15px;font-weight:700;color:#064e3b;margin-bottom:4px;">Expat drinks this Thursday — Shoreditch</div>
+        <div style="font-size:13px;color:#5a7a5a;">Casual pints near Old Street — anyone new to London welcome, no awkward networking, just good chat.</div>
         <div style="display:flex;gap:12px;margin-top:10px;">
           <span style="font-size:12px;color:#9ab09a;">❤️ 24</span>
           <span style="font-size:12px;color:#9ab09a;">💬 31 comments</span>
         </div>
       </div>
-    </div>
-    <div style="margin-top:28px;">
-      <a href="community-portal.html?city=athens" style="display:inline-block;background:#059669;color:white;padding:12px 28px;border-radius:20px;font-size:14px;font-weight:600;text-decoration:none;">
-        Join the conversation →
-      </a>
     </div>
   </div>
 </section>
@@ -830,7 +984,7 @@ button.cities-search-dropdown-item {
   <div class="cities-request-inner">
     <h2 class="cities-request-title" id="cities-request-heading">Request your city</h2>
     <p class="cities-request-sub">Heading to Barcelona, Berlin, Amsterdam, or elsewhere? Tell us which city you want next. We're expanding!</p>
-    <a href="index.html#waitlist" class="btn-primary cities-request-cta">Request your city</a>
+    <button type="button" class="btn-primary cities-request-cta" id="cities-request-open">Request your city</button>
   </div>
 </section>
 
@@ -843,6 +997,26 @@ button.cities-search-dropdown-item {
   </form>
 </div>
 
+<div id="modal-city-request" class="cr-modal" hidden aria-modal="true" role="dialog" aria-labelledby="city-request-title">
+  <div class="cr-modal-backdrop" id="city-request-backdrop" tabindex="-1"></div>
+  <div class="cr-modal-panel">
+    <button type="button" class="cr-modal-x" id="city-request-close" aria-label="Close">×</button>
+    <h2 id="city-request-title">Request your city</h2>
+    <form id="city-request-form">
+      <div class="cr-form-row">
+        <label for="city-request-city">Which city are you looking for?</label>
+        <input type="text" id="city-request-city" name="city" required maxlength="200" autocomplete="address-level2" placeholder="e.g. Munich" />
+      </div>
+      <div class="cr-form-row">
+        <label for="city-request-email">Your email</label>
+        <input type="email" id="city-request-email" name="email" required maxlength="320" autocomplete="email" placeholder="you@example.com" />
+      </div>
+      <button type="submit" class="cr-modal-submit" id="city-request-submit">Submit</button>
+    </form>
+    <p id="city-request-thanks" class="cr-modal-thanks" hidden>Thanks! We&apos;ll let you know when it&apos;s live.</p>
+  </div>
+</div>
+
 <script>
 (function () {
   /* Master city list — alphabetical; keep in sync with community-portal.html #city-switcher */
@@ -852,13 +1026,16 @@ button.cities-search-dropdown-item {
     'Milan', 'Naples', 'New York', 'Oslo', 'Paris', 'Porto', 'Prague', 'Riga', 'Rome', 'Seville',
     'Stockholm', 'Tallinn', 'Valencia', 'Vilnius', 'Vienna', 'Warsaw', 'Zurich'
   ];
-  var ACTIVE_CITIES = ['Amsterdam', 'Athens', 'Barcelona', 'Berlin', 'Lisbon', 'London', 'Madrid', 'Paris'];
   var REQUEST_CITY_HREF = 'index.html#waitlist';
+
+  function cityToPortalSlug(name) {
+    if (name === 'New York') return 'newyork';
+    return String(name || '').toLowerCase().replace(/\s+/g, '');
+  }
 
   var input = document.getElementById('cities-search-input');
   var dropdown = document.getElementById('cities-search-dropdown');
   var combo = input && input.closest('.cities-search-combo');
-  if (!input || !dropdown || !combo) return;
 
   function normalizeQuery(q) {
     return q.trim().toLowerCase();
@@ -872,11 +1049,8 @@ button.cities-search-dropdown-item {
     });
   }
 
-  function isActiveCity(city) {
-    return ACTIVE_CITIES.indexOf(city) !== -1;
-  }
-
   function hideDropdown() {
+    if (!dropdown || !input) return;
     dropdown.classList.remove('is-open');
     dropdown.hidden = true;
     dropdown.innerHTML = '';
@@ -884,22 +1058,22 @@ button.cities-search-dropdown-item {
   }
 
   function showDropdown() {
+    if (!dropdown || !input) return;
     dropdown.classList.add('is-open');
     dropdown.hidden = false;
     input.setAttribute('aria-expanded', 'true');
   }
 
   function renderDropdown(matches) {
+    if (!dropdown) return;
     dropdown.innerHTML = '';
     if (matches.length > 0) {
       matches.forEach(function (city) {
         var row = document.createElement('a');
-        row.href = isActiveCity(city)
-          ? ('community-portal.html?city=' + encodeURIComponent(city.toLowerCase()))
-          : REQUEST_CITY_HREF;
+        row.href = 'community-portal.html?city=' + encodeURIComponent(cityToPortalSlug(city));
         row.className = 'cities-search-dropdown-item';
         row.setAttribute('role', 'option');
-        row.textContent = isActiveCity(city) ? city : (city + ' (join waitlist)');
+        row.textContent = city;
         dropdown.appendChild(row);
       });
     } else {
@@ -913,6 +1087,7 @@ button.cities-search-dropdown-item {
   }
 
   function syncFromInput() {
+    if (!input) return;
     var q = input.value;
     if (normalizeQuery(q) === '') {
       hideDropdown();
@@ -921,28 +1096,131 @@ button.cities-search-dropdown-item {
     renderDropdown(filterCities(q));
   }
 
-  input.addEventListener('input', syncFromInput);
-  input.addEventListener('focus', function () {
-    if (normalizeQuery(input.value) !== '') syncFromInput();
-  });
+  if (input && dropdown && combo) {
+    input.addEventListener('input', syncFromInput);
+    input.addEventListener('focus', function () {
+      if (normalizeQuery(input.value) !== '') syncFromInput();
+    });
 
-  input.addEventListener('keydown', function (e) {
-    if (e.key !== 'Enter') return;
-    var q = normalizeQuery(input.value);
-    if (!q) return;
+    input.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      var q = normalizeQuery(input.value);
+      if (!q) return;
+      e.preventDefault();
+      var matches = filterCities(input.value);
+      if (matches.length > 0) {
+        window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityToPortalSlug(matches[0]));
+      } else {
+        window.location.href = REQUEST_CITY_HREF;
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!combo.contains(e.target)) hideDropdown();
+    });
+  }
+
+  var seeAllBtn = document.getElementById('cities-see-all-btn');
+  var allPillsPanel = document.getElementById('cities-all-pills-panel');
+  if (seeAllBtn && allPillsPanel && !allPillsPanel.childElementCount) {
+    EUROPEAN_CITIES.forEach(function (city) {
+      var a = document.createElement('a');
+      a.href = 'community-portal.html?city=' + encodeURIComponent(cityToPortalSlug(city));
+      a.className = 'cities-quick-pill';
+      a.textContent = city;
+      allPillsPanel.appendChild(a);
+    });
+    seeAllBtn.addEventListener('click', function () {
+      var open = allPillsPanel.hasAttribute('hidden');
+      if (open) {
+        allPillsPanel.removeAttribute('hidden');
+        seeAllBtn.setAttribute('aria-expanded', 'true');
+        seeAllBtn.textContent = 'Hide cities';
+      } else {
+        allPillsPanel.setAttribute('hidden', '');
+        seeAllBtn.setAttribute('aria-expanded', 'false');
+        seeAllBtn.textContent = 'See all cities';
+      }
+    });
+  }
+})();
+</script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+import { getFirestore, collection, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI',
+  authDomain: 'livvo-573e1.firebaseapp.com',
+  projectId: 'livvo-573e1',
+  storageBucket: 'livvo-573e1.firebasestorage.app',
+  messagingSenderId: '438563892670',
+  appId: '1:438563892670:web:c038316d9d3fcbee065def'
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const modal = document.getElementById('modal-city-request');
+const backdrop = document.getElementById('city-request-backdrop');
+const closeBtn = document.getElementById('city-request-close');
+const openBtn = document.getElementById('cities-request-open');
+const form = document.getElementById('city-request-form');
+const thanks = document.getElementById('city-request-thanks');
+const submitBtn = document.getElementById('city-request-submit');
+const cityIn = document.getElementById('city-request-city');
+const emailIn = document.getElementById('city-request-email');
+
+function openCityRequestModal() {
+  if (!modal) return;
+  modal.hidden = false;
+  document.body.style.overflow = 'hidden';
+  if (thanks) thanks.hidden = true;
+  if (form) form.style.display = '';
+  if (submitBtn) submitBtn.disabled = false;
+}
+
+function closeCityRequestModal() {
+  if (!modal) return;
+  modal.hidden = true;
+  document.body.style.overflow = '';
+  if (form) {
+    form.style.display = '';
+    form.reset();
+  }
+  if (thanks) thanks.hidden = true;
+  if (submitBtn) submitBtn.disabled = false;
+}
+
+if (openBtn) openBtn.addEventListener('click', openCityRequestModal);
+if (backdrop) backdrop.addEventListener('click', closeCityRequestModal);
+if (closeBtn) closeBtn.addEventListener('click', closeCityRequestModal);
+
+if (form) {
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
-    var matches = filterCities(input.value);
-    if (matches.length > 0 && isActiveCity(matches[0])) {
-      window.location.href = 'community-portal.html?city=' + encodeURIComponent(matches[0].toLowerCase());
-    } else {
-      window.location.href = REQUEST_CITY_HREF;
+    var city = cityIn && cityIn.value.trim();
+    var email = emailIn && emailIn.value.trim();
+    if (!city || !email) return;
+    if (submitBtn) submitBtn.disabled = true;
+    try {
+      await addDoc(collection(db, 'cityRequests'), {
+        city: city,
+        email: email,
+        createdAt: Timestamp.now()
+      });
+      form.style.display = 'none';
+      if (thanks) thanks.hidden = false;
+      setTimeout(function () {
+        closeCityRequestModal();
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong. Please try again.');
+      if (submitBtn) submitBtn.disabled = false;
     }
   });
-
-  document.addEventListener('click', function (e) {
-    if (!combo.contains(e.target)) hideDropdown();
-  });
-})();
+}
 </script>
 <script>
 (function () {
