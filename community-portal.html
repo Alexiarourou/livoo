@@ -714,8 +714,35 @@ nav {
   font-family: "Sora", sans-serif;
   font-weight: 700;
   font-size: 1.35rem;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
   letter-spacing: -0.02em;
+}
+.new-post-type-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 18px;
+  border-bottom: 1px solid #e8f0e8;
+}
+.new-post-type-tab {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 10px 12px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #9ab09a;
+  cursor: pointer;
+  font-family: inherit;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.new-post-type-tab:hover {
+  color: #6b8f6b;
+}
+.new-post-type-tab.active {
+  color: #064e3b;
+  border-bottom-color: #059669;
 }
 .form-row { margin-bottom: 16px; }
 .form-row label {
@@ -1296,6 +1323,11 @@ nav {
   <div class="modal-backdrop" data-close="modal-new-post"></div>
   <div class="modal-panel">
     <h2 id="modal-new-title">New post</h2>
+    <div class="new-post-type-tabs" role="tablist" aria-label="Post type">
+      <button type="button" class="new-post-type-tab active" id="tab-post-type-post" role="tab" aria-selected="true" data-post-type="post">Post</button>
+      <button type="button" class="new-post-type-tab" id="tab-post-type-question" role="tab" aria-selected="false" data-post-type="question">Question</button>
+    </div>
+    <input type="hidden" id="post-content-type" value="post" />
     <div class="form-row">
       <label for="post-title">Title</label>
       <input type="text" id="post-title" maxlength="40" autocomplete="off" placeholder="Title"
@@ -2529,6 +2561,36 @@ nav {
       }
     }
 
+    function syncNewPostModalPlaceholders() {
+      var typeEl = document.getElementById('post-content-type');
+      var mode = (typeEl && typeEl.value) === 'question' ? 'question' : 'post';
+      var titleIn = document.getElementById('post-title');
+      var bodyIn = document.getElementById('post-body');
+      if (mode === 'question') {
+        if (titleIn) titleIn.placeholder = 'Ask a question…';
+        if (bodyIn) bodyIn.placeholder = 'Add more detail (optional)';
+      } else {
+        if (titleIn) titleIn.placeholder = 'Title';
+        if (bodyIn) bodyIn.placeholder = 'Write your post…';
+      }
+    }
+    function setNewPostContentType(mode) {
+      var h = document.getElementById('post-content-type');
+      if (h) h.value = mode === 'question' ? 'question' : 'post';
+      document.querySelectorAll('.new-post-type-tab').forEach(function (btn) {
+        var t = btn.getAttribute('data-post-type');
+        var on = (mode === 'question' ? t === 'question' : t === 'post');
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      syncNewPostModalPlaceholders();
+    }
+    document.querySelectorAll('.new-post-type-tab').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        setNewPostContentType(btn.getAttribute('data-post-type'));
+      });
+    });
+
     document.getElementById('new-post-btn').addEventListener('click', function () {
       document.getElementById('post-title').value = '';
       document.getElementById('post-body').value = '';
@@ -2542,6 +2604,7 @@ nav {
       document.getElementById('post-category').value = cat;
       window.updateCounter('title-counter', 40, 10);
       window.updateCounter('body-counter', 500, 50);
+      setNewPostContentType('post');
       openModal('modal-new-post');
     });
     document.getElementById('confirm-delete-post').addEventListener('click', async function () {
@@ -2636,7 +2699,7 @@ nav {
         document.getElementById('post-title').placeholder = 'Please add a title';
         setTimeout(() => {
           document.getElementById('post-title').style.borderColor = '';
-          document.getElementById('post-title').placeholder = 'Title';
+          syncNewPostModalPlaceholders();
         }, 3000);
         return;
       }
@@ -2672,10 +2735,12 @@ nav {
         const resolvedPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim())
           || user.photoURL
           || '';
+        var contentType = (document.getElementById('post-content-type') || { value: 'post' }).value === 'question' ? 'question' : 'post';
         await addDoc(collection(db, 'communityPosts'), {
           title: document.getElementById('post-title').value,
           body: document.getElementById('post-body').value,
           category: document.getElementById('post-category').value,
+          type: contentType,
           city: city,
           author: user.uid,
           authorUsername: (currentProfileData && String(currentProfileData.username || '').trim())

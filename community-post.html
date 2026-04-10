@@ -178,20 +178,88 @@
       top: 36px;
       bottom: 0;
       width: 2px;
-      background: #e8f0e8;
+      background: #d1fae5;
       border-radius: 2px;
     }
 
     .replies-container {
+      position: relative;
       margin-top: 10px;
-      padding-left: 16px;
-      border-left: 2px solid #e8f0e8;
       margin-left: 16px;
+      padding-left: 14px;
+    }
+
+    .replies-container::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #d1fae5;
+      border-radius: 2px;
+    }
+
+    .comment-wrapper > .comment {
+      transition: background 0.2s ease;
+      border-radius: 8px;
+      padding: 6px 8px;
+      margin: -6px -8px 14px -8px;
+    }
+
+    .comment-wrapper > .comment:hover {
+      background: #f0fdf4;
     }
 
     .reply-item {
-      padding: 8px 0;
       position: relative;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      padding: 6px 8px;
+      margin-left: -8px;
+      margin-right: -8px;
+      border-radius: 8px;
+      transition: background 0.2s ease;
+    }
+
+    .reply-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .reply-item:hover {
+      background: #f0fdf4;
+    }
+
+    @keyframes commentsThreadFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #comments-container.comments-fade-in {
+      animation: commentsThreadFadeIn 0.4s ease-out forwards;
+    }
+
+    #post-image-wrap {
+      margin: 12px 0;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    #post-image {
+      width: 100%;
+      max-height: 480px;
+      object-fit: cover;
+      border-radius: 12px;
+      display: block;
+      vertical-align: middle;
     }
 
     @media (max-width: 768px) {
@@ -256,7 +324,7 @@
           <h1 style="font-size: 22px; font-weight: 800; color: #1a2e1a; margin: 0 0 8px 0; line-height: 1.3;" id="post-title"></h1>
           <p style="font-size: 15px; color: #3d5a3d; line-height: 1.7; margin: 0 0 20px 0; white-space: pre-wrap;" id="post-body"></p>
           <div id="post-image-wrap" style="display: none;">
-            <img id="post-image" alt="" style="width:100%;height:260px;object-fit:cover;border-radius:12px;margin:12px 0;display:block;">
+            <img id="post-image" alt="">
           </div>
           <div style="display: flex; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid #f0f5f0;">
             <button type="button" id="post-like-btn" onclick="likePost()" style="display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; cursor: pointer; font-size: 13px; color: #5a7a5a; transition: all 0.15s;">
@@ -675,10 +743,19 @@
       var box = document.getElementById('reply-box-' + commentId);
       if (!box) return;
       var show = box.style.display !== 'block';
+      if (show) {
+        collapseComposer();
+        document.querySelectorAll('[id^="reply-box-"]').forEach(function (b) {
+          if (b.id !== 'reply-box-' + commentId) b.style.display = 'none';
+        });
+      }
       box.style.display = show ? 'block' : 'none';
       if (show) {
         var ta = document.getElementById('reply-input-' + commentId);
         if (ta) ta.focus();
+        requestAnimationFrame(function () {
+          box.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        });
       }
     };
 
@@ -902,6 +979,7 @@
       }
 
       if (!docs.length) {
+        listEl.classList.remove('comments-fade-in');
         listEl.innerHTML = '<p class="meta-pill">No comments yet.</p>';
         requestAnimationFrame(function () {
           window.scrollTo(0, scrollY);
@@ -918,7 +996,7 @@
         wrapper.id = 'comment-' + cd.id;
         const item = document.createElement('div');
         item.className = 'comment';
-        item.style.cssText = 'display:flex;gap:10px;margin-bottom:20px;align-items:flex-start;';
+        item.style.cssText = 'display:flex;gap:10px;align-items:flex-start;';
 
         const av = document.createElement('div');
         av.className = 'comment-avatar';
@@ -1089,7 +1167,6 @@
             const rName = String(r.authorUsername || 'Member').trim() || 'Member';
             const row = document.createElement('div');
             row.className = 'reply-item';
-            row.style.cssText = 'display:flex;gap:10px;margin-bottom:12px;align-items:flex-start;';
             const rav = document.createElement('div');
             rav.style.cssText = 'flex-shrink:0;width:28px;height:28px;border-radius:50%;overflow:hidden;background:#2d6a2d;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;';
             if (r.authorPhotoURL || r.authorPhoto) {
@@ -1133,6 +1210,9 @@
         wrapper.appendChild(repliesWrap);
         listEl.appendChild(wrapper);
       });
+      listEl.classList.remove('comments-fade-in');
+      void listEl.offsetWidth;
+      listEl.classList.add('comments-fade-in');
       var csInput = document.getElementById('comment-search');
       if (csInput && csInput.value) window.filterComments(csInput.value);
       requestAnimationFrame(function () {
