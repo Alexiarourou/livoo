@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Firebase Storage: loaded via ES module import (firebase-storage.js) in the <script type="module"> below — no firebase-storage-compat.js in <head> needed. -->
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -2308,7 +2309,7 @@ nav {
           postImg = document.createElement('img');
           postImg.src = imageUrlStr;
           postImg.alt = '';
-          postImg.style.cssText = 'width:100%;max-height:300px;object-fit:cover;border-radius:10px;margin-bottom:10px;border:1px solid #e8f0e8;';
+          postImg.style.cssText = 'width:100%;max-height:320px;object-fit:cover;border-radius:10px;margin:10px 0;';
           postImg.addEventListener('error', function () {
             postImg.style.display = 'none';
           });
