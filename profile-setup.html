@@ -158,6 +158,40 @@ textarea { min-height: 88px; resize: vertical; }
 }
 .char-count.at-limit { color: var(--btn-green); font-weight: 600; }
 
+.topic-pick-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.topic-pick-item { position: relative; }
+.topic-pick-item input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.topic-pick-item label {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.topic-pick-item input:focus-visible + label {
+  outline: 2px solid var(--btn-green);
+  outline-offset: 2px;
+}
+.topic-pick-item input:checked + label {
+  border-color: var(--green);
+  background: #ecfdf5;
+  color: #064e3b;
+}
+
 .btn-complete {
   width: 100%;
   margin-top: 8px;
@@ -266,6 +300,24 @@ textarea { min-height: 88px; resize: vertical; }
         <div class="char-count" id="bio-count"><span id="bio-count-num">0</span> / 150</div>
       </div>
 
+      <div class="form-row">
+        <label>What topics interest you? <span style="font-weight:400;color:var(--muted);">(optional)</span></label>
+        <div class="topic-pick-grid" id="topic-pick-grid" aria-label="Topics you follow">
+          <div class="topic-pick-item"><input type="checkbox" id="topic-housing" value="housing" /><label for="topic-housing">Housing</label></div>
+          <div class="topic-pick-item"><input type="checkbox" id="topic-events" value="events" /><label for="topic-events">Events</label></div>
+          <div class="topic-pick-item"><input type="checkbox" id="topic-visa_admin" value="visa_admin" /><label for="topic-visa_admin">Visa &amp; Admin</label></div>
+          <div class="topic-pick-item"><input type="checkbox" id="topic-jobs_remote" value="jobs_remote" /><label for="topic-jobs_remote">Jobs &amp; Remote Work</label></div>
+          <div class="topic-pick-item"><input type="checkbox" id="topic-things_to_do" value="things_to_do" /><label for="topic-things_to_do">Things to Do</label></div>
+          <div class="topic-pick-item"><input type="checkbox" id="topic-recommendations" value="recommendations" /><label for="topic-recommendations">Recommendations</label></div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="profile-credential">Your one-liner <span style="font-weight:400;color:var(--muted);">(optional, max 60)</span></label>
+        <input type="text" id="profile-credential" name="credential" maxlength="60" autocomplete="off" placeholder="e.g. Moved to Athens 2 years ago" />
+        <div class="char-count" id="cred-count"><span id="cred-count-num">0</span> / 60</div>
+      </div>
+
       <button type="button" class="btn-complete" id="save-profile-btn">Complete my profile</button>
       <p id="complete-error" class="field-error" role="alert" style="text-align:center;margin-top:10px;" hidden></p>
     </form>
@@ -357,6 +409,16 @@ textarea { min-height: 88px; resize: vertical; }
     bioCountRow.classList.toggle('at-limit', n >= 150);
   }
 
+  function updateCredCountFromDom() {
+    var c = document.getElementById('profile-credential');
+    var num = document.getElementById('cred-count-num');
+    var row = document.getElementById('cred-count');
+    if (!c || !num || !row) return;
+    var n = (c.value || '').length;
+    num.textContent = String(n);
+    row.classList.toggle('at-limit', n >= 60);
+  }
+
   var firebaseConfig = {
     apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
     authDomain: "livvo-573e1.firebaseapp.com",
@@ -397,6 +459,15 @@ textarea { min-height: 88px; resize: vertical; }
           }
         }
         document.getElementById('profile-bio').value = String(d.aboutMe || d.bio || '').trim();
+        var credEl = document.getElementById('profile-credential');
+        if (credEl) credEl.value = String(d.credential || '').trim();
+        var ft = d.followedTopics;
+        if (Array.isArray(ft)) {
+          ft.forEach(function (slug) {
+            var cb = document.querySelector('#topic-pick-grid input[value="' + String(slug).replace(/"/g, '') + '"]');
+            if (cb) cb.checked = true;
+          });
+        }
         if (d.photoURL) {
           var prevEl = document.getElementById('photo-preview');
           var lblEl = document.getElementById('photo-label');
@@ -407,6 +478,7 @@ textarea { min-height: 88px; resize: vertical; }
           }
         }
         updateBioCountFromDom();
+        updateCredCountFromDom();
         var name = String(d.username || d.displayName || '').trim();
         var cityVal = String(d.city || '').trim();
         var prof = String(d.profession || d.role || '').trim();
@@ -454,6 +526,11 @@ textarea { min-height: 88px; resize: vertical; }
     updateBioCountFromDom();
   });
   updateBioCountFromDom();
+  var credIn = document.getElementById('profile-credential');
+  if (credIn) {
+    credIn.addEventListener('input', updateCredCountFromDom);
+    updateCredCountFromDom();
+  }
 
   var completeBtn = document.getElementById('save-profile-btn');
   var completeErrorEl = document.getElementById('complete-error');
@@ -503,6 +580,11 @@ textarea { min-height: 88px; resize: vertical; }
       profession = loadedProfession;
     }
     var bioVal = (bio.value || '').trim();
+    var credentialVal = credIn ? (credIn.value || '').trim().slice(0, 60) : '';
+    var followedTopics = [];
+    document.querySelectorAll('#topic-pick-grid input[type="checkbox"]:checked').forEach(function (cb) {
+      followedTopics.push(cb.value);
+    });
 
     if (!displayName) {
       usernameInputEl.style.borderColor = '#e53e3e';
@@ -554,6 +636,8 @@ textarea { min-height: 88px; resize: vertical; }
         displayName: displayName,
         aboutMe: bioVal,
         bio: bioVal,
+        credential: credentialVal,
+        followedTopics: followedTopics,
         city: localStorage.getItem('livvo_city') || 'Athens',
         email: user.email,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()

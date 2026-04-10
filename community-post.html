@@ -262,6 +262,141 @@
       vertical-align: middle;
     }
 
+    .thread-main-grid {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 24px;
+      align-items: start;
+      box-sizing: border-box;
+    }
+    .thread-related-aside {
+      position: sticky;
+      top: 72px;
+      background: #fff;
+      border: 1px solid #e8f0e8;
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .thread-related-aside h3 {
+      font-family: "Sora", sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #064e3b;
+      margin: 0 0 12px 0;
+    }
+    .related-card {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #f0f5f0;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .related-card:hover {
+      background: #ecfdf5;
+      border-color: #d1fae5;
+    }
+    .related-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #064e3b;
+      line-height: 1.35;
+      margin: 0 0 4px 0;
+    }
+    .related-card-meta {
+      font-size: 11px;
+      color: #9ab09a;
+    }
+    .comment-helpful-btn {
+      border: none;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: #059669;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
+    }
+    .comment-helpful-btn:hover { color: #047857; }
+    .comment-helpful-btn.marked { color: #047857; }
+    .pinned-answer-block {
+      background: #ecfdf5;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      border: 1px solid #d1fae5;
+    }
+    .pinned-answer-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #047857;
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(26, 46, 36, 0.45);
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay[hidden] { display: none !important; }
+    .modal-panel-thread {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #d4eadb;
+      padding: 20px;
+      max-height: 85vh;
+      overflow-y: auto;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+    .modal-panel-thread h2 {
+      font-family: "Sora", sans-serif;
+      font-size: 1.1rem;
+      color: #064e3b;
+      margin: 0 0 12px 0;
+    }
+    .user-search-result {
+      width: 100%;
+      text-align: left;
+      border:1px solid #f0f5f0;
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 14px;
+      color: #064e3b;
+    }
+    .user-search-result:hover { background: #ecfdf5; }
+
+    @media (max-width: 900px) {
+      .thread-main-grid {
+        grid-template-columns: 1fr;
+        padding: 16px 12px;
+      }
+      .thread-related-aside {
+        position: static;
+        order: 3;
+      }
+    }
+
     @media (max-width: 768px) {
       .post-area, #post-container {
         border-radius: 12px !important;
@@ -307,17 +442,21 @@
     <div id="loading" class="meta-pill" style="max-width: 740px; margin: 0 auto; padding: 0 16px;">Loading…</div>
     <p id="err-msg" class="feed-empty" style="max-width: 740px; margin: 0 auto; padding: 0 16px;" hidden></p>
     <div id="post-shell" hidden>
-      <div style="max-width: 740px; margin: 0 auto; padding: 24px 16px;">
+      <div class="thread-main-grid">
+      <div class="thread-main-col" style="min-width:0;">
         <a id="back-btn" href="community-portal.html" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#2d6a2d;text-decoration:none;margin-bottom:20px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
           Back
         </a>
         <div id="post-container" class="post-area" style="background: white; border: 1px solid #e8f0e8; border-radius: 16px; padding: 24px; margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+          <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px;">
             <div id="post-avatar"></div>
-            <div>
-              <span style="font-size: 13px; font-weight: 700; color: #1a2e1a;" id="post-author"></span>
-              <span style="font-size: 12px; color: #9ab09a; margin-left: 6px;" id="post-time"></span>
+            <div style="flex:1;min-width:0;">
+              <div>
+                <span style="font-size: 13px; font-weight: 700; color: #1a2e1a;" id="post-author"></span>
+                <span style="font-size: 12px; color: #9ab09a; margin-left: 6px;" id="post-time"></span>
+              </div>
+              <div id="post-credential" style="font-size: 12px; color: #9ab09a; margin-top: 3px; line-height: 1.35; display: none;"></div>
             </div>
             <span id="post-category" class="post-badge" style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;flex-shrink:0;"></span>
           </div>
@@ -326,7 +465,7 @@
           <div id="post-image-wrap" style="display: none;">
             <img id="post-image" alt="">
           </div>
-          <div style="display: flex; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid #f0f5f0;">
+          <div style="display: flex; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid #f0f5f0; flex-wrap: wrap;">
             <button type="button" id="post-like-btn" onclick="likePost()" style="display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; cursor: pointer; font-size: 13px; color: #5a7a5a; transition: all 0.15s;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
               <span id="post-like-count">0</span>
@@ -335,9 +474,12 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               <span id="post-comment-count">0</span> comments
             </button>
-            <button type="button" onclick="sharePost()" style="margin-left:auto;display:flex;align-items:center;gap:5px;border:none;background:#f5f5f5;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:13px;color:#5a7a5a;">
+            <button type="button" onclick="sharePost()" style="display:flex;align-items:center;gap:5px;border:none;background:#f5f5f5;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:13px;color:#5a7a5a;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               Share
+            </button>
+            <button type="button" id="request-answer-btn" hidden style="margin-left:auto;display:flex;align-items:center;gap:5px;border:none;background:#ecfdf5;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:13px;font-weight:600;color:#059669;border:1px solid #d1fae5;">
+              Request an answer
             </button>
           </div>
         </div>
@@ -372,15 +514,33 @@
         </div>
         <div id="comments-container"></div>
       </div>
+      <aside id="thread-related-aside" class="thread-related-aside" aria-label="More from this community">
+        <h3>More from this community</h3>
+        <div id="related-posts-list"></div>
+      </aside>
+      </div>
     </div>
   </main>
+
+  <div id="modal-request-answer" class="modal-overlay" hidden>
+    <div class="modal-panel-thread" role="dialog" aria-modal="true" aria-labelledby="request-answer-title">
+      <h2 id="request-answer-title">Request an answer</h2>
+      <p style="font-size:13px;color:#6b8f6b;margin:0 0 12px 0;">Search by display name</p>
+      <input type="text" id="request-answer-search" placeholder="Start typing a name…" autocomplete="off"
+        style="width:100%;padding:10px 12px;border:1.5px solid #e8f0e8;border-radius:12px;font-size:14px;margin-bottom:10px;box-sizing:border-box;" />
+      <div id="request-answer-results" style="max-height:220px;overflow-y:auto;"></div>
+      <button type="button" id="request-answer-close" style="margin-top:14px;width:100%;padding:10px;border:1px solid #e8f0e8;background:#fff;border-radius:12px;font-weight:600;color:#5a7a5a;cursor:pointer;">Close</button>
+    </div>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import {
-      getFirestore, collection, query, orderBy, onSnapshot, doc, getDoc,
-      serverTimestamp, increment, deleteDoc, setDoc, updateDoc, runTransaction, writeBatch
+      getFirestore, collection, query, orderBy, onSnapshot, doc, getDoc, getDocs,
+      where, limit, addDoc,
+      serverTimestamp, increment, deleteDoc, setDoc, updateDoc, runTransaction, writeBatch,
+      arrayUnion, arrayRemove
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const CATEGORY_LABELS = {
@@ -434,6 +594,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const LIVVO_ANON_AVATAR = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect width="80" height="80" rx="40" fill="#d1d5db"/><circle cx="40" cy="28" r="12" fill="#9ca3af"/><ellipse cx="40" cy="58" rx="22" ry="14" fill="#9ca3af"/></svg>');
 
     let currentUser = null;
     let currentProfileData = null;
@@ -472,14 +633,19 @@
         return {
           username: fallbackUsername || 'Anonymous',
           photoUrl: fallbackPhoto || '',
-          initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase()
+          initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase(),
+          credential: ''
         };
       }
-      if (authorCache.has(authorUid)) return authorCache.get(authorUid);
+      if (authorCache.has(authorUid)) {
+        var c0 = authorCache.get(authorUid);
+        return Object.assign({}, c0, { credential: String((c0 && c0.credential) || '').trim() });
+      }
       let profile = {
         username: fallbackUsername || 'Anonymous',
         photoUrl: fallbackPhoto || '',
-        initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase()
+        initial: String((fallbackUsername || 'A').charAt(0)).toUpperCase(),
+        credential: ''
       };
       try {
         const uSnap = await getDoc(doc(db, 'users', authorUid));
@@ -487,7 +653,12 @@
           const ud = uSnap.data() || {};
           const un = String(ud.username || ud.displayName || fallbackUsername || 'Anonymous').trim();
           const ph = String(ud.photoURL || '').trim() || String(fallbackPhoto || '').trim();
-          profile = { username: un || 'Anonymous', photoUrl: ph, initial: String((un || 'A').charAt(0)).toUpperCase() };
+          profile = {
+            username: un || 'Anonymous',
+            photoUrl: ph,
+            initial: String((un || 'A').charAt(0)).toUpperCase(),
+            credential: String(ud.credential || '').trim()
+          };
         }
       } catch (e) {}
       authorCache.set(authorUid, profile);
@@ -736,7 +907,7 @@
     };
     window.sortComments = function (value) {
       if (sortSelect && value) sortSelect.value = value;
-      renderComments();
+      renderComments().catch(function () {});
     };
 
     window.toggleReplyBox = function (commentId) {
@@ -953,32 +1124,134 @@
         var a = prev[i].data() || {};
         var b = next[i].data() || {};
         if (String(a.text || '') !== String(b.text || '')) return false;
+        if (Number(a.helpfulCount || 0) !== Number(b.helpfulCount || 0)) return false;
       }
       return true;
     }
 
-    function renderComments() {
+    var viewCountRecorded = false;
+    function recordPostViewOnce() {
+      if (viewCountRecorded) return;
+      viewCountRecorded = true;
+      var key = 'livvo_viewed_' + postId;
+      try {
+        if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(key)) return;
+        if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(key, '1');
+      } catch (e) {}
+      updateDoc(doc(db, 'communityPosts', postId), { viewCount: increment(1) }).catch(function () {});
+    }
+
+    async function loadRelatedPosts(data) {
+      var host = document.getElementById('related-posts-list');
+      if (!host) return;
+      host.innerHTML = '';
+      var cityVal = String((data && data.city) || city || '').trim();
+      var cat = String((data && data.category) || '').trim();
+      if (!cityVal || !cat) return;
+      try {
+        var rq = query(
+          collection(db, 'communityPosts'),
+          where('city', '==', cityVal),
+          where('category', '==', cat),
+          orderBy('createdAt', 'desc'),
+          limit(8)
+        );
+        var rs = await getDocs(rq);
+        var n = 0;
+        rs.forEach(function (d) {
+          if (n >= 4) return;
+          if (d.id === postId) return;
+          n++;
+          var pd = d.data() || {};
+          var a = document.createElement('a');
+          a.className = 'related-card';
+          a.href = 'community-post.html?postId=' + encodeURIComponent(d.id) + '&city=' + encodeURIComponent(cityVal);
+          var t = document.createElement('div');
+          t.className = 'related-card-title';
+          t.textContent = pd.title || 'Post';
+          a.appendChild(t);
+          var m = document.createElement('div');
+          m.className = 'related-card-meta';
+          m.textContent = pd.createdAt ? formatRelativeTime(pd.createdAt) : '';
+          a.appendChild(m);
+          host.appendChild(a);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    window.pinCommentAnswer = async function (commentId) {
+      if (!commentId || !postData) return;
+      closeAllCommentMenus();
+      try {
+        var postRef = doc(db, 'communityPosts', postId);
+        var prev = String(postData.pinnedCommentId || '').trim();
+        var batch = writeBatch(db);
+        if (prev && prev !== commentId) {
+          batch.update(doc(db, 'communityPosts', postId, 'comments', prev), { pinned: false });
+        }
+        batch.update(postRef, { pinnedCommentId: commentId });
+        batch.update(doc(db, 'communityPosts', postId, 'comments', commentId), { pinned: true });
+        await batch.commit();
+        showToast('Pinned');
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    window.toggleCommentHelpful = async function (commentId) {
+      if (!currentUser || !commentId) return;
+      try {
+        var cref = doc(db, 'communityPosts', postId, 'comments', commentId);
+        var snap = await getDoc(cref);
+        if (!snap.exists()) return;
+        var d = snap.data() || {};
+        var arr = Array.isArray(d.helpfulBy) ? d.helpfulBy : [];
+        var has = arr.indexOf(currentUser.uid) >= 0;
+        if (has) {
+          await updateDoc(cref, { helpfulBy: arrayRemove(currentUser.uid), helpfulCount: increment(-1) });
+        } else {
+          await updateDoc(cref, { helpfulBy: arrayUnion(currentUser.uid), helpfulCount: increment(1) });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    async function renderComments() {
       var scrollY = window.scrollY;
       closeAllCommentMenus();
       listEl.innerHTML = '';
       threadRepliesUnsubs.forEach(function (u) { try { u(); } catch (e) {} });
       threadRepliesUnsubs = [];
 
-      let docs = latestComments.slice();
+      var pinnedId = String((postData && postData.pinnedCommentId) || '').trim();
+      var pinnedDoc = null;
+      var pool = latestComments.slice().filter(function (cd) {
+        if (pinnedId && cd.id === pinnedId) {
+          pinnedDoc = cd;
+          return false;
+        }
+        return true;
+      });
+
       const sortVal = sortSelect ? sortSelect.value : 'best';
       if (sortVal === 'best') {
-        docs.sort(function (a, b) {
+        pool.sort(function (a, b) {
           const ad = a.data() || {}, bd = b.data() || {};
           return Number(bd.likes || bd.likeCount || 0) - Number(ad.likes || ad.likeCount || 0)
             || getMillis(bd.createdAt) - getMillis(ad.createdAt);
         });
       } else if (sortVal === 'newest') {
-        docs.sort(function (a, b) { return getMillis((b.data() || {}).createdAt) - getMillis((a.data() || {}).createdAt); });
+        pool.sort(function (a, b) { return getMillis((b.data() || {}).createdAt) - getMillis((a.data() || {}).createdAt); });
       } else {
-        docs.sort(function (a, b) { return getMillis((a.data() || {}).createdAt) - getMillis((b.data() || {}).createdAt); });
+        pool.sort(function (a, b) { return getMillis((a.data() || {}).createdAt) - getMillis((b.data() || {}).createdAt); });
       }
 
-      if (!docs.length) {
+      var ordered = pinnedDoc ? [pinnedDoc].concat(pool) : pool;
+
+      if (!ordered.length) {
         listEl.classList.remove('comments-fade-in');
         listEl.innerHTML = '<p class="meta-pill">No comments yet.</p>';
         requestAnimationFrame(function () {
@@ -987,10 +1260,28 @@
         return;
       }
 
-      docs.forEach(function (cd) {
+      for (var idx = 0; idx < ordered.length; idx++) {
+        var cd = ordered[idx];
         const c = cd.data() || {};
-        const username = String(c.authorUsername || 'Member').trim() || 'Member';
-        const photo = String(c.authorPhotoURL || c.authorPhoto || '').trim();
+        const isPinned = pinnedDoc && cd.id === pinnedDoc.id;
+        const isAnonCom = c.anonymous === true;
+        const prof = await getAuthorProfile(c.authorUid, c.authorUsername, c.authorPhotoURL || c.authorPhoto || '');
+        const username = isAnonCom ? 'Anonymous' : (String(c.authorUsername || prof.username || 'Member').trim() || 'Member');
+        const photo = isAnonCom ? LIVVO_ANON_AVATAR : String(c.authorPhotoURL || c.authorPhoto || prof.photoUrl || '').trim();
+        const credLine = isAnonCom ? '' : String(prof.credential || '').trim();
+
+        var attachHost = listEl;
+        if (isPinned) {
+          var pinShell = document.createElement('div');
+          pinShell.className = 'pinned-answer-block';
+          var pinLab = document.createElement('div');
+          pinLab.className = 'pinned-answer-label';
+          pinLab.textContent = '\uD83D\uDCCC Pinned answer';
+          pinShell.appendChild(pinLab);
+          listEl.appendChild(pinShell);
+          attachHost = pinShell;
+        }
+
         const wrapper = document.createElement('div');
         wrapper.className = 'comment-wrapper';
         wrapper.id = 'comment-' + cd.id;
@@ -1012,7 +1303,7 @@
         const right = document.createElement('div');
         right.style.cssText = 'flex:1;min-width:0;';
         const meta = document.createElement('div');
-        meta.style.cssText = 'display:flex;align-items:baseline;gap:6px;margin-bottom:3px;';
+        meta.style.cssText = 'display:flex;align-items:baseline;gap:6px;margin-bottom:3px;flex-wrap:wrap;';
         const nameSpan = document.createElement('span');
         nameSpan.className = 'comment-name';
         nameSpan.style.cssText = 'font-size:13px;font-weight:700;color:#1a2e1a;';
@@ -1022,6 +1313,13 @@
         timeSpan.textContent = formatRelativeTime(c.createdAt);
         meta.appendChild(nameSpan);
         meta.appendChild(timeSpan);
+        right.appendChild(meta);
+        if (credLine) {
+          var credEl = document.createElement('div');
+          credEl.style.cssText = 'font-size:11px;color:#9ab09a;margin:-2px 0 6px 0;line-height:1.35;';
+          credEl.textContent = credLine;
+          right.appendChild(credEl);
+        }
         const textEl = document.createElement('p');
         textEl.className = 'comment-text';
         textEl.style.cssText = 'font-size:14px;color:#2d4a2d;line-height:1.6;margin:0 0 8px 0;word-break:break-word;';
@@ -1047,6 +1345,22 @@
           e.stopPropagation();
           window.toggleReplyBox(cd.id);
         });
+
+        var helpfulN = Math.max(0, Number(c.helpfulCount || 0));
+        var helpfulMarked = !!(currentUser && Array.isArray(c.helpfulBy) && c.helpfulBy.indexOf(currentUser.uid) >= 0);
+        const helpfulBtn = document.createElement('button');
+        helpfulBtn.type = 'button';
+        helpfulBtn.className = 'comment-helpful-btn' + (helpfulMarked ? ' marked' : '');
+        helpfulBtn.textContent = helpfulN > 0
+          ? ('\u2713 ' + helpfulN + ' found this helpful')
+          : '\u2713 Helpful';
+        helpfulBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          window.toggleCommentHelpful(cd.id);
+        });
+        actionRow.appendChild(likeBtn);
+        actionRow.appendChild(helpfulBtn);
+        actionRow.appendChild(replyBtn);
 
         const moreWrap = document.createElement('div');
         moreWrap.className = 'comment-more-wrap';
@@ -1095,6 +1409,21 @@
           commentMenuDivider.style.cssText = 'height:1px;background:#f0f5f0;margin:4px 0;';
           moreMenu.appendChild(commentMenuDivider);
         }
+        var postAuthorUid = String((postData && (postData.author || postData.authorId)) || '');
+        if (currentUser && postAuthorUid && currentUser.uid === postAuthorUid) {
+          var pinBtn = document.createElement('button');
+          pinBtn.type = 'button';
+          pinBtn.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#064e3b;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
+          pinBtn.textContent = 'Pin this answer';
+          pinBtn.addEventListener('mouseenter', function () { pinBtn.style.background = '#ecfdf5'; });
+          pinBtn.addEventListener('mouseleave', function () { pinBtn.style.background = 'none'; });
+          pinBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            moreMenu.style.display = 'none';
+            window.pinCommentAnswer(cd.id);
+          });
+          moreMenu.appendChild(pinBtn);
+        }
         const reportBtn = document.createElement('button');
         reportBtn.type = 'button';
         reportBtn.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#5a7a5a;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
@@ -1109,8 +1438,6 @@
         moreWrap.appendChild(moreBtn);
         moreWrap.appendChild(moreMenu);
 
-        actionRow.appendChild(likeBtn);
-        actionRow.appendChild(replyBtn);
         actionRow.appendChild(moreWrap);
 
         if (currentUser) {
@@ -1164,14 +1491,15 @@
           repliesWrap.innerHTML = '';
           rsnap.docs.forEach(function (rd) {
             const r = rd.data() || {};
-            const rName = String(r.authorUsername || 'Member').trim() || 'Member';
+            const rAnon = r.anonymous === true;
+            const rName = rAnon ? 'Anonymous' : (String(r.authorUsername || 'Member').trim() || 'Member');
             const row = document.createElement('div');
             row.className = 'reply-item';
             const rav = document.createElement('div');
             rav.style.cssText = 'flex-shrink:0;width:28px;height:28px;border-radius:50%;overflow:hidden;background:#2d6a2d;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;';
-            if (r.authorPhotoURL || r.authorPhoto) {
+            if (rAnon || r.authorPhotoURL || r.authorPhoto) {
               const ri = document.createElement('img');
-              ri.src = r.authorPhotoURL || r.authorPhoto;
+              ri.src = rAnon ? LIVVO_ANON_AVATAR : (r.authorPhotoURL || r.authorPhoto);
               ri.alt = rName;
               ri.style.cssText = 'width:100%;height:100%;object-fit:cover;';
               rav.appendChild(ri);
@@ -1200,7 +1528,6 @@
         });
         threadRepliesUnsubs.push(unsubReplies);
 
-        right.appendChild(meta);
         right.appendChild(textEl);
         right.appendChild(actionRow);
         right.appendChild(replyBox);
@@ -1208,8 +1535,8 @@
         item.appendChild(right);
         wrapper.appendChild(item);
         wrapper.appendChild(repliesWrap);
-        listEl.appendChild(wrapper);
-      });
+        attachHost.appendChild(wrapper);
+      }
       listEl.classList.remove('comments-fade-in');
       void listEl.offsetWidth;
       listEl.classList.add('comments-fade-in');
@@ -1229,7 +1556,7 @@
       const authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim()) || currentUser.photoURL || '';
       const pendingDoc = makePendingCommentDoc(text, authorUsername, currentUser.uid, authorPhoto);
       latestComments = latestComments.concat([pendingDoc]);
-      renderComments();
+      renderComments().catch(function () {});
       const batch = writeBatch(db);
       const postRef = doc(db, 'communityPosts', postId);
       const commentRef = doc(collection(db, 'communityPosts', postId, 'comments'));
@@ -1254,7 +1581,7 @@
         console.error('Comment failed:', err);
         var pid = pendingDoc.id;
         latestComments = latestComments.filter(function (d) { return d.id !== pid; });
-        renderComments();
+        renderComments().catch(function () {});
       }
     }
 
@@ -1282,6 +1609,82 @@
           } else {
             window.location.href = 'community-portal.html' + (city ? '?city=' + encodeURIComponent(city) : '');
           }
+        });
+      }
+    })();
+
+    (function initRequestAnswerModal() {
+      var modal = document.getElementById('modal-request-answer');
+      var btn = document.getElementById('request-answer-btn');
+      var closeBtn = document.getElementById('request-answer-close');
+      var search = document.getElementById('request-answer-search');
+      var results = document.getElementById('request-answer-results');
+      if (!modal || !btn) return;
+      var searchTimer = null;
+      function closeReqModal() {
+        modal.hidden = true;
+        if (search) search.value = '';
+        if (results) results.innerHTML = '';
+      }
+      btn.addEventListener('click', function () {
+        if (!currentUser) return;
+        modal.hidden = false;
+        if (search) search.focus();
+      });
+      if (closeBtn) closeBtn.addEventListener('click', closeReqModal);
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeReqModal();
+      });
+      if (search) {
+        search.addEventListener('input', function () {
+          clearTimeout(searchTimer);
+          var q = (search.value || '').trim();
+          if (!results) return;
+          results.innerHTML = '';
+          if (q.length < 2) return;
+          searchTimer = setTimeout(async function () {
+            try {
+              var uq = query(
+                collection(db, 'users'),
+                where('displayName', '>=', q),
+                where('displayName', '<=', q + '\uf8ff'),
+                limit(12)
+              );
+              var us = await getDocs(uq);
+              us.forEach(function (ud) {
+                var uid = ud.id;
+                if (currentUser && uid === currentUser.uid) return;
+                var d = ud.data() || {};
+                var nm = String(d.displayName || d.username || '').trim();
+                if (!nm) return;
+                var row = document.createElement('button');
+                row.type = 'button';
+                row.className = 'user-search-result';
+                row.textContent = nm;
+                row.addEventListener('click', async function () {
+                  try {
+                    await addDoc(collection(db, 'notifications'), {
+                      userId: uid,
+                      type: 'answer_request',
+                      postId: postId,
+                      postTitle: (postData && postData.title) || 'Post',
+                      requestedBy: currentUser.uid,
+                      city: city,
+                      createdAt: serverTimestamp(),
+                      read: false
+                    });
+                    showToast('Request sent');
+                    closeReqModal();
+                  } catch (e) {
+                    console.error(e);
+                  }
+                });
+                results.appendChild(row);
+              });
+            } catch (e) {
+              console.error(e);
+            }
+          }, 300);
         });
       }
     })();
@@ -1315,6 +1718,11 @@
       const authorUid = data.author || data.authorId || '';
       const fallback = data.authorUsername || data.authorName || 'Anonymous';
       const ap = await getAuthorProfile(authorUid, fallback, data.authorPhotoURL || data.authorPhoto || '');
+      const isAnonPost = data.anonymous === true;
+      const displayName = isAnonPost ? 'Anonymous' : (ap.username || 'Member');
+      const displayPhoto = isAnonPost ? LIVVO_ANON_AVATAR : ap.photoUrl;
+      const displayInitial = isAnonPost ? '?' : ap.initial;
+      const credPost = isAnonPost ? '' : String(ap.credential || '').trim();
 
       postTitleEl.textContent = data.title || 'Untitled';
       const catKey = data.category || '';
@@ -1322,16 +1730,27 @@
       postCategoryTagEl.className = 'post-badge';
       postCategoryTagEl.style.cssText = 'margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;flex-shrink:0;' + getCategoryStyle(catLabel);
       postCategoryTagEl.textContent = catLabel;
-      postAuthorNameEl.textContent = ap.username || 'Member';
+      postAuthorNameEl.textContent = displayName;
       postTimestampEl.textContent = data.createdAt ? '· ' + formatRelativeTime(data.createdAt) : '';
 
+      var credHost = document.getElementById('post-credential');
+      if (credHost) {
+        if (credPost) {
+          credHost.style.display = 'block';
+          credHost.textContent = credPost;
+        } else {
+          credHost.style.display = 'none';
+          credHost.textContent = '';
+        }
+      }
+
       postAuthorAvatarEl.innerHTML = '';
-      if (ap.photoUrl) {
+      if (displayPhoto) {
         const im = document.createElement('img');
-        im.src = ap.photoUrl;
-        im.alt = ap.username;
+        im.src = displayPhoto;
+        im.alt = displayName;
         postAuthorAvatarEl.appendChild(im);
-      } else postAuthorAvatarEl.textContent = ap.initial;
+      } else postAuthorAvatarEl.textContent = displayInitial;
 
       const bodyPlain = (data.body != null && String(data.body).trim()) ? String(data.body) : stripHtml(data.bodyHtml || '');
       postBodyEl.textContent = bodyPlain || '';
@@ -1369,6 +1788,16 @@
 
       updateCommentCountLabel();
       fillComposerAvatar();
+
+      var rab = document.getElementById('request-answer-btn');
+      if (rab) {
+        var showReq = String(data.type || '') === 'question' && !!currentUser;
+        rab.hidden = !showReq;
+        if (showReq) rab.style.display = 'flex';
+        else rab.style.display = 'none';
+      }
+
+      loadRelatedPosts(data).catch(function () {});
     }
 
     let commentsUnsub = null;
@@ -1392,7 +1821,7 @@
           return;
         }
         latestComments = next;
-        renderComments();
+        renderComments().catch(function () {});
       }, function () {
         listEl.innerHTML = '<p class="meta-pill">Could not load comments.</p>';
       });
@@ -1413,6 +1842,7 @@
           return;
         }
         const pdata = snap.data() || {};
+        postData = pdata;
         loadingEl.hidden = true;
         errEl.hidden = true;
         shell.hidden = false;
@@ -1421,6 +1851,7 @@
           await hydratePost(pdata);
           postHydrated = true;
           wireCommentsListener();
+          recordPostViewOnce();
         } else {
           const cc = document.getElementById('post-comment-count');
           if (cc) cc.textContent = String(Number(pdata.commentCount || 0));
@@ -1430,6 +1861,12 @@
             if (lc.textContent !== srv) lc.textContent = srv;
           }
           updateCommentCountLabel();
+          var rab2 = document.getElementById('request-answer-btn');
+          if (rab2) {
+            var showReq2 = String(pdata.type || '') === 'question' && !!currentUser;
+            rab2.hidden = !showReq2;
+            rab2.style.display = showReq2 ? 'flex' : 'none';
+          }
         }
       }, function () {
         loadingEl.hidden = true;
