@@ -340,6 +340,7 @@
       white-space: normal;
       text-overflow: clip;
       max-height: 2000px;
+      overflow: visible;
     }
     .pinned-answer-block {
       background: #ecfdf5;
@@ -347,6 +348,16 @@
       padding: 10px 12px;
       margin-bottom: 12px;
       border: 1px solid #d1fae5;
+    }
+    .thread-post-edit-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 10px;
+      margin: 0 0 16px 0;
+      width: 100%;
+      box-sizing: border-box;
     }
     .pinned-answer-label {
       font-size: 11px;
@@ -473,6 +484,7 @@
               <div id="post-credential" style="font-size: 12px; color: #9ab09a; margin-top: 3px; line-height: 1.35; display: none;"></div>
             </div>
             <span id="post-category" class="post-badge" style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;flex-shrink:0;"></span>
+            <div id="post-owner-menu-wrap" hidden style="position:relative;flex-shrink:0;margin-left:8px;align-self:flex-start;"></div>
           </div>
           <h1 style="font-size: 22px; font-weight: 800; color: #1a2e1a; margin: 0 0 8px 0; line-height: 1.3;" id="post-title"></h1>
           <p style="font-size: 15px; color: #3d5a3d; line-height: 1.7; margin: 0 0 20px 0; white-space: pre-wrap;" id="post-body"></p>
@@ -535,6 +547,17 @@
       </div>
     </div>
   </main>
+
+  <div id="modal-delete-post" class="modal-overlay" hidden>
+    <div class="modal-panel-thread" role="dialog" aria-modal="true" aria-labelledby="modal-delete-post-title">
+      <h2 id="modal-delete-post-title">Delete post?</h2>
+      <p style="font-size:14px;color:#5a7a5a;margin:0 0 20px 0;line-height:1.55;">Are you sure you want to delete this post? This cannot be undone.</p>
+      <div style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;">
+        <button type="button" id="modal-delete-post-cancel" style="border:none;background:transparent;border-radius:8px;padding:10px 18px;min-width:88px;font-size:14px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit;">Cancel</button>
+        <button type="button" id="modal-delete-post-confirm" style="border:none;background:#b42318;color:#fff;border-radius:10px;padding:10px 22px;min-width:88px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Delete</button>
+      </div>
+    </div>
+  </div>
 
   <div id="modal-request-answer" class="modal-overlay" hidden>
     <div class="modal-panel-thread" role="dialog" aria-modal="true" aria-labelledby="request-answer-title">
@@ -610,6 +633,7 @@
     let currentUser = null;
     let currentProfileData = null;
     let postData = null;
+    let threadPostEditBackup = null;
     let threadRepliesUnsubs = [];
     const authorCache = new Map();
 
@@ -836,6 +860,249 @@
       }, 2500);
     }
 
+    if (!window.__livvoPostOwnerMenuDoc) {
+      window.__livvoPostOwnerMenuDoc = true;
+      document.addEventListener('click', function () {
+        var m = document.getElementById('post-owner-menu-pop');
+        if (m) m.style.display = 'none';
+        var b = document.querySelector('#post-owner-menu-wrap > button[aria-label="Post options"]');
+        if (b) b.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    function setupPostOwnerMenu(authorUid) {
+      var wrap = document.getElementById('post-owner-menu-wrap');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+      if (!currentUser || !authorUid || currentUser.uid !== authorUid) {
+        wrap.hidden = true;
+        return;
+      }
+      if (document.getElementById('thread-post-edit-actions')) {
+        wrap.hidden = true;
+        return;
+      }
+      wrap.hidden = false;
+      var menuBtn = document.createElement('button');
+      menuBtn.type = 'button';
+      menuBtn.setAttribute('aria-label', 'Post options');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.style.cssText = 'border:none;background:transparent;padding:4px 8px;cursor:pointer;color:#c0d4c0;font-size:20px;border-radius:6px;line-height:1;';
+      menuBtn.textContent = '···';
+      menuBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var menu = document.getElementById('post-owner-menu-pop');
+        if (!menu) return;
+        var open = menu.style.display !== 'block';
+        menu.style.display = open ? 'block' : 'none';
+        menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      menuBtn.addEventListener('mouseenter', function () { menuBtn.style.background = '#f0f5f0'; });
+      menuBtn.addEventListener('mouseleave', function () { menuBtn.style.background = 'transparent'; });
+
+      var menuPop = document.createElement('div');
+      menuPop.id = 'post-owner-menu-pop';
+      menuPop.style.cssText = 'display:none;position:absolute;right:0;top:28px;background:#fff;border:1px solid #e8f0e8;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:100;min-width:160px;overflow:hidden;padding:4px;';
+      menuPop.addEventListener('click', function (e) { e.stopPropagation(); });
+
+      var editOpt = document.createElement('button');
+      editOpt.type = 'button';
+      editOpt.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#064e3b;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
+      editOpt.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>Edit post</span>';
+      editOpt.addEventListener('mouseenter', function () { editOpt.style.background = '#f5f5f5'; });
+      editOpt.addEventListener('mouseleave', function () { editOpt.style.background = 'none'; });
+      editOpt.addEventListener('click', function (e) {
+        e.stopPropagation();
+        menuPop.style.display = 'none';
+        menuBtn.setAttribute('aria-expanded', 'false');
+        startThreadPostEdit();
+      });
+      menuPop.appendChild(editOpt);
+
+      var menuDivider = document.createElement('div');
+      menuDivider.style.cssText = 'height:1px;background:#f0f5f0;margin:4px 0;';
+      menuPop.appendChild(menuDivider);
+
+      var delOpt = document.createElement('button');
+      delOpt.type = 'button';
+      delOpt.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#b42318;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;font-weight:600;border-radius:8px;';
+      delOpt.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><span>Delete post</span>';
+      delOpt.addEventListener('mouseenter', function () { delOpt.style.background = '#fef2f2'; });
+      delOpt.addEventListener('mouseleave', function () { delOpt.style.background = 'none'; });
+      delOpt.addEventListener('click', function (e) {
+        e.stopPropagation();
+        menuPop.style.display = 'none';
+        menuBtn.setAttribute('aria-expanded', 'false');
+        openDeletePostModal();
+      });
+      menuPop.appendChild(delOpt);
+
+      wrap.appendChild(menuBtn);
+      wrap.appendChild(menuPop);
+    }
+
+    function openDeletePostModal() {
+      var c = document.getElementById('modal-delete-post-confirm');
+      if (c) c.disabled = false;
+      var m = document.getElementById('modal-delete-post');
+      if (m) {
+        m.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeDeletePostModal() {
+      var m = document.getElementById('modal-delete-post');
+      if (m) {
+        m.hidden = true;
+        document.body.style.overflow = '';
+      }
+    }
+
+    async function confirmDeleteThreadPost() {
+      var btn = document.getElementById('modal-delete-post-confirm');
+      if (btn) btn.disabled = true;
+      try {
+        await deleteDoc(doc(db, 'communityPosts', postId));
+        closeDeletePostModal();
+        window.location.href = 'community-portal.html?city=' + encodeURIComponent(city) + '&deleted=1';
+      } catch (err) {
+        console.error(err);
+        showToast('Could not delete post');
+        closeDeletePostModal();
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    (function wireDeletePostModal() {
+      var modal = document.getElementById('modal-delete-post');
+      var cancel = document.getElementById('modal-delete-post-cancel');
+      var confirmBtn = document.getElementById('modal-delete-post-confirm');
+      if (cancel) cancel.addEventListener('click', function () { closeDeletePostModal(); });
+      if (confirmBtn) confirmBtn.addEventListener('click', function () { confirmDeleteThreadPost(); });
+      if (modal) {
+        modal.addEventListener('click', function (e) {
+          if (e.target === modal) closeDeletePostModal();
+        });
+      }
+    })();
+
+    function startThreadPostEdit() {
+      if (!postData || !currentUser) return;
+      var authorUid = postData.author || postData.authorId || '';
+      if (!authorUid || currentUser.uid !== authorUid) return;
+      if (document.getElementById('thread-post-edit-actions')) return;
+
+      var t = postTitleEl.textContent || '';
+      var b = postBodyEl.textContent || '';
+      threadPostEditBackup = { title: t, body: b };
+
+      postTitleEl.textContent = '';
+      var inp = document.createElement('input');
+      inp.type = 'text';
+      inp.id = 'thread-post-edit-title';
+      inp.setAttribute('maxlength', '40');
+      inp.maxLength = 40;
+      inp.value = t.length > 40 ? t.slice(0, 40) : t;
+      inp.style.cssText = 'width:100%;border:1.5px solid #059669;border-radius:8px;padding:10px 12px;font-size:18px;font-weight:800;color:#1a2e1a;outline:none;font-family:inherit;box-sizing:border-box;line-height:1.3;';
+      inp.addEventListener('input', function () {
+        if (inp.value.length > 40) inp.value = inp.value.slice(0, 40);
+      });
+      postTitleEl.appendChild(inp);
+
+      postBodyEl.textContent = '';
+      var ta = document.createElement('textarea');
+      ta.id = 'thread-post-edit-body';
+      ta.value = b;
+      ta.style.cssText = 'width:100%;border:1.5px solid #e8f0e8;border-radius:8px;padding:10px 12px;font-size:15px;color:#3d5a3d;outline:none;font-family:inherit;resize:vertical;min-height:120px;line-height:1.7;box-sizing:border-box;';
+      postBodyEl.appendChild(ta);
+
+      var actions = document.createElement('div');
+      actions.id = 'thread-post-edit-actions';
+      actions.className = 'thread-post-edit-actions';
+      var cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.style.cssText = 'border:none;background:transparent;border-radius:8px;padding:10px 18px;min-width:92px;box-sizing:border-box;font-size:14px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap;';
+      cancelBtn.addEventListener('mouseenter', function () { cancelBtn.style.background = 'rgba(100,116,139,0.1)'; });
+      cancelBtn.addEventListener('mouseleave', function () { cancelBtn.style.background = 'transparent'; });
+      cancelBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        cancelThreadPostEdit();
+      });
+      var saveBtn = document.createElement('button');
+      saveBtn.type = 'button';
+      saveBtn.textContent = 'Save';
+      saveBtn.style.cssText = 'border:none;background:#059669;color:#fff;border-radius:10px;padding:10px 22px;min-width:92px;box-sizing:border-box;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap;';
+      saveBtn.addEventListener('mouseenter', function () { saveBtn.style.background = '#047857'; });
+      saveBtn.addEventListener('mouseleave', function () { saveBtn.style.background = '#059669'; });
+      saveBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        saveThreadPostEdit();
+      });
+      actions.appendChild(cancelBtn);
+      actions.appendChild(saveBtn);
+
+      var postContainer = document.getElementById('post-container');
+      var imgWrap = document.getElementById('post-image-wrap');
+      if (postContainer && imgWrap) {
+        postContainer.insertBefore(actions, imgWrap);
+      }
+
+      var wrap = document.getElementById('post-owner-menu-wrap');
+      if (wrap) wrap.hidden = true;
+    }
+
+    function cancelThreadPostEdit() {
+      if (!threadPostEditBackup) return;
+      var act = document.getElementById('thread-post-edit-actions');
+      if (act) act.remove();
+      postTitleEl.textContent = threadPostEditBackup.title;
+      postBodyEl.textContent = threadPostEditBackup.body;
+      threadPostEditBackup = null;
+      if (postData) {
+        setupPostOwnerMenu(postData.author || postData.authorId || '');
+      }
+    }
+
+    async function saveThreadPostEdit() {
+      var inp = document.getElementById('thread-post-edit-title');
+      var ta = document.getElementById('thread-post-edit-body');
+      var rawTitle = inp ? String(inp.value || '') : '';
+      var newTitle = rawTitle.trim().slice(0, 40);
+      var newBody = ta ? String(ta.value || '').trim() : '';
+      if (!newTitle) {
+        showToast('Add a title');
+        return;
+      }
+      try {
+        await updateDoc(doc(db, 'communityPosts', postId), {
+          title: newTitle,
+          body: newBody,
+          editedAt: serverTimestamp()
+        });
+        var act = document.getElementById('thread-post-edit-actions');
+        if (act) act.remove();
+        postTitleEl.textContent = newTitle;
+        postBodyEl.textContent = newBody;
+        threadPostEditBackup = null;
+        if (postData) {
+          postData.title = newTitle;
+          postData.body = newBody;
+        }
+        document.title = newTitle + ' | Livvo';
+        showToast('Post updated');
+        if (postData) {
+          setupPostOwnerMenu(postData.author || postData.authorId || '');
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Could not update post');
+      }
+    }
+
     function fitCommentComposerHeight() {
       if (!commentInputEl) return;
       commentInputEl.style.height = 'auto';
@@ -1011,11 +1278,14 @@
         ta.style.height = ta.scrollHeight + 'px';
       });
       var actions = document.createElement('div');
-      actions.style.cssText = 'display:flex;justify-content:flex-end;gap:6px;margin-top:6px;';
+      actions.className = 'comment-edit-actions';
+      actions.style.cssText = 'display:flex;justify-content:flex-end;align-items:center;flex-wrap:nowrap;gap:10px;margin-top:8px;width:100%;box-sizing:border-box;flex-shrink:0;overflow:visible;';
       var cancelBtn = document.createElement('button');
       cancelBtn.type = 'button';
       cancelBtn.textContent = 'Cancel';
-      cancelBtn.style.cssText = 'border:1px solid #e8f0e8;background:white;border-radius:20px;padding:5px 12px;font-size:12px;color:#5a7a5a;cursor:pointer;';
+      cancelBtn.style.cssText = 'border:none;background:transparent;border-radius:8px;padding:10px 18px;min-width:92px;box-sizing:border-box;font-size:14px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap;';
+      cancelBtn.addEventListener('mouseenter', function () { cancelBtn.style.background = 'rgba(100,116,139,0.1)'; });
+      cancelBtn.addEventListener('mouseleave', function () { cancelBtn.style.background = 'transparent'; });
       cancelBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         window.cancelEditComment(commentId, plain);
@@ -1023,7 +1293,9 @@
       var saveBtn = document.createElement('button');
       saveBtn.type = 'button';
       saveBtn.textContent = 'Save';
-      saveBtn.style.cssText = 'border:none;background:#2d6a2d;color:white;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;';
+      saveBtn.style.cssText = 'border:none;background:#059669;color:#fff;border-radius:10px;padding:10px 22px;min-width:92px;box-sizing:border-box;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap;';
+      saveBtn.addEventListener('mouseenter', function () { saveBtn.style.background = '#047857'; });
+      saveBtn.addEventListener('mouseleave', function () { saveBtn.style.background = '#059669'; });
       saveBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         window.saveEditComment(commentId);
@@ -1820,6 +2092,8 @@
         else rab.style.display = 'none';
       }
 
+      setupPostOwnerMenu(authorUid);
+
       loadRelatedPosts(data).catch(function () {});
     }
 
@@ -1925,6 +2199,9 @@
       populateThreadNavAvatar(user);
       fillComposerAvatar();
       startPostListener();
+      if (postHydrated && postData) {
+        setupPostOwnerMenu(postData.author || postData.authorId || '');
+      }
     });
   </script>
 </body>

@@ -1493,7 +1493,7 @@ nav {
     <div class="form-row">
       <label for="post-title" id="post-title-label">Title</label>
       <input type="text" id="post-title" maxlength="40" autocomplete="off" placeholder="Title"
-        oninput="updateCounter('title-counter', 40 - this.value.length, 10)" />
+        oninput="updateCounter('title-counter', 40 - this.value.length, 0)" />
       <div style="display:flex;justify-content:flex-end;margin-top:4px;">
         <span id="title-counter" style="font-size:11px;color:#9ab09a;">40</span>
       </div>
@@ -1980,7 +1980,7 @@ nav {
       }
       if (typeof window.removePostImage === 'function') window.removePostImage();
       if (typeof window.updateCounter === 'function') {
-        window.updateCounter('title-counter', 40, 10);
+        window.updateCounter('title-counter', 40, 0);
         window.updateCounter('body-counter', 500, 50);
       }
       setNewPostContentType('post');
@@ -2165,7 +2165,11 @@ nav {
       const el = document.getElementById(counterId);
       if (!el) return;
       el.textContent = remaining;
-      el.style.color = remaining <= warnAt ? '#e53e3e' : '#9ab09a';
+      if (counterId === 'title-counter') {
+        el.style.color = remaining <= 0 ? '#e53e3e' : '#9ab09a';
+      } else {
+        el.style.color = remaining <= warnAt ? '#e53e3e' : '#9ab09a';
+      }
     };
 
     window.previewPostImage = function previewPostImage(input) {
@@ -2276,50 +2280,77 @@ nav {
       var titleEl = card.querySelector('.post-title');
       var bodyEl = card.querySelector('.post-body');
       if (!titleEl || !bodyEl) return;
+      var oldAct = document.getElementById('post-card-edit-actions-' + postId);
+      if (oldAct) oldAct.remove();
+
       var currentTitle = titleEl.textContent;
       var currentBody = bodyEl.textContent;
-      card.__editBackup = { title: currentTitle, body: currentBody };
+      card.__editBackup = { title: currentTitle, body: currentBody, bodyStyle: bodyEl.style.cssText };
+
+      bodyEl.style.cssText = 'font-size:13px;color:#5a7a5a;margin:0 0 8px 0;display:block;overflow:visible;word-break:break-word;line-height:1.55;';
 
       titleEl.textContent = '';
       var inp = document.createElement('input');
+      inp.type = 'text';
       inp.id = 'edit-title-' + postId;
-      inp.value = currentTitle;
-      inp.style.cssText = 'width:100%;border:1.5px solid #059669;border-radius:8px;padding:8px 12px;font-size:15px;font-weight:700;color:#064e3b;outline:none;font-family:inherit;box-sizing:border-box;';
+      inp.setAttribute('maxlength', '40');
+      inp.maxLength = 40;
+      inp.value = currentTitle.length > 40 ? currentTitle.slice(0, 40) : currentTitle;
+      inp.style.cssText = 'width:100%;border:1.5px solid #059669;border-radius:8px;padding:10px 12px;font-size:15px;font-weight:700;color:#064e3b;outline:none;font-family:inherit;box-sizing:border-box;';
       inp.addEventListener('click', function (e) { e.stopPropagation(); });
+      inp.addEventListener('input', function () {
+        if (inp.value.length > 40) inp.value = inp.value.slice(0, 40);
+      });
       titleEl.appendChild(inp);
 
       bodyEl.textContent = '';
       var ta = document.createElement('textarea');
       ta.id = 'edit-body-' + postId;
       ta.value = currentBody;
-      ta.style.cssText = 'width:100%;border:1.5px solid #e8f0e8;border-radius:8px;padding:8px 12px;font-size:14px;color:#3d5a3d;outline:none;font-family:inherit;resize:none;min-height:80px;line-height:1.6;box-sizing:border-box;';
+      ta.style.cssText = 'width:100%;border:1.5px solid #e8f0e8;border-radius:8px;padding:10px 12px;font-size:14px;color:#3d5a3d;outline:none;font-family:inherit;resize:vertical;min-height:80px;line-height:1.6;box-sizing:border-box;';
       ta.addEventListener('click', function (e) { e.stopPropagation(); });
       ta.addEventListener('input', function () {
         ta.style.height = 'auto';
         ta.style.height = ta.scrollHeight + 'px';
       });
+      bodyEl.appendChild(ta);
+
       var actions = document.createElement('div');
-      actions.style.cssText = 'display:flex;justify-content:flex-end;gap:8px;margin-top:8px;';
+      actions.id = 'post-card-edit-actions-' + postId;
+      actions.className = 'post-card-edit-actions';
+      actions.style.cssText = 'display:flex;justify-content:flex-end;align-items:center;flex-wrap:nowrap;gap:10px;margin:0 0 12px 0;width:100%;box-sizing:border-box;flex-shrink:0;';
+
       var cancelBtn = document.createElement('button');
       cancelBtn.type = 'button';
       cancelBtn.textContent = 'Cancel';
-      cancelBtn.style.cssText = 'border:1px solid #e8f0e8;background:white;border-radius:20px;padding:6px 14px;font-size:12px;color:#5a7a5a;cursor:pointer;';
+      cancelBtn.style.cssText = 'border:none;background:transparent;border-radius:8px;padding:10px 18px;min-width:92px;box-sizing:border-box;font-size:14px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap;';
+      cancelBtn.addEventListener('mouseenter', function () { cancelBtn.style.background = 'rgba(100,116,139,0.1)'; });
+      cancelBtn.addEventListener('mouseleave', function () { cancelBtn.style.background = 'transparent'; });
       cancelBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         window.cancelEditPost(postId);
       });
+
       var saveBtn = document.createElement('button');
       saveBtn.type = 'button';
       saveBtn.textContent = 'Save';
-      saveBtn.style.cssText = 'border:none;background:#059669;color:white;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;';
+      saveBtn.style.cssText = 'border:none;background:#059669;color:#fff;border-radius:10px;padding:10px 22px;min-width:92px;box-sizing:border-box;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap;';
+      saveBtn.addEventListener('mouseenter', function () { saveBtn.style.background = '#047857'; });
+      saveBtn.addEventListener('mouseleave', function () { saveBtn.style.background = '#059669'; });
       saveBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         window.saveEditPost(postId);
       });
+
       actions.appendChild(cancelBtn);
       actions.appendChild(saveBtn);
-      bodyEl.appendChild(ta);
-      bodyEl.appendChild(actions);
+
+      var actionBar = card.querySelector('.post-card-action-bar');
+      if (actionBar) {
+        card.insertBefore(actions, actionBar);
+      } else {
+        card.appendChild(actions);
+      }
     };
 
     window.cancelEditPost = function (postId) {
@@ -2328,15 +2359,21 @@ nav {
       var titleEl = card.querySelector('.post-title');
       var bodyEl = card.querySelector('.post-body');
       if (!titleEl || !bodyEl) return;
+      var act = document.getElementById('post-card-edit-actions-' + postId);
+      if (act) act.remove();
       titleEl.textContent = card.__editBackup.title;
       bodyEl.textContent = card.__editBackup.body;
+      if (card.__editBackup.bodyStyle !== undefined) {
+        bodyEl.style.cssText = card.__editBackup.bodyStyle;
+      }
       delete card.__editBackup;
     };
 
     window.saveEditPost = async function (postId) {
       var titleInp = document.getElementById('edit-title-' + postId);
       var bodyTa = document.getElementById('edit-body-' + postId);
-      var newTitle = titleInp && titleInp.value.trim();
+      var rawTitle = titleInp ? String(titleInp.value || '') : '';
+      var newTitle = rawTitle.trim().slice(0, 40);
       var newBody = bodyTa ? bodyTa.value.trim() : '';
       if (!newTitle) return;
       try {
@@ -2347,10 +2384,15 @@ nav {
         });
         var card = document.getElementById('post-card-' + postId);
         if (!card) return;
+        var act = document.getElementById('post-card-edit-actions-' + postId);
+        if (act) act.remove();
         var titleEl = card.querySelector('.post-title');
         var bodyEl = card.querySelector('.post-body');
         if (titleEl) titleEl.textContent = newTitle;
         if (bodyEl) bodyEl.textContent = newBody;
+        if (card.__editBackup && card.__editBackup.bodyStyle !== undefined) {
+          bodyEl.style.cssText = card.__editBackup.bodyStyle;
+        }
         delete card.__editBackup;
         showToast('Post updated');
       } catch (err) {
@@ -2714,6 +2756,7 @@ nav {
         });
         card.addEventListener('click', function (ev) {
           if (ev.target.closest('button') || ev.target.closest('[id^="post-menu-"]') || ev.target.closest('.post-card-more-trigger')) return;
+          if (ev.target.closest('.post-card-edit-actions')) return;
           if (card.querySelector('input[id^="edit-title-"]')) return;
           window.location.href = threadPageUrl(postId);
         });
@@ -2823,6 +2866,7 @@ nav {
         }
 
         const actionBar = document.createElement('div');
+        actionBar.className = 'post-card-action-bar';
         actionBar.style.cssText = 'display:flex;align-items:center;gap:4px;';
 
         const likeBtn = document.createElement('button');
@@ -2987,7 +3031,7 @@ nav {
       var cat = newPostCategoryPreset || (activeCategory === 'all' ? 'housing' : activeCategory);
       newPostCategoryPreset = null;
       document.getElementById('post-category').value = cat;
-      window.updateCounter('title-counter', 40, 10);
+      window.updateCounter('title-counter', 40, 0);
       window.updateCounter('body-counter', 500, 50);
       setNewPostContentType('post');
       syncPostModalCitySelect();
@@ -3056,6 +3100,14 @@ nav {
       loadPosts(true);
       loadMeetups();
       refreshSidebarCommunityStats();
+      var spDel = new URLSearchParams(window.location.search);
+      if (spDel.get('deleted') === '1') {
+        spDel.delete('deleted');
+        var qsDel = spDel.toString();
+        var cleanUrl = window.location.pathname + (qsDel ? '?' + qsDel : '') + window.location.hash;
+        history.replaceState(null, '', cleanUrl);
+        showPortalToast('Post deleted');
+      }
     }
 
     var loadMoreBtn = document.getElementById('load-more-btn');
@@ -3072,7 +3124,9 @@ nav {
     }
 
     document.getElementById('post-title').addEventListener('input', function () {
+      if (this.value.length > 40) this.value = this.value.slice(0, 40);
       this.style.borderColor = '';
+      window.updateCounter('title-counter', 40 - this.value.length, 0);
     });
     document.getElementById('post-category').addEventListener('change', function () {
       this.style.borderColor = '';
@@ -3089,6 +3143,16 @@ nav {
         setTimeout(() => {
           document.getElementById('post-title').style.borderColor = '';
           syncNewPostModalPlaceholders();
+        }, 3000);
+        return;
+      }
+
+      if (titleVal.length > 40) {
+        showToast('Title must be 40 characters or less');
+        document.getElementById('post-title').focus();
+        document.getElementById('post-title').style.borderColor = '#e53e3e';
+        setTimeout(function () {
+          document.getElementById('post-title').style.borderColor = '';
         }, 3000);
         return;
       }
@@ -3132,7 +3196,7 @@ nav {
         var authorPhotoVal = resolvedPhoto || '';
         var bodyVal = contentType === 'question' ? '' : document.getElementById('post-body').value;
         await addDoc(collection(db, 'communityPosts'), {
-          title: document.getElementById('post-title').value,
+          title: document.getElementById('post-title').value.trim().slice(0, 40),
           body: bodyVal,
           category: document.getElementById('post-category').value,
           type: contentType,
