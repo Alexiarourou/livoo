@@ -169,130 +169,6 @@ nav {
 .card h3 { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 8px; color: var(--text-dark); }
 .card p { font-size: 0.9rem; color: var(--muted-dark); line-height: 1.6; margin: 0; }
 
-.cities-more-wrap { width: 100%; max-width: 600px; margin: 36px auto 0; }
-.cities-search-card {
-  background: #ffffff;
-  border: 1px solid #d4eadb;
-  border-radius: 16px;
-  padding: 32px;
-  max-width: 600px;
-  margin: 0 auto;
-}
-.cities-search-eyebrow {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--green);
-  text-align: center;
-  margin: 0 0 16px;
-}
-.cities-search-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  background: #ffffff;
-  border: 1px solid #c0deca;
-  border-radius: 100px;
-  padding: 16px 24px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.cities-search-bar:focus-within {
-  border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
-}
-.cities-search-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--muted-dark);
-}
-.cities-search-icon svg {
-  width: 18px;
-  height: 18px;
-}
-.cities-search-icon svg circle,
-.cities-search-icon svg line {
-  stroke: currentColor;
-  fill: none;
-}
-.cities-search-input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  background: transparent;
-  font-family: "DM Sans", sans-serif;
-  font-size: 16px;
-  color: var(--text-dark);
-  outline: none;
-}
-.cities-search-input::placeholder {
-  color: var(--muted-dark);
-  opacity: 0.85;
-  font-size: 16px;
-}
-.cities-search-combo {
-  position: relative;
-  width: 100%;
-}
-.cities-search-dropdown {
-  display: none;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(100% + 8px);
-  z-index: 40;
-  background: #ffffff;
-  border: 1px solid #d4eadb;
-  border-radius: 12px;
-  box-shadow: 0 12px 40px rgba(13, 43, 26, 0.08);
-  max-height: min(320px, 50vh);
-  overflow-y: auto;
-  text-align: left;
-}
-.cities-search-dropdown.is-open {
-  display: block;
-}
-.cities-search-dropdown-item {
-  display: block;
-  width: 100%;
-  padding: 12px 20px;
-  border: none;
-  background: transparent;
-  font-family: "DM Sans", sans-serif;
-  font-size: 15px;
-  color: #0d2b1a;
-  text-align: left;
-  cursor: pointer;
-  text-decoration: none;
-  box-sizing: border-box;
-  transition: background 0.15s;
-}
-button.cities-search-dropdown-item {
-  -webkit-tap-highlight-color: transparent;
-}
-.cities-search-dropdown-item:hover,
-.cities-search-dropdown-item:focus {
-  background: #ecfdf5;
-  outline: none;
-}
-.cities-search-dropdown-fallback {
-  display: block;
-  padding: 12px 20px;
-  font-family: "DM Sans", sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--green);
-  text-decoration: none;
-  transition: background 0.15s;
-}
-.cities-search-dropdown-fallback:hover,
-.cities-search-dropdown-fallback:focus {
-  background: #ecfdf5;
-  outline: none;
-}
 .cities-quick-pills {
   display: flex;
   flex-wrap: wrap;
@@ -382,6 +258,34 @@ button.cities-search-dropdown-item {
 .btn-see-all-cities:focus-visible {
   outline: 2px solid var(--green);
   outline-offset: 2px;
+}
+
+.cities-see-all-wrap {
+  text-align: center;
+  margin-top: 28px;
+}
+.cities-all-pills-panel {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  visibility: hidden;
+  margin-top: 0;
+  transition: max-height 0.45s ease, opacity 0.35s ease, margin-top 0.35s ease, visibility 0s linear 0.35s;
+}
+.cities-all-pills-panel.is-open {
+  max-height: 2500px;
+  opacity: 1;
+  visibility: visible;
+  margin-top: 20px;
+  transition: max-height 0.45s ease, opacity 0.35s ease, margin-top 0.35s ease, visibility 0s linear 0s;
+}
+.cities-quick-pills-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 920px;
+  margin: 0 auto;
 }
 
 .cr-modal {
@@ -706,8 +610,13 @@ button.cities-request-cta {
     font-size: 0.95rem;
   }
   .nav-links a:last-child { border-bottom: none; }
-  .nav-links a.btn-nav { display: none; }
   #nav-toggle:checked ~ .nav-links { display: flex; }
+  .nav-links a.btn-nav {
+    text-align: center;
+    justify-content: center;
+    margin-top: 4px;
+    border-radius: 10px;
+  }
   .hero .cta-row {
     flex-direction: column;
     flex-wrap: nowrap;
@@ -731,7 +640,6 @@ button.cities-request-cta {
     letter-spacing: 0.02em;
   }
   .cities-request-strip { padding: 48px 24px; }
-  .cities-search-card { padding: 24px 20px; }
 }
 </style>
 </head>
@@ -749,6 +657,7 @@ button.cities-request-cta {
   <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="community.html" class="active">Community</a>
+    <a href="signup.html" class="btn-nav">Join the community</a>
   </div>
 </nav>
 
@@ -873,35 +782,13 @@ button.cities-request-cta {
       </div>
     </a>
   </div>
-  <div class="cities-see-all-wrap" style="text-align:center;margin-top:28px;">
+  <div class="cities-see-all-wrap">
     <button type="button" class="btn-see-all-cities" id="cities-see-all-btn" aria-expanded="false" aria-controls="cities-all-pills-panel">See all cities</button>
-    <div id="cities-all-pills-panel" class="cities-quick-pills cities-all-pills-panel" hidden style="margin-top:20px;max-width:920px;margin-left:auto;margin-right:auto;"></div>
-  </div>
-  <p class="cities-more-note"><a href="index.html#waitlist">Can&apos;t find your city? Join the waitlist →</a></p>
-  <div class="cities-more-wrap">
-    <div class="cities-search-card">
-      <p class="cities-search-eyebrow" id="cities-search-eyebrow">Find your city</p>
-      <div class="cities-search-combo">
-        <div class="cities-search-bar" role="search" aria-labelledby="cities-search-eyebrow">
-          <span class="cities-search-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </span>
-          <input type="search" id="cities-search-input" class="cities-search-input" placeholder="Search for your city..." autocomplete="off" aria-label="Search for your city" aria-autocomplete="list" aria-controls="cities-search-dropdown" aria-expanded="false" />
-        </div>
-        <div id="cities-search-dropdown" class="cities-search-dropdown" role="listbox" aria-label="City suggestions" hidden></div>
-      </div>
-      <div class="cities-quick-pills">
-        <a href="community-portal.html?city=amsterdam" class="cities-quick-pill">Amsterdam</a>
-        <a href="community-portal.html?city=athens" class="cities-quick-pill">Athens</a>
-        <a href="community-portal.html?city=barcelona" class="cities-quick-pill">Barcelona</a>
-        <a href="community-portal.html?city=berlin" class="cities-quick-pill">Berlin</a>
-        <a href="community-portal.html?city=lisbon" class="cities-quick-pill">Lisbon</a>
-        <a href="community-portal.html?city=london" class="cities-quick-pill">London</a>
-        <a href="community-portal.html?city=madrid" class="cities-quick-pill">Madrid</a>
-        <a href="community-portal.html?city=paris" class="cities-quick-pill">Paris</a>
-      </div>
+    <div id="cities-all-pills-panel" class="cities-all-pills-panel" role="region" aria-label="All cities">
+      <div class="cities-quick-pills-inner" id="cities-all-pills-inner"></div>
     </div>
   </div>
+  <p class="cities-more-note"><a href="index.html#waitlist">Can&apos;t find your city? Join the waitlist →</a></p>
 </div>
 
 <section class="section" id="community-benefits" aria-label="What you get from the community">
@@ -1026,121 +913,32 @@ button.cities-request-cta {
     'Milan', 'Naples', 'New York', 'Oslo', 'Paris', 'Porto', 'Prague', 'Riga', 'Rome', 'Seville',
     'Stockholm', 'Tallinn', 'Valencia', 'Vilnius', 'Vienna', 'Warsaw', 'Zurich'
   ];
-  var REQUEST_CITY_HREF = 'index.html#waitlist';
 
   function cityToPortalSlug(name) {
     if (name === 'New York') return 'newyork';
     return String(name || '').toLowerCase().replace(/\s+/g, '');
   }
 
-  var input = document.getElementById('cities-search-input');
-  var dropdown = document.getElementById('cities-search-dropdown');
-  var combo = input && input.closest('.cities-search-combo');
-
-  function normalizeQuery(q) {
-    return q.trim().toLowerCase();
-  }
-
-  function filterCities(query) {
-    var n = normalizeQuery(query);
-    if (!n) return [];
-    return EUROPEAN_CITIES.filter(function (city) {
-      return city.toLowerCase().indexOf(n) !== -1;
-    });
-  }
-
-  function hideDropdown() {
-    if (!dropdown || !input) return;
-    dropdown.classList.remove('is-open');
-    dropdown.hidden = true;
-    dropdown.innerHTML = '';
-    input.setAttribute('aria-expanded', 'false');
-  }
-
-  function showDropdown() {
-    if (!dropdown || !input) return;
-    dropdown.classList.add('is-open');
-    dropdown.hidden = false;
-    input.setAttribute('aria-expanded', 'true');
-  }
-
-  function renderDropdown(matches) {
-    if (!dropdown) return;
-    dropdown.innerHTML = '';
-    if (matches.length > 0) {
-      matches.forEach(function (city) {
-        var row = document.createElement('a');
-        row.href = 'community-portal.html?city=' + encodeURIComponent(cityToPortalSlug(city));
-        row.className = 'cities-search-dropdown-item';
-        row.setAttribute('role', 'option');
-        row.textContent = city;
-        dropdown.appendChild(row);
-      });
-    } else {
-      var fallback = document.createElement('a');
-      fallback.href = REQUEST_CITY_HREF;
-      fallback.className = 'cities-search-dropdown-fallback';
-      fallback.textContent = "Can't find your city? Tell us where you're headed →";
-      dropdown.appendChild(fallback);
-    }
-    showDropdown();
-  }
-
-  function syncFromInput() {
-    if (!input) return;
-    var q = input.value;
-    if (normalizeQuery(q) === '') {
-      hideDropdown();
-      return;
-    }
-    renderDropdown(filterCities(q));
-  }
-
-  if (input && dropdown && combo) {
-    input.addEventListener('input', syncFromInput);
-    input.addEventListener('focus', function () {
-      if (normalizeQuery(input.value) !== '') syncFromInput();
-    });
-
-    input.addEventListener('keydown', function (e) {
-      if (e.key !== 'Enter') return;
-      var q = normalizeQuery(input.value);
-      if (!q) return;
-      e.preventDefault();
-      var matches = filterCities(input.value);
-      if (matches.length > 0) {
-        window.location.href = 'community-portal.html?city=' + encodeURIComponent(cityToPortalSlug(matches[0]));
-      } else {
-        window.location.href = REQUEST_CITY_HREF;
-      }
-    });
-
-    document.addEventListener('click', function (e) {
-      if (!combo.contains(e.target)) hideDropdown();
-    });
-  }
-
   var seeAllBtn = document.getElementById('cities-see-all-btn');
   var allPillsPanel = document.getElementById('cities-all-pills-panel');
-  if (seeAllBtn && allPillsPanel && !allPillsPanel.childElementCount) {
-    EUROPEAN_CITIES.forEach(function (city) {
-      var a = document.createElement('a');
-      a.href = 'community-portal.html?city=' + encodeURIComponent(cityToPortalSlug(city));
-      a.className = 'cities-quick-pill';
-      a.textContent = city;
-      allPillsPanel.appendChild(a);
-    });
+  var pillsInner = document.getElementById('cities-all-pills-inner');
+  if (seeAllBtn && allPillsPanel && pillsInner) {
+    if (!pillsInner.childElementCount) {
+      EUROPEAN_CITIES.forEach(function (city) {
+        var a = document.createElement('a');
+        a.href = 'community-portal.html?city=' + encodeURIComponent(cityToPortalSlug(city));
+        a.className = 'cities-quick-pill';
+        a.textContent = city;
+        pillsInner.appendChild(a);
+      });
+    }
+    pillsInner.setAttribute('inert', '');
     seeAllBtn.addEventListener('click', function () {
-      var open = allPillsPanel.hasAttribute('hidden');
-      if (open) {
-        allPillsPanel.removeAttribute('hidden');
-        seeAllBtn.setAttribute('aria-expanded', 'true');
-        seeAllBtn.textContent = 'Hide cities';
-      } else {
-        allPillsPanel.setAttribute('hidden', '');
-        seeAllBtn.setAttribute('aria-expanded', 'false');
-        seeAllBtn.textContent = 'See all cities';
-      }
+      var expanded = allPillsPanel.classList.toggle('is-open');
+      seeAllBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      seeAllBtn.textContent = expanded ? 'Show less' : 'See all cities';
+      if (expanded) pillsInner.removeAttribute('inert');
+      else pillsInner.setAttribute('inert', '');
     });
   }
 })();
