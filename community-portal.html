@@ -2560,7 +2560,7 @@ nav {
         let imageUrl = '';
         if (postImageFile) {
           try {
-            const storageRef = ref(storage, 'post-images/' + user.uid + '/' + Date.now() + '_' + postImageFile.name);
+            const storageRef = ref(storage, `post-images/${currentUser.uid}/${Date.now()}_${postImageFile.name}`);
             await uploadBytes(storageRef, postImageFile);
             imageUrl = await getDownloadURL(storageRef);
           } catch (err) {
