@@ -22,7 +22,12 @@
       --muted: #4a7c5e;
     }
     body { background: var(--bg); color: var(--text); font-family: "DM Sans", sans-serif; min-height: 100vh; }
-    .thread-page { max-width: 720px; margin: 0 auto; padding: 88px 20px 48px; }
+    .thread-page.thread-page-wrapper {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px 16px 60px;
+      box-sizing: border-box;
+    }
     .thread-back {
       display: inline-flex;
       align-items: center;
@@ -171,15 +176,12 @@
       padding-bottom: 4px;
     }
 
-    .comment-wrapper:not(:last-child)::before {
+    .comment-wrapper + .comment-wrapper::before {
       content: '';
-      position: absolute;
-      left: 16px;
-      top: 36px;
-      bottom: 0;
-      width: 2px;
-      background: #d1fae5;
-      border-radius: 2px;
+      display: block;
+      height: 1px;
+      background: #f0f5f0;
+      margin: 0 0 16px 0;
     }
 
     .replies-container {
@@ -187,17 +189,7 @@
       margin-top: 10px;
       margin-left: 16px;
       padding-left: 14px;
-    }
-
-    .replies-container::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: #d1fae5;
-      border-radius: 2px;
+      border-left: 2px solid #e8f0e8;
     }
 
     .comment-wrapper > .comment {
@@ -263,14 +255,22 @@
     }
 
     .thread-main-grid {
-      max-width: 1080px;
+      max-width: 1180px;
       margin: 0 auto;
-      padding: 24px 16px;
+      padding: 0;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 280px;
+      grid-template-columns: minmax(0, 740px) minmax(240px, 280px);
       gap: 24px;
       align-items: start;
+      justify-content: center;
       box-sizing: border-box;
+    }
+    .thread-main-col {
+      width: 100%;
+      max-width: 740px;
+    }
+    .more-col {
+      max-width: 280px;
     }
     .thread-related-aside {
       position: sticky;
@@ -414,11 +414,14 @@
     @media (max-width: 900px) {
       .thread-main-grid {
         grid-template-columns: 1fr;
-        padding: 16px 12px;
+        padding: 0;
       }
+      .thread-main-col {
+        justify-self: center;
+      }
+      .more-col,
       .thread-related-aside {
-        position: static;
-        order: 3;
+        display: none;
       }
     }
 
@@ -449,8 +452,8 @@
   </style>
 </head>
 <body>
-  <nav style="position:sticky;top:0;z-index:100;background:white;border-bottom:1px solid #e8f0e8;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;">
-    <a href="community-portal.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+  <nav role="navigation" aria-label="Main" style="position:sticky;top:0;z-index:100;background:white;border-bottom:1px solid #e8f0e8;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;max-width:100%;">
+    <a id="thread-nav-logo" href="index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="28" height="28" rx="7" fill="#059669"/>
         <polyline points="6,10 14,21 22,10" fill="none" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -459,11 +462,12 @@
       <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#1a2e1a;letter-spacing:-0.04em;">livvo</span>
     </a>
     <div style="display:flex;align-items:center;gap:16px;">
+      <a id="thread-nav-feed" href="community-portal.html" style="font-size:13px;color:#5a7a5a;text-decoration:none;font-weight:500;">Feed</a>
       <a id="thread-nav-community" href="community-portal.html" style="font-size:13px;color:#5a7a5a;text-decoration:none;font-weight:500;">Community</a>
       <div id="thread-nav-avatar" style="width:32px;height:32px;border-radius:50%;overflow:hidden;background:#2d6a2d;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;cursor:pointer;"></div>
     </div>
   </nav>
-  <main class="thread-page" style="max-width: none; padding: 16px 0 48px;">
+  <main class="thread-page thread-page-wrapper">
     <div id="loading" class="meta-pill" style="max-width: 740px; margin: 0 auto; padding: 0 16px;">Loading…</div>
     <p id="err-msg" class="feed-empty" style="max-width: 740px; margin: 0 auto; padding: 0 16px;" hidden></p>
     <div id="post-shell" hidden>
@@ -500,13 +504,15 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               <span id="post-comment-count">0</span> comments
             </button>
-            <button type="button" onclick="sharePost()" style="display:flex;align-items:center;gap:5px;border:none;background:#f5f5f5;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:13px;color:#5a7a5a;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <div style="display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;">
+            <button type="button" id="post-share-btn" onclick="sharePost()" style="display:flex;align-items:center;gap:5px;border:none;background:#f5f5f5;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:13px;color:#5a7a5a;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               Share
             </button>
-            <button type="button" id="request-answer-btn" hidden style="margin-left:auto;display:flex;align-items:center;gap:5px;border:none;background:#ecfdf5;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:13px;font-weight:600;color:#059669;border:1px solid #d1fae5;">
+            <button type="button" id="request-answer-btn" hidden style="display:flex;align-items:center;gap:5px;border:none;background:#ecfdf5;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:13px;font-weight:600;color:#059669;border:1px solid #d1fae5;">
               Request an answer
             </button>
+            </div>
           </div>
         </div>
         <div id="composer-collapsed" style="background: white; border: 1px solid #e8f0e8; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; cursor: text;" onclick="expandComposer()">
@@ -517,7 +523,7 @@
           <textarea id="comment-input" rows="2" placeholder="Share your thoughts..." style="width: 100%; border: none; outline: none; font-size: 14px; color: #1a2e1a; resize: none; min-height: 48px; overflow: hidden; font-family: inherit; background: transparent; box-sizing: border-box; line-height: 1.5; padding: 4px 0;" oninput="if(window.__fitCommentComposer)window.__fitCommentComposer();"></textarea>
           <div style="display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; border-top: 1px solid #f0f5f0; margin-top: 6px;">
             <button type="button" onclick="collapseComposer()" style="border: 1px solid #e8f0e8; background: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; color: #5a7a5a; cursor: pointer;">Cancel</button>
-            <button type="button" onclick="submitComment()" style="border: none; background: #2d6a2d; color: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer;">Comment</button>
+            <button type="button" id="thread-comment-submit-btn" onclick="submitComment()" style="border: none; background: #2d6a2d; color: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer;">Comment</button>
           </div>
         </div>
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f5f0;">
@@ -540,9 +546,9 @@
         </div>
         <div id="comments-container"></div>
       </div>
-      <aside id="thread-related-aside" class="thread-related-aside" aria-label="More from this community">
-        <h3>More from this community</h3>
-        <div id="related-posts-list"></div>
+      <aside id="more-from-community" class="thread-related-aside more-col" aria-label="More from this community">
+        <h3 id="more-section-title">More from this community</h3>
+        <div id="more-posts-list"></div>
       </aside>
       </div>
     </div>
@@ -609,7 +615,7 @@
     }
 
     const params = new URLSearchParams(location.search);
-    const postId = String(params.get('postId') || '').trim();
+    const postId = String(params.get('postId') || params.get('id') || '').trim();
     let city = String(params.get('city') || '').trim();
     if (!city) city = 'Athens';
 
@@ -636,6 +642,13 @@
     let threadPostEditBackup = null;
     let threadRepliesUnsubs = [];
     const authorCache = new Map();
+    let isSubmittingComment = false;
+
+    function cityForFirestoreQuery(raw) {
+      var s = String(raw || '').trim();
+      if (!s) return 'Athens';
+      return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+    }
 
     function stripHtml(html) {
       const d = document.createElement('div');
@@ -684,7 +697,7 @@
       };
       try {
         const uSnap = await getDoc(doc(db, 'users', authorUid));
-        if (uSnap.exists()) {
+        if (uSnap.exists) {
           const ud = uSnap.data() || {};
           const un = String(ud.username || ud.displayName || fallbackUsername || 'Anonymous').trim();
           const ph = String(ud.photoURL || '').trim() || String(fallbackPhoto || '').trim();
@@ -737,7 +750,7 @@
       }
     }
 
-    /** Optimistic UI + Firestore upvotes only — no renderComments/hydratePost/reload here. */
+    /** Optimistic UI + atomic Firestore toggle (upvotes subcollection + upvoteCount). */
     async function likePostImpl() {
       if (!currentUser) return;
       const btn = document.getElementById('post-like-btn');
@@ -752,19 +765,26 @@
       } else {
         applyPostLikeVisual(btn, true);
         countEl.textContent = String(currentCount + 1);
-        btn.style.transform = 'scale(1.2)';
+        btn.style.transform = 'scale(1.15)';
         setTimeout(function () { btn.style.transform = 'scale(1)'; }, 150);
       }
 
+      const postRef = doc(db, 'communityPosts', postId);
+      const likeRef = doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid);
       try {
-        const likeRef = doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid);
-        if (alreadyLiked) {
-          await deleteDoc(likeRef);
-          await updateDoc(doc(db, 'communityPosts', postId), { upvoteCount: increment(-1) });
-        } else {
-          await setDoc(likeRef, { uid: currentUser.uid });
-          await updateDoc(doc(db, 'communityPosts', postId), { upvoteCount: increment(1) });
-        }
+        await runTransaction(db, async function (transaction) {
+          const likeSnap = await transaction.get(likeRef);
+          const liked = likeSnap.exists;
+          if (alreadyLiked) {
+            if (liked) {
+              transaction.delete(likeRef);
+              transaction.update(postRef, { upvoteCount: increment(-1) });
+            }
+          } else if (!liked) {
+            transaction.set(likeRef, { uid: currentUser.uid });
+            transaction.update(postRef, { upvoteCount: increment(1) });
+          }
+        });
       } catch (err) {
         if (alreadyLiked) {
           applyPostLikeVisual(btn, true);
@@ -1211,7 +1231,7 @@
         await deleteDoc(doc(db, 'communityPosts', postId, 'comments', commentId));
         await runTransaction(db, async function (transaction) {
           const postSnap = await transaction.get(doc(db, 'communityPosts', postId));
-          if (!postSnap.exists()) return;
+          if (!postSnap.exists) return;
           const cur = Number((postSnap.data() || {}).commentCount || 0);
           transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
         });
@@ -1444,43 +1464,63 @@
       updateDoc(doc(db, 'communityPosts', postId), { viewCount: increment(1) }).catch(function () {});
     }
 
-    async function loadRelatedPosts(data) {
-      var host = document.getElementById('related-posts-list');
+    async function loadMoreFromCommunity(data) {
+      var section = document.getElementById('more-from-community');
+      var host = document.getElementById('more-posts-list');
+      var titleEl = document.getElementById('more-section-title');
       if (!host) return;
-      host.innerHTML = '';
-      var cityVal = String((data && data.city) || city || '').trim();
-      var cat = String((data && data.category) || '').trim();
-      if (!cityVal || !cat) return;
+
+      var cityRaw = String((data && data.city) || city || 'athens').trim();
+      var cityVal = cityForFirestoreQuery(cityRaw);
+      var currentPostId = postId;
+
       try {
         var rq = query(
           collection(db, 'communityPosts'),
           where('city', '==', cityVal),
-          where('category', '==', cat),
-          orderBy('createdAt', 'desc'),
-          limit(8)
+          orderBy('upvoteCount', 'desc'),
+          limit(12)
         );
         var rs = await getDocs(rq);
-        var n = 0;
-        rs.forEach(function (d) {
-          if (n >= 4) return;
-          if (d.id === postId) return;
-          n++;
-          var pd = d.data() || {};
-          var a = document.createElement('a');
-          a.className = 'related-card';
-          a.href = 'community-post.html?postId=' + encodeURIComponent(d.id) + '&city=' + encodeURIComponent(cityVal);
-          var t = document.createElement('div');
-          t.className = 'related-card-title';
-          t.textContent = pd.title || 'Post';
-          a.appendChild(t);
-          var m = document.createElement('div');
-          m.className = 'related-card-meta';
-          m.textContent = pd.createdAt ? formatRelativeTime(pd.createdAt) : '';
-          a.appendChild(m);
-          host.appendChild(a);
+        var posts = rs.docs.filter(function (d) { return d.id !== currentPostId; }).slice(0, 3);
+
+        if (posts.length === 0) {
+          if (section) section.style.display = 'none';
+          return;
+        }
+        if (section) section.style.display = '';
+
+        var cityLabel = cityVal.charAt(0).toUpperCase() + cityVal.slice(1).toLowerCase();
+        if (titleEl) titleEl.textContent = 'More from ' + cityLabel + ' community';
+
+        host.innerHTML = '';
+        posts.forEach(function (d) {
+          var post = d.data() || {};
+          var card = document.createElement('div');
+          card.style.cssText = 'background:white;border:1px solid #e8f0e8;border-radius:12px;padding:14px;cursor:pointer;margin-bottom:8px;transition:border-color 0.15s;';
+          card.onmouseover = function () { card.style.borderColor = '#059669'; };
+          card.onmouseout = function () { card.style.borderColor = '#e8f0e8'; };
+          var author = escapeHtml(post.authorName || post.authorUsername || 'Member');
+          var cat = escapeHtml(String(post.category || '').trim() || '—');
+          var tTitle = escapeHtml(post.title || 'Post');
+          card.innerHTML =
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">' +
+            '<span style="font-size:11px;color:#6b8f6b;">' + author + ' · ' + formatRelativeTime(post.createdAt) + '</span>' +
+            '<span style="margin-left:auto;font-size:10px;background:#f0f7f0;color:#059669;padding:2px 8px;border-radius:20px;font-weight:600;">' + cat + '</span>' +
+            '</div>' +
+            '<div style="font-size:14px;font-weight:700;color:#1a2e1a;line-height:1.3;margin-bottom:4px;">' + tTitle + '</div>' +
+            '<div style="display:flex;gap:10px;margin-top:6px;">' +
+            '<span style="font-size:11px;color:#9ab09a;">♥ ' + (post.upvoteCount || 0) + '</span>' +
+            '<span style="font-size:11px;color:#9ab09a;">💬 ' + (post.commentCount || 0) + '</span>' +
+            '</div>';
+          card.onclick = function () {
+            window.location.href = 'community-post.html?postId=' + encodeURIComponent(d.id) + '&city=' + encodeURIComponent(cityVal);
+          };
+          host.appendChild(card);
         });
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        console.error('More posts error:', err);
+        if (section) section.style.display = 'none';
       }
     }
 
@@ -1711,7 +1751,7 @@
 
         if (currentUser) {
           getDoc(doc(db, 'communityPosts', postId, 'comments', cd.id, 'likes', currentUser.uid)).then(function (ls) {
-            if (ls.exists()) {
+            if (ls.exists) {
               likeBtn.classList.add('liked');
               likeBtn.style.color = '#e53e3e';
             }
@@ -1815,9 +1855,18 @@
     }
 
     async function submitThreadComment() {
-      if (!currentUser) return;
-      const text = (commentInputEl.value || '').trim();
+      if (!currentUser || isSubmittingComment) return;
+      const text = (commentInputEl && commentInputEl.value || '').trim();
       if (!text) return;
+
+      isSubmittingComment = true;
+      const submitBtn = document.getElementById('thread-comment-submit-btn');
+      var prevLabel = submitBtn ? submitBtn.textContent : '';
+      if (submitBtn) {
+        submitBtn.textContent = 'Posting...';
+        submitBtn.disabled = true;
+      }
+
       const authorUsername = (currentProfileData && String(currentProfileData.username || '').trim())
         || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : '') || 'Member';
       const authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim()) || currentUser.photoURL || '';
@@ -1833,12 +1882,20 @@
       batch.update(postRef, { commentCount: increment(1) });
       try {
         await batch.commit();
-        commentInputEl.value = '';
-        commentInputEl.style.height = '';
+        if (commentInputEl) {
+          commentInputEl.value = '';
+          commentInputEl.style.height = '';
+        }
         collapseComposer();
       } catch (err) {
-        console.error('Comment failed:', err);
+        console.error('Comment submit error:', err);
         showToast('Could not post comment');
+      } finally {
+        isSubmittingComment = false;
+        if (submitBtn) {
+          submitBtn.textContent = prevLabel || 'Comment';
+          submitBtn.disabled = false;
+        }
       }
     }
 
@@ -1855,7 +1912,10 @@
 
     (function initThreadNavAndBack() {
       const tnc = document.getElementById('thread-nav-community');
-      if (tnc) tnc.href = 'community-portal.html?city=' + encodeURIComponent(city);
+      const tnf = document.getElementById('thread-nav-feed');
+      const navCity = encodeURIComponent(city);
+      if (tnc) tnc.href = 'community-portal.html?city=' + navCity;
+      if (tnf) tnf.href = 'community-portal.html?city=' + navCity;
       const bb = document.getElementById('back-btn');
       if (bb) {
         bb.href = 'community-portal.html' + (city ? '?city=' + encodeURIComponent(city) : '');
@@ -1952,7 +2012,7 @@
       let photoURL = '';
       try {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
+        if (userDoc.exists) {
           photoURL = String((userDoc.data() || {}).photoURL || '').trim();
         }
       } catch (e) {}
@@ -2037,7 +2097,7 @@
       if (currentUser) {
         try {
           const vs = await getDoc(doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid));
-          hasLiked = vs.exists();
+          hasLiked = vs.exists;
         } catch (e) {}
       }
       applyPostLikeVisual(postLikeBtn, hasLiked);
@@ -2055,7 +2115,7 @@
 
       setupPostOwnerMenu(authorUid);
 
-      loadRelatedPosts(data).catch(function () {});
+      loadMoreFromCommunity(data).catch(function () {});
     }
 
     let commentsUnsub = null;
@@ -2092,7 +2152,7 @@
       if (postUnsub) { postUnsub(); postUnsub = null; }
       const pref = doc(db, 'communityPosts', postId);
       postUnsub = onSnapshot(pref, async function (snap) {
-        if (!snap.exists()) {
+        if (!snap.exists) {
           loadingEl.hidden = true;
           shell.hidden = true;
           errEl.hidden = false;
@@ -2153,7 +2213,7 @@
       currentUser = user;
       try {
         const pd = await getDoc(doc(db, 'users', user.uid));
-        currentProfileData = pd.exists() ? pd.data() : null;
+        currentProfileData = pd.exists ? pd.data() : null;
       } catch (e) {
         currentProfileData = null;
       }
