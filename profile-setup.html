@@ -419,6 +419,12 @@ textarea { min-height: 88px; resize: vertical; }
     row.classList.toggle('at-limit', n >= 60);
   }
 
+  function normalizeCityForSave(city) {
+    var s = String(city || '').trim();
+    if (!s) return '';
+    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+  }
+
   var firebaseConfig = {
     apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
     authDomain: "livvo-573e1.firebaseapp.com",
@@ -638,14 +644,15 @@ textarea { min-height: 88px; resize: vertical; }
         bio: bioVal,
         credential: credentialVal,
         followedTopics: followedTopics,
-        city: localStorage.getItem('livvo_city') || 'Athens',
+        city: normalizeCityForSave(localStorage.getItem('livvo_city') || 'Athens'),
         email: user.email,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
       if (finalPhotoURL) payload.photoURL = finalPhotoURL;
+      localStorage.setItem('livvo_city', payload.city);
       await firebase.firestore().collection('users').doc(user.uid).set(payload, { merge: true });
 
-      var userCity = String(cityDisplay || localStorage.getItem('livvo_city') || '').trim();
+      var userCity = normalizeCityForSave(cityDisplay || localStorage.getItem('livvo_city') || '');
       if (userCity) {
         window.location.href = 'community-portal.html?city=' + encodeURIComponent(userCity);
       } else {

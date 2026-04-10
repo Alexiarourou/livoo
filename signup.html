@@ -635,7 +635,7 @@ nav {
     signInWithEmailAndPassword, GoogleAuthProvider,
     signInWithPopup, sendPasswordResetEmail,
     setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
@@ -704,11 +704,36 @@ nav {
     await routeAfterAuth();
   }
 
+  async function ensureUserDoc(user) {
+    if (!user || !user.uid) return;
+    try {
+      const ref = doc(db, 'users', user.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists) return;
+      const email = String(user.email || '').trim();
+      const displayName = (user.displayName && String(user.displayName).trim())
+        || (email ? email.split('@')[0] : '');
+      await setDoc(ref, {
+        uid: user.uid,
+        email: email,
+        displayName: displayName,
+        photoURL: user.photoURL || '',
+        city: '',
+        credential: '',
+        followedTopics: [],
+        createdAt: serverTimestamp()
+      }, { merge: true });
+    } catch (e) {
+      console.error('ensureUserDoc:', e);
+    }
+  }
+
   // Google button (popup)
   async function handleGooglePopupSignIn() {
     try {
       var provider = new GoogleAuthProvider();
       var result = await signInWithPopup(auth, provider);
+      await ensureUserDoc(result.user);
       goAfterAuth();
     } catch (err) {
       console.error('Google sign-in error:', err);
@@ -865,6 +890,7 @@ nav {
       return;
     }
     try {
+      await ensureUserDoc(cred.user);
       await redirectNewAccountAfterAuth(cred.user.uid);
     } catch (err) {
       console.error('Post-signup profile route:', err);
@@ -893,6 +919,7 @@ nav {
       return;
     }
     try {
+      await ensureUserDoc(auth.currentUser);
       await routeAfterAuth();
     } catch (err) {
       console.error('Post-login profile route:', err);
