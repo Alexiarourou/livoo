@@ -42,7 +42,7 @@ nav {
 .nav-links { display: flex; align-items: center; gap: 24px; flex-shrink: 0; }
 .nav-links a { font-size: 0.85rem; color: var(--muted-dark); text-decoration: none; }
 .nav-links a:hover, .nav-links a.active { color: var(--text-dark); }
-.btn-nav { background: var(--green); color: white; padding: 8px 20px; border-radius: 8px; font-size: 0.83rem; font-weight: 600; text-decoration: none; }
+.btn-nav { background: var(--green); color: white; padding: 8px 20px; border-radius: 999px; font-size: 0.83rem; font-weight: 600; text-decoration: none; }
 .nav-links a.btn-nav { color: white; }
 .nav-links a.btn-nav:hover { color: white; background: var(--green-dark); }
 
@@ -132,7 +132,28 @@ nav {
 .btn-primary.btn-cta-main {
   padding: 16px 36px;
   font-size: 1.05rem;
+  border-radius: 999px;
   box-shadow: 0 10px 28px rgba(5, 150, 105, 0.35);
+}
+.cta-bottom-account {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--green);
+  color: white;
+  padding: 16px 40px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  box-shadow: 0 10px 28px rgba(5, 150, 105, 0.35);
+  transition: background 0.2s, transform 0.2s, color 0.2s;
+}
+.cta-bottom-account:hover {
+  background: var(--green-dark);
+  color: white;
+  transform: translateY(-2px);
 }
 .btn-secondary-cta {
   background: transparent;
@@ -656,7 +677,7 @@ nav {
     text-align: center;
     justify-content: center;
     margin-top: 4px;
-    border-radius: 10px;
+    border-radius: 999px;
   }
   .hero .cta-row {
     flex-direction: column;
@@ -897,10 +918,7 @@ nav {
       Only takes 30 seconds.
     </p>
 
-    <a href="signup.html"
-      style="display:inline-block;background:#059669;color:white;padding:16px 40px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;letter-spacing:-0.01em;">
-      Create account
-    </a>
+    <a href="signup.html" class="cta-bottom-account">Create account</a>
 
   </div>
 </section>
