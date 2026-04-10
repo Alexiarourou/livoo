@@ -182,35 +182,48 @@ nav {
   font-family: "DM Sans", sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: var(--green);
+  color: #059669;
   padding: 8px 18px;
   border-radius: 999px;
   background: #ffffff;
-  border: 1px solid var(--green);
+  border: 1px solid #059669;
   text-decoration: none;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s;
+  transition: box-shadow 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.cities-quick-pill:link,
+.cities-quick-pill:visited {
+  color: #059669;
+  background: #ffffff;
+  border-color: #059669;
 }
 .cities-quick-pill:hover {
-  background: rgba(5, 150, 105, 0.08);
-  border-color: var(--green-dark);
-  color: var(--green-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
+  background: #ffffff;
+  border-color: #059669;
+  color: #059669;
+  box-shadow: 0 1px 4px rgba(5, 150, 105, 0.15);
+}
+.cities-quick-pill:active {
+  background: #ffffff;
+  border-color: #059669;
+  color: #059669;
+}
+.cities-quick-pill:focus-visible {
+  outline: 2px solid #059669;
+  outline-offset: 2px;
 }
 .cities-quick-pill-more {
-  border-style: dashed;
-  border-color: var(--green);
+  border: 1px dashed #059669;
   color: #64748b;
-  background: transparent;
+  background: #ffffff;
   cursor: default;
   pointer-events: none;
   user-select: none;
 }
 .cities-quick-pill-more:hover {
-  background: transparent;
-  border-color: var(--green);
+  background: #ffffff;
+  border-color: #059669;
   color: #64748b;
-  transform: none;
   box-shadow: none;
 }
 .cities-more-note { margin-top: 22px; font-size: 0.82rem; text-align: center; line-height: 1.45; color: var(--muted-dark); }
