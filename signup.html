@@ -223,11 +223,6 @@ nav {
   text-decoration: none;
 }
 .auth-forgot a:hover { text-decoration: underline; }
-.auth-forgot-btn {
-  background: none; border: none; padding: 0; margin: 0;
-  font: inherit; color: var(--green); cursor: pointer; text-decoration: underline;
-}
-.auth-forgot-btn:hover { color: var(--green-dark); }
 .password-rules {
   list-style: none;
   margin-top: 10px;
@@ -238,7 +233,9 @@ nav {
 #panel-signup.active #signup-password:focus + #signup-password-rules {
   display: block;
 }
-.auth-modal {
+
+/* Forgot password modal */
+.fp-modal {
   position: fixed;
   inset: 0;
   z-index: 10000;
@@ -246,83 +243,208 @@ nav {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
-.auth-modal[hidden] {
+.fp-modal[hidden] {
   display: none !important;
 }
-.auth-modal-backdrop {
+.fp-modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(26, 46, 36, 0.45);
-  backdrop-filter: blur(4px);
+  background: rgba(6, 78, 59, 0.55);
+  backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
 }
-.auth-modal-panel {
+.fp-modal-card {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   background: #fff;
-  border: 1px solid var(--border-dark);
   border-radius: 16px;
-  padding: 28px 24px 24px;
-  box-shadow: 0 24px 64px rgba(13, 43, 26, 0.18);
+  padding: 32px;
+  box-shadow: 0 24px 64px rgba(6, 78, 59, 0.15);
   z-index: 1;
 }
-.auth-modal-panel h2 {
-  font-family: "Outfit", sans-serif;
-  font-weight: 800;
-  font-size: 1.35rem;
-  color: var(--text-dark);
-  margin: 0 0 8px;
-  text-align: center;
-  letter-spacing: -0.02em;
-}
-.auth-modal-sub {
-  font-size: 0.9rem;
-  color: var(--muted-dark);
-  line-height: 1.5;
-  margin: 0 0 20px;
-  text-align: center;
-}
-.auth-modal-x {
+.fp-modal-close {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 36px;
-  height: 36px;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
   border: none;
   background: transparent;
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1;
   color: #94a3b8;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
 }
-.auth-modal-x:hover {
+.fp-modal-close:hover {
   color: #64748b;
-  background: rgba(148, 163, 184, 0.12);
+  background: #f1f5f9;
 }
-.auth-modal-success {
-  display: none;
-  margin-top: 8px;
-  padding: 14px;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  border-radius: 10px;
-  color: #047857;
-  font-size: 0.9rem;
-  font-weight: 600;
+.fp-modal-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.fp-modal-logo svg {
+  display: block;
+  color: #059669;
+}
+.fp-modal-title {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #064e3b;
   text-align: center;
+  margin: 0 0 12px;
+  line-height: 1.3;
+}
+.fp-modal-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+  text-align: center;
+  margin: 0 0 20px;
+}
+.fp-inline-error {
+  display: none;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 13px;
   line-height: 1.45;
 }
-.auth-modal-success.is-visible {
+.fp-inline-error.is-visible {
   display: block;
 }
-#reset-modal-error {
-  margin-top: 12px;
+.fp-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 8px;
 }
+.fp-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  font-size: 15px;
+  border: 1px solid #c0deca;
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.2s ease;
+  margin-bottom: 18px;
+}
+.fp-input:focus {
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+}
+.fp-btn-primary {
+  position: relative;
+  width: 100%;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 20px;
+  background: #059669;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-family: "Sora", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.fp-btn-primary:hover:not(:disabled) {
+  background: #047857;
+  transform: translateY(-1px);
+}
+.fp-btn-primary:disabled {
+  opacity: 0.85;
+  cursor: not-allowed;
+  transform: none;
+}
+.fp-btn-primary.is-loading .fp-btn-text {
+  visibility: hidden;
+}
+.fp-btn-loading {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.fp-btn-primary.is-loading .fp-btn-loading {
+  display: block;
+}
+@keyframes fp-spin {
+  to { transform: rotate(360deg); }
+}
+.fp-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: fp-spin 0.65s linear infinite;
+}
+.fp-link-cancel {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: #64748b;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: all 0.2s ease;
+}
+.fp-link-cancel:hover {
+  color: #475569;
+}
+.fp-view-success {
+  text-align: center;
+}
+.fp-view-success[hidden] {
+  display: none !important;
+}
+.fp-success-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.fp-success-icon svg {
+  display: block;
+}
+.fp-success-text {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.55;
+  margin: 0 0 24px;
+}
+.fp-view-form[hidden] {
+  display: none !important;
+}
+.fp-link-cancel:focus-visible {
+  outline: 2px solid #059669;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .password-rules li {
   display: flex;
   align-items: flex-start;
@@ -472,21 +594,38 @@ nav {
   <div id="joinThanks" class="join-thanks" role="status">Thanks! We&apos;ll be in touch shortly to complete your account setup.</div>
 </div>
 
-<div id="reset-password-modal" class="auth-modal" hidden aria-modal="true" role="dialog" aria-labelledby="reset-modal-title">
-  <div class="auth-modal-backdrop" id="reset-modal-backdrop" tabindex="-1"></div>
-  <div class="auth-modal-panel">
-    <button type="button" class="auth-modal-x" id="reset-modal-close" aria-label="Close">&times;</button>
-    <h2 id="reset-modal-title">Reset your password</h2>
-    <p class="auth-modal-sub">Enter your email address and we&apos;ll send you a link to reset your password</p>
-    <div id="reset-modal-form-wrap">
-      <div class="form-group">
-        <label for="reset-email">Email</label>
-        <input id="reset-email" type="email" name="reset-email" placeholder="your@email.com" autocomplete="email" />
+<div id="fp-modal" class="fp-modal" hidden aria-modal="true" role="dialog" aria-labelledby="fp-modal-title">
+  <div class="fp-modal-backdrop" id="fp-modal-backdrop" tabindex="-1"></div>
+  <div class="fp-modal-card">
+    <button type="button" class="fp-modal-close" id="fp-modal-close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <div id="fp-view-form">
+      <div class="fp-modal-logo">
+        <svg width="32" height="32" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M2 3L9 15L16 3" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
-      <button type="button" class="btn-auth-primary" id="reset-send-btn">Send reset link</button>
+      <h2 class="fp-modal-title" id="fp-modal-title">Reset your password</h2>
+      <p class="fp-modal-subtitle">Enter your email and we&apos;ll send you a reset link. Check your spam folder if it doesn&apos;t arrive within a few minutes.</p>
+      <div id="fp-inline-error" class="fp-inline-error" role="alert"></div>
+      <label class="fp-label" for="fp-email">Email</label>
+      <input type="email" id="fp-email" class="fp-input" name="fp-email" placeholder="your@email.com" autocomplete="email" />
+      <button type="button" class="fp-btn-primary" id="fp-submit">
+        <span class="fp-btn-text">Send reset link</span>
+        <span class="fp-btn-loading" aria-hidden="true"><span class="fp-spinner"></span></span>
+      </button>
+      <button type="button" class="fp-link-cancel" id="fp-cancel">Cancel</button>
     </div>
-    <div id="reset-modal-error" class="auth-error" role="alert"></div>
-    <p id="reset-modal-success" class="auth-modal-success" aria-live="polite">Email sent! Check your inbox for a reset link</p>
+    <div id="fp-view-success" class="fp-view-success" hidden>
+      <div class="fp-success-icon" aria-hidden="true">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="11" stroke="#059669" stroke-width="1.5"/>
+          <path d="M7 12l3 3 7-7" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 class="fp-modal-title">Check your inbox</h2>
+      <p class="fp-success-text" id="fp-success-msg"></p>
+      <button type="button" class="fp-btn-primary" id="fp-back-login">Back to login</button>
+    </div>
   </div>
 </div>
 
@@ -761,85 +900,97 @@ nav {
     }
   });
 
-  const resetModal = document.getElementById('reset-password-modal');
-  const resetBackdrop = document.getElementById('reset-modal-backdrop');
-  const resetCloseBtn = document.getElementById('reset-modal-close');
-  const resetFormWrap = document.getElementById('reset-modal-form-wrap');
-  const resetEmailInput = document.getElementById('reset-email');
-  const resetSendBtn = document.getElementById('reset-send-btn');
-  const resetErrorEl = document.getElementById('reset-modal-error');
-  const resetSuccessEl = document.getElementById('reset-modal-success');
+  const fpModal = document.getElementById('fp-modal');
+  const fpBackdrop = document.getElementById('fp-modal-backdrop');
+  const fpClose = document.getElementById('fp-modal-close');
+  const fpViewForm = document.getElementById('fp-view-form');
+  const fpViewSuccess = document.getElementById('fp-view-success');
+  const fpEmail = document.getElementById('fp-email');
+  const fpSubmit = document.getElementById('fp-submit');
+  const fpCancel = document.getElementById('fp-cancel');
+  const fpInlineError = document.getElementById('fp-inline-error');
+  const fpSuccessMsg = document.getElementById('fp-success-msg');
+  const fpBackLogin = document.getElementById('fp-back-login');
 
-  function hideResetModalError() {
-    resetErrorEl.textContent = '';
-    resetErrorEl.style.display = 'none';
+  function fpHideError() {
+    fpInlineError.textContent = '';
+    fpInlineError.classList.remove('is-visible');
   }
-  function showResetModalError(msg) {
-    resetErrorEl.textContent = msg;
-    resetErrorEl.style.display = 'block';
-    resetErrorEl.style.color = '#b91c1c';
+  function fpShowError(msg) {
+    fpInlineError.textContent = msg;
+    fpInlineError.classList.add('is-visible');
   }
 
-  function openResetPasswordModal(e) {
+  function fpResetToFormView() {
+    fpViewSuccess.hidden = true;
+    fpViewForm.hidden = false;
+    fpSubmit.classList.remove('is-loading');
+    fpSubmit.disabled = false;
+    fpHideError();
+  }
+
+  function openForgotPasswordModal(e) {
     if (e) e.preventDefault();
-    hideResetModalError();
-    resetSuccessEl.classList.remove('is-visible');
-    resetFormWrap.style.display = '';
-    resetSendBtn.disabled = false;
-    resetEmailInput.value = (document.getElementById('signin-email').value || '').trim();
-    resetModal.hidden = false;
+    fpResetToFormView();
+    fpEmail.value = (document.getElementById('signin-email').value || '').trim();
+    fpModal.hidden = false;
     document.body.style.overflow = 'hidden';
     setTimeout(function () {
-      resetEmailInput.focus();
+      fpEmail.focus();
     }, 50);
   }
 
-  function closeResetPasswordModal() {
-    resetModal.hidden = true;
+  function closeForgotPasswordModal() {
+    fpModal.hidden = true;
     document.body.style.overflow = '';
-    hideResetModalError();
-    resetSuccessEl.classList.remove('is-visible');
-    resetFormWrap.style.display = '';
+    fpResetToFormView();
+    fpEmail.value = '';
   }
 
   var forgotLink = document.getElementById('forgotPasswordLink');
-  if (forgotLink) {
-    forgotLink.addEventListener('click', openResetPasswordModal);
-  }
-  if (resetCloseBtn) resetCloseBtn.addEventListener('click', closeResetPasswordModal);
-  if (resetBackdrop) resetBackdrop.addEventListener('click', closeResetPasswordModal);
-  resetSendBtn.addEventListener('click', async function () {
-    hideResetModalError();
-    var email = (resetEmailInput.value || '').trim();
+  if (forgotLink) forgotLink.addEventListener('click', openForgotPasswordModal);
+  if (fpClose) fpClose.addEventListener('click', closeForgotPasswordModal);
+  if (fpBackdrop) fpBackdrop.addEventListener('click', closeForgotPasswordModal);
+  if (fpCancel) fpCancel.addEventListener('click', closeForgotPasswordModal);
+  if (fpBackLogin) fpBackLogin.addEventListener('click', closeForgotPasswordModal);
+
+  fpEmail.addEventListener('input', fpHideError);
+
+  fpSubmit.addEventListener('click', async function () {
+    fpHideError();
+    var email = (fpEmail.value || '').trim();
     if (!email) {
-      showResetModalError('Please enter a valid email address');
+      fpShowError('Please enter a valid email address');
       return;
     }
-    resetSendBtn.disabled = true;
+    fpSubmit.classList.add('is-loading');
+    fpSubmit.disabled = true;
     try {
       await sendPasswordResetEmail(auth, email);
-      resetFormWrap.style.display = 'none';
-      hideResetModalError();
-      resetSuccessEl.classList.add('is-visible');
-    } catch (error) {
-      var code = error && error.code;
+      fpViewForm.hidden = true;
+      fpViewSuccess.hidden = false;
+      fpSuccessMsg.textContent =
+        'We sent a reset link to ' + email + ". If you don't see it, check your spam or junk folder.";
+    } catch (err) {
+      var code = err && err.code;
       if (code === 'auth/user-not-found') {
-        showResetModalError('No account found with this email');
+        fpShowError('No account found with this email address');
       } else if (code === 'auth/invalid-email') {
-        showResetModalError('Please enter a valid email address');
+        fpShowError('Please enter a valid email address');
       } else if (code === 'auth/too-many-requests') {
-        showResetModalError('Too many attempts — please wait a few minutes and try again');
+        fpShowError('Too many attempts — please wait a few minutes before trying again');
       } else {
-        showResetModalError(getFriendlyError(code));
+        fpShowError('Something went wrong — please try again');
       }
     } finally {
-      resetSendBtn.disabled = false;
+      fpSubmit.classList.remove('is-loading');
+      fpSubmit.disabled = false;
     }
   });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && resetModal && !resetModal.hidden) {
-      closeResetPasswordModal();
+    if (e.key === 'Escape' && fpModal && !fpModal.hidden) {
+      closeForgotPasswordModal();
     }
   });
 </script>
