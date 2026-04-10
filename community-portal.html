@@ -1401,7 +1401,7 @@ nav {
     </div>
     <input type="hidden" id="post-content-type" value="post" />
     <div class="form-row">
-      <label for="post-title">Title</label>
+      <label for="post-title" id="post-title-label">Title</label>
       <input type="text" id="post-title" maxlength="40" autocomplete="off" placeholder="Title"
         oninput="updateCounter('title-counter', 40 - this.value.length, 10)" />
       <div style="display:flex;justify-content:flex-end;margin-top:4px;">
@@ -1421,6 +1421,7 @@ nav {
         <option value="things_to_do">Things to Do</option>
       </select>
     </div>
+    <div id="new-post-body-image-block">
     <div class="form-row">
       <label for="post-body">Body</label>
       <textarea id="post-body" rows="8" maxlength="500" placeholder="Write your post…"
@@ -1453,9 +1454,6 @@ nav {
           style="position:absolute;top:8px;right:8px;border:none;background:rgba(0,0,0,0.5);color:white;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
     </div>
-    <div class="form-row" style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:4px;">
-      <label for="post-anonymous-toggle" style="margin:0;font-size:0.88rem;font-weight:600;color:#064e3b;">Post anonymously</label>
-      <input type="checkbox" id="post-anonymous-toggle" style="width:18px;height:18px;accent-color:#059669;cursor:pointer;" />
     </div>
     <div class="modal-actions">
       <button type="button" class="btn-secondary" data-close="modal-new-post">Cancel</button>
@@ -1584,8 +1582,6 @@ nav {
     const db = getFirestore(app);
     const storage = getStorage(app);
     let postImageFile = null;
-    const LIVVO_ANON_AVATAR = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect width="80" height="80" rx="40" fill="#d1d5db"/><circle cx="40" cy="28" r="12" fill="#9ca3af"/><ellipse cx="40" cy="58" rx="22" ry="14" fill="#9ca3af"/></svg>');
-
     const portalContent = document.getElementById('portal-content');
     const headerUsernameEl = document.getElementById('header-username');
     const navCity = document.getElementById('nav-city-label');
@@ -2523,11 +2519,10 @@ nav {
           }
         }
 
-        const isAnon = d.anonymous === true;
-        const displayName = isAnon ? 'Anonymous' : (authorProfile.username || 'Anonymous');
-        const initial = isAnon ? '?' : (authorProfile.initial || 'A');
-        const photoUrlStr = isAnon ? LIVVO_ANON_AVATAR : String(authorProfile.photoUrl || '').trim();
-        const credentialText = isAnon ? '' : String((authorProfile && authorProfile.credential) || '').trim();
+        const displayName = authorProfile.username || 'Anonymous';
+        const initial = authorProfile.initial || 'A';
+        const photoUrlStr = String(authorProfile.photoUrl || '').trim();
+        const credentialText = String((authorProfile && authorProfile.credential) || '').trim();
 
         const card = document.createElement('div');
         card.className = 'post-card';
@@ -2777,12 +2772,22 @@ nav {
       var mode = (typeEl && typeEl.value) === 'question' ? 'question' : 'post';
       var titleIn = document.getElementById('post-title');
       var bodyIn = document.getElementById('post-body');
+      var titleLab = document.getElementById('post-title-label');
+      var bodyImgBlock = document.getElementById('new-post-body-image-block');
       if (mode === 'question') {
         if (titleIn) titleIn.placeholder = 'Ask a question…';
-        if (bodyIn) bodyIn.placeholder = 'Add more detail (optional)';
+        if (titleLab) titleLab.textContent = 'Your question';
+        if (bodyIn) {
+          bodyIn.value = '';
+          bodyIn.style.height = '';
+        }
+        if (bodyImgBlock) bodyImgBlock.style.display = 'none';
+        window.removePostImage();
       } else {
         if (titleIn) titleIn.placeholder = 'Title';
+        if (titleLab) titleLab.textContent = 'Title';
         if (bodyIn) bodyIn.placeholder = 'Write your post…';
+        if (bodyImgBlock) bodyImgBlock.style.display = '';
       }
     }
     function setNewPostContentType(mode) {
@@ -2816,8 +2821,6 @@ nav {
       window.updateCounter('title-counter', 40, 10);
       window.updateCounter('body-counter', 500, 50);
       setNewPostContentType('post');
-      var anonT = document.getElementById('post-anonymous-toggle');
-      if (anonT) anonT.checked = false;
       openModal('modal-new-post');
     });
     document.getElementById('confirm-delete-post').addEventListener('click', async function () {
@@ -2937,8 +2940,9 @@ nav {
       const submitBtn = document.getElementById('submit-post-btn');
       if (submitBtn) submitBtn.disabled = true;
       try {
+        var contentType = (document.getElementById('post-content-type') || { value: 'post' }).value === 'question' ? 'question' : 'post';
         let imageUrl = '';
-        if (postImageFile) {
+        if (contentType !== 'question' && postImageFile) {
           try {
             const storageRef = ref(storage, `post-images/${currentUser.uid}/${Date.now()}_${postImageFile.name}`);
             await uploadBytes(storageRef, postImageFile);
@@ -2951,22 +2955,19 @@ nav {
         const resolvedPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim())
           || user.photoURL
           || '';
-        var contentType = (document.getElementById('post-content-type') || { value: 'post' }).value === 'question' ? 'question' : 'post';
-        var anonToggle = document.getElementById('post-anonymous-toggle');
-        var postAnon = !!(anonToggle && anonToggle.checked);
-        var authorUsernameVal = postAnon ? 'Anonymous' : ((currentProfileData && String(currentProfileData.username || '').trim())
+        var authorUsernameVal = (currentProfileData && String(currentProfileData.username || '').trim())
           || user.displayName
           || (user.email ? user.email.split('@')[0] : '')
-          || 'Anonymous');
-        var authorPhotoVal = postAnon ? LIVVO_ANON_AVATAR : (resolvedPhoto || '');
+          || 'Anonymous';
+        var authorPhotoVal = resolvedPhoto || '';
+        var bodyVal = contentType === 'question' ? '' : document.getElementById('post-body').value;
         await addDoc(collection(db, 'communityPosts'), {
           title: document.getElementById('post-title').value,
-          body: document.getElementById('post-body').value,
+          body: bodyVal,
           category: document.getElementById('post-category').value,
           type: contentType,
           city: city,
           author: user.uid,
-          anonymous: postAnon,
           authorUsername: authorUsernameVal,
           authorName: authorUsernameVal,
           authorPhotoURL: authorPhotoVal || null,

@@ -312,21 +312,35 @@
       font-size: 11px;
       color: #9ab09a;
     }
-    .comment-helpful-btn {
-      border: none;
-      background: none;
-      padding: 0;
+    .comment-compact-zone {
       cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      color: #059669;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: color 0.15s;
+      border-radius: 8px;
+      margin: 0 -6px;
+      padding: 4px 6px;
+      transition: background 0.15s ease;
     }
-    .comment-helpful-btn:hover { color: #047857; }
-    .comment-helpful-btn.marked { color: #047857; }
+    .comment-compact-zone:hover { background: rgba(240, 253, 244, 0.55); }
+    .comment-compact-zone:focus-visible {
+      outline: 2px solid #059669;
+      outline-offset: 2px;
+    }
+    .comment-text-compact {
+      font-size: 14px;
+      color: #2d4a2d;
+      line-height: 1.6;
+      margin: 0 0 6px 0;
+      word-break: break-word;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-height: 1.6em;
+      transition: max-height 0.35s ease;
+    }
+    .comment-text-compact.comment-text-expanded {
+      white-space: normal;
+      text-overflow: clip;
+      max-height: 2000px;
+    }
     .pinned-answer-block {
       background: #ecfdf5;
       border-radius: 12px;
@@ -487,9 +501,9 @@
           <div id="composer-avatar-small"></div>
           <div style="flex: 1; font-size: 14px; color: #9ab09a;">Share your thoughts...</div>
         </div>
-        <div id="composer-expanded" style="display: none; background: white; border: 1px solid #2d6a2d; border-radius: 12px; padding: 16px; margin-bottom: 20px; box-shadow: 0 0 0 3px rgba(45, 106, 45, 0.08);">
-          <textarea id="comment-input" placeholder="Share your thoughts..." style="width: 100%; border: none; outline: none; font-size: 14px; color: #1a2e1a; resize: none; min-height: 80px; font-family: inherit; background: transparent; box-sizing: border-box; line-height: 1.6;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
-          <div style="display: flex; justify-content: flex-end; gap: 8px; padding-top: 10px; border-top: 1px solid #f0f5f0; margin-top: 8px;">
+        <div id="composer-expanded" style="display: none; background: white; border: 1px solid #2d6a2d; border-radius: 12px; padding: 10px 12px; margin-bottom: 20px; box-shadow: 0 0 0 3px rgba(45, 106, 45, 0.08);">
+          <textarea id="comment-input" rows="2" placeholder="Share your thoughts..." style="width: 100%; border: none; outline: none; font-size: 14px; color: #1a2e1a; resize: none; min-height: 48px; overflow: hidden; font-family: inherit; background: transparent; box-sizing: border-box; line-height: 1.5; padding: 4px 0;" oninput="if(window.__fitCommentComposer)window.__fitCommentComposer();"></textarea>
+          <div style="display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; border-top: 1px solid #f0f5f0; margin-top: 6px;">
             <button type="button" onclick="collapseComposer()" style="border: 1px solid #e8f0e8; background: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; color: #5a7a5a; cursor: pointer;">Cancel</button>
             <button type="button" onclick="submitComment()" style="border: none; background: #2d6a2d; color: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer;">Comment</button>
           </div>
@@ -539,8 +553,7 @@
     import {
       getFirestore, collection, query, orderBy, onSnapshot, doc, getDoc, getDocs,
       where, limit, addDoc,
-      serverTimestamp, increment, deleteDoc, setDoc, updateDoc, runTransaction, writeBatch,
-      arrayUnion, arrayRemove
+      serverTimestamp, increment, deleteDoc, setDoc, updateDoc, runTransaction, writeBatch
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const CATEGORY_LABELS = {
@@ -594,8 +607,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const LIVVO_ANON_AVATAR = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect width="80" height="80" rx="40" fill="#d1d5db"/><circle cx="40" cy="28" r="12" fill="#9ca3af"/><ellipse cx="40" cy="58" rx="22" ry="14" fill="#9ca3af"/></svg>');
-
     let currentUser = null;
     let currentProfileData = null;
     let postData = null;
@@ -825,12 +836,23 @@
       }, 2500);
     }
 
+    function fitCommentComposerHeight() {
+      if (!commentInputEl) return;
+      commentInputEl.style.height = 'auto';
+      var minH = 48;
+      commentInputEl.style.height = Math.max(minH, commentInputEl.scrollHeight) + 'px';
+    }
+    window.__fitCommentComposer = fitCommentComposerHeight;
+
     function expandComposer() {
       var collapsed = document.getElementById('composer-collapsed');
       var expanded = document.getElementById('composer-expanded');
       if (collapsed) collapsed.style.display = 'none';
       if (expanded) expanded.style.display = 'block';
-      if (commentInputEl) commentInputEl.focus();
+      if (commentInputEl) {
+        commentInputEl.focus();
+        requestAnimationFrame(function () { fitCommentComposerHeight(); });
+      }
     }
 
     function collapseComposer() {
@@ -973,8 +995,11 @@
       var menu = document.getElementById('comment-menu-' + commentId);
       if (menu) menu.style.display = 'none';
       var commentEl = document.getElementById('comment-' + commentId);
-      var textEl = commentEl && commentEl.querySelector('.comment-text');
+      var textEl = commentEl && commentEl.querySelector('.comment .comment-text');
       if (!textEl) return;
+      textEl.classList.add('comment-text-expanded');
+      var z = textEl.closest('.comment-compact-zone');
+      if (z) z.setAttribute('aria-expanded', 'true');
       var plain = textEl.textContent;
       textEl.innerHTML = '';
       var ta = document.createElement('textarea');
@@ -1011,9 +1036,12 @@
 
     window.cancelEditComment = function (commentId, plainText) {
       var row = document.getElementById('comment-' + commentId);
-      var textEl = row && row.querySelector('.comment-text');
+      var textEl = row && row.querySelector('.comment .comment-text');
       if (!textEl) return;
       textEl.innerHTML = linkify(plainText);
+      textEl.classList.remove('comment-text-expanded');
+      var z = textEl.closest('.comment-compact-zone');
+      if (z) z.setAttribute('aria-expanded', 'false');
     };
 
     window.saveEditComment = async function (commentId) {
@@ -1026,8 +1054,13 @@
           editedAt: serverTimestamp()
         });
         var row = document.getElementById('comment-' + commentId);
-        var textEl = row && row.querySelector('.comment-text');
-        if (textEl) textEl.innerHTML = linkify(newText);
+        var textEl = row && row.querySelector('.comment .comment-text');
+        if (textEl) {
+          textEl.innerHTML = linkify(newText);
+          textEl.classList.remove('comment-text-expanded');
+          var z = textEl.closest('.comment-compact-zone');
+          if (z) z.setAttribute('aria-expanded', 'false');
+        }
         showToast('Comment updated');
       } catch (err) {
         console.error(err);
@@ -1108,6 +1141,34 @@
 
     const heartStrokeSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
 
+    function wireCommentCompactZone(metaEl, credEl, textEl) {
+      var zone = document.createElement('div');
+      zone.className = 'comment-compact-zone';
+      zone.setAttribute('role', 'button');
+      zone.setAttribute('tabindex', '0');
+      zone.setAttribute('aria-expanded', 'false');
+      if (metaEl) zone.appendChild(metaEl);
+      if (credEl) zone.appendChild(credEl);
+      textEl.classList.add('comment-text', 'comment-text-compact');
+      zone.appendChild(textEl);
+      function toggle(ev) {
+        if (ev) ev.stopPropagation();
+        var on = textEl.classList.toggle('comment-text-expanded');
+        zone.setAttribute('aria-expanded', on ? 'true' : 'false');
+      }
+      zone.addEventListener('click', function (ev) {
+        if (ev.target.closest('textarea, input, button, a')) return;
+        toggle(ev);
+      });
+      zone.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle(e);
+        }
+      });
+      return zone;
+    }
+
     function closeAllCommentMenus() {
       document.querySelectorAll('[id^="comment-menu-"]').forEach(function (m) { m.style.display = 'none'; });
     }
@@ -1124,7 +1185,6 @@
         var a = prev[i].data() || {};
         var b = next[i].data() || {};
         if (String(a.text || '') !== String(b.text || '')) return false;
-        if (Number(a.helpfulCount || 0) !== Number(b.helpfulCount || 0)) return false;
       }
       return true;
     }
@@ -1200,25 +1260,6 @@
       }
     };
 
-    window.toggleCommentHelpful = async function (commentId) {
-      if (!currentUser || !commentId) return;
-      try {
-        var cref = doc(db, 'communityPosts', postId, 'comments', commentId);
-        var snap = await getDoc(cref);
-        if (!snap.exists()) return;
-        var d = snap.data() || {};
-        var arr = Array.isArray(d.helpfulBy) ? d.helpfulBy : [];
-        var has = arr.indexOf(currentUser.uid) >= 0;
-        if (has) {
-          await updateDoc(cref, { helpfulBy: arrayRemove(currentUser.uid), helpfulCount: increment(-1) });
-        } else {
-          await updateDoc(cref, { helpfulBy: arrayUnion(currentUser.uid), helpfulCount: increment(1) });
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
     async function renderComments() {
       var scrollY = window.scrollY;
       closeAllCommentMenus();
@@ -1264,11 +1305,10 @@
         var cd = ordered[idx];
         const c = cd.data() || {};
         const isPinned = pinnedDoc && cd.id === pinnedDoc.id;
-        const isAnonCom = c.anonymous === true;
         const prof = await getAuthorProfile(c.authorUid, c.authorUsername, c.authorPhotoURL || c.authorPhoto || '');
-        const username = isAnonCom ? 'Anonymous' : (String(c.authorUsername || prof.username || 'Member').trim() || 'Member');
-        const photo = isAnonCom ? LIVVO_ANON_AVATAR : String(c.authorPhotoURL || c.authorPhoto || prof.photoUrl || '').trim();
-        const credLine = isAnonCom ? '' : String(prof.credential || '').trim();
+        const username = (String(c.authorUsername || prof.username || 'Member').trim() || 'Member');
+        const photo = String(c.authorPhotoURL || c.authorPhoto || prof.photoUrl || '').trim();
+        const credLine = String(prof.credential || '').trim();
 
         var attachHost = listEl;
         if (isPinned) {
@@ -1313,17 +1353,16 @@
         timeSpan.textContent = formatRelativeTime(c.createdAt);
         meta.appendChild(nameSpan);
         meta.appendChild(timeSpan);
-        right.appendChild(meta);
+        var credEl = null;
         if (credLine) {
-          var credEl = document.createElement('div');
+          credEl = document.createElement('div');
           credEl.style.cssText = 'font-size:11px;color:#9ab09a;margin:-2px 0 6px 0;line-height:1.35;';
           credEl.textContent = credLine;
-          right.appendChild(credEl);
         }
         const textEl = document.createElement('p');
-        textEl.className = 'comment-text';
-        textEl.style.cssText = 'font-size:14px;color:#2d4a2d;line-height:1.6;margin:0 0 8px 0;word-break:break-word;';
         textEl.innerHTML = linkify(c.text || '');
+        var compactZone = wireCommentCompactZone(meta, credEl, textEl);
+        right.appendChild(compactZone);
 
         const actionRow = document.createElement('div');
         actionRow.style.cssText = 'display:flex;align-items:center;gap:14px;flex-wrap:wrap;';
@@ -1346,20 +1385,7 @@
           window.toggleReplyBox(cd.id);
         });
 
-        var helpfulN = Math.max(0, Number(c.helpfulCount || 0));
-        var helpfulMarked = !!(currentUser && Array.isArray(c.helpfulBy) && c.helpfulBy.indexOf(currentUser.uid) >= 0);
-        const helpfulBtn = document.createElement('button');
-        helpfulBtn.type = 'button';
-        helpfulBtn.className = 'comment-helpful-btn' + (helpfulMarked ? ' marked' : '');
-        helpfulBtn.textContent = helpfulN > 0
-          ? ('\u2713 ' + helpfulN + ' found this helpful')
-          : '\u2713 Helpful';
-        helpfulBtn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          window.toggleCommentHelpful(cd.id);
-        });
         actionRow.appendChild(likeBtn);
-        actionRow.appendChild(helpfulBtn);
         actionRow.appendChild(replyBtn);
 
         const moreWrap = document.createElement('div');
@@ -1491,15 +1517,15 @@
           repliesWrap.innerHTML = '';
           rsnap.docs.forEach(function (rd) {
             const r = rd.data() || {};
-            const rAnon = r.anonymous === true;
-            const rName = rAnon ? 'Anonymous' : (String(r.authorUsername || 'Member').trim() || 'Member');
+            const rName = (String(r.authorUsername || 'Member').trim() || 'Member');
             const row = document.createElement('div');
             row.className = 'reply-item';
             const rav = document.createElement('div');
             rav.style.cssText = 'flex-shrink:0;width:28px;height:28px;border-radius:50%;overflow:hidden;background:#2d6a2d;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;';
-            if (rAnon || r.authorPhotoURL || r.authorPhoto) {
+            const rPhoto = String(r.authorPhotoURL || r.authorPhoto || '').trim();
+            if (rPhoto) {
               const ri = document.createElement('img');
-              ri.src = rAnon ? LIVVO_ANON_AVATAR : (r.authorPhotoURL || r.authorPhoto);
+              ri.src = rPhoto;
               ri.alt = rName;
               ri.style.cssText = 'width:100%;height:100%;object-fit:cover;';
               rav.appendChild(ri);
@@ -1517,10 +1543,9 @@
             rm.appendChild(rns);
             rm.appendChild(rts);
             const rb = document.createElement('p');
-            rb.style.cssText = 'font-size:14px;color:#2d4a2d;line-height:1.6;margin:0;word-break:break-word;';
             rb.innerHTML = linkify(r.text || '');
-            rr.appendChild(rm);
-            rr.appendChild(rb);
+            var rZone = wireCommentCompactZone(rm, null, rb);
+            rr.appendChild(rZone);
             row.appendChild(rav);
             row.appendChild(rr);
             repliesWrap.appendChild(row);
@@ -1528,7 +1553,6 @@
         });
         threadRepliesUnsubs.push(unsubReplies);
 
-        right.appendChild(textEl);
         right.appendChild(actionRow);
         right.appendChild(replyBox);
         item.appendChild(av);
@@ -1718,11 +1742,10 @@
       const authorUid = data.author || data.authorId || '';
       const fallback = data.authorUsername || data.authorName || 'Anonymous';
       const ap = await getAuthorProfile(authorUid, fallback, data.authorPhotoURL || data.authorPhoto || '');
-      const isAnonPost = data.anonymous === true;
-      const displayName = isAnonPost ? 'Anonymous' : (ap.username || 'Member');
-      const displayPhoto = isAnonPost ? LIVVO_ANON_AVATAR : ap.photoUrl;
-      const displayInitial = isAnonPost ? '?' : ap.initial;
-      const credPost = isAnonPost ? '' : String(ap.credential || '').trim();
+      const displayName = ap.username || 'Member';
+      const displayPhoto = ap.photoUrl;
+      const displayInitial = ap.initial;
+      const credPost = String(ap.credential || '').trim();
 
       postTitleEl.textContent = data.title || 'Untitled';
       const catKey = data.category || '';
