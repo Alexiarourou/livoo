@@ -571,55 +571,12 @@ nav {
 .btn-city-active { background: var(--green); border-color: var(--green); color: white; }
 .btn-city-active:hover { background: var(--green-dark); border-color: var(--green-dark); color: white; }
 
-.join-section {
-  background: var(--bg-dark);
-  border: none;
-  border-radius: 0;
-  padding: 56px 48px 80px;
-  margin: 0;
-  max-width: none;
-  width: 100%;
-  text-align: center;
-  scroll-margin-top: 72px;
-}
-.join-section h2 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2.2rem; letter-spacing: -0.03em; margin-bottom: 14px; color: var(--text-dark); }
-.join-section h2 span { color: var(--green); }
-.join-section p { color: var(--muted-dark); font-size: 1rem; max-width: 480px; margin: 0 auto 24px; line-height: 1.7; }
-.join-section form#communityJoinForm { max-width: 440px; margin: 0 auto; }
-.join-form { display: flex; gap: 12px; align-items: stretch; }
-.join-section .join-form-hint {
-  margin: 10px 0 0;
-  max-width: none;
-  font-size: 13px;
-  color: #6b7280;
-  line-height: 1.45;
-}
-.join-input {
-  flex: 1;
-  min-width: 0;
-  background: #ffffff;
-  border: 1px solid rgba(5, 150, 105, 0.35);
-  border-radius: 10px;
-  padding: 14px 16px;
-  font-family: "DM Sans", sans-serif;
-  font-size: 0.95rem;
-  color: var(--text-dark);
-  outline: none;
-  transition: border-color 0.2s;
-}
-.join-input::placeholder { color: var(--muted-dark); opacity: 0.75; }
-.join-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15); }
-.btn-join { background: var(--green); color: white; border: none; border-radius: 10px; padding: 14px 24px; font-family: "DM Sans", sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
-.btn-join:hover { background: var(--green-dark); }
-
 @media (max-width: 900px) {
   .cities-grid { grid-template-columns: 1fr; }
   .cards-grid-3 { grid-template-columns: 1fr; max-width: 420px; }
   .hero { margin: 0; padding: 48px 24px 16px; }
   .section { padding: 48px 24px; }
   #cities { padding: 24px 24px 40px; }
-  .join-section { margin: 0; padding: 44px 24px 60px; }
-  .join-form { flex-direction: column; }
 }
 
 .site-footer-community {
@@ -930,17 +887,23 @@ nav {
   </div>
 </section>
 
-<div class="join-section" id="join">
-  <h2>Ready to find <span>your people?</span></h2>
-  <p>Join the Livvo community. It is completely free. Connect with people moving to the same city as you.</p>
-  <form id="communityJoinForm">
-    <div class="join-form">
-      <input class="join-input" type="email" name="email" id="communityJoinEmail" placeholder="Your email address" required autocomplete="email" />
-      <button type="submit" class="btn-join" id="communityJoinBtn">Create free account</button>
-    </div>
-    <p class="join-form-hint">Takes 30 seconds. No credit card.</p>
-  </form>
-</div>
+<section id="join" style="padding:80px 24px;text-align:center;background:#f0f7f0;scroll-margin-top:72px;">
+  <div style="max-width:480px;margin:0 auto;">
+
+    <h2 style="font-size:36px;font-weight:800;color:#1a2e1a;margin:0 0 8px 0;line-height:1.2;letter-spacing:-0.02em;">
+      Create your account
+    </h2>
+    <p style="font-size:15px;color:#6b8f6b;margin:0 0 32px 0;">
+      Only takes 30 seconds.
+    </p>
+
+    <a href="signup.html"
+      style="display:inline-block;background:#059669;color:white;padding:16px 40px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;letter-spacing:-0.01em;">
+      Create account
+    </a>
+
+  </div>
+</section>
 
 <footer class="site-footer-community" aria-label="Site footer">
   <div class="site-footer-community-inner">
@@ -1101,21 +1064,6 @@ if (form) {
     }
   });
 }
-</script>
-<script>
-(function () {
-  var form = document.getElementById('communityJoinForm');
-  var input = document.getElementById('communityJoinEmail');
-  if (!form || !input) return;
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!form.checkValidity()) {
-      input.reportValidity();
-      return;
-    }
-    window.location.href = 'signup.html?email=' + encodeURIComponent(input.value.trim());
-  });
-})();
 </script>
 </body>
 </html>
