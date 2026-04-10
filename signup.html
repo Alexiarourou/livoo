@@ -233,6 +233,95 @@ nav {
   margin-top: 10px;
   font-size: 12px;
   line-height: 1.45;
+  display: none;
+}
+#panel-signup.active #signup-password:focus + #signup-password-rules {
+  display: block;
+}
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.auth-modal[hidden] {
+  display: none !important;
+}
+.auth-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 46, 36, 0.45);
+  backdrop-filter: blur(4px);
+}
+.auth-modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 24px 64px rgba(13, 43, 26, 0.18);
+  z-index: 1;
+}
+.auth-modal-panel h2 {
+  font-family: "Outfit", sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: var(--text-dark);
+  margin: 0 0 8px;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+.auth-modal-sub {
+  font-size: 0.9rem;
+  color: var(--muted-dark);
+  line-height: 1.5;
+  margin: 0 0 20px;
+  text-align: center;
+}
+.auth-modal-x {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-modal-x:hover {
+  color: #64748b;
+  background: rgba(148, 163, 184, 0.12);
+}
+.auth-modal-success {
+  display: none;
+  margin-top: 8px;
+  padding: 14px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 10px;
+  color: #047857;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.45;
+}
+.auth-modal-success.is-visible {
+  display: block;
+}
+#reset-modal-error {
+  margin-top: 12px;
 }
 .password-rules li {
   display: flex;
@@ -363,11 +452,6 @@ nav {
         <div class="form-group">
           <label for="signin-password">Password</label>
           <input id="signin-password" type="password" name="password" placeholder="Your password" required autocomplete="current-password" />
-          <ul class="password-rules" id="signin-password-rules" aria-live="polite">
-            <li id="signin-pw-rule-len"><span class="pw-tick" aria-hidden="true">✓</span><span>At least 8 characters</span></li>
-            <li id="signin-pw-rule-upper"><span class="pw-tick" aria-hidden="true">✓</span><span>At least 1 uppercase letter</span></li>
-            <li id="signin-pw-rule-special"><span class="pw-tick" aria-hidden="true">✓</span><span>At least 1 special character (!@#$%^&*)</span></li>
-          </ul>
         </div>
         <div style="display: flex; align-items: center; gap: 8px; margin: 12px 0;">
           <input type="checkbox" id="remember-me" checked style="width: 16px; height: 16px; accent-color: #059669;">
@@ -380,13 +464,32 @@ nav {
           <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.785 9.093c0-.638-.057-1.251-.164-1.84H9v3.478h4.938a4.17 4.17 0 0 1-1.8 2.736v2.272h2.914a8.837 8.837 0 0 0 2.733-6.646z"/><path fill="#34A853" d="M9.003 18c2.43 0 4.467-.806 5.956-2.18l-2.909-2.27c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.44 15.983 5.485 18 9.003 18z"/><path fill="#FBBC05" d="M3.964 10.712c-.18-.563-.29-1.164-.29-1.79s.11-1.227.29-1.79L.96 4.408A8.094 8.094 0 0 0 0 8.922c0 1.322.318 2.62.96 3.742l3.004-2.952z"/><path fill="#EA4335" d="M9.003 3.58c1.322 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.426 0 9.003 0 5.485 0 2.44 2.017.96 4.977l3.005 2.458c.707-2.127 2.692-3.855 5.038-3.855z"/></svg>
           Continue with Google
         </button>
-        <p class="auth-forgot"><button type="button" class="auth-forgot-btn" id="forgotPasswordBtn">Forgot password?</button></p>
+        <p class="auth-forgot"><a href="#" id="forgotPasswordLink">Forgot password?</a></p>
         <p class="auth-switch"><button type="button" id="linkToSignup">Don&apos;t have an account? Sign up →</button></p>
       </form>
     </div>
   </div>
   <div id="joinThanks" class="join-thanks" role="status">Thanks! We&apos;ll be in touch shortly to complete your account setup.</div>
 </div>
+
+<div id="reset-password-modal" class="auth-modal" hidden aria-modal="true" role="dialog" aria-labelledby="reset-modal-title">
+  <div class="auth-modal-backdrop" id="reset-modal-backdrop" tabindex="-1"></div>
+  <div class="auth-modal-panel">
+    <button type="button" class="auth-modal-x" id="reset-modal-close" aria-label="Close">&times;</button>
+    <h2 id="reset-modal-title">Reset your password</h2>
+    <p class="auth-modal-sub">Enter your email address and we&apos;ll send you a link to reset your password</p>
+    <div id="reset-modal-form-wrap">
+      <div class="form-group">
+        <label for="reset-email">Email</label>
+        <input id="reset-email" type="email" name="reset-email" placeholder="your@email.com" autocomplete="email" />
+      </div>
+      <button type="button" class="btn-auth-primary" id="reset-send-btn">Send reset link</button>
+    </div>
+    <div id="reset-modal-error" class="auth-error" role="alert"></div>
+    <p id="reset-modal-success" class="auth-modal-success" aria-live="polite">Email sent! Check your inbox for a reset link</p>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword,
@@ -511,7 +614,6 @@ nav {
     panelSignup.classList.add('active');
     panelSignin.classList.remove('active');
     updateSignupPasswordRules();
-    updateSigninPasswordRules();
   }
   function showSignin() {
     tabSignin.classList.add('active');
@@ -521,7 +623,6 @@ nav {
     panelSignin.classList.add('active');
     panelSignup.classList.remove('active');
     updateSignupPasswordRules();
-    updateSigninPasswordRules();
   }
 
   tabSignup.addEventListener('click', showSignup);
@@ -581,14 +682,6 @@ nav {
     });
   }
 
-  function updateSigninPasswordRules() {
-    updatePasswordRuleRows(document.getElementById('signin-password').value, {
-      len: 'signin-pw-rule-len',
-      upper: 'signin-pw-rule-upper',
-      special: 'signin-pw-rule-special'
-    });
-  }
-
   const signupErrorEl = document.getElementById('signup-error');
   const signinErrorEl = document.getElementById('signin-error');
   const rememberMeEl = document.getElementById('remember-me');
@@ -607,10 +700,8 @@ nav {
   });
   document.getElementById('signin-password').addEventListener('input', function () {
     hideError(signinErrorEl);
-    updateSigninPasswordRules();
   });
   updateSignupPasswordRules();
-  updateSigninPasswordRules();
   document.getElementById('signin-email').addEventListener('input', function () { hideError(signinErrorEl); });
 
   document.getElementById('signup-btn').addEventListener('click', async () => {
@@ -670,20 +761,85 @@ nav {
     }
   });
 
-  document.getElementById('forgotPasswordBtn').addEventListener('click', async function () {
-    const email = (document.getElementById('signin-email').value || '').trim();
-    const errorDiv = document.getElementById('signin-error');
-    hideError(errorDiv);
+  const resetModal = document.getElementById('reset-password-modal');
+  const resetBackdrop = document.getElementById('reset-modal-backdrop');
+  const resetCloseBtn = document.getElementById('reset-modal-close');
+  const resetFormWrap = document.getElementById('reset-modal-form-wrap');
+  const resetEmailInput = document.getElementById('reset-email');
+  const resetSendBtn = document.getElementById('reset-send-btn');
+  const resetErrorEl = document.getElementById('reset-modal-error');
+  const resetSuccessEl = document.getElementById('reset-modal-success');
+
+  function hideResetModalError() {
+    resetErrorEl.textContent = '';
+    resetErrorEl.style.display = 'none';
+  }
+  function showResetModalError(msg) {
+    resetErrorEl.textContent = msg;
+    resetErrorEl.style.display = 'block';
+    resetErrorEl.style.color = '#b91c1c';
+  }
+
+  function openResetPasswordModal(e) {
+    if (e) e.preventDefault();
+    hideResetModalError();
+    resetSuccessEl.classList.remove('is-visible');
+    resetFormWrap.style.display = '';
+    resetSendBtn.disabled = false;
+    resetEmailInput.value = (document.getElementById('signin-email').value || '').trim();
+    resetModal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    setTimeout(function () {
+      resetEmailInput.focus();
+    }, 50);
+  }
+
+  function closeResetPasswordModal() {
+    resetModal.hidden = true;
+    document.body.style.overflow = '';
+    hideResetModalError();
+    resetSuccessEl.classList.remove('is-visible');
+    resetFormWrap.style.display = '';
+  }
+
+  var forgotLink = document.getElementById('forgotPasswordLink');
+  if (forgotLink) {
+    forgotLink.addEventListener('click', openResetPasswordModal);
+  }
+  if (resetCloseBtn) resetCloseBtn.addEventListener('click', closeResetPasswordModal);
+  if (resetBackdrop) resetBackdrop.addEventListener('click', closeResetPasswordModal);
+  resetSendBtn.addEventListener('click', async function () {
+    hideResetModalError();
+    var email = (resetEmailInput.value || '').trim();
     if (!email) {
-      showError(errorDiv, 'Enter your email above, then click Forgot password again.');
+      showResetModalError('Please enter a valid email address');
       return;
     }
+    resetSendBtn.disabled = true;
     try {
       await sendPasswordResetEmail(auth, email);
-      showError(errorDiv, 'Check your email for a reset link.');
-      errorDiv.style.color = 'var(--muted-dark)';
+      resetFormWrap.style.display = 'none';
+      hideResetModalError();
+      resetSuccessEl.classList.add('is-visible');
     } catch (error) {
-      showError(errorDiv, getFriendlyError(error.code));
+      var code = error && error.code;
+      if (code === 'auth/user-not-found') {
+        showResetModalError('No account found with this email');
+      } else if (code === 'auth/invalid-email') {
+        showResetModalError('Please enter a valid email address');
+      } else if (code === 'auth/too-many-requests') {
+        showResetModalError('Too many attempts — please wait a few minutes and try again');
+      } else {
+        showResetModalError(getFriendlyError(code));
+      }
+    } finally {
+      resetSendBtn.disabled = false;
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && resetModal && !resetModal.hidden) {
+      closeResetPasswordModal();
     }
   });
 </script>
