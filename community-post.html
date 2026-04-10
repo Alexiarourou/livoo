@@ -1445,13 +1445,18 @@
         setTimeout(function () { btn.style.transform = 'scale(1)'; }, 150);
       }
 
+      var commentRef = doc(db, 'communityPosts', postId, 'comments', commentId);
       try {
         if (alreadyLiked) {
-          await deleteDoc(ref);
-          await updateDoc(doc(db, 'communityPosts', postId, 'comments', commentId), { likes: increment(-1) });
+          var batchUn = writeBatch(db);
+          batchUn.delete(ref);
+          batchUn.update(commentRef, { likes: increment(-1) });
+          await batchUn.commit();
         } else {
-          await setDoc(ref, { uid: currentUser.uid, createdAt: serverTimestamp() });
-          await updateDoc(doc(db, 'communityPosts', postId, 'comments', commentId), { likes: increment(1) });
+          var batchLike = writeBatch(db);
+          batchLike.set(ref, { uid: currentUser.uid, createdAt: serverTimestamp() });
+          batchLike.update(commentRef, { likes: increment(1) });
+          await batchLike.commit();
         }
       } catch (err) {
         if (alreadyLiked) {
@@ -1540,7 +1545,7 @@
       document.querySelectorAll('[id^="comment-menu-"]').forEach(function (m) { m.style.display = 'none'; });
     });
 
-    /** True when snapshot only changed metadata (e.g. likes) — same comments, same text. Avoids full DOM rebuild on like. */
+    /** Same comment bodies + same like totals — safe to patch counts only. Like count changes must full re-render (patch used stale likes and broke the counter vs. heart state). */
     function commentDocsCompatibleForPatch(prev, next) {
       if (!prev || !next || prev.length !== next.length) return false;
       for (var i = 0; i < prev.length; i++) {
@@ -1548,6 +1553,7 @@
         var a = prev[i].data() || {};
         var b = next[i].data() || {};
         if (String(a.text || '') !== String(b.text || '')) return false;
+        if (Number(a.likes || a.likeCount || 0) !== Number(b.likes || b.likeCount || 0)) return false;
       }
       return true;
     }
@@ -1859,6 +1865,11 @@
             if (ls.exists) {
               likeBtn.classList.add('liked');
               likeBtn.style.color = '#e53e3e';
+              var cspan = document.getElementById('clc-' + commentId);
+              var shown = parseInt(cspan && cspan.textContent, 10) || 0;
+              if (cspan && shown === 0 && initialCommentLikes === 0) {
+                cspan.textContent = '1';
+              }
             }
           }).catch(function () {});
         }
