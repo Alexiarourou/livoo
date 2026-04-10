@@ -293,6 +293,40 @@ nav {
   font-size: 0.7rem;
   color: #8aa896;
 }
+.meetups-widget {
+  border-top: 1px solid #e8f0e8;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+.meetups-widget h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a2e1a;
+  margin: 0 0 12px 0;
+  font-family: inherit;
+}
+.meetups-widget #meetups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.post-event-btn {
+  width: 100%;
+  margin-top: 12px;
+  border: 1.5px dashed #c0ddc0;
+  background: none;
+  border-radius: 10px;
+  padding: 8px;
+  font-size: 12px;
+  color: #059669;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.post-event-btn:hover {
+  border-color: #059669;
+  background: rgba(5, 150, 105, 0.06);
+}
 .main-column { min-width: 500px; width: 100%; }
 .city-info-card, .rules-card {
   border: 1px solid var(--border);
@@ -1164,16 +1198,10 @@ nav {
         </ol>
       </div>
       <!-- Upcoming meetups -->
-      <div style="border-top:1px solid #e8f0e8;margin-top:20px;padding-top:20px;">
-        <h4 style="font-size:13px;font-weight:700;color:#1a2e1a;margin:0 0 12px 0;">
-          Upcoming meetups
-        </h4>
-        <div id="meetups-list" style="display:flex;flex-direction:column;gap:10px;">
-        </div>
-        <button type="button" onclick="openNewPostModal('Events')"
-          style="width:100%;margin-top:12px;border:1.5px dashed #c0ddc0;background:none;border-radius:10px;padding:8px;font-size:12px;color:#059669;font-weight:600;cursor:pointer;">
-          + Post an event
-        </button>
+      <div class="meetups-widget">
+        <h3>Upcoming meetups</h3>
+        <div id="meetups-list"></div>
+        <button type="button" class="post-event-btn" onclick="openNewPostModal('Events')">+ Post an event</button>
       </div>
       <div class="left-sidebar-footer">
         <a href="faqs.html">Community Guidelines</a>
@@ -1711,7 +1739,7 @@ nav {
           )
         );
         if (snap.empty) {
-          meetupsList.innerHTML = '<p style="font-size:12px;color:#9ab09a;text-align:center;padding:8px 0;">No events yet — be the first!</p>';
+          meetupsList.innerHTML = '';
           return;
         }
         meetupsList.innerHTML = '';
@@ -1736,7 +1764,7 @@ nav {
         });
       } catch (err) {
         console.error('Meetups load error:', err);
-        meetupsList.innerHTML = '<p style="font-size:12px;color:#9ab09a;text-align:center;padding:8px 0;">Could not load events.</p>';
+        meetupsList.innerHTML = '';
       }
     }
 
