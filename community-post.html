@@ -164,8 +164,27 @@
     #post-like-btn.liked svg path { fill: #e53e3e; stroke: #e53e3e; }
     #post-like-btn.liked { color: #e53e3e !important; background: #fff0f0 !important; }
     [id^="clb-"] { transition: all 0.15s ease; }
+    /* Subtle liked state for comment hearts */
     [id^="clb-"].liked { color: #e53e3e !important; }
     [id^="clb-"].liked svg path { fill: #e53e3e; stroke: #e53e3e; }
+
+    /* Comment delete inline confirm */
+    .delete-confirm-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+      font-size: 11px;
+      color: #9ab09a;
+    }
+    .delete-confirm-bar button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0;
+      font: inherit;
+    }
     #post-avatar { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #059669; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
     #post-avatar img { width: 100%; height: 100%; object-fit: cover; }
     #composer-avatar-small { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; background: #2d6a2d; color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -187,41 +206,27 @@
     .replies-container {
       position: relative;
       margin-top: 10px;
-      margin-left: 16px;
-      padding-left: 14px;
+      margin-left: 8px;
+      padding-left: 12px;
       border-left: 2px solid #e8f0e8;
     }
 
-    .comment-wrapper > .comment {
-      transition: background 0.2s ease;
-      border-radius: 8px;
-      padding: 6px 8px;
-      margin: -6px -8px 14px -8px;
-    }
-
-    .comment-wrapper > .comment:hover {
-      background: #f0fdf4;
+    .comment-card-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
     }
 
     .reply-item {
       position: relative;
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: flex-start;
-      margin-bottom: 12px;
-      padding: 6px 8px;
-      margin-left: -8px;
-      margin-right: -8px;
-      border-radius: 8px;
-      transition: background 0.2s ease;
+      margin-bottom: 10px;
     }
 
     .reply-item:last-child {
       margin-bottom: 0;
-    }
-
-    .reply-item:hover {
-      background: #f0fdf4;
     }
 
     @keyframes commentsThreadFadeIn {
@@ -1226,6 +1231,7 @@
     window.requestDeleteComment = function requestDeleteComment(commentId) {
       var commentEl = document.getElementById('comment-' + commentId);
       if (!commentEl) return;
+      var host = commentEl.querySelector('.comment-main-col') || commentEl;
       var menu = document.getElementById('comment-menu-' + commentId);
       if (menu) menu.style.display = 'none';
       var existing = document.getElementById('del-confirm-' + commentId);
@@ -1235,14 +1241,12 @@
       }
       var bar = document.createElement('div');
       bar.id = 'del-confirm-' + commentId;
-      bar.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px;padding:6px 0 0 0;border-top:1px solid #f0f5f0;';
+      bar.className = 'delete-confirm-bar';
       var msg = document.createElement('span');
-      msg.style.cssText = 'font-size:11px;color:#9ab09a;';
       msg.textContent = 'Delete this comment?';
       var cancelBtn = document.createElement('button');
       cancelBtn.type = 'button';
       cancelBtn.textContent = 'Cancel';
-      cancelBtn.style.cssText = 'border:none;background:none;font-size:11px;color:#9ab09a;cursor:pointer;padding:0;font:inherit;';
       cancelBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         bar.remove();
@@ -1250,7 +1254,7 @@
       var delBtn = document.createElement('button');
       delBtn.type = 'button';
       delBtn.textContent = 'Delete';
-      delBtn.style.cssText = 'border:none;background:none;font-size:11px;color:#e53e3e;cursor:pointer;padding:0;font-weight:600;font:inherit;';
+      delBtn.style.cssText = 'color:#e53e3e;font-weight:600;';
       delBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         window.confirmDeleteComment(commentId);
@@ -1258,7 +1262,7 @@
       bar.appendChild(msg);
       bar.appendChild(cancelBtn);
       bar.appendChild(delBtn);
-      commentEl.appendChild(bar);
+      host.appendChild(bar);
     };
 
     window.confirmDeleteComment = async function confirmDeleteComment(commentId) {
@@ -1283,6 +1287,7 @@
       if (!commentId || !replyId || !currentUser) return;
       var replyEl = document.getElementById('reply-' + replyId);
       if (!replyEl) return;
+      var host = replyEl.querySelector('.reply-main-col') || replyEl;
       var existing = document.getElementById('del-confirm-reply-' + replyId);
       if (existing) {
         existing.remove();
@@ -1290,14 +1295,12 @@
       }
       var bar = document.createElement('div');
       bar.id = 'del-confirm-reply-' + replyId;
-      bar.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:4px;padding-top:4px;';
+      bar.className = 'delete-confirm-bar';
       var msg = document.createElement('span');
-      msg.style.cssText = 'font-size:11px;color:#9ab09a;';
       msg.textContent = 'Delete this reply?';
       var cancelBtn = document.createElement('button');
       cancelBtn.type = 'button';
       cancelBtn.textContent = 'Cancel';
-      cancelBtn.style.cssText = 'border:none;background:none;font-size:11px;color:#9ab09a;cursor:pointer;padding:0;font:inherit;';
       cancelBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         bar.remove();
@@ -1305,7 +1308,7 @@
       var delBtn = document.createElement('button');
       delBtn.type = 'button';
       delBtn.textContent = 'Delete';
-      delBtn.style.cssText = 'border:none;background:none;font-size:11px;color:#e53e3e;cursor:pointer;padding:0;font-weight:600;font:inherit;';
+      delBtn.style.cssText = 'color:#e53e3e;font-weight:600;';
       delBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         window.confirmDeleteReply(commentId, replyId);
@@ -1313,7 +1316,7 @@
       bar.appendChild(msg);
       bar.appendChild(cancelBtn);
       bar.appendChild(delBtn);
-      replyEl.appendChild(bar);
+      host.appendChild(bar);
     };
 
     window.confirmDeleteReply = async function confirmDeleteReply(commentId, replyId) {
@@ -1342,7 +1345,7 @@
       var menu = document.getElementById('comment-menu-' + commentId);
       if (menu) menu.style.display = 'none';
       var commentEl = document.getElementById('comment-' + commentId);
-      var textEl = commentEl && commentEl.querySelector('.comment .comment-text');
+      var textEl = commentEl && commentEl.querySelector('.comment-text');
       if (!textEl) return;
       textEl.classList.add('comment-text-expanded');
       var z = textEl.closest('.comment-compact-zone');
@@ -1388,7 +1391,7 @@
 
     window.cancelEditComment = function (commentId, plainText) {
       var row = document.getElementById('comment-' + commentId);
-      var textEl = row && row.querySelector('.comment .comment-text');
+      var textEl = row && row.querySelector('.comment-text');
       if (!textEl) return;
       textEl.innerHTML = linkify(plainText);
       textEl.classList.remove('comment-text-expanded');
@@ -1406,7 +1409,7 @@
           editedAt: serverTimestamp()
         });
         var row = document.getElementById('comment-' + commentId);
-        var textEl = row && row.querySelector('.comment .comment-text');
+        var textEl = row && row.querySelector('.comment-text');
         if (textEl) {
           textEl.innerHTML = linkify(newText);
           textEl.classList.remove('comment-text-expanded');
@@ -1430,10 +1433,10 @@
       const currentCount = parseInt(countEl.textContent, 10) || 0;
       const ref = doc(db, 'communityPosts', postId, 'comments', commentId, 'likes', currentUser.uid);
 
-      if (alreadyLiked) {
-        btn.classList.remove('liked');
-        btn.style.color = '#9ab09a';
-        countEl.textContent = String(Math.max(0, currentCount - 1));
+        if (alreadyLiked) {
+          btn.classList.remove('liked');
+          btn.style.color = '#b0c8b0';
+          countEl.textContent = String(Math.max(0, currentCount - 1));
       } else {
         btn.classList.add('liked');
         btn.style.color = '#e53e3e';
@@ -1457,7 +1460,7 @@
           countEl.textContent = String(currentCount);
         } else {
           btn.classList.remove('liked');
-          btn.style.color = '#9ab09a';
+          btn.style.color = '#b0c8b0';
           countEl.textContent = String(currentCount);
         }
         console.error('Comment like error:', err);
@@ -1499,7 +1502,7 @@
       }
     };
 
-    const heartStrokeSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+    const heartStrokeSvg = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
 
     function wireCommentCompactZone(metaEl, credEl, textEl) {
       var zone = document.createElement('div');
@@ -1706,25 +1709,30 @@
         const wrapper = document.createElement('div');
         wrapper.className = 'comment-wrapper';
         wrapper.id = 'comment-' + commentId;
-        const item = document.createElement('div');
-        item.className = 'comment';
-        item.style.cssText = 'display:flex;gap:10px;align-items:flex-start;';
+        wrapper.style.cssText = 'margin-bottom:18px;';
+
+        const row = document.createElement('div');
+        row.className = 'comment-card-row';
 
         const av = document.createElement('div');
-        av.className = 'comment-avatar';
-        av.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;overflow:hidden;background:#2d6a2d;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;';
+        av.style.cssText = 'flex-shrink:0;width:32px;height:32px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;';
         if (photo) {
           const img = document.createElement('img');
           img.src = photo;
           img.alt = username;
           img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+          img.addEventListener('error', function () {
+            this.remove();
+            av.textContent = username.charAt(0).toUpperCase();
+          });
           av.appendChild(img);
         } else av.textContent = username.charAt(0).toUpperCase();
 
         const right = document.createElement('div');
+        right.className = 'comment-main-col';
         right.style.cssText = 'flex:1;min-width:0;';
         const meta = document.createElement('div');
-        meta.style.cssText = 'display:flex;align-items:baseline;gap:6px;margin-bottom:3px;flex-wrap:wrap;';
+        meta.style.cssText = 'display:flex;align-items:baseline;gap:6px;margin-bottom:3px;';
         const nameSpan = document.createElement('span');
         nameSpan.className = 'comment-name';
         nameSpan.style.cssText = 'font-size:13px;font-weight:700;color:#1a2e1a;';
@@ -1741,25 +1749,27 @@
           credEl.textContent = credLine;
         }
         const textEl = document.createElement('p');
+        textEl.className = 'comment';
+        textEl.style.cssText = 'font-size:14px;color:#2d4a2d;line-height:1.6;margin:0 0 6px 0;word-break:break-word;';
         textEl.innerHTML = linkify(c.text || '');
         var compactZone = wireCommentCompactZone(meta, credEl, textEl);
-        right.appendChild(compactZone);
+        compactZone.classList.add('comment');
 
         const actionRow = document.createElement('div');
-        actionRow.style.cssText = 'display:flex;align-items:center;gap:14px;flex-wrap:wrap;';
+        actionRow.style.cssText = 'display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
         const initialCommentLikes = Number(c.likes || c.likeCount || 0);
         const likeBtn = document.createElement('button');
         likeBtn.type = 'button';
         likeBtn.id = 'clb-' + commentId;
-        likeBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#9ab09a;display:flex;align-items:center;gap:4px;';
-        likeBtn.innerHTML = heartStrokeSvg + '<span id="clc-' + commentId + '">' + String(initialCommentLikes) + '</span>';
+        likeBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#b0c8b0;display:flex;align-items:center;gap:3px;transition:color 0.1s;';
+        likeBtn.innerHTML = heartStrokeSvg + '<span id="clc-' + commentId + '" style="font-size:11px;">' + String(initialCommentLikes) + '</span>';
         likeBtn.addEventListener('click', function (e) {
           e.stopPropagation();
           window.likeComment(commentId);
         });
         const replyBtn = document.createElement('button');
         replyBtn.type = 'button';
-        replyBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#9ab09a;font-weight:500;';
+        replyBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#b0c8b0;font-weight:500;';
         replyBtn.textContent = 'Reply';
         replyBtn.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -1768,6 +1778,18 @@
 
         actionRow.appendChild(likeBtn);
         actionRow.appendChild(replyBtn);
+
+        if (currentUser && c.authorUid && c.authorUid === currentUser.uid) {
+          const delInline = document.createElement('button');
+          delInline.type = 'button';
+          delInline.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#d0d0d0;';
+          delInline.textContent = 'Delete';
+          delInline.addEventListener('click', function (e) {
+            e.stopPropagation();
+            window.requestDeleteComment(commentId);
+          });
+          actionRow.appendChild(delInline);
+        }
 
         const moreWrap = document.createElement('div');
         moreWrap.className = 'comment-more-wrap';
@@ -1800,21 +1822,6 @@
             window.editComment(commentId);
           });
           moreMenu.appendChild(editBtn);
-          const delBtn = document.createElement('button');
-          delBtn.type = 'button';
-          delBtn.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#e53e3e;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
-          delBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><span>Delete</span>';
-          delBtn.addEventListener('mouseenter', function () { delBtn.style.background = '#fff5f5'; });
-          delBtn.addEventListener('mouseleave', function () { delBtn.style.background = 'none'; });
-          delBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            moreMenu.style.display = 'none';
-            window.requestDeleteComment(commentId);
-          });
-          moreMenu.appendChild(delBtn);
-          const commentMenuDivider = document.createElement('div');
-          commentMenuDivider.style.cssText = 'height:1px;background:#f0f5f0;margin:4px 0;';
-          moreMenu.appendChild(commentMenuDivider);
         }
         var postAuthorUid = String((postData && (postData.author || postData.authorId)) || '');
         if (currentUser && postAuthorUid && currentUser.uid === postAuthorUid) {
@@ -1858,19 +1865,41 @@
 
         const replyBox = document.createElement('div');
         replyBox.id = 'reply-box-' + commentId;
-        replyBox.style.cssText = 'display:none;margin-top:10px;';
+        replyBox.style.cssText = 'display:none;margin-top:8px;';
+        const replyRowInner = document.createElement('div');
+        replyRowInner.style.cssText = 'display:flex;gap:8px;align-items:flex-start;';
+        const replyAv = document.createElement('div');
+        replyAv.style.cssText = 'width:24px;height:24px;border-radius:50%;overflow:hidden;background:#059669;display:flex;align-items:center;justify-content:center;color:white;font-size:9px;font-weight:700;flex-shrink:0;margin-top:2px;';
+        var replyInitial = (currentUser && (currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()) || 'U';
+        var replyAvUrl = (currentProfileData && String(currentProfileData.photoURL || '').trim()) || (currentUser && currentUser.photoURL) || '';
+        if (replyAvUrl && currentUser) {
+          const rimg = document.createElement('img');
+          rimg.src = replyAvUrl;
+          rimg.alt = '';
+          rimg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+          rimg.addEventListener('error', function () {
+            this.remove();
+            replyAv.textContent = replyInitial;
+          });
+          replyAv.appendChild(rimg);
+        }
+        if (!replyAv.querySelector('img')) replyAv.textContent = replyInitial;
         const replyInner = document.createElement('div');
-        replyInner.style.cssText = 'background:#f8fdf8;border:1px solid #e8f0e8;border-radius:10px;padding:10px;';
+        replyInner.style.cssText = 'flex:1;background:#f8fdf8;border:1px solid #e8f0e8;border-radius:10px;padding:8px 10px;';
         const replyTa = document.createElement('textarea');
         replyTa.id = 'reply-input-' + commentId;
         replyTa.placeholder = 'Write a reply...';
-        replyTa.style.cssText = 'width:100%;border:none;outline:none;font-size:13px;color:#1a2e1a;resize:none;min-height:56px;font-family:inherit;background:transparent;box-sizing:border-box;';
+        replyTa.style.cssText = 'width:100%;border:none;outline:none;font-size:13px;color:#1a2e1a;resize:none;min-height:44px;max-height:120px;font-family:inherit;background:transparent;box-sizing:border-box;line-height:1.5;';
+        replyTa.addEventListener('input', function () {
+          replyTa.style.height = 'auto';
+          replyTa.style.height = Math.min(replyTa.scrollHeight, 120) + 'px';
+        });
         const replyAct = document.createElement('div');
-        replyAct.style.cssText = 'display:flex;justify-content:flex-end;gap:6px;margin-top:6px;';
+        replyAct.style.cssText = 'display:flex;justify-content:flex-end;gap:6px;padding-top:6px;border-top:1px solid #f0f5f0;margin-top:4px;';
         const replyCancel = document.createElement('button');
         replyCancel.type = 'button';
         replyCancel.textContent = 'Cancel';
-        replyCancel.style.cssText = 'border:1px solid #e8f0e8;background:white;border-radius:20px;padding:5px 12px;font-size:12px;color:#5a7a5a;cursor:pointer;';
+        replyCancel.style.cssText = 'border:none;background:none;font-size:12px;color:#9ab09a;cursor:pointer;padding:3px 8px;';
         replyCancel.addEventListener('click', function (e) {
           e.stopPropagation();
           window.toggleReplyBox(commentId);
@@ -1879,7 +1908,7 @@
         replyGo.type = 'button';
         replyGo.id = 'reply-submit-' + commentId;
         replyGo.textContent = 'Reply';
-        replyGo.style.cssText = 'border:none;background:#2d6a2d;color:white;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;';
+        replyGo.style.cssText = 'border:none;background:#059669;color:white;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;';
         replyGo.addEventListener('click', function (e) {
           e.stopPropagation();
           window.submitReply(commentId);
@@ -1888,7 +1917,9 @@
         replyAct.appendChild(replyGo);
         replyInner.appendChild(replyTa);
         replyInner.appendChild(replyAct);
-        replyBox.appendChild(replyInner);
+        replyRowInner.appendChild(replyAv);
+        replyRowInner.appendChild(replyInner);
+        replyBox.appendChild(replyRowInner);
 
         const repliesWrap = document.createElement('div');
         repliesWrap.id = 'replies-' + commentId;
@@ -1904,21 +1935,26 @@
             row.className = 'reply-item';
             row.id = 'reply-' + rd.id;
             const rav = document.createElement('div');
-            rav.style.cssText = 'flex-shrink:0;width:28px;height:28px;border-radius:50%;overflow:hidden;background:#2d6a2d;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;';
+            rav.style.cssText = 'flex-shrink:0;width:26px;height:26px;border-radius:50%;overflow:hidden;background:#059669;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;';
             const rPhoto = String(r.authorPhotoURL || r.authorPhoto || '').trim();
             if (rPhoto) {
               const ri = document.createElement('img');
               ri.src = rPhoto;
               ri.alt = rName;
               ri.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+              ri.addEventListener('error', function () {
+                this.remove();
+                rav.textContent = rName.charAt(0).toUpperCase();
+              });
               rav.appendChild(ri);
             } else rav.textContent = rName.charAt(0).toUpperCase();
             const rr = document.createElement('div');
+            rr.className = 'reply-main-col';
             rr.style.cssText = 'flex:1;min-width:0;';
             const rm = document.createElement('div');
             rm.style.cssText = 'display:flex;align-items:baseline;gap:6px;margin-bottom:3px;';
             const rns = document.createElement('span');
-            rns.style.cssText = 'font-size:13px;font-weight:700;color:#1a2e1a;';
+            rns.style.cssText = 'font-size:12px;font-weight:700;color:#1a2e1a;';
             rns.textContent = rName;
             const rts = document.createElement('span');
             rts.style.cssText = 'font-size:11px;color:#b0c8b0;';
@@ -1926,19 +1962,24 @@
             rm.appendChild(rns);
             rm.appendChild(rts);
             const rb = document.createElement('p');
+            rb.className = 'comment';
+            rb.style.cssText = 'font-size:13px;color:#2d4a2d;line-height:1.6;margin:0 0 6px 0;word-break:break-word;';
             rb.innerHTML = linkify(r.text || '');
             var rZone = wireCommentCompactZone(rm, null, rb);
             rr.appendChild(rZone);
             if (currentUser && String(r.authorUid || '') === currentUser.uid) {
+              var repActions = document.createElement('div');
+              repActions.style.cssText = 'display:flex;align-items:center;gap:12px;';
               var delRep = document.createElement('button');
               delRep.type = 'button';
               delRep.textContent = 'Delete';
-              delRep.style.cssText = 'border:none;background:none;font-size:11px;color:#9ab09a;cursor:pointer;padding:4px 0;margin-top:2px;font:inherit;';
+              delRep.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#d0d0d0;';
               delRep.addEventListener('click', function (e) {
                 e.stopPropagation();
                 window.requestDeleteReply(commentId, rd.id);
               });
-              rr.appendChild(delRep);
+              repActions.appendChild(delRep);
+              rr.appendChild(repActions);
             }
             row.appendChild(rav);
             row.appendChild(rr);
@@ -1947,12 +1988,13 @@
         });
         threadRepliesUnsubs.push(unsubReplies);
 
+        right.appendChild(compactZone);
         right.appendChild(actionRow);
         right.appendChild(replyBox);
-        item.appendChild(av);
-        item.appendChild(right);
-        wrapper.appendChild(item);
-        wrapper.appendChild(repliesWrap);
+        right.appendChild(repliesWrap);
+        row.appendChild(av);
+        row.appendChild(right);
+        wrapper.appendChild(row);
         attachHost.appendChild(wrapper);
       }
       listEl.classList.remove('comments-fade-in');
