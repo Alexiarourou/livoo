@@ -777,25 +777,6 @@
       }
     }
 
-    function makePendingCommentDoc(text, authorUsername, authorUid, authorPhoto) {
-      var id = 'pending-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
-      return {
-        id: id,
-        data: function () {
-          return {
-            text: text,
-            authorUsername: authorUsername,
-            authorUid: authorUid,
-            authorPhoto: authorPhoto,
-            authorPhotoURL: authorPhoto,
-            createdAt: { toDate: function () { return new Date(); } },
-            likes: 0,
-            likeCount: 0
-          };
-        }
-      };
-    }
-
     const loadingEl = document.getElementById('loading');
     const errEl = document.getElementById('err-msg');
     const shell = document.getElementById('post-shell');
@@ -819,14 +800,6 @@
       if (!el || !label) return;
       const n = Math.max(0, parseInt(el.textContent, 10) || 0);
       label.textContent = String(n) + ' comment' + (n === 1 ? '' : 's');
-    }
-
-    function bumpThreadCommentCount(delta) {
-      const el = document.getElementById('post-comment-count');
-      if (!el) return;
-      const n = Math.max(0, (parseInt(el.textContent, 10) || 0) + delta);
-      el.textContent = String(n);
-      updateCommentCountLabel();
     }
 
     function fillComposerAvatar() {
@@ -1244,7 +1217,6 @@
         });
         var row = document.getElementById('comment-' + commentId);
         if (row) row.remove();
-        bumpThreadCommentCount(-1);
         showToast('Comment deleted');
       } catch (err) {
         console.error(err);
@@ -1403,7 +1375,6 @@
           createdAt: serverTimestamp()
         });
         await updateDoc(doc(db, 'communityPosts', postId), { commentCount: increment(1) });
-        bumpThreadCommentCount(1);
         if (ta) ta.value = '';
         window.toggleReplyBox(parentCommentId);
       } catch (err) {
@@ -1850,9 +1821,6 @@
       const authorUsername = (currentProfileData && String(currentProfileData.username || '').trim())
         || currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : '') || 'Member';
       const authorPhoto = (currentProfileData && String(currentProfileData.photoURL || '').trim()) || currentUser.photoURL || '';
-      const pendingDoc = makePendingCommentDoc(text, authorUsername, currentUser.uid, authorPhoto);
-      latestComments = latestComments.concat([pendingDoc]);
-      renderComments().catch(function () {});
       const batch = writeBatch(db);
       const postRef = doc(db, 'communityPosts', postId);
       const commentRef = doc(collection(db, 'communityPosts', postId, 'comments'));
@@ -1865,19 +1833,12 @@
       batch.update(postRef, { commentCount: increment(1) });
       try {
         await batch.commit();
-        const countEl = document.getElementById('post-comment-count');
-        const labelEl = document.getElementById('comment-count-label');
-        const newCount = (parseInt(countEl && countEl.textContent, 10) || 0) + 1;
-        if (countEl) countEl.textContent = String(newCount);
-        if (labelEl) labelEl.textContent = newCount + ' comment' + (newCount !== 1 ? 's' : '');
         commentInputEl.value = '';
         commentInputEl.style.height = '';
         collapseComposer();
       } catch (err) {
         console.error('Comment failed:', err);
-        var pid = pendingDoc.id;
-        latestComments = latestComments.filter(function (d) { return d.id !== pid; });
-        renderComments().catch(function () {});
+        showToast('Could not post comment');
       }
     }
 
