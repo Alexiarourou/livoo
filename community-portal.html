@@ -12,14 +12,14 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --green: #059669;
-  --green-light: #10b981;
+  --green-light: #059669;
   --green-dark: #047857;
-  --btn-green: #1a7a4a;
-  --btn-green-hover: #156b42;
-  --bg: #edf7f0;
+  --btn-green: #059669;
+  --btn-green-hover: #047857;
+  --bg: #ecfdf5;
   --surface: #ffffff;
   --border: #d4e5dc;
-  --text: #1a2e24;
+  --text: #064e3b;
   --muted: #4a7c5e;
 }
 html { scroll-behavior: smooth; }
@@ -899,7 +899,7 @@ nav {
 #mobile-city-bar .city-name {
   font-size: 13px;
   font-weight: 700;
-  color: #1a2e1a;
+  color: #064e3b;
 }
 
 #mobile-city-bar select {
@@ -907,7 +907,7 @@ nav {
   border: 1.5px solid #d4e6d4;
   border-radius: 8px;
   padding: 4px 10px;
-  color: #2d6a2d;
+  color: #059669;
   background: white;
   font-weight: 600;
   cursor: pointer;
@@ -922,7 +922,7 @@ nav {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: #2d6a2d;
+  background: #059669;
   color: white;
   border: none;
   font-size: 26px;
@@ -1008,7 +1008,7 @@ nav {
 #mobile-community-card h4 {
   font-size: 13px;
   font-weight: 700;
-  color: #1a2e1a;
+  color: #064e3b;
   margin-bottom: 2px;
 }
 
@@ -1021,7 +1021,7 @@ nav {
 #mobile-community-card .rules-title {
   font-size: 12px;
   font-weight: 700;
-  color: #1a2e1a;
+  color: #064e3b;
   margin-bottom: 8px;
 }
 
@@ -1044,7 +1044,7 @@ nav {
         <polyline points="6,10 14,21 22,10" fill="none" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
         <polyline points="10,15 14,20 18,15" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
       </svg>
-      <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#1a2e1a;letter-spacing:-0.04em;">livvo</span>
+      <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:#064e3b;letter-spacing:-0.04em;">livvo</span>
     </a>
     <label for="nav-toggle" class="nav-burger" aria-label="Open menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></label>
   </div>
@@ -1099,10 +1099,10 @@ nav {
   <div class="portal-layout">
     <aside class="left-sidebar">
       <div style="margin-bottom: 24px;">
-        <label style="font-size: 13px; font-weight: 700; color: #1a2e1a; display: block; margin-bottom: 8px;">Browse cities</label>
+        <label style="font-size: 13px; font-weight: 700; color: #064e3b; display: block; margin-bottom: 8px;">Browse cities</label>
         <div style="position: relative;">
           <select id="city-switcher" onchange="switchCityFromDropdown(this.value)"
-            style="width: 100%; font-size: 13px; font-weight: 500; color: #1a2e1a; background: white; border: 1.5px solid #d4e6d4; border-radius: 10px; padding: 9px 32px 9px 12px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%235a7a5a%22/></svg>'); background-repeat: no-repeat; background-position: right 12px center;">
+            style="width: 100%; font-size: 13px; font-weight: 500; color: #064e3b; background: white; border: 1.5px solid #d4e6d4; border-radius: 10px; padding: 9px 32px 9px 12px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%235a7a5a%22/></svg>'); background-repeat: no-repeat; background-position: right 12px center;">
             <option value="amsterdam">Amsterdam</option>
             <option value="athens">Athens</option>
             <option value="barcelona">Barcelona</option>
@@ -1150,11 +1150,11 @@ nav {
       </div>
       <!-- Community info — moved from right sidebar -->
       <div style="border-top:1px solid #e8f0e8;margin-top:20px;padding-top:20px;">
-        <h4 style="font-size:13px;font-weight:700;color:#1a2e1a;margin:0 0 4px 0;" id="sidebar-city-name">Athens Community</h4>
+        <h4 style="font-size:13px;font-weight:700;color:#064e3b;margin:0 0 4px 0;" id="sidebar-city-name">Athens Community</h4>
         <p style="font-size:12px;color:#6b8f6b;margin:0 0 16px 0;">
           <span id="sidebar-member-count">0</span> members
         </p>
-        <h4 style="font-size:13px;font-weight:700;color:#1a2e1a;margin:0 0 8px 0;">Community rules</h4>
+        <h4 style="font-size:13px;font-weight:700;color:#064e3b;margin:0 0 8px 0;">Community rules</h4>
         <ol style="font-size:12px;color:#5a7a5a;margin:0;padding-left:16px;line-height:1.8;">
           <li>Be kind and respectful.</li>
           <li>No spam or self-promo dumps.</li>
@@ -1173,9 +1173,9 @@ nav {
     <section class="main-column">
       <!-- Page header -->
       <div class="greeting-section" style="margin-bottom: 24px;">
-        <h1 id="header-greeting" style="font-size: 26px; font-weight: 700; color: #1a2e1a; margin: 0 0 4px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+        <h1 id="header-greeting" style="font-size: 26px; font-weight: 700; color: #064e3b; margin: 0 0 4px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
           Hi, <span id="header-username">there</span>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d6a2d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
         </h1>
         <p style="font-size: 14px; color: #5a7a5a; margin: 0;">
           Share tips, events, housing advice and connect with people in your city.
@@ -1203,12 +1203,12 @@ nav {
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-          <select id="sort-select" style="font-size: 13px; font-weight: 500; color: #1a2e1a; background: white; border: 1.5px solid #d4e6d4; border-radius: 20px; padding: 7px 14px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%235a7a5a%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;">
+          <select id="sort-select" style="font-size: 13px; font-weight: 500; color: #064e3b; background: white; border: 1.5px solid #d4e6d4; border-radius: 20px; padding: 7px 14px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%235a7a5a%22/></svg>'); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;">
             <option value="recent">Most Recent</option>
             <option value="popular">Most Popular</option>
             <option value="oldest">Oldest</option>
           </select>
-          <button type="button" id="new-post-btn" style="font-size: 13px; font-weight: 600; background: #2d6a2d; color: white; border: none; border-radius: 20px; padding: 8px 18px; cursor: pointer; white-space: nowrap;">
+          <button type="button" id="new-post-btn" style="font-size: 13px; font-weight: 600; background: #059669; color: white; border: none; border-radius: 20px; padding: 8px 18px; cursor: pointer; white-space: nowrap;">
             + New post
           </button>
         </div>
@@ -1220,8 +1220,8 @@ nav {
         </svg>
         <input id="post-search" type="text" placeholder="Search posts in this city..."
           oninput="filterPosts(this.value)"
-          style="width:100%;padding:11px 16px 11px 40px;border:1.5px solid #e8f0e8;border-radius:12px;font-size:14px;color:#1a2e1a;background:white;outline:none;font-family:inherit;transition:border-color 0.15s;"
-          onfocus="this.style.borderColor='#2d6a2d'"
+          style="width:100%;padding:11px 16px 11px 40px;border:1.5px solid #e8f0e8;border-radius:12px;font-size:14px;color:#064e3b;background:white;outline:none;font-family:inherit;transition:border-color 0.15s;"
+          onfocus="this.style.borderColor='#059669'"
           onblur="this.style.borderColor='#e8f0e8'">
       </div>
 
@@ -1240,7 +1240,7 @@ nav {
       </div>
       <div id="load-more-container" style="display:none;text-align:center;padding:20px 0;">
         <button type="button" id="load-more-btn"
-          style="border:1.5px solid #2d6a2d;background:white;color:#2d6a2d;border-radius:20px;padding:9px 28px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;">
+          style="border:1.5px solid #059669;background:white;color:#059669;border-radius:20px;padding:9px 28px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;">
           Load more posts
         </button>
       </div>
@@ -1285,13 +1285,13 @@ nav {
       </div>
     </div>
     <div style="margin-top:12px;">
-      <label style="font-size:13px;font-weight:600;color:#1a2e1a;display:block;margin-bottom:8px;">
+      <label style="font-size:13px;font-weight:600;color:#064e3b;display:block;margin-bottom:8px;">
         Image
         <span style="font-weight:400;color:#9ab09a;font-size:12px;">(optional)</span>
       </label>
       <div id="image-upload-area" onclick="document.getElementById('post-image-input').click()"
         style="border:2px dashed #d4e6d4;border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.15s;background:#fafffa;"
-        onmouseover="this.style.borderColor='#2d6a2d'"
+        onmouseover="this.style.borderColor='#059669'"
         onmouseout="this.style.borderColor='#d4e6d4'">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ab09a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:6px;">
           <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
@@ -1690,7 +1690,7 @@ nav {
       var t = document.createElement('div');
       t.id = 'toast';
       t.textContent = msg;
-      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2e1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:10000;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;';
+      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#064e3b;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:10000;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;';
       document.body.appendChild(t);
       setTimeout(function () { t.style.opacity = '1'; }, 10);
       setTimeout(function () {
@@ -1740,7 +1740,7 @@ nav {
         'events': 'background:#fdf3e8;color:#a86b1a;',
         'flatmate search': 'background:#f3e8fd;color:#6b1aa8;',
         'flatmate': 'background:#f3e8fd;color:#6b1aa8;',
-        'general': 'background:#f0f7f0;color:#2d6a2d;',
+        'general': 'background:#ecfdf5;color:#059669;',
         'recommendations': 'background:#fde8e8;color:#a81a1a;',
         'visa & admin': 'background:#e8fdf3;color:#1aa86b;',
         'visa': 'background:#e8fdf3;color:#1aa86b;',
@@ -1750,10 +1750,10 @@ nav {
         'jobs_remote': 'background:#fdf9e8;color:#a8961a;',
         'things to do': 'background:#e8eafd;color:#1a2ea8;',
         'things_to_do': 'background:#e8eafd;color:#1a2ea8;',
-        'post': 'background:#f0f7f0;color:#2d6a2d;'
+        'post': 'background:#ecfdf5;color:#059669;'
       };
       var key = category ? String(category).toLowerCase().trim() : 'general';
-      return styles[key] || 'background:#f0f7f0;color:#2d6a2d;';
+      return styles[key] || 'background:#ecfdf5;color:#059669;';
     }
 
     window.filterPosts = function (query) {
@@ -1778,7 +1778,7 @@ nav {
         noResults = document.createElement('div');
         noResults.id = 'no-search-results';
         noResults.style.cssText = 'text-align:center;padding:40px 20px;color:#9ab09a;display:none;';
-        noResults.innerHTML = '<p style="font-size:14px;font-weight:600;color:#1a2e1a;margin-bottom:4px;">No posts found</p><p style="font-size:13px;">Try a different search term</p>';
+        noResults.innerHTML = '<p style="font-size:14px;font-weight:600;color:#064e3b;margin-bottom:4px;">No posts found</p><p style="font-size:13px;">Try a different search term</p>';
         var pc = document.getElementById('posts-container');
         if (pc) pc.appendChild(noResults);
       }
@@ -1823,7 +1823,7 @@ nav {
       var inp = document.createElement('input');
       inp.id = 'edit-title-' + postId;
       inp.value = currentTitle;
-      inp.style.cssText = 'width:100%;border:1.5px solid #2d6a2d;border-radius:8px;padding:8px 12px;font-size:15px;font-weight:700;color:#1a2e1a;outline:none;font-family:inherit;box-sizing:border-box;';
+      inp.style.cssText = 'width:100%;border:1.5px solid #059669;border-radius:8px;padding:8px 12px;font-size:15px;font-weight:700;color:#064e3b;outline:none;font-family:inherit;box-sizing:border-box;';
       inp.addEventListener('click', function (e) { e.stopPropagation(); });
       titleEl.appendChild(inp);
 
@@ -1850,7 +1850,7 @@ nav {
       var saveBtn = document.createElement('button');
       saveBtn.type = 'button';
       saveBtn.textContent = 'Save';
-      saveBtn.style.cssText = 'border:none;background:#2d6a2d;color:white;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;';
+      saveBtn.style.cssText = 'border:none;background:#059669;color:white;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;';
       saveBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         window.saveEditPost(postId);
@@ -2174,14 +2174,14 @@ nav {
       iconWrap.style.cssText = 'display:flex;justify-content:center;margin-bottom:12px;';
       iconWrap.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9ab09a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
       const h3 = document.createElement('h3');
-      h3.style.cssText = 'font-size:16px;font-weight:700;color:#1a2e1a;margin:0 0 6px 0;';
+      h3.style.cssText = 'font-size:16px;font-weight:700;color:#064e3b;margin:0 0 6px 0;';
       h3.textContent = 'No posts in this city yet';
       const p = document.createElement('p');
       p.style.cssText = 'font-size:13px;margin:0 0 16px 0;';
       p.textContent = 'Be the first to share a tip, event or question.';
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.style.cssText = 'background:#2d6a2d;color:white;border:none;border-radius:20px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;';
+      btn.style.cssText = 'background:#059669;color:white;border:none;border-radius:20px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;';
       btn.textContent = '+ Start the conversation';
       btn.addEventListener('click', function () {
         document.getElementById('new-post-btn').click();
@@ -2220,7 +2220,7 @@ nav {
         card.id = 'post-card-' + postId;
         card.style.cssText = 'background:white; border:1px solid #e8f0e8; border-radius:12px; padding:12px 16px; margin-bottom:8px; cursor:pointer; transition: border-color 0.15s, box-shadow 0.15s;';
         card.addEventListener('mouseenter', function () {
-          card.style.borderColor = '#2d6a2d';
+          card.style.borderColor = '#059669';
           card.style.boxShadow = '0 2px 8px rgba(45,106,45,0.1)';
         });
         card.addEventListener('mouseleave', function () {
@@ -2245,7 +2245,7 @@ nav {
           img.style.cssText = 'width:32px;height:32px;border-radius:50%;object-fit:cover;display:block;';
           const fallback = document.createElement('div');
           fallback.className = 'avatar-fallback';
-          fallback.style.cssText = 'display:none;width:32px;height:32px;border-radius:50%;background:#2d6a2d;color:white;font-weight:600;font-size:12px;align-items:center;justify-content:center;';
+          fallback.style.cssText = 'display:none;width:32px;height:32px;border-radius:50%;background:#059669;color:white;font-weight:600;font-size:12px;align-items:center;justify-content:center;';
           fallback.textContent = initial;
           img.addEventListener('error', function () {
             img.style.display = 'none';
@@ -2255,7 +2255,7 @@ nav {
           avatarWrap.appendChild(fallback);
         } else {
           const fb = document.createElement('div');
-          fb.style.cssText = 'width:32px;height:32px;border-radius:50%;background:#2d6a2d;color:white;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;';
+          fb.style.cssText = 'width:32px;height:32px;border-radius:50%;background:#059669;color:white;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;';
           fb.textContent = initial;
           avatarWrap.appendChild(fb);
         }
@@ -2281,7 +2281,7 @@ nav {
 
         const titleEl = document.createElement('h3');
         titleEl.className = 'post-title';
-        titleEl.style.cssText = 'font-size:15px;font-weight:700;color:#1a2e1a;margin:0 0 4px 0;line-height:1.3;';
+        titleEl.style.cssText = 'font-size:15px;font-weight:700;color:#064e3b;margin:0 0 4px 0;line-height:1.3;';
         titleEl.textContent = d.title || 'Untitled';
         titleEl.addEventListener('click', function (e) {
           if (e.target.closest && e.target.closest('input')) return;
@@ -2373,7 +2373,7 @@ nav {
         if (canDelete) {
           const editBtn = document.createElement('button');
           editBtn.type = 'button';
-          editBtn.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#1a2e1a;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
+          editBtn.style.cssText = 'width:100%;border:none;background:none;padding:9px 14px;text-align:left;font-size:13px;color:#064e3b;cursor:pointer;display:flex;align-items:center;gap:10px;font:inherit;border-radius:8px;';
           editBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>Edit post</span>';
           editBtn.addEventListener('mouseenter', function () { editBtn.style.background = '#f5f5f5'; });
           editBtn.addEventListener('mouseleave', function () { editBtn.style.background = 'none'; });
@@ -2508,12 +2508,12 @@ nav {
     if (loadMoreBtn) {
       loadMoreBtn.addEventListener('click', function () { loadPosts(false); });
       loadMoreBtn.addEventListener('mouseenter', function () {
-        loadMoreBtn.style.background = '#2d6a2d';
+        loadMoreBtn.style.background = '#059669';
         loadMoreBtn.style.color = 'white';
       });
       loadMoreBtn.addEventListener('mouseleave', function () {
         loadMoreBtn.style.background = 'white';
-        loadMoreBtn.style.color = '#2d6a2d';
+        loadMoreBtn.style.color = '#059669';
       });
     }
 
@@ -2699,7 +2699,7 @@ nav {
 </button>
 
 <button id="back-to-top" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})"
-  style="display:none;position:fixed;bottom:24px;right:24px;width:40px;height:40px;border-radius:50%;background:#2d6a2d;color:white;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:999;font-family:inherit;line-height:1;padding:0;"
+  style="display:none;position:fixed;bottom:24px;right:24px;width:40px;height:40px;border-radius:50%;background:#059669;color:white;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:999;font-family:inherit;line-height:1;padding:0;"
   aria-label="Back to top">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
