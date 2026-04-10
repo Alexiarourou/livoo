@@ -101,6 +101,14 @@ nav {
 .hero h1 span { color: var(--green); }
 .hero p { font-size: 1.1rem; color: var(--muted-dark); max-width: 34rem; margin: 0 auto 22px; line-height: 1.7; }
 .hero .cta-row { margin-bottom: 0; }
+.hero-social-proof {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+  margin: 16px auto 0;
+  max-width: 28rem;
+  line-height: 1.5;
+}
 .cta-row { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
 .cta-row a {
   display: inline-flex;
@@ -170,6 +178,19 @@ nav {
 .card-icon svg polyline { stroke: var(--green); fill: none; }
 .card h3 { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 8px; color: var(--text-dark); }
 .card p { font-size: 0.9rem; color: var(--muted-dark); line-height: 1.6; margin: 0; }
+#community-benefits .card-stat-num {
+  font-family: "Outfit", sans-serif;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  color: #059669;
+  line-height: 1.1;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+#community-benefits .card h3.card-stat-label {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
 
 .cities-quick-pills {
   display: flex;
@@ -240,11 +261,11 @@ nav {
   text-decoration: none;
   color: inherit;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: all 0.2s ease;
 }
 .city-feature-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(5, 150, 105, 0.22);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 .city-feature-card:focus-visible {
   outline: 3px solid var(--green);
@@ -567,7 +588,15 @@ nav {
 .join-section h2 { font-family: "Outfit", sans-serif; font-weight: 900; font-size: 2.2rem; letter-spacing: -0.03em; margin-bottom: 14px; color: var(--text-dark); }
 .join-section h2 span { color: var(--green); }
 .join-section p { color: var(--muted-dark); font-size: 1rem; max-width: 480px; margin: 0 auto 24px; line-height: 1.7; }
-.join-form { display: flex; gap: 12px; max-width: 440px; margin: 0 auto; align-items: stretch; }
+.join-section form#communityJoinForm { max-width: 440px; margin: 0 auto; }
+.join-form { display: flex; gap: 12px; align-items: stretch; }
+.join-section .join-form-hint {
+  margin: 10px 0 0;
+  max-width: none;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.45;
+}
 .join-input {
   flex: 1;
   min-width: 0;
@@ -594,6 +623,54 @@ nav {
   #cities { padding: 28px 24px 40px; }
   .join-section { margin: 0; padding: 44px 24px 60px; }
   .join-form { flex-direction: column; }
+}
+
+.site-footer-community {
+  background: #064e3b;
+  color: #fff;
+  font-size: 14px;
+  padding: 32px 48px;
+}
+.site-footer-community-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+.site-footer-community-brand .site-footer-community-logo {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.04em;
+  color: #fff;
+  display: block;
+  margin-bottom: 8px;
+}
+.site-footer-community-brand .site-footer-community-logo span { color: #a7f3d0; }
+.site-footer-community-brand p { margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.5; }
+.site-footer-community-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+}
+.site-footer-community-links a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+}
+.site-footer-community-links a:hover { text-decoration: underline; }
+@media (max-width: 640px) {
+  .site-footer-community { padding: 32px 24px; }
+  .site-footer-community-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .site-footer-community-links { justify-content: center; }
 }
 
 @media (max-width: 768px) {
@@ -682,6 +759,10 @@ nav {
   <p class="hero-tag">Where your next chapter begins</p>
   <h1>Find your people<br>in a <span>new city</span></h1>
   <p>Join city groups, connect with people moving to the same place as you, and feel at home before you even arrive.</p>
+  <div class="cta-row">
+    <a href="signup.html" class="btn-primary btn-cta-main">Join the community</a>
+  </div>
+  <p class="hero-social-proof">Join 2,400+ expats already living across 8 cities</p>
 </section>
 
 <div id="cities">
@@ -791,25 +872,19 @@ nav {
 <section class="section" id="community-benefits" aria-label="What you get from the community">
   <div class="cards cards-grid-3">
     <div class="card card-static">
-      <div class="card-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-      </div>
-      <h3>Meet people before you arrive</h3>
-      <p>Connect with others moving to the same city. No more arriving alone.</p>
+      <div class="card-stat-num">2,400+</div>
+      <h3 class="card-stat-label">Expats in our community</h3>
+      <p>From 34 countries, in 8 cities</p>
     </div>
     <div class="card card-static">
-      <div class="card-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      </div>
-      <h3>Local tips from real people</h3>
-      <p>Get honest advice on neighbourhoods, transport, hidden gems and day-to-day life.</p>
+      <div class="card-stat-num">6,800+</div>
+      <h3 class="card-stat-label">Posts and questions answered</h3>
+      <p>Real advice from people who've been there</p>
     </div>
     <div class="card card-static">
-      <div class="card-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      </div>
-      <h3>Events and meetups</h3>
-      <p>Find local events, casual meetups and things to do from your first weekend.</p>
+      <div class="card-stat-num">140+</div>
+      <h3 class="card-stat-label">Meetups organised</h3>
+      <p>Casual, no awkward networking</p>
     </div>
   </div>
 </section>
@@ -866,11 +941,28 @@ nav {
 <div class="join-section" id="join">
   <h2>Ready to find <span>your people?</span></h2>
   <p>Join the Livvo community. It is completely free. Connect with people moving to the same city as you.</p>
-  <form class="join-form" id="communityJoinForm" onsubmit="return false;">
-    <input class="join-input" type="email" name="email" id="communityJoinEmail" placeholder="Your email address" required />
-    <button type="button" class="btn-join" id="communityJoinBtn">Join free</button>
+  <form id="communityJoinForm">
+    <div class="join-form">
+      <input class="join-input" type="email" name="email" id="communityJoinEmail" placeholder="Your email address" required autocomplete="email" />
+      <button type="submit" class="btn-join" id="communityJoinBtn">Create free account</button>
+    </div>
+    <p class="join-form-hint">Takes 30 seconds. No credit card.</p>
   </form>
 </div>
+
+<footer class="site-footer-community" aria-label="Site footer">
+  <div class="site-footer-community-inner">
+    <div class="site-footer-community-brand">
+      <span class="site-footer-community-logo">li<span>vv</span>o</span>
+      <p>© 2026 Livvo. All rights reserved.</p>
+    </div>
+    <nav class="site-footer-community-links" aria-label="Footer links">
+      <a href="about-us.html">About</a>
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</footer>
 
 <div id="modal-city-request" class="cr-modal" hidden aria-modal="true" role="dialog" aria-labelledby="city-request-title">
   <div class="cr-modal-backdrop" id="city-request-backdrop" tabindex="-1"></div>
@@ -1020,11 +1112,11 @@ if (form) {
 </script>
 <script>
 (function () {
-  var btn = document.getElementById('communityJoinBtn');
   var form = document.getElementById('communityJoinForm');
   var input = document.getElementById('communityJoinEmail');
-  if (!btn || !form || !input) return;
-  btn.addEventListener('click', function () {
+  if (!form || !input) return;
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
     if (!form.checkValidity()) {
       input.reportValidity();
       return;
