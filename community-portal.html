@@ -1244,6 +1244,65 @@ nav {
   padding-left: 16px;
   line-height: 1.8;
 }
+
+#incomplete-profile-banner {
+  display: none;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  background: #fff8e6;
+  border-bottom: 1px solid #f0d070;
+  padding: 10px 20px;
+  margin-top: 64px;
+  box-sizing: border-box;
+}
+
+#nav-profile-menu-toggle {
+  border: 1px solid #d4eadb;
+  background: #fff;
+  color: #064e3b;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+#nav-profile-menu-toggle:hover { background: #ecfdf5; }
+
+.nav-profile-menu-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #059669;
+  text-decoration: none;
+  border-bottom: 1px solid #f0f5f0;
+  border-radius: 8px;
+}
+.nav-profile-menu-link:hover { background: #f0f7f0; }
+
+@media (max-width: 768px) {
+  #mobile-bottom-nav {
+    display: flex !important;
+  }
+  body.portal-ready {
+    padding-bottom: 70px;
+  }
+  body.portal-ready #fab-new-post {
+    display: none !important;
+  }
+  #back-to-top {
+    bottom: 88px !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -1278,10 +1337,14 @@ nav {
         </button>
         <div id="nav-notifications-dropdown" class="nav-notifications-dropdown" hidden role="menu"></div>
       </div>
-      <div class="nav-profile-wrap">
-        <button type="button" id="nav-profile-trigger" class="nav-profile-trigger" aria-label="Open profile menu"></button>
+      <div class="nav-profile-wrap" style="display:flex;align-items:center;gap:4px;">
+        <a id="nav-profile-trigger" class="nav-profile-trigger" href="profile-setup.html" aria-label="Your profile"></a>
+        <button type="button" id="nav-profile-menu-toggle" class="nav-profile-menu-toggle" aria-label="Account menu" aria-expanded="false" aria-haspopup="true">⋯</button>
         <div id="nav-profile-menu" class="nav-profile-menu" hidden>
-          <button type="button" class="nav-profile-item" id="menu-edit-profile">Edit Profile</button>
+          <a id="menu-edit-profile" class="nav-profile-menu-link" href="profile-setup.html">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit profile
+          </a>
           <button type="button" class="nav-profile-item" id="menu-switch-city">Switch City</button>
           <button type="button" class="nav-profile-item" id="menu-signout">Sign out</button>
         </div>
@@ -1290,6 +1353,16 @@ nav {
     </div>
   </div>
 </nav>
+
+<div id="incomplete-profile-banner">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4a017" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  <div style="flex:1;min-width:0;">
+    <p style="font-size:13px;font-weight:700;color:#92610a;margin:0 0 1px 0;">Your profile is incomplete</p>
+    <span style="font-size:12px;color:#b07a20;">Add a photo and bio so people in your city know who you are.</span>
+  </div>
+  <a id="incomplete-banner-complete-link" href="profile-setup.html" style="background:#059669;color:white;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;">Complete profile →</a>
+  <button type="button" onclick="window.dismissBanner && window.dismissBanner()" style="border:none;background:none;color:#b07a20;cursor:pointer;font-size:18px;padding:0 4px;line-height:1;" aria-label="Dismiss">×</button>
+</div>
 
 <!-- Mobile city bar -->
 <div id="mobile-city-bar">
@@ -1318,6 +1391,26 @@ nav {
 <main id="portal-content" class="page-wrap" hidden>
   <div class="portal-layout">
     <aside class="left-sidebar">
+      <div id="sidebar-profile-card" style="background:white;border:1px solid #e8f0e8;border-radius:14px;padding:14px;margin-bottom:16px;display:none;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <div style="position:relative;flex-shrink:0;">
+            <div id="sidebar-profile-avatar" style="width:44px;height:44px;border-radius:50%;overflow:hidden;background:#059669;display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:700;"></div>
+            <a id="sidebar-profile-edit-mini" href="profile-setup.html" style="position:absolute;bottom:0;right:0;width:16px;height:16px;background:#059669;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;text-decoration:none;">
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </a>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div id="sidebar-profile-name" style="font-size:13px;font-weight:700;color:#1a2e1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+            <div id="sidebar-profile-role" style="font-size:11px;color:#6b8f6b;"></div>
+          </div>
+          <a id="sidebar-profile-edit-link" href="profile-setup.html" style="font-size:11px;font-weight:700;color:#059669;text-decoration:none;border:1.5px solid #059669;border-radius:20px;padding:4px 10px;white-space:nowrap;">Edit</a>
+        </div>
+        <div id="sidebar-missing-fields" style="display:none;background:#fff8e6;border-radius:8px;padding:8px 10px;">
+          <p style="font-size:11px;font-weight:700;color:#92610a;margin:0 0 4px 0;">Profile incomplete</p>
+          <div id="sidebar-missing-list" style="font-size:11px;color:#b07a20;line-height:1.7;"></div>
+          <a id="sidebar-missing-complete-link" href="profile-setup.html" style="font-size:11px;font-weight:700;color:#059669;text-decoration:none;">Complete now →</a>
+        </div>
+      </div>
       <div style="margin-bottom: 24px;">
         <label style="font-size: 13px; font-weight: 700; color: #064e3b; display: block; margin-bottom: 8px;">Browse cities</label>
         <div style="position: relative;">
@@ -3081,6 +3174,82 @@ nav {
     });
 
     const navEl = document.querySelector('nav');
+    const navProfileMenuToggle = document.getElementById('nav-profile-menu-toggle');
+
+    function profileSetupHref() {
+      return 'profile-setup.html?city=' + encodeURIComponent(cityForFeedQuery()) + '&edit=1';
+    }
+
+    function checkProfileComplete(userData) {
+      if (!userData) return;
+      var banner = document.getElementById('incomplete-profile-banner');
+      if (!banner) return;
+      if (sessionStorage.getItem('profileBannerDismissed')) {
+        banner.style.display = 'none';
+        return;
+      }
+      var navPhoto = String((userData && userData.photoURL) || '').trim()
+        || String((currentUser && currentUser.photoURL) || '').trim();
+      var missingPhoto = !navPhoto;
+      var bioRaw = userData.bio || userData.aboutMe;
+      var missingBio = !bioRaw || !String(bioRaw).trim();
+      if (missingPhoto || missingBio) {
+        banner.style.display = 'flex';
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    window.dismissBanner = function dismissBanner() {
+      var b = document.getElementById('incomplete-profile-banner');
+      if (b) b.style.display = 'none';
+      try {
+        sessionStorage.setItem('profileBannerDismissed', 'true');
+      } catch (e) {}
+    };
+
+    function populateSidebarProfileCard(user, userData) {
+      var card = document.getElementById('sidebar-profile-card');
+      if (!card) return;
+      card.style.display = 'block';
+      var ud = userData || {};
+      var avatarEl = document.getElementById('sidebar-profile-avatar');
+      var photoURL = String(ud.photoURL || '').trim() || (user && String(user.photoURL || '').trim()) || '';
+      var name = String(ud.username || '').trim()
+        || (user && (user.displayName || (user.email ? user.email.split('@')[0] : '')))
+        || 'Your name';
+      if (avatarEl) {
+        if (photoURL) {
+          avatarEl.innerHTML = '<img alt="" src="' + photoURL.replace(/"/g, '') + '" style="width:100%;height:100%;object-fit:cover;">';
+        } else {
+          avatarEl.textContent = name.charAt(0).toUpperCase();
+        }
+      }
+      var nm = document.getElementById('sidebar-profile-name');
+      if (nm) nm.textContent = name;
+      var role = document.getElementById('sidebar-profile-role');
+      var prof = String(ud.profession || '').trim();
+      if (role) role.textContent = prof || 'Add your role';
+      var psh = profileSetupHref();
+      ['sidebar-profile-edit-mini', 'sidebar-profile-edit-link', 'sidebar-missing-complete-link'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.href = psh;
+      });
+      var missing = [];
+      if (!photoURL) missing.push('• Profile photo');
+      var bioCheck = ud.bio || ud.aboutMe;
+      if (!bioCheck || !String(bioCheck).trim()) missing.push('• Bio');
+      if (!prof) missing.push('• What you do');
+      var mf = document.getElementById('sidebar-missing-fields');
+      var ml = document.getElementById('sidebar-missing-list');
+      if (missing.length > 0 && mf && ml) {
+        mf.style.display = 'block';
+        ml.style.whiteSpace = 'pre-line';
+        ml.textContent = missing.join('\n');
+      } else if (mf) {
+        mf.style.display = 'none';
+      }
+    }
 
     function setWelcomeAndNav(profileData) {
       const profileUsername = (profileData && String(profileData.username || '').trim())
@@ -3091,7 +3260,15 @@ nav {
       navCity.textContent = cityForUi + ' community';
       navEmail.textContent = '';
       syncMobileCityBar();
+      var psh = profileSetupHref();
+      ['incomplete-banner-complete-link'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.href = psh;
+      });
       if (navProfileTrigger) {
+        navProfileTrigger.href = psh;
+        navProfileTrigger.style.cursor = 'pointer';
+        navProfileTrigger.removeAttribute('title');
         /* Firestore custom photo first, then Firebase Auth (e.g. Google), not post authorPhoto. */
         var navPhoto = String((profileData && profileData.photoURL) || '').trim()
           || String((currentUser && currentUser.photoURL) || '').trim();
@@ -3102,6 +3279,8 @@ nav {
           navProfileTrigger.innerHTML = '<span class="nav-profile-initial">' + initial + '</span>';
         }
       }
+      var menuEdit = document.getElementById('menu-edit-profile');
+      if (menuEdit) menuEdit.href = psh;
     }
 
     function showPortal(user, profileData) {
@@ -3111,6 +3290,23 @@ nav {
       var ft = profileData && profileData.followedTopics;
       followedTopicSlugs = Array.isArray(ft) ? ft.map(function (x) { return String(x || '').trim(); }).filter(Boolean) : [];
       setWelcomeAndNav(profileData);
+      checkProfileComplete(profileData || {});
+      populateSidebarProfileCard(user, profileData || {});
+      var feedL = document.getElementById('mobile-nav-feed-link');
+      if (feedL) feedL.href = 'community-portal.html?city=' + encodeURIComponent(cityForFeedQuery());
+      var profL = document.getElementById('mobile-nav-profile-link');
+      if (profL) profL.href = profileSetupHref();
+      var bottomNavAvatar = document.getElementById('bottom-nav-avatar');
+      if (bottomNavAvatar) {
+        var bPhoto = String((profileData && profileData.photoURL) || '').trim() || String(user.photoURL || '').trim();
+        var bName = String((profileData && profileData.username) || user.displayName || (user.email ? user.email.split('@')[0] : '') || 'U');
+        if (bPhoto) {
+          bottomNavAvatar.innerHTML = '<img alt="" src="' + bPhoto.replace(/"/g, '') + '" style="width:100%;height:100%;object-fit:cover;">';
+        } else {
+          bottomNavAvatar.textContent = bName.charAt(0).toUpperCase();
+        }
+      }
+      window.portalCurrentCity = cityForFeedQuery();
       document.body.classList.add('portal-ready');
       navEl.removeAttribute('hidden');
       navEl.style.display = '';
@@ -3309,19 +3505,24 @@ nav {
       });
     });
 
-    if (navProfileTrigger && navProfileMenu) {
-      navProfileTrigger.addEventListener('click', function (e) {
+    if (navProfileMenuToggle && navProfileMenu) {
+      navProfileMenuToggle.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
         navProfileMenu.hidden = !navProfileMenu.hidden;
+        navProfileMenuToggle.setAttribute('aria-expanded', navProfileMenu.hidden ? 'false' : 'true');
       });
       navProfileMenu.addEventListener('click', function (e) { e.stopPropagation(); });
-      document.addEventListener('click', function () { navProfileMenu.hidden = true; });
-      document.getElementById('menu-edit-profile').addEventListener('click', function () {
-        window.location.href = 'profile-setup.html?city=' + encodeURIComponent(cityForFeedQuery()) + '&edit=1';
-      });
-      document.getElementById('menu-switch-city').addEventListener('click', function () {
+      document.addEventListener('click', function () {
         navProfileMenu.hidden = true;
+        if (navProfileMenuToggle) navProfileMenuToggle.setAttribute('aria-expanded', 'false');
+      });
+    }
+    var menuSwitchCity = document.getElementById('menu-switch-city');
+    if (menuSwitchCity) {
+      menuSwitchCity.addEventListener('click', function () {
+        if (navProfileMenu) navProfileMenu.hidden = true;
+        if (navProfileMenuToggle) navProfileMenuToggle.setAttribute('aria-expanded', 'false');
         if (window.matchMedia && window.matchMedia('(max-width:768px)').matches) {
           var mb = document.getElementById('mobile-city-bar');
           var ms = document.getElementById('mobile-city-switcher');
@@ -3335,12 +3536,68 @@ nav {
           cs.focus({ preventScroll: true });
         }
       });
-      document.getElementById('menu-signout').addEventListener('click', function () {
-        document.getElementById('nav-signout').click();
+    }
+    var menuSignout = document.getElementById('menu-signout');
+    if (menuSignout) {
+      menuSignout.addEventListener('click', function () {
+        var so = document.getElementById('nav-signout');
+        if (so) so.click();
+      });
+    }
+
+    var mobileNavSearchBtn = document.getElementById('mobile-nav-search-btn');
+    if (mobileNavSearchBtn) {
+      mobileNavSearchBtn.addEventListener('click', function () {
+        var ps = document.getElementById('post-search');
+        if (ps) {
+          ps.focus();
+          ps.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+    }
+    var mobileNavNewPostBtn = document.getElementById('mobile-nav-new-post-btn');
+    if (mobileNavNewPostBtn) {
+      mobileNavNewPostBtn.addEventListener('click', function () {
+        var b = document.getElementById('new-post-btn');
+        if (b) b.click();
+      });
+    }
+    var mobileNavCitiesBtn = document.getElementById('mobile-nav-cities-btn');
+    if (mobileNavCitiesBtn) {
+      mobileNavCitiesBtn.addEventListener('click', function () {
+        var ms = document.getElementById('mobile-city-switcher');
+        if (ms) {
+          ms.focus();
+          ms.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       });
     }
   }
 </script>
+
+<nav id="mobile-bottom-nav" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e8f0e8;padding:8px 0 max(12px, env(safe-area-inset-bottom));z-index:200;justify-content:space-around;align-items:center;">
+  <a id="mobile-nav-feed-link" href="community-portal.html" style="display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span style="font-size:10px;font-weight:600;color:#059669;">Feed</span>
+  </a>
+  <button type="button" id="mobile-nav-search-btn" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font:inherit;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9ab09a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span style="font-size:10px;font-weight:600;color:#9ab09a;">Search</span>
+  </button>
+  <button type="button" id="mobile-nav-new-post-btn" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font:inherit;">
+    <div style="width:40px;height:40px;border-radius:50%;background:#059669;display:flex;align-items:center;justify-content:center;margin-bottom:2px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </div>
+  </button>
+  <button type="button" id="mobile-nav-cities-btn" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font:inherit;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9ab09a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    <span style="font-size:10px;font-weight:600;color:#9ab09a;">Cities</span>
+  </button>
+  <a id="mobile-nav-profile-link" href="profile-setup.html" style="display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;">
+    <div id="bottom-nav-avatar" style="width:26px;height:26px;border-radius:50%;overflow:hidden;background:#059669;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700;"></div>
+    <span style="font-size:10px;font-weight:600;color:#9ab09a;">Profile</span>
+  </a>
+</nav>
 
 <!-- Mobile floating action button -->
 <button type="button" id="fab-new-post" onclick="(function(){ var b=document.getElementById('new-post-btn'); if(b) b.click(); else if(typeof openNewPostModal==='function') openNewPostModal(); })()">
