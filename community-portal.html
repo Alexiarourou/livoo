@@ -1724,7 +1724,8 @@ nav {
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
     getFirestore, collection, query, where, addDoc, doc, getDoc, getDocs,
-    limit, increment, deleteDoc, setDoc, updateDoc, serverTimestamp, orderBy, onSnapshot
+    limit, increment, deleteDoc, setDoc, updateDoc, serverTimestamp, orderBy, onSnapshot,
+    runTransaction
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
   const CATEGORY_LABELS = {
@@ -2618,45 +2619,60 @@ nav {
         menu.style.display = menu.style.display === 'none' || menu.style.display === '' ? 'block' : 'none';
       }
     };
+    var feedPostLikeInFlight = new Set();
+    function applyFeedPostLikeVisual(btn, liked) {
+      if (!btn) return;
+      if (liked) btn.classList.add('liked');
+      else btn.classList.remove('liked');
+    }
     window.likePost = async function (event, postId) {
       if (event) {
         event.stopPropagation();
         event.preventDefault();
       }
       const user = auth.currentUser;
-      if (!user) return;
+      if (!user || feedPostLikeInFlight.has(postId)) return;
       const btn = document.getElementById('like-btn-' + postId);
       const countEl = document.getElementById('like-count-' + postId);
       if (!btn || !countEl) return;
-      const alreadyLiked = btn.classList.contains('liked');
-      const currentCount = parseInt(countEl.textContent, 10) || 0;
-      if (alreadyLiked) {
-        btn.classList.remove('liked');
-        countEl.textContent = String(Math.max(0, currentCount - 1));
-      } else {
-        btn.classList.add('liked');
-        countEl.textContent = String(currentCount + 1);
+      feedPostLikeInFlight.add(postId);
+      const postRef = doc(db, 'communityPosts', postId);
+      const likeRef = doc(db, 'communityPosts', postId, 'likes', user.uid);
+      const legacyRef = doc(db, 'communityPosts', postId, 'upvotes', user.uid);
+      try {
+        await runTransaction(db, async function (transaction) {
+          const likeSnap = await transaction.get(likeRef);
+          const legacySnap = await transaction.get(legacyRef);
+          const postSnap = await transaction.get(postRef);
+          var serverLiked = !!(likeSnap.exists || legacySnap.exists);
+          var cur = Math.max(0, Number((postSnap.data() || {}).upvoteCount || 0));
+          if (serverLiked) {
+            if (likeSnap.exists) transaction.delete(likeRef);
+            if (legacySnap.exists) transaction.delete(legacyRef);
+            if (cur > 0) transaction.update(postRef, { upvoteCount: increment(-1) });
+          } else {
+            transaction.set(likeRef, { likedAt: serverTimestamp() });
+            transaction.update(postRef, { upvoteCount: increment(1) });
+          }
+        });
+        var lSnap = await getDoc(likeRef);
+        var uSnap = await getDoc(legacyRef);
+        var pSnap = await getDoc(postRef);
+        applyFeedPostLikeVisual(btn, !!(lSnap.exists || uSnap.exists));
+        countEl.textContent = String(Math.max(0, Number((pSnap.data() || {}).upvoteCount || 0)));
         btn.style.transform = 'scale(1.06)';
         setTimeout(function () { btn.style.transform = 'scale(1)'; }, 150);
-      }
-      try {
-        const likeRef = doc(db, 'communityPosts', postId, 'upvotes', user.uid);
-        if (alreadyLiked) {
-          await deleteDoc(likeRef);
-          await updateDoc(doc(db, 'communityPosts', postId), { upvoteCount: increment(-1) });
-        } else {
-          await setDoc(likeRef, { uid: user.uid });
-          await updateDoc(doc(db, 'communityPosts', postId), { upvoteCount: increment(1) });
-        }
       } catch (err) {
         console.error(err);
-        if (alreadyLiked) {
-          btn.classList.add('liked');
-          countEl.textContent = String(currentCount);
-        } else {
-          btn.classList.remove('liked');
-          countEl.textContent = String(currentCount);
-        }
+        try {
+          var l2 = await getDoc(likeRef);
+          var u2 = await getDoc(legacyRef);
+          var p2 = await getDoc(postRef);
+          applyFeedPostLikeVisual(btn, !!(l2.exists || u2.exists));
+          countEl.textContent = String(Math.max(0, Number((p2.data() || {}).upvoteCount || 0)));
+        } catch (e) {}
+      } finally {
+        feedPostLikeInFlight.delete(postId);
       }
     };
 
@@ -2895,8 +2911,11 @@ nav {
         let hasUpvoted = false;
         if (currentUser) {
           try {
-            const voteState = await getDoc(doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid));
-            hasUpvoted = voteState.exists();
+            const [voteNew, voteLeg] = await Promise.all([
+              getDoc(doc(db, 'communityPosts', postId, 'likes', currentUser.uid)),
+              getDoc(doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid))
+            ]);
+            hasUpvoted = !!(voteNew.exists || voteLeg.exists);
           } catch (e) {
             hasUpvoted = false;
           }
