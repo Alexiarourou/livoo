@@ -585,7 +585,9 @@ button.cities-search-dropdown-item {
   <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="community.html" class="active">Community</a>
-    <a href="index.html#waitlist" class="btn-nav">Get early access</a>
+    <a href="community-portal.html" style="background:#2d6a2d;color:white;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:600;text-decoration:none;">
+      Join the community
+    </a>
   </div>
 </nav>
 
@@ -642,6 +644,58 @@ button.cities-search-dropdown-item {
       </div>
     </div>
   </div>
+  <!-- Second row of cities -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:20px;">
+    <div style="border-radius:16px;overflow:hidden;cursor:pointer;position:relative;">
+      <img src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80" alt="Barcelona" style="width:100%;height:200px;object-fit:cover;display:block;">
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,rgba(0,0,0,0.7));">
+        <h3 style="color:white;font-size:20px;font-weight:800;margin:0;">Barcelona</h3>
+      </div>
+      <div style="padding:16px 0 8px;">
+        <p style="font-size:14px;color:#5a7a5a;text-align:center;">Sunshine, culture and a vibrant expat scene.</p>
+        <div style="text-align:center;margin-top:12px;">
+          <a href="community-portal.html?city=barcelona" style="display:inline-block;background:#2d6a2d;color:white;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;">Join Barcelona community</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-radius:16px;overflow:hidden;cursor:pointer;position:relative;">
+      <img src="https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&q=80" alt="Berlin" style="width:100%;height:200px;object-fit:cover;display:block;">
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,rgba(0,0,0,0.7));">
+        <h3 style="color:white;font-size:20px;font-weight:800;margin:0;">Berlin</h3>
+      </div>
+      <div style="padding:16px 0 8px;">
+        <p style="font-size:14px;color:#5a7a5a;text-align:center;">Creative, edgy and endlessly exciting to explore.</p>
+        <div style="text-align:center;margin-top:12px;">
+          <a href="community-portal.html?city=berlin" style="display:inline-block;background:#2d6a2d;color:white;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;">Join Berlin community</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-radius:16px;overflow:hidden;cursor:pointer;position:relative;">
+      <img src="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=600&q=80" alt="Lisbon" style="width:100%;height:200px;object-fit:cover;display:block;">
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,rgba(0,0,0,0.7));">
+        <h3 style="color:white;font-size:20px;font-weight:800;margin:0;">Lisbon</h3>
+      </div>
+      <div style="padding:16px 0 8px;">
+        <p style="font-size:14px;color:#5a7a5a;text-align:center;">Warm, affordable and full of digital nomads.</p>
+        <div style="text-align:center;margin-top:12px;">
+          <a href="community-portal.html?city=lisbon" style="display:inline-block;background:#2d6a2d;color:white;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;">Join Lisbon community</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-radius:16px;overflow:hidden;cursor:pointer;position:relative;">
+      <img src="https://images.unsplash.com/photo-1584003564911-c8b04f703d7a?w=600&q=80" alt="Amsterdam" style="width:100%;height:200px;object-fit:cover;display:block;">
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,rgba(0,0,0,0.7));">
+        <h3 style="color:white;font-size:20px;font-weight:800;margin:0;">Amsterdam</h3>
+      </div>
+      <div style="padding:16px 0 8px;">
+        <p style="font-size:14px;color:#5a7a5a;text-align:center;">Bikes, canals and one of Europe's most international cities.</p>
+        <div style="text-align:center;margin-top:12px;">
+          <a href="community-portal.html?city=amsterdam" style="display:inline-block;background:#2d6a2d;color:white;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;">Join Amsterdam community</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="cities-more-note"><a href="index.html#waitlist">Can&apos;t find your city? Join the waitlist →</a></p>
   <div class="cities-more-wrap">
     <div class="cities-search-card">
       <p class="cities-search-eyebrow" id="cities-search-eyebrow">Find your city</p>
@@ -655,42 +709,15 @@ button.cities-search-dropdown-item {
         <div id="cities-search-dropdown" class="cities-search-dropdown" role="listbox" aria-label="City suggestions" hidden></div>
       </div>
       <div class="cities-quick-pills">
-        <a href="signup.html?redirect=community&amp;city=Amsterdam" class="cities-quick-pill">Amsterdam</a>
-        <a href="signup.html?redirect=community&amp;city=Athens" class="cities-quick-pill">Athens</a>
-        <a href="signup.html?redirect=community&amp;city=Barcelona" class="cities-quick-pill">Barcelona</a>
-        <a href="signup.html?redirect=community&amp;city=Berlin" class="cities-quick-pill">Berlin</a>
-        <a href="signup.html?redirect=community&amp;city=Bologna" class="cities-quick-pill">Bologna</a>
-        <a href="signup.html?redirect=community&amp;city=Brussels" class="cities-quick-pill">Brussels</a>
-        <a href="signup.html?redirect=community&amp;city=Budapest" class="cities-quick-pill">Budapest</a>
-        <a href="signup.html?redirect=community&amp;city=Copenhagen" class="cities-quick-pill">Copenhagen</a>
-        <a href="signup.html?redirect=community&amp;city=Dublin" class="cities-quick-pill">Dublin</a>
-        <a href="signup.html?redirect=community&amp;city=Dubai" class="cities-quick-pill">Dubai</a>
-        <a href="signup.html?redirect=community&amp;city=Edinburgh" class="cities-quick-pill">Edinburgh</a>
-        <a href="signup.html?redirect=community&amp;city=Florence" class="cities-quick-pill">Florence</a>
-        <a href="signup.html?redirect=community&amp;city=Krakow" class="cities-quick-pill">Krakow</a>
-        <a href="signup.html?redirect=community&amp;city=Lisbon" class="cities-quick-pill">Lisbon</a>
-        <a href="signup.html?redirect=community&amp;city=Ljubljana" class="cities-quick-pill">Ljubljana</a>
-        <a href="signup.html?redirect=community&amp;city=London" class="cities-quick-pill">London</a>
-        <a href="signup.html?redirect=community&amp;city=Madrid" class="cities-quick-pill">Madrid</a>
-        <a href="signup.html?redirect=community&amp;city=Milan" class="cities-quick-pill">Milan</a>
-        <a href="signup.html?redirect=community&amp;city=Naples" class="cities-quick-pill">Naples</a>
-        <a href="signup.html?redirect=community&amp;city=New%20York" class="cities-quick-pill">New York</a>
-        <a href="signup.html?redirect=community&amp;city=Oslo" class="cities-quick-pill">Oslo</a>
-        <a href="signup.html?redirect=community&amp;city=Paris" class="cities-quick-pill">Paris</a>
-        <a href="signup.html?redirect=community&amp;city=Porto" class="cities-quick-pill">Porto</a>
-        <a href="signup.html?redirect=community&amp;city=Prague" class="cities-quick-pill">Prague</a>
-        <a href="signup.html?redirect=community&amp;city=Riga" class="cities-quick-pill">Riga</a>
-        <a href="signup.html?redirect=community&amp;city=Rome" class="cities-quick-pill">Rome</a>
-        <a href="signup.html?redirect=community&amp;city=Seville" class="cities-quick-pill">Seville</a>
-        <a href="signup.html?redirect=community&amp;city=Stockholm" class="cities-quick-pill">Stockholm</a>
-        <a href="signup.html?redirect=community&amp;city=Tallinn" class="cities-quick-pill">Tallinn</a>
-        <a href="signup.html?redirect=community&amp;city=Valencia" class="cities-quick-pill">Valencia</a>
-        <a href="signup.html?redirect=community&amp;city=Vilnius" class="cities-quick-pill">Vilnius</a>
-        <a href="signup.html?redirect=community&amp;city=Vienna" class="cities-quick-pill">Vienna</a>
-        <a href="signup.html?redirect=community&amp;city=Warsaw" class="cities-quick-pill">Warsaw</a>
-        <a href="signup.html?redirect=community&amp;city=Zurich" class="cities-quick-pill">Zurich</a>
+        <a href="community-portal.html?city=amsterdam" class="cities-quick-pill">Amsterdam</a>
+        <a href="community-portal.html?city=athens" class="cities-quick-pill">Athens</a>
+        <a href="community-portal.html?city=barcelona" class="cities-quick-pill">Barcelona</a>
+        <a href="community-portal.html?city=berlin" class="cities-quick-pill">Berlin</a>
+        <a href="community-portal.html?city=lisbon" class="cities-quick-pill">Lisbon</a>
+        <a href="community-portal.html?city=london" class="cities-quick-pill">London</a>
+        <a href="community-portal.html?city=madrid" class="cities-quick-pill">Madrid</a>
+        <a href="community-portal.html?city=paris" class="cities-quick-pill">Paris</a>
       </div>
-      <p class="cities-more-note"><a href="index.html#waitlist">Can&apos;t find your city? Join the waitlist →</a></p>
     </div>
   </div>
 </div>
@@ -721,11 +748,63 @@ button.cities-search-dropdown-item {
   </div>
 </section>
 
+<!-- Community preview section -->
+<section class="section">
+  <div style="padding:60px 0;text-align:center;">
+    <p style="font-size:12px;font-weight:700;letter-spacing:0.1em;color:#2d6a2d;text-transform:uppercase;margin-bottom:8px;">WHAT IT LOOKS LIKE INSIDE</p>
+    <h2 style="font-size:28px;font-weight:800;color:#1a2e1a;margin-bottom:8px;">Real conversations, real people</h2>
+    <p style="font-size:15px;color:#5a7a5a;margin-bottom:40px;">Here's what's happening in the Athens community right now.</p>
+    <div style="max-width:680px;margin:0 auto;text-align:left;display:flex;flex-direction:column;gap:10px;">
+      <div style="background:white;border:1px solid #e8f0e8;border-radius:14px;padding:18px;cursor:pointer;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:#2d6a2d;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">R</div>
+          <span style="font-size:12px;color:#6b8f6b;">Romain · Athens · 2h ago</span>
+          <span style="margin-left:auto;font-size:10px;background:#fde8e8;color:#a81a1a;padding:2px 8px;border-radius:20px;font-weight:600;">Recommendations</span>
+        </div>
+        <div style="font-size:15px;font-weight:700;color:#1a2e1a;margin-bottom:4px;">Best souvlaki in Athens? 🙏</div>
+        <div style="font-size:13px;color:#5a7a5a;">Just moved here and need the real deal — not the tourist version near Syntagma...</div>
+        <div style="display:flex;gap:12px;margin-top:10px;">
+          <span style="font-size:12px;color:#9ab09a;">❤️ 12</span>
+          <span style="font-size:12px;color:#9ab09a;">💬 8 comments</span>
+        </div>
+      </div>
+      <div style="background:white;border:1px solid #e8f0e8;border-radius:14px;padding:18px;cursor:pointer;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:#4a4aaa;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">S</div>
+          <span style="font-size:12px;color:#6b8f6b;">Sofia · Athens · 5h ago</span>
+          <span style="margin-left:auto;font-size:10px;background:#e8f4fd;color:#1a6fa8;padding:2px 8px;border-radius:20px;font-weight:600;">Housing Tips</span>
+        </div>
+        <div style="font-size:15px;font-weight:700;color:#1a2e1a;margin-bottom:4px;">Exarchia vs Koukaki for a digital nomad?</div>
+        <div style="font-size:13px;color:#5a7a5a;">Looking for good cafes with wifi, safe at night, not too touristy. Which would you pick?</div>
+        <div style="display:flex;gap:12px;margin-top:10px;">
+          <span style="font-size:12px;color:#9ab09a;">❤️ 6</span>
+          <span style="font-size:12px;color:#9ab09a;">💬 14 comments</span>
+        </div>
+      </div>
+      <div style="background:white;border:1px solid #e8f0e8;border-radius:14px;padding:18px;cursor:pointer;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:#d4820a;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">J</div>
+          <span style="font-size:12px;color:#6b8f6b;">James · Athens · 1d ago</span>
+          <span style="margin-left:auto;font-size:10px;background:#fdf3e8;color:#a86b1a;padding:2px 8px;border-radius:20px;font-weight:600;">Events</span>
+        </div>
+        <div style="font-size:15px;font-weight:700;color:#1a2e1a;margin-bottom:4px;">Expat drinks this Friday — Monastiraki</div>
+        <div style="font-size:13px;color:#5a7a5a;">Organising a casual meetup for anyone new to Athens. All welcome, no awkward networking!</div>
+        <div style="display:flex;gap:12px;margin-top:10px;">
+          <span style="font-size:12px;color:#9ab09a;">❤️ 24</span>
+          <span style="font-size:12px;color:#9ab09a;">💬 31 comments</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:28px;">
+      <a href="community-portal.html?city=athens" style="display:inline-block;background:#2d6a2d;color:white;padding:12px 28px;border-radius:20px;font-size:14px;font-weight:600;text-decoration:none;">
+        Join the conversation →
+      </a>
+    </div>
+  </div>
+</section>
+
 <section class="cities-request-strip" aria-labelledby="cities-request-heading">
   <div class="cities-request-inner">
-    <div class="cities-request-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-    </div>
     <h2 class="cities-request-title" id="cities-request-heading">Request your city</h2>
     <p class="cities-request-sub">Heading to Barcelona, Berlin, Amsterdam, or elsewhere? Tell us which city you want next. We're expanding!</p>
     <a href="index.html#waitlist" class="btn-primary cities-request-cta">Request your city</a>
@@ -750,6 +829,7 @@ button.cities-search-dropdown-item {
     'Milan', 'Naples', 'New York', 'Oslo', 'Paris', 'Porto', 'Prague', 'Riga', 'Rome', 'Seville',
     'Stockholm', 'Tallinn', 'Valencia', 'Vilnius', 'Vienna', 'Warsaw', 'Zurich'
   ];
+  var ACTIVE_CITIES = ['Amsterdam', 'Athens', 'Barcelona', 'Berlin', 'Lisbon', 'London', 'Madrid', 'Paris'];
   var REQUEST_CITY_HREF = 'index.html#waitlist';
 
   var input = document.getElementById('cities-search-input');
@@ -767,6 +847,10 @@ button.cities-search-dropdown-item {
     return EUROPEAN_CITIES.filter(function (city) {
       return city.toLowerCase().indexOf(n) !== -1;
     });
+  }
+
+  function isActiveCity(city) {
+    return ACTIVE_CITIES.indexOf(city) !== -1;
   }
 
   function hideDropdown() {
@@ -787,10 +871,12 @@ button.cities-search-dropdown-item {
     if (matches.length > 0) {
       matches.forEach(function (city) {
         var row = document.createElement('a');
-        row.href = 'signup.html?redirect=community&city=' + encodeURIComponent(city);
+        row.href = isActiveCity(city)
+          ? ('community-portal.html?city=' + encodeURIComponent(city.toLowerCase()))
+          : REQUEST_CITY_HREF;
         row.className = 'cities-search-dropdown-item';
         row.setAttribute('role', 'option');
-        row.textContent = city;
+        row.textContent = isActiveCity(city) ? city : (city + ' (join waitlist)');
         dropdown.appendChild(row);
       });
     } else {
@@ -823,8 +909,8 @@ button.cities-search-dropdown-item {
     if (!q) return;
     e.preventDefault();
     var matches = filterCities(input.value);
-    if (matches.length > 0) {
-      window.location.href = 'signup.html?redirect=community&city=' + encodeURIComponent(matches[0]);
+    if (matches.length > 0 && isActiveCity(matches[0])) {
+      window.location.href = 'community-portal.html?city=' + encodeURIComponent(matches[0].toLowerCase());
     } else {
       window.location.href = REQUEST_CITY_HREF;
     }
