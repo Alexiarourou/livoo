@@ -1163,6 +1163,18 @@ nav {
           <li>Protect personal information.</li>
         </ol>
       </div>
+      <!-- Upcoming meetups -->
+      <div style="border-top:1px solid #e8f0e8;margin-top:20px;padding-top:20px;">
+        <h4 style="font-size:13px;font-weight:700;color:#064e3b;margin:0 0 12px 0;">
+          Upcoming meetups
+        </h4>
+        <div id="meetups-list" style="display:flex;flex-direction:column;gap:10px;">
+        </div>
+        <button type="button" onclick="openNewPostModal('Events')"
+          style="width:100%;margin-top:12px;border:1.5px dashed #c0ddc0;background:none;border-radius:10px;padding:8px;font-size:12px;color:#059669;font-weight:600;cursor:pointer;">
+          + Post an event
+        </button>
+      </div>
       <div class="left-sidebar-footer">
         <a href="faqs.html">Community Guidelines</a>
         <a href="privacy-policy.html">Privacy Policy</a>
@@ -1335,7 +1347,7 @@ nav {
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
     getFirestore, collection, query, where, addDoc, doc, getDoc, getDocs,
-    limit, increment, deleteDoc, setDoc, updateDoc, serverTimestamp
+    limit, increment, deleteDoc, setDoc, updateDoc, serverTimestamp, orderBy
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
   const CATEGORY_LABELS = {
@@ -1580,7 +1592,13 @@ nav {
     }
     syncMobileCityBar();
 
-    window.openNewPostModal = function openNewPostModal() {
+    var newPostCategoryPreset = null;
+    window.openNewPostModal = function openNewPostModal(presetCategory) {
+      if (presetCategory === 'Events' || presetCategory === 'events') {
+        newPostCategoryPreset = 'events';
+      } else {
+        newPostCategoryPreset = null;
+      }
       var b = document.getElementById('new-post-btn');
       if (b) b.click();
     };
@@ -1676,6 +1694,50 @@ nav {
 
     function threadPageUrl(postId) {
       return 'community-post.html?postId=' + encodeURIComponent(postId) + '&city=' + encodeURIComponent(cityForFeedQuery());
+    }
+
+    async function loadMeetups() {
+      const meetupsList = document.getElementById('meetups-list');
+      if (!meetupsList) return;
+      const feedCity = cityForFeedQuery();
+      try {
+        const snap = await getDocs(
+          query(
+            collection(db, 'communityPosts'),
+            where('city', '==', feedCity),
+            where('category', '==', 'events'),
+            orderBy('createdAt', 'desc'),
+            limit(3)
+          )
+        );
+        if (snap.empty) {
+          meetupsList.innerHTML = '<p style="font-size:12px;color:#9ab09a;text-align:center;padding:8px 0;">No events yet — be the first!</p>';
+          return;
+        }
+        meetupsList.innerHTML = '';
+        snap.docs.forEach(function (snapDoc) {
+          const post = snapDoc.data() || {};
+          const postId = snapDoc.id;
+          const div = document.createElement('div');
+          div.style.cssText = 'background:#f8fdf8;border-radius:10px;padding:10px;cursor:pointer;border:1px solid #e8f0e8;';
+          const titleEl = document.createElement('div');
+          titleEl.style.cssText = 'font-size:12px;font-weight:700;color:#064e3b;margin-bottom:2px;line-height:1.4;';
+          titleEl.textContent = post.title || 'Untitled';
+          const metaEl = document.createElement('div');
+          metaEl.style.cssText = 'font-size:11px;color:#6b8f6b;';
+          const authorLabel = String(post.authorUsername || post.authorName || 'Member').trim() || 'Member';
+          metaEl.textContent = 'by ' + authorLabel + ' · ' + formatRelativeTime(post.createdAt);
+          div.appendChild(titleEl);
+          div.appendChild(metaEl);
+          div.addEventListener('click', function () {
+            window.location.href = threadPageUrl(postId);
+          });
+          meetupsList.appendChild(div);
+        });
+      } catch (err) {
+        console.error('Meetups load error:', err);
+        meetupsList.innerHTML = '<p style="font-size:12px;color:#9ab09a;text-align:center;padding:8px 0;">Could not load events.</p>';
+      }
     }
 
     window.openPost = function (postId) {
@@ -2447,7 +2509,8 @@ nav {
         bodyTa.style.height = '';
       }
       window.removePostImage();
-      var cat = activeCategory === 'all' ? 'housing' : activeCategory;
+      var cat = newPostCategoryPreset || (activeCategory === 'all' ? 'housing' : activeCategory);
+      newPostCategoryPreset = null;
       document.getElementById('post-category').value = cat;
       window.updateCounter('title-counter', 40, 10);
       window.updateCounter('body-counter', 500, 50);
@@ -2511,6 +2574,7 @@ nav {
       portalContent.removeAttribute('hidden');
       portalContent.style.display = '';
       loadPosts(true);
+      loadMeetups();
       refreshSidebarCommunityStats();
     }
 
