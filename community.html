@@ -197,6 +197,22 @@ nav {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
 }
+.cities-quick-pill-more {
+  border-style: dashed;
+  border-color: var(--green);
+  color: #64748b;
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
+}
+.cities-quick-pill-more:hover {
+  background: transparent;
+  border-color: var(--green);
+  color: #64748b;
+  transform: none;
+  box-shadow: none;
+}
 .cities-more-note { margin-top: 22px; font-size: 0.82rem; text-align: center; line-height: 1.45; color: var(--muted-dark); }
 .cities-more-note a { color: var(--green); font-weight: 600; text-decoration: none; }
 .cities-more-note a:hover { text-decoration: underline; }
@@ -339,7 +355,7 @@ nav {
   max-height: 2500px;
   opacity: 1;
   visibility: visible;
-  margin-top: 20px;
+  margin-top: 32px;
   transition: max-height 0.45s ease, opacity 0.35s ease, margin-top 0.35s ease, visibility 0s linear 0s;
 }
 .cities-quick-pills-inner {
@@ -451,75 +467,6 @@ nav {
   line-height: 1.5;
 }
 
-.cities-request-strip {
-  width: 100%;
-  background: #ecfdf5;
-  border-top: 1px solid #d4eadb;
-  border-bottom: 1px solid #d4eadb;
-  padding: 60px 48px;
-}
-.cities-request-inner {
-  max-width: 32rem;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 20px;
-}
-.cities-request-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: rgba(5, 150, 105, 0.14);
-  border: 1px solid rgba(5, 150, 105, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 2px;
-}
-.cities-request-icon svg {
-  width: 26px;
-  height: 26px;
-}
-.cities-request-icon svg path {
-  stroke: var(--green);
-}
-.cities-request-title {
-  font-family: "Sora", sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.55rem, 4.2vw, 1.95rem);
-  letter-spacing: -0.03em;
-  line-height: 1.2;
-  color: var(--text-dark);
-  margin: 0;
-}
-.cities-request-sub {
-  font-size: 1rem;
-  font-weight: 400;
-  color: var(--muted-dark);
-  line-height: 1.65;
-  margin: -4px 0 0;
-  max-width: 28rem;
-}
-.cities-request-cta {
-  margin-top: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 28px;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-}
-button.cities-request-cta {
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-}
-.cities-request-cta:hover { color: white; }
 .cities-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; align-items: stretch; }
 .city-card {
   position: relative;
@@ -702,7 +649,6 @@ button.cities-request-cta {
     padding: 5px 14px;
     letter-spacing: 0.02em;
   }
-  .cities-request-strip { padding: 48px 24px; }
 }
 </style>
 </head>
@@ -732,7 +678,6 @@ button.cities-request-cta {
 
 <div id="cities">
   <div class="section-header">
-    <div class="section-label">City Communities</div>
     <h2 class="section-title">Choose your city</h2>
     <p class="section-sub">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
   </div>
@@ -832,7 +777,7 @@ button.cities-request-cta {
       <div class="cities-quick-pills-inner" id="cities-all-pills-inner"></div>
     </div>
   </div>
-  <p class="cities-more-note"><a href="index.html#waitlist">Can&apos;t find your city? Join the waitlist →</a></p>
+  <p class="cities-more-note"><a href="#" id="cities-cant-find-open" aria-haspopup="dialog">Can&apos;t find your city? Request your city →</a></p>
 </div>
 
 <section class="section" id="community-benefits" aria-label="What you get from the community">
@@ -911,14 +856,6 @@ button.cities-request-cta {
   </div>
 </section>
 
-<section class="cities-request-strip" aria-labelledby="cities-request-heading">
-  <div class="cities-request-inner">
-    <h2 class="cities-request-title" id="cities-request-heading">Request your city</h2>
-    <p class="cities-request-sub">Heading to Barcelona, Berlin, Amsterdam, or elsewhere? Tell us which city you want next. We're expanding!</p>
-    <button type="button" class="btn-primary cities-request-cta" id="cities-request-open">Request your city</button>
-  </div>
-</section>
-
 <div class="join-section" id="join">
   <h2>Ready to find <span>your people?</span></h2>
   <p>Join the Livvo community. It is completely free. Connect with people moving to the same city as you.</p>
@@ -975,6 +912,10 @@ button.cities-request-cta {
         a.textContent = city;
         pillsInner.appendChild(a);
       });
+      var morePill = document.createElement('span');
+      morePill.className = 'cities-quick-pill cities-quick-pill-more';
+      morePill.textContent = 'More cities coming…';
+      pillsInner.appendChild(morePill);
     }
     pillsInner.setAttribute('inert', '');
     seeAllBtn.addEventListener('click', function () {
@@ -1006,7 +947,7 @@ const db = getFirestore(app);
 const modal = document.getElementById('modal-city-request');
 const backdrop = document.getElementById('city-request-backdrop');
 const closeBtn = document.getElementById('city-request-close');
-const openBtn = document.getElementById('cities-request-open');
+const cantFindOpen = document.getElementById('cities-cant-find-open');
 const form = document.getElementById('city-request-form');
 const thanks = document.getElementById('city-request-thanks');
 const submitBtn = document.getElementById('city-request-submit');
@@ -1034,7 +975,10 @@ function closeCityRequestModal() {
   if (submitBtn) submitBtn.disabled = false;
 }
 
-if (openBtn) openBtn.addEventListener('click', openCityRequestModal);
+if (cantFindOpen) cantFindOpen.addEventListener('click', function (e) {
+  e.preventDefault();
+  openCityRequestModal();
+});
 if (backdrop) backdrop.addEventListener('click', closeCityRequestModal);
 if (closeBtn) closeBtn.addEventListener('click', closeCityRequestModal);
 
