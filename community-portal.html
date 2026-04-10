@@ -775,15 +775,47 @@ nav {
   margin-top: auto;
   margin-bottom: auto;
 }
+.new-post-modal-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+  padding: 0;
+}
+.new-post-modal-header {
+  flex-shrink: 0;
+  padding: 28px 56px 12px 28px;
+}
+.new-post-modal-header h2 {
+  margin: 0;
+}
+.new-post-modal-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 28px 80px;
+  -webkit-overflow-scrolling: touch;
+}
+.new-post-modal-footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px 28px 24px;
+  border-top: 1px solid #e8f0e8;
+  background: #fff;
+}
+.new-post-modal-panel .modal-close-x {
+  top: 20px;
+  right: 16px;
+}
 .modal-panel h2 {
   font-family: "Sora", sans-serif;
   font-weight: 700;
   font-size: 1.35rem;
   margin-bottom: 12px;
   letter-spacing: -0.02em;
-}
-.new-post-modal-panel h2 {
-  padding-right: 40px;
 }
 .modal-close-x {
   position: absolute;
@@ -862,9 +894,32 @@ nav {
 }
 .form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--btn-green); }
 #post-body {
-  min-height: 120px;
+  min-height: 0;
   resize: vertical;
   line-height: 1.55;
+}
+#image-upload-area.new-post-image-drop {
+  height: 80px;
+  min-height: 80px;
+  max-height: 80px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+#image-upload-area.new-post-image-drop svg {
+  margin-bottom: 2px;
+  flex-shrink: 0;
+}
+#image-upload-area.new-post-image-drop p {
+  margin: 0;
+  line-height: 1.25;
+}
+#image-upload-area.new-post-image-drop p + p {
+  margin-top: 2px;
 }
 .modal-actions {
   display: flex;
@@ -1426,7 +1481,10 @@ nav {
   <div class="modal-backdrop" data-close="modal-new-post"></div>
   <div class="modal-panel new-post-modal-panel">
     <button type="button" class="modal-close-x" data-close="modal-new-post" aria-label="Close new post dialog">×</button>
-    <h2 id="modal-new-title">New post</h2>
+    <div class="new-post-modal-header">
+      <h2 id="modal-new-title">New post</h2>
+    </div>
+    <div class="new-post-modal-scroll">
     <div class="new-post-type-tabs" role="tablist" aria-label="Post type">
       <button type="button" class="new-post-type-tab active" id="tab-post-type-post" role="tab" aria-selected="true" data-post-type="post">Post</button>
       <button type="button" class="new-post-type-tab" id="tab-post-type-question" role="tab" aria-selected="false" data-post-type="question">Question</button>
@@ -1453,11 +1511,50 @@ nav {
         <option value="things_to_do">Things to Do</option>
       </select>
     </div>
+    <div class="form-row">
+      <label for="post-modal-city">City</label>
+      <select id="post-modal-city" aria-label="City for this post">
+        <option value="amsterdam">Amsterdam</option>
+        <option value="athens">Athens</option>
+        <option value="barcelona">Barcelona</option>
+        <option value="berlin">Berlin</option>
+        <option value="bologna">Bologna</option>
+        <option value="brussels">Brussels</option>
+        <option value="budapest">Budapest</option>
+        <option value="copenhagen">Copenhagen</option>
+        <option value="dublin">Dublin</option>
+        <option value="dubai">Dubai</option>
+        <option value="edinburgh">Edinburgh</option>
+        <option value="florence">Florence</option>
+        <option value="krakow">Krakow</option>
+        <option value="lisbon">Lisbon</option>
+        <option value="ljubljana">Ljubljana</option>
+        <option value="london">London</option>
+        <option value="madrid">Madrid</option>
+        <option value="milan">Milan</option>
+        <option value="naples">Naples</option>
+        <option value="new-york">New York</option>
+        <option value="oslo">Oslo</option>
+        <option value="paris">Paris</option>
+        <option value="porto">Porto</option>
+        <option value="prague">Prague</option>
+        <option value="riga">Riga</option>
+        <option value="rome">Rome</option>
+        <option value="seville">Seville</option>
+        <option value="stockholm">Stockholm</option>
+        <option value="tallinn">Tallinn</option>
+        <option value="valencia">Valencia</option>
+        <option value="vilnius">Vilnius</option>
+        <option value="vienna">Vienna</option>
+        <option value="warsaw">Warsaw</option>
+        <option value="zurich">Zurich</option>
+      </select>
+    </div>
     <div id="new-post-body-image-block">
     <div class="form-row">
       <label for="post-body">Body</label>
-      <textarea id="post-body" rows="8" maxlength="500" placeholder="Write your post…"
-        oninput="updateCounter('body-counter', 500 - this.value.length, 50); this.style.height='auto'; this.style.height=this.scrollHeight+'px'"></textarea>
+      <textarea id="post-body" rows="3" maxlength="500" placeholder="Write your post…"
+        oninput="updateCounter('body-counter', 500 - this.value.length, 50)"></textarea>
       <div style="display:flex;justify-content:flex-end;margin-top:4px;">
         <span id="body-counter" style="font-size:11px;color:#9ab09a;">500</span>
       </div>
@@ -1467,16 +1564,16 @@ nav {
         Image
         <span style="font-weight:400;color:#9ab09a;font-size:12px;">(optional)</span>
       </label>
-      <div id="image-upload-area" onclick="document.getElementById('post-image-input').click()"
-        style="border:2px dashed #d4e6d4;border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.15s;background:#fafffa;"
+      <div id="image-upload-area" class="new-post-image-drop" onclick="document.getElementById('post-image-input').click()"
+        style="border:2px dashed #d4e6d4;border-radius:12px;text-align:center;cursor:pointer;transition:border-color 0.15s;background:#fafffa;"
         onmouseover="this.style.borderColor='#059669'"
         onmouseout="this.style.borderColor='#d4e6d4'">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ab09a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:6px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ab09a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
           <polyline points="21 15 16 10 5 21"/>
         </svg>
-        <p style="font-size:13px;color:#9ab09a;margin:0;">Click to upload an image</p>
-        <p style="font-size:11px;color:#b0c8b0;margin:4px 0 0 0;">JPG, PNG up to 5MB</p>
+        <p style="font-size:12px;color:#9ab09a;">Click to upload</p>
+        <p style="font-size:10px;color:#b0c8b0;">JPG, PNG up to 5MB</p>
       </div>
       <input id="post-image-input" type="file" accept="image/*" style="display:none;"
         onchange="previewPostImage(this)">
@@ -1487,7 +1584,8 @@ nav {
       </div>
     </div>
     </div>
-    <div class="modal-actions">
+    </div>
+    <div class="new-post-modal-footer">
       <button type="button" class="btn-secondary" data-close="modal-new-post">Cancel</button>
       <button type="button" id="submit-post-btn" class="btn-primary" onclick="submitPost()">Submit</button>
     </div>
@@ -1886,6 +1984,7 @@ nav {
         window.updateCounter('body-counter', 500, 50);
       }
       setNewPostContentType('post');
+      syncPostModalCitySelect();
       var submitBtn = document.getElementById('submit-post-btn');
       if (submitBtn) submitBtn.disabled = false;
     }
@@ -1972,6 +2071,24 @@ nav {
       if (fromUrl) return fromUrl;
       return 'Athens';
     }
+
+    function feedCityFromModalSelect() {
+      var sel = document.getElementById('post-modal-city');
+      var val = sel && sel.value;
+      var slug = String(val || '').toLowerCase().trim().replace(/[\s_-]+/g, '');
+      return cityNames[slug] || titleCaseFromRaw(String(val || '').replace(/-/g, ' ')) || 'Athens';
+    }
+
+    function syncPostModalCitySelect() {
+      var sel = document.getElementById('post-modal-city');
+      if (!sel) return;
+      var selectVal = String(rawCity || 'athens').toLowerCase().trim().replace(/\s+/g, '-');
+      if (selectVal === 'new york' || selectVal === 'newyork') selectVal = 'new-york';
+      if (Array.prototype.some.call(sel.options, function (o) { return o.value === selectVal; })) {
+        sel.value = selectVal;
+      }
+    }
+    syncPostModalCitySelect();
 
     function threadPageUrl(postId) {
       return 'community-post.html?postId=' + encodeURIComponent(postId) + '&city=' + encodeURIComponent(cityForFeedQuery());
@@ -2719,7 +2836,6 @@ nav {
         });
 
         const cc = Number(d.commentCount || 0);
-        const vc = Number(d.viewCount || 0);
         const commentBtn = document.createElement('button');
         commentBtn.type = 'button';
         commentBtn.style.cssText = 'border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:13px;color:#5a7a5a;display:flex;align-items:center;gap:5px;';
@@ -2731,12 +2847,6 @@ nav {
         const commentRow = document.createElement('span');
         commentRow.style.cssText = 'display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;';
         commentRow.appendChild(commentBtn);
-        if (vc > 0) {
-          const viewSpan = document.createElement('span');
-          viewSpan.style.cssText = 'font-size:13px;color:#5a7a5a;white-space:nowrap;';
-          viewSpan.textContent = '\uD83D\uDC41 ' + vc;
-          commentRow.appendChild(viewSpan);
-        }
 
         const shareBtn = document.createElement('button');
         shareBtn.type = 'button';
@@ -2880,6 +2990,7 @@ nav {
       window.updateCounter('title-counter', 40, 10);
       window.updateCounter('body-counter', 500, 50);
       setNewPostContentType('post');
+      syncPostModalCitySelect();
       openModal('modal-new-post');
     });
     document.getElementById('confirm-delete-post').addEventListener('click', async function () {
@@ -2995,7 +3106,7 @@ nav {
         console.error('Post submit blocked: user not logged in');
         return;
       }
-      const city = cityForFeedQuery();
+      const city = feedCityFromModalSelect();
       const submitBtn = document.getElementById('submit-post-btn');
       if (submitBtn) submitBtn.disabled = true;
       try {
