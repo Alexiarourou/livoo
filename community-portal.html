@@ -1289,18 +1289,50 @@ nav {
 }
 .nav-profile-menu-link:hover { background: #f0f7f0; }
 
+/* Mobile bottom nav — keep z-index low when re-enabled; currently disabled (emergency fix) */
+#mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: white;
+  border-top: 1px solid #e8f0e8;
+  padding: 8px 0 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  justify-content: space-around;
+  align-items: center;
+  display: none !important;
+}
+
+@media (min-width: 769px) {
+  #sidebar-profile-card {
+    display: block !important;
+  }
+}
+
 @media (max-width: 768px) {
-  #mobile-bottom-nav {
-    display: flex !important;
-  }
-  body.portal-ready {
-    padding-bottom: 70px;
-  }
-  body.portal-ready #fab-new-post {
+  #sidebar-profile-card {
     display: none !important;
   }
+  #portal-content,
+  #posts-container,
+  .main-column,
+  .feed-col {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+  #posts-container {
+    padding-bottom: 80px;
+  }
+  body.portal-ready #fab-new-post {
+    display: flex !important;
+  }
   #back-to-top {
-    bottom: 88px !important;
+    bottom: 24px !important;
+    right: 20px !important;
   }
 }
 </style>
@@ -3582,7 +3614,7 @@ nav {
   }
 </script>
 
-<nav id="mobile-bottom-nav" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e8f0e8;padding:8px 0 max(12px, env(safe-area-inset-bottom));z-index:200;justify-content:space-around;align-items:center;">
+<nav id="mobile-bottom-nav" class="mobile-bottom-nav-inner" aria-label="Mobile navigation">
   <a id="mobile-nav-feed-link" href="community-portal.html" style="display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     <span style="font-size:10px;font-weight:600;color:#059669;">Feed</span>
