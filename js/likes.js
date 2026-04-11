@@ -12,10 +12,10 @@ import {
 
 import { app } from "./firebase-config.js";
 
+const busyPosts = new Set();
+
 const auth = getAuth(app);
 const db = getFirestore(app);
-
-const busyByBtn = new WeakMap();
 
 /** Firestore snapshot: this project’s runtime exposes exists as a method. */
 function snapExists(snap) {
@@ -73,63 +73,45 @@ if (auth.currentUser) {
   initLikedButtonsForCurrentUser();
 }
 
-document.body.addEventListener("click", async (e) => {
-  const btn = e.target.closest(".like-btn[data-post-id]");
+document.body.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.like-btn[data-post-id]');
   if (!btn) return;
 
-  console.log("=== LIKE CLICK ===");
-  console.log("Post ID:", btn.dataset.postId);
-  console.log("Current user:", auth.currentUser?.uid ?? "NOT LOGGED IN");
-  console.log("Busy map has entry:", !!busyByBtn.get(btn));
-
-  e.preventDefault();
-  e.stopPropagation();
-
   const postId = btn.dataset.postId;
-  const countEl = btn.querySelector(".like-count");
-  if (!countEl) {
-    console.log("No .like-count child — abort");
-    return;
-  }
 
   if (!auth.currentUser) {
-    console.log("Redirecting to signup — no user");
-    window.location.href = "signup.html";
+    window.location.href = 'signup.html';
     return;
   }
 
-  if (busyByBtn.get(btn)) {
-    console.log("Blocked — busy");
-    return;
-  }
+  if (busyPosts.has(postId)) return;
 
-  busyByBtn.set(btn, true);
+  busyPosts.add(postId);
   btn.disabled = true;
 
   const uid = auth.currentUser.uid;
-  const likeRef = doc(db, "communityPosts", postId, "likes", uid);
-  const postRef = doc(db, "communityPosts", postId);
+  const postRef = doc(db, 'communityPosts', postId);
+  const likeRef = doc(db, 'communityPosts', postId, 'likes', uid);
 
   try {
     const snap = await getDoc(likeRef);
-    console.log("Like doc exists:", snapExists(snap));
-    if (snapExists(snap)) {
+    if (snap.exists()) {
       await deleteDoc(likeRef);
       await updateDoc(postRef, { upvoteCount: increment(-1) });
-      btn.classList.remove("liked");
-      countEl.style.color = "";
-      countEl.textContent = String(Math.max(0, (parseInt(countEl.textContent, 10) || 0) - 1));
+      btn.classList.remove('liked');
+      const c = btn.querySelector('.like-count');
+      if (c) c.textContent = Math.max(0, parseInt(c.textContent) - 1);
     } else {
       await setDoc(likeRef, { likedAt: serverTimestamp() });
       await updateDoc(postRef, { upvoteCount: increment(1) });
-      btn.classList.add("liked");
-      countEl.style.color = "#059669";
-      countEl.textContent = String((parseInt(countEl.textContent, 10) || 0) + 1);
+      btn.classList.add('liked');
+      const c = btn.querySelector('.like-count');
+      if (c) c.textContent = parseInt(c.textContent) + 1;
     }
-  } catch (err) {
-    console.error("Like click error:", err);
+  } catch(err) {
+    console.error('Like error:', err);
   } finally {
-    busyByBtn.delete(btn);
+    busyPosts.delete(postId);
     btn.disabled = false;
   }
 });
