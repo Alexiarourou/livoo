@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="referrer" content="no-referrer">
   <title>Post | Livvo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -569,7 +568,7 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { app } from "./js/firebase-config.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import {
       getFirestore,
@@ -636,16 +635,6 @@
       if (b) b.setAttribute('data-post-id', postId);
     })();
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
-      authDomain: "livvo-573e1.firebaseapp.com",
-      projectId: "livvo-573e1",
-      storageBucket: "livvo-573e1.firebasestorage.app",
-      messagingSenderId: "438563892670",
-      appId: "1:438563892670:web:c038316d9d3fcbee065def"
-    };
-
-    const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     let currentUser = null;
