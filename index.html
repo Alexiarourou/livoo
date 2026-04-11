@@ -159,6 +159,41 @@
   .fla{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s;cursor:none;}
   .fla:hover{color:var(--mint);}
 
+  @media (max-width: 768px) {
+  nav { padding: 0 4%; height: 54px; }
+  .logo-text { font-size: 19px; }
+  .logo-v { width: 34px; height: 34px; font-size: 18px; }
+  .nav-links { display: none; }
+  .nav-cta { padding: 7px 13px; font-size: 12px; }
+  .hero-inner { margin-top: -40px; padding: 0 6%; }
+  h1 { font-size: clamp(34px, 9vw, 52px); letter-spacing: -2px; }
+  .hero-sub { font-size: 14px; max-width: 100%; }
+  .hero-btns { flex-direction: column; align-items: center; gap: 8px; }
+  .btn-pri, .btn-ghost { width: 100%; max-width: 280px; justify-content: center; }
+  .ticker-wrap { flex-direction: column; gap: 8px; }
+  .ticker-outer { width: 280px; }
+  section { padding: 56px 4%; }
+  section.what, section.community, section.cta { padding: 56px 4%; }
+  section.landlord { padding: 48px 4%; }
+  .sec-t { font-size: clamp(22px, 7vw, 32px); letter-spacing: -1.2px; }
+  .sec-s { font-size: 13px; max-width: 100%; margin-bottom: 28px; }
+  .steps { grid-template-columns: 1fr; gap: 10px; }
+  .feats { grid-template-columns: 1fr; gap: 10px; }
+  .city-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .city-card { aspect-ratio: 4/3; }
+  .comm-inner { grid-template-columns: 1fr; gap: 32px; }
+  .comm-photo-wrap img { height: 260px; }
+  .waitlist { flex-direction: column; align-items: center; }
+  .wl-i, .waitlist .btn-pri { width: 100%; max-width: 300px; justify-content: center; }
+  footer { flex-direction: column; gap: 16px; text-align: center; padding: 24px 4%; }
+  .fl { flex-wrap: wrap; justify-content: center; gap: 12px; }
+  }
+  @media (max-width: 480px) {
+  .city-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .city-card { aspect-ratio: 1/1; border-radius: 11px; }
+  h1 { font-size: clamp(30px, 10vw, 44px); letter-spacing: -1.8px; }
+  }
+
   /* REVEAL */
   .r{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease;}
   .r.v{opacity:1;transform:translateY(0);}
