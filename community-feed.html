@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Community Feed — Livvo</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="livvo-base.css">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root { --green: #059669; --green-light: #10b981; --green-dark: #047857; --bg: #f0f7f2; --surface: #ffffff; --border: #d4e5dc; --text: #1a2e24; --muted: #4a7c5e; }
@@ -13,14 +16,14 @@ body { background: var(--bg); color: var(--text); font-family: "DM Sans", sans-s
 nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.98); border-bottom: 1px solid var(--border); }
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
 .logo-icon { width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, var(--green), var(--green-light)); }
-.logo-word { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--text); }
+.logo-word { font-family: "Sora", sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--text); }
 .logo-word span { color: var(--green); }
 .nav-center { display: flex; gap: 8px; }
 .nav-tab { padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; color: var(--muted); text-decoration: none; font-weight: 500; }
 .nav-tab:hover, .nav-tab.active { color: var(--green); background: rgba(5,150,105,0.08); }
 .feed-layout { display: flex; padding-top: 56px; max-width: 1200px; margin: 0 auto; min-height: 100vh; }
 .sidebar { width: 280px; flex-shrink: 0; padding: 24px 16px; border-right: 1px solid var(--border); background: var(--surface); }
-.sidebar h2 { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; }
+.sidebar h2 { font-family: "Sora", sans-serif; font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; }
 .sidebar .members { font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; }
 .sidebar .topics { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
 .sidebar .topic { display: block; padding: 10px 14px; border-radius: 8px; font-size: 0.88rem; color: var(--text); text-decoration: none; margin-bottom: 4px; }
@@ -35,7 +38,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; p
 .post-body { flex: 1; padding: 16px 20px; }
 .post-meta { font-size: 0.75rem; color: var(--muted); margin-bottom: 8px; }
 .post-meta span { margin-right: 12px; }
-.post-title { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 1rem; line-height: 1.4; margin-bottom: 8px; }
+.post-title { font-family: "Sora", sans-serif; font-weight: 700; font-size: 1rem; line-height: 1.4; margin-bottom: 8px; }
 .post-title a { color: var(--text); text-decoration: none; }
 .post-title a:hover { color: var(--green); }
 .post-excerpt { font-size: 0.88rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
