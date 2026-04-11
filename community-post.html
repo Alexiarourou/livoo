@@ -2210,6 +2210,14 @@
       setupPostOwnerMenu(authorUid);
 
       loadMoreFromCommunity(data).catch(function () {});
+
+      if (typeof window.initLikedButtonsForCurrentUser === 'function') {
+        window.initLikedButtonsForCurrentUser();
+      } else {
+        import('./js/likes.js').then(function (m) {
+          if (m.initLikedButtonsForCurrentUser) return m.initLikedButtonsForCurrentUser();
+        }).catch(function () {});
+      }
     }
 
     let commentsUnsub = null;
