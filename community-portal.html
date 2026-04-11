@@ -1727,7 +1727,6 @@ nav {
     limit, increment, deleteDoc, setDoc, updateDoc, serverTimestamp, orderBy, onSnapshot
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-  import { initPostLikeButton } from "./js/community-post-likes.js";
   const CATEGORY_LABELS = {
     housing: 'Housing Tips',
     events: 'Events',
@@ -2985,15 +2984,12 @@ nav {
         actionBar.className = 'post-card-action-bar';
         actionBar.style.cssText = 'display:flex;align-items:center;gap:4px;';
 
-        const likeBtn = document.createElement('button');
-        likeBtn.type = 'button';
-        likeBtn.id = 'like-btn-' + postId;
-        likeBtn.className = 'like-btn';
-        likeBtn.style.cssText = 'display:flex;align-items:center;gap:5px;border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;font-size:13px;transition:all 0.15s;';
-        likeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span id="like-count-' + postId + '">' + String(Number(d.upvoteCount || 0)) + '</span>';
-        const likeCountEl = likeBtn.querySelector('#like-count-' + postId);
-        const likeCleanup = await initPostLikeButton(db, auth, postId, likeBtn, likeCountEl);
-        postCardMetaUnsubs.push(likeCleanup);
+        const feedPostLikeBtn = document.createElement('button');
+        feedPostLikeBtn.type = 'button';
+        feedPostLikeBtn.className = 'like-btn';
+        feedPostLikeBtn.setAttribute('data-post-id', postId);
+        feedPostLikeBtn.style.cssText = 'display:flex;align-items:center;gap:5px;border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;font-size:13px;transition:all 0.15s;';
+        feedPostLikeBtn.innerHTML = '♥ <span class="like-count">' + String(Number(d.upvoteCount || 0)) + '</span>';
 
         const cc = Number(d.commentCount || 0);
         const ccSpanId = 'post-card-cc-' + postId;
@@ -3082,7 +3078,7 @@ nav {
         menuWrap.appendChild(menuPop);
         menuHost.appendChild(menuWrap);
 
-        actionBar.appendChild(likeBtn);
+        actionBar.appendChild(feedPostLikeBtn);
         actionBar.appendChild(commentRow);
         actionBar.appendChild(shareBtn);
         actionBar.appendChild(menuHost);
@@ -3614,5 +3610,6 @@ window.addEventListener('scroll', function () {
   if (btn) btn.style.display = window.scrollY > 400 ? 'flex' : 'none';
 });
 </script>
+<script type="module" src="js/likes.js"></script>
 </body>
 </html>

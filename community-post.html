@@ -160,7 +160,7 @@
     .comment-more-menu button:hover { background: #fef2f2; }
     .feed-empty, .meta-pill { text-align: center; color: var(--muted); padding: 24px; }
     .meta-pill { text-align: left; padding: 0; font-size: 0.88rem; }
-    #post-like-btn { transition: all 0.15s ease; }
+    .like-btn { transition: all 0.15s ease; }
     [id^="clb-"] { transition: all 0.15s ease; }
     /* Subtle liked state for comment hearts */
     [id^="clb-"].liked { color: #e53e3e !important; }
@@ -499,9 +499,8 @@
             <img id="post-image" alt="">
           </div>
           <div style="display: flex; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid #f0f5f0; flex-wrap: wrap;">
-            <button type="button" id="post-like-btn" class="like-btn" style="display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; font-size: 13px; transition: all 0.15s;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              <span id="post-like-count">0</span>
+            <button type="button" class="like-btn" data-post-id="" style="display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; font-size: 13px; transition: all 0.15s;">
+              ♥ <span class="like-count">0</span>
             </button>
             <button type="button" onclick="scrollToComments()" style="font-size:13px;color:#9ab09a;display:flex;align-items:center;gap:5px;border:none;background:none;cursor:pointer;padding:0;font:inherit;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -591,7 +590,6 @@
       runTransaction,
       writeBatch
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { initPostLikeButton } from "./js/community-post-likes.js";
 
     const CATEGORY_LABELS = {
       housing: 'Housing Tips', events: 'Events', flatmate: 'Flatmate Search', general: 'General',
@@ -631,6 +629,11 @@
       window.location.replace('community-portal.html?city=' + encodeURIComponent(city));
       throw new Error('missing postId');
     }
+
+    (function setPostLikeDataId() {
+      var b = document.querySelector('#post-shell .like-btn, .like-btn');
+      if (b) b.setAttribute('data-post-id', postId);
+    })();
 
     const firebaseConfig = {
       apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
@@ -735,9 +738,6 @@
         return '<a href="' + url.replace(/"/g, '&quot;') + '" target="_blank" rel="noopener noreferrer" style="color:#2d6a2d;text-decoration:underline;">' + url + '</a>';
       });
     }
-
-    let postLikeCleanup = null;
-    let postLikeWired = false;
 
     const loadingEl = document.getElementById('loading');
     const errEl = document.getElementById('err-msg');
@@ -1707,12 +1707,12 @@
         const actionRow = document.createElement('div');
         actionRow.style.cssText = 'display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
         const initialCommentLikes = Number(c.likes || c.likeCount || 0);
-        const likeBtn = document.createElement('button');
-        likeBtn.type = 'button';
-        likeBtn.id = 'clb-' + thisCommentId;
-        likeBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#b0c8b0;display:flex;align-items:center;gap:3px;transition:color 0.1s;';
-        likeBtn.innerHTML = heartStrokeSvg + '<span id="clc-' + thisCommentId + '" style="font-size:11px;">' + String(initialCommentLikes) + '</span>';
-        likeBtn.addEventListener('click', function (e) {
+        const commentHeartBtn = document.createElement('button');
+        commentHeartBtn.type = 'button';
+        commentHeartBtn.id = 'clb-' + thisCommentId;
+        commentHeartBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#b0c8b0;display:flex;align-items:center;gap:3px;transition:color 0.1s;';
+        commentHeartBtn.innerHTML = heartStrokeSvg + '<span id="clc-' + thisCommentId + '" style="font-size:11px;">' + String(initialCommentLikes) + '</span>';
+        commentHeartBtn.addEventListener('click', function (e) {
           e.stopPropagation();
           window.likeComment(thisCommentId);
         });
@@ -1725,7 +1725,7 @@
           window.toggleReplyBox(thisCommentId);
         });
 
-        actionRow.appendChild(likeBtn);
+        actionRow.appendChild(commentHeartBtn);
         actionRow.appendChild(replyBtn);
 
         if (currentUser && c.authorUid && c.authorUid === currentUser.uid) {
@@ -1806,8 +1806,8 @@
         if (currentUser) {
           getDoc(doc(db, 'communityPosts', postId, 'comments', thisCommentId, 'likes', currentUser.uid)).then(function (ls) {
             if (ls.exists) {
-              likeBtn.classList.add('liked');
-              likeBtn.style.color = '#e53e3e';
+              commentHeartBtn.classList.add('liked');
+              commentHeartBtn.style.color = '#e53e3e';
               var cspan = document.getElementById('clc-' + thisCommentId);
               var shown = parseInt(cspan && cspan.textContent, 10) || 0;
               if (cspan && shown === 0 && initialCommentLikes === 0) {
@@ -2194,7 +2194,8 @@
         }
       }
 
-      document.getElementById('post-like-count').textContent = String(Number(data.upvoteCount || 0));
+      var likeCountSpan = document.querySelector('.like-btn .like-count');
+      if (likeCountSpan) likeCountSpan.textContent = String(Number(data.upvoteCount || 0));
       try {
         const commentsCol = collection(db, 'communityPosts', postId, 'comments');
         const cs = await getDocs(commentsCol);
@@ -2204,16 +2205,6 @@
       }
 
       document.title = (data.title || 'Post') + ' | Livvo';
-
-      if (!postLikeWired) {
-        postLikeWired = true;
-        try {
-          if (postLikeCleanup) postLikeCleanup();
-        } catch (e) {}
-        const likeBtn = document.getElementById('post-like-btn');
-        const countEl = document.getElementById('post-like-count');
-        postLikeCleanup = await initPostLikeButton(db, auth, postId, likeBtn, countEl);
-      }
 
       updateCommentCountLabel();
       fillComposerAvatar();
@@ -2274,7 +2265,7 @@
           wireCommentsListener();
           recordPostViewOnce();
         } else {
-          const lc = document.getElementById('post-like-count');
+          var lc = document.querySelector('.like-btn .like-count');
           if (lc) {
             var srv = String(Number(pdata.upvoteCount || 0));
             if (lc.textContent !== srv) lc.textContent = srv;
@@ -2326,5 +2317,6 @@
       }
     });
   </script>
+  <script type="module" src="js/likes.js"></script>
 </body>
 </html>
