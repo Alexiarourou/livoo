@@ -14,6 +14,7 @@ import { app } from "./firebase-config.js";
 
 const busyPosts = new Set();
 const busyComments = new Set();
+const busyReplies = new Set();
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -21,6 +22,10 @@ const db = getFirestore(app);
 /** Firestore snapshot: this project’s runtime exposes exists as a method. */
 function snapExists(snap) {
   return snap.exists();
+}
+
+function replyBusyKey(postId, commentId, replyId) {
+  return postId + "\0" + commentId + "\0" + replyId;
 }
 
 /**
@@ -72,14 +77,52 @@ export async function initCommentLikeButtonsForCurrentUser() {
   );
 }
 
+/**
+ * Sets .liked on nested reply like buttons only.
+ */
+export async function initReplyLikeButtonsForCurrentUser() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const buttons = document.querySelectorAll(".reply-like-btn[data-reply-id][data-comment-id][data-post-id]");
+  await Promise.all(
+    Array.from(buttons).map(async (btn) => {
+      const postId = btn.dataset.postId;
+      const commentId = btn.dataset.commentId;
+      const replyId = btn.dataset.replyId;
+      if (!postId || !commentId || !replyId) return;
+      const likeRef = doc(
+        db,
+        "communityPosts",
+        postId,
+        "comments",
+        commentId,
+        "replies",
+        replyId,
+        "likes",
+        user.uid
+      );
+      try {
+        const snap = await getDoc(likeRef);
+        if (snapExists(snap)) btn.classList.add("liked");
+        else btn.classList.remove("liked");
+      } catch (e) {
+        console.error("Init reply like state error:", e);
+      }
+    })
+  );
+}
+
 if (typeof window !== "undefined") {
   window.initLikedButtonsForCurrentUser = initLikedButtonsForCurrentUser;
   window.initCommentLikeButtonsForCurrentUser = initCommentLikeButtonsForCurrentUser;
+  window.initReplyLikeButtonsForCurrentUser = initReplyLikeButtonsForCurrentUser;
 }
 
 function runLikeInits() {
   initLikedButtonsForCurrentUser();
   initCommentLikeButtonsForCurrentUser();
+  initReplyLikeButtonsForCurrentUser();
 }
 
 onAuthStateChanged(auth, (user) => {
@@ -88,6 +131,9 @@ onAuthStateChanged(auth, (user) => {
       btn.classList.remove("liked");
     });
     document.querySelectorAll(".comment-like-btn[data-comment-id].liked").forEach((btn) => {
+      btn.classList.remove("liked");
+    });
+    document.querySelectorAll(".reply-like-btn[data-reply-id].liked").forEach((btn) => {
       btn.classList.remove("liked");
     });
     return;
@@ -100,6 +146,58 @@ if (auth.currentUser) {
 }
 
 document.body.addEventListener('click', async (e) => {
+  const rbtn = e.target.closest('.reply-like-btn[data-reply-id][data-comment-id][data-post-id]');
+  if (rbtn) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const postId = rbtn.dataset.postId;
+    const commentId = rbtn.dataset.commentId;
+    const replyId = rbtn.dataset.replyId;
+    const bKey = replyBusyKey(postId, commentId, replyId);
+
+    if (!auth.currentUser) {
+      window.location.href = 'signup.html';
+      return;
+    }
+
+    if (busyReplies.has(bKey)) return;
+
+    busyReplies.add(bKey);
+    rbtn.disabled = true;
+
+    const uid = auth.currentUser.uid;
+    const replyRef = doc(db, 'communityPosts', postId, 'comments', commentId, 'replies', replyId);
+    const likeRef = doc(db, 'communityPosts', postId, 'comments', commentId, 'replies', replyId, 'likes', uid);
+    const countEl = rbtn.querySelector('.reply-like-count');
+
+    try {
+      const snap = await getDoc(likeRef);
+      const replySnap = await getDoc(replyRef);
+      const cur = Math.max(0, Number((replySnap.data() || {}).likes || (replySnap.data() || {}).likeCount || 0));
+
+      if (snap.exists()) {
+        await deleteDoc(likeRef);
+        if (cur > 0) await updateDoc(replyRef, { likes: increment(-1) });
+        rbtn.classList.remove('liked');
+      } else {
+        await setDoc(likeRef, { likedAt: serverTimestamp() });
+        await updateDoc(replyRef, { likes: increment(1) });
+        rbtn.classList.add('liked');
+      }
+      const rs = await getDoc(replyRef);
+      if (countEl) {
+        countEl.textContent = String(Math.max(0, Number((rs.data() || {}).likes || (rs.data() || {}).likeCount || 0)));
+      }
+    } catch (err) {
+      console.error('Reply like error:', err);
+    } finally {
+      busyReplies.delete(bKey);
+      rbtn.disabled = false;
+    }
+    return;
+  }
+
   const cbtn = e.target.closest('.comment-like-btn[data-comment-id][data-post-id]');
   if (cbtn) {
     e.preventDefault();

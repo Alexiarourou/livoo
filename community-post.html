@@ -168,6 +168,9 @@
     [id^="clb-"].liked { color: #e53e3e !important; }
     .comment-like-btn.liked svg path,
     [id^="clb-"].liked svg path { fill: #e53e3e; stroke: #e53e3e; }
+    .reply-like-btn { transition: all 0.15s ease; }
+    .reply-like-btn.liked { color: #e53e3e !important; }
+    .reply-like-btn.liked svg path { fill: #e53e3e; stroke: #e53e3e; }
 
     /* Comment delete inline confirm */
     .delete-confirm-bar {
@@ -1391,6 +1394,7 @@
           authorPhotoURL: authorPhoto || null,
           authorPhoto: authorPhoto,
           parentCommentId: commentId,
+          likes: 0,
           createdAt: serverTimestamp()
         });
         ta.value = '';
@@ -1861,9 +1865,19 @@
             rb.innerHTML = linkify(r.text || '');
             var rZone = wireCommentCompactZone(rm, null, rb);
             rr.appendChild(rZone);
+            var replyActionRow = document.createElement('div');
+            replyActionRow.style.cssText = 'display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:2px;';
+            var initialReplyLikes = Math.max(0, Number(r.likes || r.likeCount || 0));
+            var replyLikeBtn = document.createElement('button');
+            replyLikeBtn.type = 'button';
+            replyLikeBtn.className = 'reply-like-btn';
+            replyLikeBtn.setAttribute('data-post-id', postId);
+            replyLikeBtn.setAttribute('data-comment-id', thisCommentId);
+            replyLikeBtn.setAttribute('data-reply-id', rd.id);
+            replyLikeBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#b0c8b0;display:flex;align-items:center;gap:3px;transition:color 0.1s;';
+            replyLikeBtn.innerHTML = heartStrokeSvg + '<span class="reply-like-count" style="font-size:11px;">' + String(initialReplyLikes) + '</span>';
+            replyActionRow.appendChild(replyLikeBtn);
             if (currentUser && String(r.authorUid || '') === currentUser.uid) {
-              var repActions = document.createElement('div');
-              repActions.style.cssText = 'display:flex;align-items:center;gap:12px;';
               var delRep = document.createElement('button');
               delRep.type = 'button';
               delRep.textContent = 'Delete';
@@ -1872,13 +1886,20 @@
                 e.stopPropagation();
                 window.requestDeleteReply(thisCommentId, rd.id);
               });
-              repActions.appendChild(delRep);
-              rr.appendChild(repActions);
+              replyActionRow.appendChild(delRep);
             }
+            rr.appendChild(replyActionRow);
             row.appendChild(rav);
             row.appendChild(rr);
             repliesWrap.appendChild(row);
           });
+          if (typeof window.initReplyLikeButtonsForCurrentUser === 'function') {
+            window.initReplyLikeButtonsForCurrentUser();
+          } else {
+            import('./js/likes.js').then(function (m) {
+              if (m.initReplyLikeButtonsForCurrentUser) return m.initReplyLikeButtonsForCurrentUser();
+            }).catch(function () {});
+          }
         });
         threadRepliesUnsubs.push(unsubReplies);
 
