@@ -35,20 +35,35 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 document.body.addEventListener("click", async (e) => {
-  const btn = e.target.closest(".like-btn");
-  if (!btn || !btn.dataset.postId) return;
+  const btn = e.target.closest(".like-btn[data-post-id]");
+  if (!btn) return;
+
+  console.log("=== LIKE CLICK ===");
+  console.log("Post ID:", btn.dataset.postId);
+  console.log("Current user:", auth.currentUser?.uid ?? "NOT LOGGED IN");
+  console.log("Busy map has entry:", !!busyByBtn.get(btn));
+
   e.preventDefault();
   e.stopPropagation();
+
   const postId = btn.dataset.postId;
   const countEl = btn.querySelector(".like-count");
-  if (!countEl) return;
+  if (!countEl) {
+    console.log("No .like-count child — abort");
+    return;
+  }
 
-  const user = auth.currentUser;
-  if (!user) {
+  if (!auth.currentUser) {
+    console.log("Redirecting to signup — no user");
     window.location.href = "signup.html";
     return;
   }
-  if (busyByBtn.get(btn)) return;
+
+  if (busyByBtn.get(btn)) {
+    console.log("Blocked — busy");
+    return;
+  }
+
   busyByBtn.set(btn, true);
   btn.disabled = true;
 
@@ -57,6 +72,7 @@ document.body.addEventListener("click", async (e) => {
 
   try {
     const snap = await getDoc(likeRef);
+    console.log("Like doc exists:", snap.exists);
     if (snap.exists) {
       await deleteDoc(likeRef);
       await updateDoc(postRef, { upvoteCount: increment(-1) });
@@ -69,7 +85,7 @@ document.body.addEventListener("click", async (e) => {
       countEl.textContent = String((parseInt(countEl.textContent, 10) || 0) + 1);
     }
   } catch (err) {
-    console.error(err);
+    console.error("Like click error:", err);
   } finally {
     busyByBtn.delete(btn);
     btn.disabled = false;
