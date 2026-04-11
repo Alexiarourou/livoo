@@ -19,12 +19,18 @@ const busyByBtn = new WeakMap();
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;
+
   document.querySelectorAll(".like-btn[data-post-id]").forEach(async (btn) => {
     const postId = btn.dataset.postId;
-    if (!postId) return;
-    const likeSnap = await getDoc(doc(db, "communityPosts", postId, "likes", user.uid));
-    if (likeSnap.exists) btn.classList.add("liked");
-    else btn.classList.remove("liked");
+    const likeRef = doc(db, "communityPosts", postId, "likes", user.uid);
+
+    try {
+      const snap = await getDoc(likeRef);
+      if (snap.exists) btn.classList.add("liked");
+      else btn.classList.remove("liked");
+    } catch (e) {
+      console.error("Init like state error:", e);
+    }
   });
 });
 
