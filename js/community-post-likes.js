@@ -31,11 +31,9 @@ export async function initPostLikeButton(db, auth, postId, btnEl, countEl, opts)
     };
   }
 
-  const uid = auth.currentUser.uid;
   const postRef = doc(db, "communityPosts", postId);
-  const likeRef = doc(db, "communityPosts", postId, "likes", uid);
 
-  const likeSnap = await getDoc(likeRef);
+  const likeSnap = await getDoc(doc(db, "communityPosts", postId, "likes", auth.currentUser.uid));
   if (likeSnap.exists) {
     btnEl.classList.add("liked");
   }
@@ -53,8 +51,16 @@ export async function initPostLikeButton(db, auth, postId, btnEl, countEl, opts)
       e.stopPropagation();
       e.preventDefault();
     }
+    if (!auth.currentUser) {
+      console.log("Not logged in");
+      window.location.href = signupUrl;
+      return;
+    }
+    console.log("User:", auth.currentUser.uid);
     if (processing) return;
     processing = true;
+    const uid = auth.currentUser.uid;
+    const likeRef = doc(db, "communityPosts", postId, "likes", uid);
     try {
       const snap = await getDoc(likeRef);
       if (snap.exists) {

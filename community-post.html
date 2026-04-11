@@ -572,9 +572,24 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import {
-      getFirestore, collection, query, orderBy, onSnapshot, doc, getDoc, getDocs,
-      where, limit, addDoc,
-      serverTimestamp, increment, deleteDoc, setDoc, updateDoc, runTransaction, writeBatch
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      deleteDoc,
+      updateDoc,
+      increment,
+      serverTimestamp,
+      onSnapshot,
+      collection,
+      getDocs,
+      addDoc,
+      query,
+      orderBy,
+      where,
+      limit,
+      runTransaction,
+      writeBatch
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { initPostLikeButton } from "./js/community-post-likes.js";
 
@@ -746,6 +761,13 @@
       if (!el || !label) return;
       const n = Math.max(0, parseInt(el.textContent, 10) || 0);
       label.textContent = String(n) + ' comment' + (n === 1 ? '' : 's');
+    }
+
+    /** Subcollection size — do not use post.commentCount (can be stale). */
+    function syncCommentCountUi(size) {
+      const el = document.getElementById('post-comment-count');
+      if (el) el.textContent = String(Math.max(0, Number(size) || 0));
+      updateCommentCountLabel();
     }
 
     function fillComposerAvatar() {
@@ -1206,8 +1228,6 @@
           const cur = Number((postSnap.data() || {}).commentCount || 0);
           transaction.update(doc(db, 'communityPosts', postId), { commentCount: Math.max(0, cur - 1) });
         });
-        var row = document.getElementById('comment-' + commentId);
-        if (row) row.remove();
         showToast('Comment deleted');
       } catch (err) {
         console.error(err);
@@ -1480,19 +1500,6 @@
     document.addEventListener('click', function () {
       document.querySelectorAll('[id^="comment-menu-"]').forEach(function (m) { m.style.display = 'none'; });
     });
-
-    /** Same comment bodies + same like totals — safe to patch counts only. Like count changes must full re-render (patch used stale likes and broke the counter vs. heart state). */
-    function commentDocsCompatibleForPatch(prev, next) {
-      if (!prev || !next || prev.length !== next.length) return false;
-      for (var i = 0; i < prev.length; i++) {
-        if (prev[i].id !== next[i].id) return false;
-        var a = prev[i].data() || {};
-        var b = next[i].data() || {};
-        if (String(a.text || '') !== String(b.text || '')) return false;
-        if (Number(a.likes || a.likeCount || 0) !== Number(b.likes || b.likeCount || 0)) return false;
-      }
-      return true;
-    }
 
     var viewCountRecorded = false;
     function recordPostViewOnce() {
@@ -2188,7 +2195,13 @@
       }
 
       document.getElementById('post-like-count').textContent = String(Number(data.upvoteCount || 0));
-      document.getElementById('post-comment-count').textContent = String(Number(data.commentCount || 0));
+      try {
+        const commentsCol = collection(db, 'communityPosts', postId, 'comments');
+        const cs = await getDocs(commentsCol);
+        syncCommentCountUi(cs.size);
+      } catch (e) {
+        syncCommentCountUi(0);
+      }
 
       document.title = (data.title || 'Post') + ' | Livvo';
 
@@ -2227,18 +2240,8 @@
       }
       const cq = query(collection(db, 'communityPosts', postId, 'comments'), orderBy('createdAt', 'asc'));
       commentsUnsub = onSnapshot(cq, function (csnap) {
-        var next = csnap.docs.slice();
-        if (commentDocsCompatibleForPatch(latestComments, next)) {
-          latestComments = next;
-          next.forEach(function (cd) {
-            var d = cd.data() || {};
-            var n = Math.max(0, Number(d.likes || d.likeCount || 0));
-            var el = document.getElementById('clc-' + cd.id);
-            if (el) el.textContent = String(n);
-          });
-          return;
-        }
-        latestComments = next;
+        latestComments = csnap.docs.slice();
+        syncCommentCountUi(csnap.size);
         renderComments().catch(function () {});
       }, function () {
         listEl.innerHTML = '<p class="meta-pill">Could not load comments.</p>';
@@ -2271,8 +2274,6 @@
           wireCommentsListener();
           recordPostViewOnce();
         } else {
-          const cc = document.getElementById('post-comment-count');
-          if (cc) cc.textContent = String(Number(pdata.commentCount || 0));
           const lc = document.getElementById('post-like-count');
           if (lc) {
             var srv = String(Number(pdata.upvoteCount || 0));
