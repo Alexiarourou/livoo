@@ -2986,7 +2986,7 @@ nav {
         feedPostLikeBtn.className = 'like-btn';
         feedPostLikeBtn.setAttribute('data-post-id', postId);
         feedPostLikeBtn.style.cssText = 'display:flex;align-items:center;gap:5px;border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;font-size:13px;transition:all 0.15s;';
-        feedPostLikeBtn.innerHTML = '♥ <span class="like-count">' + String(Number(d.upvoteCount || 0)) + '</span>';
+        feedPostLikeBtn.innerHTML = '♥ <span class="like-count">' + String(Math.max(0, Number(d.upvoteCount || 0))) + '</span>';
 
         const cc = Number(d.commentCount || 0);
         const ccSpanId = 'post-card-cc-' + postId;
