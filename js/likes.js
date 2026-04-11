@@ -67,7 +67,8 @@ document.body.addEventListener("click", async (e) => {
   busyByBtn.set(btn, true);
   btn.disabled = true;
 
-  const likeRef = doc(db, "communityPosts", postId, "likes", user.uid);
+  const uid = auth.currentUser.uid;
+  const likeRef = doc(db, "communityPosts", postId, "likes", uid);
   const postRef = doc(db, "communityPosts", postId);
 
   try {
