@@ -26,7 +26,7 @@ onAuthStateChanged(auth, async (user) => {
 
     try {
       const snap = await getDoc(likeRef);
-      if (snap.exists) btn.classList.add("liked");
+      if (snap.exists()) btn.classList.add("liked");
       else btn.classList.remove("liked");
     } catch (e) {
       console.error("Init like state error:", e);
@@ -73,8 +73,8 @@ document.body.addEventListener("click", async (e) => {
 
   try {
     const snap = await getDoc(likeRef);
-    console.log("Like doc exists:", snap.exists);
-    if (snap.exists) {
+    console.log("Like doc exists:", snap.exists());
+    if (snap.exists()) {
       await deleteDoc(likeRef);
       await updateDoc(postRef, { upvoteCount: increment(-1) });
       btn.classList.remove("liked");
