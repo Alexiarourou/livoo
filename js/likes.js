@@ -12,6 +12,7 @@ import {
 
 import { app } from "./firebase-config.js";
 
+/* Busy guards: must stay at module scope so they persist across auth callbacks and clicks. */
 const busyPosts = new Set();
 const busyComments = new Set();
 const busyReplies = new Set();
