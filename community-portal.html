@@ -417,8 +417,7 @@ nav {
 .feed { display: flex; flex-direction: column; gap: 8px; width: 100%; }
 
 .post-card:active { transform: scale(0.995); }
-.post-like-heart.liked svg path { fill: #e53e3e; stroke: #e53e3e; }
-.post-like-heart.liked { color: #e53e3e !important; background: #fff0f0 !important; }
+/* Post like button — .like-btn lives in livvo-base.css */
 .feed-empty {
   text-align: center;
   color: var(--muted);
@@ -1728,6 +1727,7 @@ nav {
     limit, increment, deleteDoc, setDoc, updateDoc, serverTimestamp, orderBy, onSnapshot
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+  import { initPostLikeButton } from "./js/community-post-likes.js";
   const CATEGORY_LABELS = {
     housing: 'Housing Tips',
     events: 'Events',
@@ -2619,58 +2619,6 @@ nav {
         menu.style.display = menu.style.display === 'none' || menu.style.display === '' ? 'block' : 'none';
       }
     };
-    var feedPostLikeInFlight = new Set();
-    function applyFeedPostLikeVisual(btn, liked) {
-      if (!btn) return;
-      if (liked) btn.classList.add('liked');
-      else btn.classList.remove('liked');
-    }
-    window.likePost = async function (event, postId) {
-      if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-      }
-      const user = auth.currentUser;
-      if (!user || feedPostLikeInFlight.has(postId)) return;
-      const btn = document.getElementById('like-btn-' + postId);
-      const countEl = document.getElementById('like-count-' + postId);
-      if (!btn || !countEl) return;
-      feedPostLikeInFlight.add(postId);
-      const postRef = doc(db, 'communityPosts', postId);
-      const likeRef = doc(db, 'communityPosts', postId, 'likes', user.uid);
-      const legacyRef = doc(db, 'communityPosts', postId, 'upvotes', user.uid);
-      try {
-        const likeSnap = await getDoc(likeRef);
-        const legacySnap = await getDoc(legacyRef);
-        const serverLiked = !!(likeSnap.exists || legacySnap.exists);
-        if (serverLiked) {
-          if (likeSnap.exists) await deleteDoc(likeRef);
-          if (legacySnap.exists) await deleteDoc(legacyRef);
-          await updateDoc(postRef, { upvoteCount: increment(-1) });
-          applyFeedPostLikeVisual(btn, false);
-        } else {
-          await setDoc(likeRef, { likedAt: serverTimestamp() });
-          await updateDoc(postRef, { upvoteCount: increment(1) });
-          applyFeedPostLikeVisual(btn, true);
-        }
-        const pSnap = await getDoc(postRef);
-        countEl.textContent = String(Math.max(0, Number((pSnap.data() || {}).upvoteCount || 0)));
-        btn.style.transform = 'scale(1.06)';
-        setTimeout(function () { btn.style.transform = 'scale(1)'; }, 150);
-      } catch (err) {
-        console.error(err);
-        try {
-          var l2 = await getDoc(likeRef);
-          var u2 = await getDoc(legacyRef);
-          var p2 = await getDoc(postRef);
-          applyFeedPostLikeVisual(btn, !!(l2.exists || u2.exists));
-          countEl.textContent = String(Math.max(0, Number((p2.data() || {}).upvoteCount || 0)));
-        } catch (e) {}
-      } finally {
-        feedPostLikeInFlight.delete(postId);
-      }
-    };
-
     document.addEventListener('click', function (e) {
       if (e.target.closest('[id^="post-menu-"]') || e.target.closest('.post-card-more-trigger')) return;
       if (!e.target.closest('.nav-notifications-wrap')) closeNotificationsDropdown();
@@ -2903,18 +2851,6 @@ nav {
         const authorUid = d.author || d.authorId || '';
         const fallbackUsername = d.authorUsername || d.authorName || d.authorEmail || 'Anonymous';
         const authorProfile = await getAuthorProfile(authorUid, fallbackUsername, d.authorPhotoURL || d.authorPhoto || '');
-        let hasUpvoted = false;
-        if (currentUser) {
-          try {
-            const [voteNew, voteLeg] = await Promise.all([
-              getDoc(doc(db, 'communityPosts', postId, 'likes', currentUser.uid)),
-              getDoc(doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid))
-            ]);
-            hasUpvoted = !!(voteNew.exists || voteLeg.exists);
-          } catch (e) {
-            hasUpvoted = false;
-          }
-        }
 
         const displayName = authorProfile.username || 'Anonymous';
         const initial = authorProfile.initial || 'A';
@@ -3052,12 +2988,12 @@ nav {
         const likeBtn = document.createElement('button');
         likeBtn.type = 'button';
         likeBtn.id = 'like-btn-' + postId;
-        likeBtn.className = 'post-like-heart' + (hasUpvoted ? ' liked' : '');
-        likeBtn.style.cssText = 'display:flex;align-items:center;gap:5px;border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:13px;color:#5a7a5a;transition:all 0.15s;';
+        likeBtn.className = 'like-btn';
+        likeBtn.style.cssText = 'display:flex;align-items:center;gap:5px;border:none;background:#f5f5f5;border-radius:20px;padding:5px 12px;font-size:13px;transition:all 0.15s;';
         likeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span id="like-count-' + postId + '">' + String(Number(d.upvoteCount || 0)) + '</span>';
-        likeBtn.addEventListener('click', function (e) {
-          window.likePost(e, postId);
-        });
+        const likeCountEl = likeBtn.querySelector('#like-count-' + postId);
+        const likeCleanup = await initPostLikeButton(db, auth, postId, likeBtn, likeCountEl);
+        postCardMetaUnsubs.push(likeCleanup);
 
         const cc = Number(d.commentCount || 0);
         const ccSpanId = 'post-card-cc-' + postId;

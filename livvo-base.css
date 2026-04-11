@@ -111,3 +111,21 @@ h1, h2, h3, h4 {
 .logo-word span {
   color: var(--green);
 }
+
+/* Post like (community feed + thread) */
+.like-btn {
+  color: #9ca3af;
+  cursor: pointer;
+}
+.like-btn:not(.liked) svg path {
+  fill: none;
+  stroke: currentColor;
+}
+.like-btn.liked {
+  color: #059669;
+}
+.like-btn.liked svg,
+.like-btn.liked svg path {
+  fill: #059669;
+  stroke: #059669;
+}

@@ -161,8 +161,6 @@
     .feed-empty, .meta-pill { text-align: center; color: var(--muted); padding: 24px; }
     .meta-pill { text-align: left; padding: 0; font-size: 0.88rem; }
     #post-like-btn { transition: all 0.15s ease; }
-    #post-like-btn.liked svg path { fill: #e53e3e; stroke: #e53e3e; }
-    #post-like-btn.liked { color: #e53e3e !important; background: #fff0f0 !important; }
     [id^="clb-"] { transition: all 0.15s ease; }
     /* Subtle liked state for comment hearts */
     [id^="clb-"].liked { color: #e53e3e !important; }
@@ -501,7 +499,7 @@
             <img id="post-image" alt="">
           </div>
           <div style="display: flex; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid #f0f5f0; flex-wrap: wrap;">
-            <button type="button" id="post-like-btn" style="display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; cursor: pointer; font-size: 13px; color: #5a7a5a; transition: all 0.15s;">
+            <button type="button" id="post-like-btn" class="like-btn" style="display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; font-size: 13px; transition: all 0.15s;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
               <span id="post-like-count">0</span>
             </button>
@@ -578,6 +576,7 @@
       where, limit, addDoc,
       serverTimestamp, increment, deleteDoc, setDoc, updateDoc, runTransaction, writeBatch
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initPostLikeButton } from "./js/community-post-likes.js";
 
     const CATEGORY_LABELS = {
       housing: 'Housing Tips', events: 'Events', flatmate: 'Flatmate Search', general: 'General',
@@ -722,75 +721,8 @@
       });
     }
 
-    function applyPostLikeVisual(btn, isLiked) {
-      if (!btn) return;
-      const svg = btn.querySelector('svg');
-      if (isLiked) {
-        btn.classList.add('liked');
-        btn.style.color = '#e53e3e';
-        btn.style.background = '#fff0f0';
-        if (svg) {
-          svg.style.fill = '#e53e3e';
-          svg.style.stroke = '#e53e3e';
-        }
-      } else {
-        btn.classList.remove('liked');
-        btn.style.color = '#5a7a5a';
-        btn.style.background = '#f5f5f5';
-        if (svg) {
-          svg.style.fill = 'none';
-          svg.style.stroke = 'currentColor';
-        }
-      }
-    }
-
-    /** Per-user like doc at likes/{uid}; legacy upvotes/{uid} removed on unlike. Sequential ops — one increment/decrement per toggle. */
-    var postLikeInFlight = false;
-    async function togglePostLike() {
-      if (!currentUser || postLikeInFlight) return;
-      const likeBtn = document.getElementById('post-like-btn');
-      const countEl = document.getElementById('post-like-count');
-      if (!likeBtn || !countEl) return;
-      postLikeInFlight = true;
-      const postRef = doc(db, 'communityPosts', postId);
-      const likeRef = doc(db, 'communityPosts', postId, 'likes', currentUser.uid);
-      const legacyRef = doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid);
-      try {
-        const likeSnap = await getDoc(likeRef);
-        const legacySnap = await getDoc(legacyRef);
-        const serverLiked = !!(likeSnap.exists || legacySnap.exists);
-        if (serverLiked) {
-          if (likeSnap.exists) await deleteDoc(likeRef);
-          if (legacySnap.exists) await deleteDoc(legacyRef);
-          await updateDoc(postRef, { upvoteCount: increment(-1) });
-          likeBtn.classList.remove('liked');
-          applyPostLikeVisual(likeBtn, false);
-        } else {
-          await setDoc(likeRef, { likedAt: serverTimestamp() });
-          await updateDoc(postRef, { upvoteCount: increment(1) });
-          likeBtn.classList.add('liked');
-          applyPostLikeVisual(likeBtn, true);
-        }
-        const pSnap = await getDoc(postRef);
-        countEl.textContent = String(Math.max(0, Number((pSnap.data() || {}).upvoteCount || 0)));
-        likeBtn.style.transform = 'scale(1.12)';
-        setTimeout(function () { likeBtn.style.transform = 'scale(1)'; }, 150);
-      } catch (err) {
-        console.error('Like error:', err);
-        try {
-          const l2 = await getDoc(likeRef);
-          const u2 = await getDoc(legacyRef);
-          const still = !!(l2.exists || u2.exists);
-          applyPostLikeVisual(likeBtn, still);
-          if (still) likeBtn.classList.add('liked');
-          else likeBtn.classList.remove('liked');
-          const p2 = await getDoc(postRef);
-          countEl.textContent = String(Math.max(0, Number((p2.data() || {}).upvoteCount || 0)));
-        } catch (e) {}
-      } finally {
-        postLikeInFlight = false;
-      }
-    }
+    let postLikeCleanup = null;
+    let postLikeWired = false;
 
     const loadingEl = document.getElementById('loading');
     const errEl = document.getElementById('err-msg');
@@ -801,13 +733,6 @@
     const postTimestampEl = document.getElementById('post-time');
     const postAuthorAvatarEl = document.getElementById('post-avatar');
     const postBodyEl = document.getElementById('post-body');
-    const postLikeBtn = document.getElementById('post-like-btn');
-    if (postLikeBtn) {
-      postLikeBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        togglePostLike();
-      });
-    }
     const sortSelect = document.getElementById('sort-comments');
     const listEl = document.getElementById('comments-container');
     const commentInputEl = document.getElementById('comment-input');
@@ -2076,7 +2001,6 @@
 
     window.submitComment = function () { submitThreadComment(); };
     window.cancelComment = function () { collapseComposer(); };
-    window.likePost = function () { togglePostLike(); };
     window.scrollToComments = function () {
       const commentsSection = document.getElementById('comments-container');
       if (commentsSection) {
@@ -2268,17 +2192,15 @@
 
       document.title = (data.title || 'Post') + ' | Livvo';
 
-      let hasLiked = false;
-      if (currentUser) {
+      if (!postLikeWired) {
+        postLikeWired = true;
         try {
-          const [vLike, vLeg] = await Promise.all([
-            getDoc(doc(db, 'communityPosts', postId, 'likes', currentUser.uid)),
-            getDoc(doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid))
-          ]);
-          hasLiked = !!(vLike.exists || vLeg.exists);
+          if (postLikeCleanup) postLikeCleanup();
         } catch (e) {}
+        const likeBtn = document.getElementById('post-like-btn');
+        const countEl = document.getElementById('post-like-count');
+        postLikeCleanup = await initPostLikeButton(db, auth, postId, likeBtn, countEl);
       }
-      applyPostLikeVisual(postLikeBtn, hasLiked);
 
       updateCommentCountLabel();
       fillComposerAvatar();
