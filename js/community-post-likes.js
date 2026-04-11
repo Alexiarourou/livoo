@@ -11,7 +11,7 @@ import {
 
 /**
  * Post-level likes: communityPosts/{postId}/likes/{uid}, counter on post.upvoteCount.
- * Returns a cleanup function (unsubscribe + remove click listener).
+ * One listener per button; processing + disabled block stacked clicks until Firestore finishes.
  */
 export async function initPostLikeButton(db, auth, postId, btnEl, countEl, opts) {
   opts = opts || {};
@@ -33,8 +33,10 @@ export async function initPostLikeButton(db, auth, postId, btnEl, countEl, opts)
 
   const postRef = doc(db, "communityPosts", postId);
 
-  const likeSnap = await getDoc(doc(db, "communityPosts", postId, "likes", auth.currentUser.uid));
-  if (likeSnap.exists) {
+  const initialLike = await getDoc(
+    doc(db, "communityPosts", postId, "likes", auth.currentUser.uid)
+  );
+  if (initialLike.exists) {
     btnEl.classList.add("liked");
   }
 
@@ -46,21 +48,25 @@ export async function initPostLikeButton(db, auth, postId, btnEl, countEl, opts)
   });
 
   let processing = false;
-  const onClick = async (e) => {
+
+  async function onLikeClick(e) {
     if (e) {
       e.stopPropagation();
       e.preventDefault();
     }
+
     if (!auth.currentUser) {
-      console.log("Not logged in");
       window.location.href = signupUrl;
       return;
     }
-    console.log("User:", auth.currentUser.uid);
+
     if (processing) return;
     processing = true;
+    btnEl.disabled = true;
+
     const uid = auth.currentUser.uid;
     const likeRef = doc(db, "communityPosts", postId, "likes", uid);
+
     try {
       const snap = await getDoc(likeRef);
       if (snap.exists) {
@@ -73,17 +79,19 @@ export async function initPostLikeButton(db, auth, postId, btnEl, countEl, opts)
         btnEl.classList.add("liked");
       }
     } catch (err) {
-      console.error("Like failed:", err);
+      console.error("Like error:", err);
     } finally {
       processing = false;
+      btnEl.disabled = false;
     }
-  };
-  btnEl.addEventListener("click", onClick);
+  }
+
+  btnEl.addEventListener("click", onLikeClick);
 
   return function cleanup() {
     try {
       unsubPost();
     } catch (e) {}
-    btnEl.removeEventListener("click", onClick);
+    btnEl.removeEventListener("click", onLikeClick);
   };
 }
