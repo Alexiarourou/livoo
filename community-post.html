@@ -161,9 +161,12 @@
     .feed-empty, .meta-pill { text-align: center; color: var(--muted); padding: 24px; }
     .meta-pill { text-align: left; padding: 0; font-size: 0.88rem; }
     .like-btn { transition: all 0.15s ease; }
+    .comment-like-btn { transition: all 0.15s ease; }
     [id^="clb-"] { transition: all 0.15s ease; }
     /* Subtle liked state for comment hearts */
+    .comment-like-btn.liked,
     [id^="clb-"].liked { color: #e53e3e !important; }
+    .comment-like-btn.liked svg path,
     [id^="clb-"].liked svg path { fill: #e53e3e; stroke: #e53e3e; }
 
     /* Comment delete inline confirm */
@@ -1365,58 +1368,6 @@
       }
     };
 
-    var commentLikeInFlight = new Set();
-    /** Per-user like doc; sequential toggle (no double-count). */
-    window.likeComment = async function (commentId) {
-      if (!currentUser || commentLikeInFlight.has(commentId)) return;
-      commentLikeInFlight.add(commentId);
-      const btn = document.getElementById('clb-' + commentId);
-      const countEl = document.getElementById('clc-' + commentId);
-      if (!btn || !countEl) {
-        commentLikeInFlight.delete(commentId);
-        return;
-      }
-      const commentRef = doc(db, 'communityPosts', postId, 'comments', commentId);
-      const likeRef = doc(db, 'communityPosts', postId, 'comments', commentId, 'likes', currentUser.uid);
-      try {
-        const likeSnap = await getDoc(likeRef);
-        const commentSnap = await getDoc(commentRef);
-        const serverLiked = !!likeSnap.exists;
-        const cur = Math.max(0, Number((commentSnap.data() || {}).likes || (commentSnap.data() || {}).likeCount || 0));
-        if (serverLiked) {
-          await deleteDoc(likeRef);
-          if (cur > 0) await updateDoc(commentRef, { likes: increment(-1) });
-          btn.classList.remove('liked');
-          btn.style.color = '#b0c8b0';
-        } else {
-          await setDoc(likeRef, { likedAt: serverTimestamp() });
-          await updateDoc(commentRef, { likes: increment(1) });
-          btn.classList.add('liked');
-          btn.style.color = '#e53e3e';
-        }
-        const cs = await getDoc(commentRef);
-        countEl.textContent = String(Math.max(0, Number((cs.data() || {}).likes || (cs.data() || {}).likeCount || 0)));
-        btn.style.transform = 'scale(1.2)';
-        setTimeout(function () { btn.style.transform = 'scale(1)'; }, 150);
-      } catch (err) {
-        console.error('Comment like error:', err);
-        try {
-          var ls2 = await getDoc(likeRef);
-          var cs2 = await getDoc(commentRef);
-          if (ls2.exists) {
-            btn.classList.add('liked');
-            btn.style.color = '#e53e3e';
-          } else {
-            btn.classList.remove('liked');
-            btn.style.color = '#b0c8b0';
-          }
-          countEl.textContent = String(Math.max(0, Number((cs2.data() || {}).likes || (cs2.data() || {}).likeCount || 0)));
-        } catch (e) {}
-      } finally {
-        commentLikeInFlight.delete(commentId);
-      }
-    };
-
     window.submitReply = async function (commentId) {
       if (!currentUser) return;
       var ta = document.getElementById('reply-input-' + commentId);
@@ -1699,13 +1650,12 @@
         const initialCommentLikes = Number(c.likes || c.likeCount || 0);
         const commentHeartBtn = document.createElement('button');
         commentHeartBtn.type = 'button';
+        commentHeartBtn.className = 'comment-like-btn';
         commentHeartBtn.id = 'clb-' + thisCommentId;
+        commentHeartBtn.setAttribute('data-post-id', postId);
+        commentHeartBtn.setAttribute('data-comment-id', thisCommentId);
         commentHeartBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#b0c8b0;display:flex;align-items:center;gap:3px;transition:color 0.1s;';
-        commentHeartBtn.innerHTML = heartStrokeSvg + '<span id="clc-' + thisCommentId + '" style="font-size:11px;">' + String(initialCommentLikes) + '</span>';
-        commentHeartBtn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          window.likeComment(thisCommentId);
-        });
+        commentHeartBtn.innerHTML = heartStrokeSvg + '<span class="comment-like-count" id="clc-' + thisCommentId + '" style="font-size:11px;">' + String(initialCommentLikes) + '</span>';
         const replyBtn = document.createElement('button');
         replyBtn.type = 'button';
         replyBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#b0c8b0;font-weight:500;';
@@ -1941,6 +1891,14 @@
         wrapper.appendChild(row);
         attachHost.appendChild(wrapper);
       }
+      if (typeof window.initCommentLikeButtonsForCurrentUser === 'function') {
+        window.initCommentLikeButtonsForCurrentUser();
+      } else {
+        import('./js/likes.js').then(function (m) {
+          if (m.initCommentLikeButtonsForCurrentUser) return m.initCommentLikeButtonsForCurrentUser();
+        }).catch(function () {});
+      }
+
       listEl.classList.remove('comments-fade-in');
       void listEl.offsetWidth;
       listEl.classList.add('comments-fade-in');
@@ -2127,23 +2085,28 @@
     }
 
     async function hydratePost(data) {
-      postData = data;
-      const authorUid = data.author || data.authorId || '';
-      const fallback = data.authorUsername || data.authorName || 'Anonymous';
-      const ap = await getAuthorProfile(authorUid, fallback, data.authorPhotoURL || data.authorPhoto || '');
+      const postRef = doc(db, 'communityPosts', postId);
+      const freshSnap = await getDoc(postRef);
+      const merged = freshSnap.exists
+        ? { ...(data || {}), ...(freshSnap.data() || {}) }
+        : { ...(data || {}) };
+      postData = merged;
+      const authorUid = merged.author || merged.authorId || '';
+      const fallback = merged.authorUsername || merged.authorName || 'Anonymous';
+      const ap = await getAuthorProfile(authorUid, fallback, merged.authorPhotoURL || merged.authorPhoto || '');
       const displayName = ap.username || 'Member';
       const displayPhoto = ap.photoUrl;
       const displayInitial = ap.initial;
       const credPost = String(ap.credential || '').trim();
 
-      postTitleEl.textContent = data.title || 'Untitled';
-      const catKey = data.category || '';
+      postTitleEl.textContent = merged.title || 'Untitled';
+      const catKey = merged.category || '';
       const catLabel = CATEGORY_LABELS[catKey] || catKey || '';
       postCategoryTagEl.className = 'post-badge';
       postCategoryTagEl.style.cssText = 'margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;flex-shrink:0;' + getCategoryStyle(catLabel);
       postCategoryTagEl.textContent = catLabel;
       postAuthorNameEl.textContent = displayName;
-      postTimestampEl.textContent = data.createdAt ? '· ' + formatRelativeTime(data.createdAt) : '';
+      postTimestampEl.textContent = merged.createdAt ? '· ' + formatRelativeTime(merged.createdAt) : '';
 
       var credHost = document.getElementById('post-credential');
       if (credHost) {
@@ -2164,13 +2127,13 @@
         postAuthorAvatarEl.appendChild(im);
       } else postAuthorAvatarEl.textContent = displayInitial;
 
-      const bodyPlain = (data.body != null && String(data.body).trim()) ? String(data.body) : stripHtml(data.bodyHtml || '');
+      const bodyPlain = (merged.body != null && String(merged.body).trim()) ? String(merged.body) : stripHtml(merged.bodyHtml || '');
       postBodyEl.textContent = bodyPlain || '';
 
       const postImageWrap = document.getElementById('post-image-wrap');
       const postImageEl = document.getElementById('post-image');
       if (postImageWrap && postImageEl) {
-        const imageUrl = String(data.imageUrl || '').trim();
+        const imageUrl = String(merged.imageUrl || '').trim();
         if (imageUrl) {
           postImageEl.src = imageUrl;
           postImageEl.style.display = 'block';
@@ -2185,7 +2148,7 @@
       }
 
       var likeCountSpan = document.querySelector('.like-btn .like-count');
-      if (likeCountSpan) likeCountSpan.textContent = String(Math.max(0, Number(data.upvoteCount || 0)));
+      if (likeCountSpan) likeCountSpan.textContent = String(Math.max(0, Number(merged.upvoteCount || 0)));
       try {
         const commentsCol = collection(db, 'communityPosts', postId, 'comments');
         const cs = await getDocs(commentsCol);
@@ -2194,14 +2157,14 @@
         syncCommentCountUi(0);
       }
 
-      document.title = (data.title || 'Post') + ' | Livvo';
+      document.title = (merged.title || 'Post') + ' | Livvo';
 
       updateCommentCountLabel();
       fillComposerAvatar();
 
       var rab = document.getElementById('request-answer-btn');
       if (rab) {
-        var showReq = String(data.type || '') === 'question' && !!currentUser;
+        var showReq = String(merged.type || '') === 'question' && !!currentUser;
         rab.hidden = !showReq;
         if (showReq) rab.style.display = 'flex';
         else rab.style.display = 'none';
@@ -2209,7 +2172,7 @@
 
       setupPostOwnerMenu(authorUid);
 
-      loadMoreFromCommunity(data).catch(function () {});
+      loadMoreFromCommunity(merged).catch(function () {});
 
       if (typeof window.initLikedButtonsForCurrentUser === 'function') {
         window.initLikedButtonsForCurrentUser();
@@ -2263,15 +2226,18 @@
           wireCommentsListener();
           recordPostViewOnce();
         } else {
+          var postRef2 = doc(db, 'communityPosts', postId);
+          var freshSnap2 = await getDoc(postRef2);
+          var fd = freshSnap2.exists ? { ...(pdata || {}), ...(freshSnap2.data() || {}) } : pdata;
+          postData = fd;
           var lc = document.querySelector('.like-btn .like-count');
           if (lc) {
-            var srv = String(Math.max(0, Number(pdata.upvoteCount || 0)));
-            if (lc.textContent !== srv) lc.textContent = srv;
+            lc.textContent = String(Math.max(0, Number(fd.upvoteCount || 0)));
           }
           updateCommentCountLabel();
           var rab2 = document.getElementById('request-answer-btn');
           if (rab2) {
-            var showReq2 = String(pdata.type || '') === 'question' && !!currentUser;
+            var showReq2 = String(fd.type || '') === 'question' && !!currentUser;
             rab2.hidden = !showReq2;
             rab2.style.display = showReq2 ? 'flex' : 'none';
           }
