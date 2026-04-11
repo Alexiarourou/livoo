@@ -501,7 +501,7 @@
             <img id="post-image" alt="">
           </div>
           <div style="display: flex; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid #f0f5f0; flex-wrap: wrap;">
-            <button type="button" id="post-like-btn" onclick="likePost()" style="display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; cursor: pointer; font-size: 13px; color: #5a7a5a; transition: all 0.15s;">
+            <button type="button" id="post-like-btn" style="display: flex; align-items: center; gap: 5px; border: none; background: #f5f5f5; border-radius: 20px; padding: 7px 14px; cursor: pointer; font-size: 13px; color: #5a7a5a; transition: all 0.15s;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
               <span id="post-like-count">0</span>
             </button>
@@ -744,47 +744,47 @@
       }
     }
 
-    /** Single source of truth: likes/{uid} (new) or upvotes/{uid} (legacy) + upvoteCount. No client-side toggle from DOM. */
+    /** Per-user like doc at likes/{uid}; legacy upvotes/{uid} removed on unlike. Sequential ops — one increment/decrement per toggle. */
     var postLikeInFlight = false;
-    async function likePostImpl() {
+    async function togglePostLike() {
       if (!currentUser || postLikeInFlight) return;
-      const btn = document.getElementById('post-like-btn');
+      const likeBtn = document.getElementById('post-like-btn');
       const countEl = document.getElementById('post-like-count');
-      if (!btn || !countEl) return;
+      if (!likeBtn || !countEl) return;
       postLikeInFlight = true;
       const postRef = doc(db, 'communityPosts', postId);
       const likeRef = doc(db, 'communityPosts', postId, 'likes', currentUser.uid);
       const legacyRef = doc(db, 'communityPosts', postId, 'upvotes', currentUser.uid);
       try {
-        await runTransaction(db, async function (transaction) {
-          const likeSnap = await transaction.get(likeRef);
-          const legacySnap = await transaction.get(legacyRef);
-          const postSnap = await transaction.get(postRef);
-          var serverLiked = !!(likeSnap.exists || legacySnap.exists);
-          var cur = Math.max(0, Number((postSnap.data() || {}).upvoteCount || 0));
-          if (serverLiked) {
-            if (likeSnap.exists) transaction.delete(likeRef);
-            if (legacySnap.exists) transaction.delete(legacyRef);
-            if (cur > 0) transaction.update(postRef, { upvoteCount: increment(-1) });
-          } else {
-            transaction.set(likeRef, { likedAt: serverTimestamp() });
-            transaction.update(postRef, { upvoteCount: increment(1) });
-          }
-        });
-        var lSnap = await getDoc(likeRef);
-        var uSnap = await getDoc(legacyRef);
-        applyPostLikeVisual(btn, !!(lSnap.exists || uSnap.exists));
-        var pSnap = await getDoc(postRef);
+        const likeSnap = await getDoc(likeRef);
+        const legacySnap = await getDoc(legacyRef);
+        const serverLiked = !!(likeSnap.exists || legacySnap.exists);
+        if (serverLiked) {
+          if (likeSnap.exists) await deleteDoc(likeRef);
+          if (legacySnap.exists) await deleteDoc(legacyRef);
+          await updateDoc(postRef, { upvoteCount: increment(-1) });
+          likeBtn.classList.remove('liked');
+          applyPostLikeVisual(likeBtn, false);
+        } else {
+          await setDoc(likeRef, { likedAt: serverTimestamp() });
+          await updateDoc(postRef, { upvoteCount: increment(1) });
+          likeBtn.classList.add('liked');
+          applyPostLikeVisual(likeBtn, true);
+        }
+        const pSnap = await getDoc(postRef);
         countEl.textContent = String(Math.max(0, Number((pSnap.data() || {}).upvoteCount || 0)));
-        btn.style.transform = 'scale(1.12)';
-        setTimeout(function () { btn.style.transform = 'scale(1)'; }, 150);
+        likeBtn.style.transform = 'scale(1.12)';
+        setTimeout(function () { likeBtn.style.transform = 'scale(1)'; }, 150);
       } catch (err) {
         console.error('Like error:', err);
         try {
-          var l2 = await getDoc(likeRef);
-          var u2 = await getDoc(legacyRef);
-          applyPostLikeVisual(btn, !!(l2.exists || u2.exists));
-          var p2 = await getDoc(postRef);
+          const l2 = await getDoc(likeRef);
+          const u2 = await getDoc(legacyRef);
+          const still = !!(l2.exists || u2.exists);
+          applyPostLikeVisual(likeBtn, still);
+          if (still) likeBtn.classList.add('liked');
+          else likeBtn.classList.remove('liked');
+          const p2 = await getDoc(postRef);
           countEl.textContent = String(Math.max(0, Number((p2.data() || {}).upvoteCount || 0)));
         } catch (e) {}
       } finally {
@@ -802,6 +802,12 @@
     const postAuthorAvatarEl = document.getElementById('post-avatar');
     const postBodyEl = document.getElementById('post-body');
     const postLikeBtn = document.getElementById('post-like-btn');
+    if (postLikeBtn) {
+      postLikeBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        togglePostLike();
+      });
+    }
     const sortSelect = document.getElementById('sort-comments');
     const listEl = document.getElementById('comments-container');
     const commentInputEl = document.getElementById('comment-input');
@@ -1425,7 +1431,7 @@
     };
 
     var commentLikeInFlight = new Set();
-    /** Toggle from Firestore transaction only — never from optimistic DOM state (prevents spam / negative counts). */
+    /** Per-user like doc; sequential toggle (no double-count). */
     window.likeComment = async function (commentId) {
       if (!currentUser || commentLikeInFlight.has(commentId)) return;
       commentLikeInFlight.add(commentId);
@@ -1438,28 +1444,22 @@
       const commentRef = doc(db, 'communityPosts', postId, 'comments', commentId);
       const likeRef = doc(db, 'communityPosts', postId, 'comments', commentId, 'likes', currentUser.uid);
       try {
-        await runTransaction(db, async function (transaction) {
-          const likeSnap = await transaction.get(likeRef);
-          const commentSnap = await transaction.get(commentRef);
-          var serverLiked = !!likeSnap.exists;
-          var cur = Math.max(0, Number((commentSnap.data() || {}).likes || (commentSnap.data() || {}).likeCount || 0));
-          if (serverLiked) {
-            transaction.delete(likeRef);
-            if (cur > 0) transaction.update(commentRef, { likes: increment(-1) });
-          } else {
-            transaction.set(likeRef, { likedAt: serverTimestamp() });
-            transaction.update(commentRef, { likes: increment(1) });
-          }
-        });
-        var ls = await getDoc(likeRef);
-        var cs = await getDoc(commentRef);
-        if (ls.exists) {
-          btn.classList.add('liked');
-          btn.style.color = '#e53e3e';
-        } else {
+        const likeSnap = await getDoc(likeRef);
+        const commentSnap = await getDoc(commentRef);
+        const serverLiked = !!likeSnap.exists;
+        const cur = Math.max(0, Number((commentSnap.data() || {}).likes || (commentSnap.data() || {}).likeCount || 0));
+        if (serverLiked) {
+          await deleteDoc(likeRef);
+          if (cur > 0) await updateDoc(commentRef, { likes: increment(-1) });
           btn.classList.remove('liked');
           btn.style.color = '#b0c8b0';
+        } else {
+          await setDoc(likeRef, { likedAt: serverTimestamp() });
+          await updateDoc(commentRef, { likes: increment(1) });
+          btn.classList.add('liked');
+          btn.style.color = '#e53e3e';
         }
+        const cs = await getDoc(commentRef);
         countEl.textContent = String(Math.max(0, Number((cs.data() || {}).likes || (cs.data() || {}).likeCount || 0)));
         btn.style.transform = 'scale(1.2)';
         setTimeout(function () { btn.style.transform = 'scale(1)'; }, 150);
@@ -1500,6 +1500,7 @@
         await addDoc(collection(db, 'communityPosts', postId, 'comments', commentId, 'replies'), {
           text: replyText,
           authorUid: currentUser.uid,
+          authorName: currentUser.displayName || authorUsername,
           authorUsername: authorUsername,
           authorPhotoURL: authorPhoto || null,
           authorPhoto: authorPhoto,
@@ -1702,9 +1703,9 @@
 
       for (var idx = 0; idx < ordered.length; idx++) {
         var cd = ordered[idx];
-        const commentId = cd.id;
+        const thisCommentId = cd.id;
         const c = cd.data() || {};
-        const isPinned = pinnedDoc && commentId === pinnedDoc.id;
+        const isPinned = pinnedDoc && thisCommentId === pinnedDoc.id;
         const prof = await getAuthorProfile(c.authorUid, c.authorUsername, c.authorPhotoURL || c.authorPhoto || '');
         const username = (String(c.authorUsername || prof.username || 'Member').trim() || 'Member');
         const photo = String(c.authorPhotoURL || c.authorPhoto || prof.photoUrl || '').trim();
@@ -1724,7 +1725,7 @@
 
         const wrapper = document.createElement('div');
         wrapper.className = 'comment-wrapper';
-        wrapper.id = 'comment-' + commentId;
+        wrapper.id = 'comment-' + thisCommentId;
         wrapper.style.cssText = 'margin-bottom:18px;';
 
         const row = document.createElement('div');
@@ -1776,12 +1777,12 @@
         const initialCommentLikes = Number(c.likes || c.likeCount || 0);
         const likeBtn = document.createElement('button');
         likeBtn.type = 'button';
-        likeBtn.id = 'clb-' + commentId;
+        likeBtn.id = 'clb-' + thisCommentId;
         likeBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#b0c8b0;display:flex;align-items:center;gap:3px;transition:color 0.1s;';
-        likeBtn.innerHTML = heartStrokeSvg + '<span id="clc-' + commentId + '" style="font-size:11px;">' + String(initialCommentLikes) + '</span>';
+        likeBtn.innerHTML = heartStrokeSvg + '<span id="clc-' + thisCommentId + '" style="font-size:11px;">' + String(initialCommentLikes) + '</span>';
         likeBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          window.likeComment(commentId);
+          window.likeComment(thisCommentId);
         });
         const replyBtn = document.createElement('button');
         replyBtn.type = 'button';
@@ -1789,7 +1790,7 @@
         replyBtn.textContent = 'Reply';
         replyBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          window.toggleReplyBox(commentId);
+          window.toggleReplyBox(thisCommentId);
         });
 
         actionRow.appendChild(likeBtn);
@@ -1802,7 +1803,7 @@
           delInline.textContent = 'Delete';
           delInline.addEventListener('click', function (e) {
             e.stopPropagation();
-            window.requestDeleteComment(commentId);
+            window.requestDeleteComment(thisCommentId);
           });
           actionRow.appendChild(delInline);
         }
@@ -1811,7 +1812,7 @@
         moreWrap.className = 'comment-more-wrap';
         moreWrap.style.cssText = 'position:relative;margin-left:auto;';
         const moreMenu = document.createElement('div');
-        moreMenu.id = 'comment-menu-' + commentId;
+        moreMenu.id = 'comment-menu-' + thisCommentId;
         moreMenu.className = 'comment-more-menu';
         moreMenu.style.cssText = 'display:none;position:absolute;right:0;top:28px;background:#fff;border:1px solid #e8f0e8;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.08);z-index:100;min-width:160px;overflow:hidden;padding:4px;';
         moreMenu.addEventListener('click', function (e) { e.stopPropagation(); });
@@ -1823,7 +1824,7 @@
         moreBtn.addEventListener('mouseleave', function () { moreBtn.style.background = 'none'; });
         moreBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          window.toggleCommentMenu(e, commentId);
+          window.toggleCommentMenu(e, thisCommentId);
         });
         if (currentUser && c.authorUid && c.authorUid === currentUser.uid) {
           const editBtn = document.createElement('button');
@@ -1835,7 +1836,7 @@
           editBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             moreMenu.style.display = 'none';
-            window.editComment(commentId);
+            window.editComment(thisCommentId);
           });
           moreMenu.appendChild(editBtn);
         }
@@ -1850,7 +1851,7 @@
           pinBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             moreMenu.style.display = 'none';
-            window.pinCommentAnswer(commentId);
+            window.pinCommentAnswer(thisCommentId);
           });
           moreMenu.appendChild(pinBtn);
         }
@@ -1862,7 +1863,7 @@
         reportBtn.addEventListener('mouseleave', function () { reportBtn.style.background = 'none'; });
         reportBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          window.reportComment(commentId);
+          window.reportComment(thisCommentId);
         });
         moreMenu.appendChild(reportBtn);
         moreWrap.appendChild(moreBtn);
@@ -1871,11 +1872,11 @@
         actionRow.appendChild(moreWrap);
 
         if (currentUser) {
-          getDoc(doc(db, 'communityPosts', postId, 'comments', commentId, 'likes', currentUser.uid)).then(function (ls) {
+          getDoc(doc(db, 'communityPosts', postId, 'comments', thisCommentId, 'likes', currentUser.uid)).then(function (ls) {
             if (ls.exists) {
               likeBtn.classList.add('liked');
               likeBtn.style.color = '#e53e3e';
-              var cspan = document.getElementById('clc-' + commentId);
+              var cspan = document.getElementById('clc-' + thisCommentId);
               var shown = parseInt(cspan && cspan.textContent, 10) || 0;
               if (cspan && shown === 0 && initialCommentLikes === 0) {
                 cspan.textContent = '1';
@@ -1885,7 +1886,7 @@
         }
 
         const replyBox = document.createElement('div');
-        replyBox.id = 'reply-box-' + commentId;
+        replyBox.id = 'reply-box-' + thisCommentId;
         replyBox.style.cssText = 'display:none;margin-top:8px;';
         const replyRowInner = document.createElement('div');
         replyRowInner.style.cssText = 'display:flex;gap:8px;align-items:flex-start;';
@@ -1908,7 +1909,7 @@
         const replyInner = document.createElement('div');
         replyInner.style.cssText = 'flex:1;background:#f8fdf8;border:1px solid #e8f0e8;border-radius:10px;padding:8px 10px;';
         const replyTa = document.createElement('textarea');
-        replyTa.id = 'reply-input-' + commentId;
+        replyTa.id = 'reply-input-' + thisCommentId;
         replyTa.placeholder = 'Write a reply...';
         replyTa.style.cssText = 'width:100%;border:none;outline:none;font-size:13px;color:#1a2e1a;resize:none;min-height:44px;max-height:120px;font-family:inherit;background:transparent;box-sizing:border-box;line-height:1.5;';
         replyTa.addEventListener('input', function () {
@@ -1923,16 +1924,16 @@
         replyCancel.style.cssText = 'border:none;background:none;font-size:12px;color:#9ab09a;cursor:pointer;padding:3px 8px;';
         replyCancel.addEventListener('click', function (e) {
           e.stopPropagation();
-          window.toggleReplyBox(commentId);
+          window.toggleReplyBox(thisCommentId);
         });
         const replyGo = document.createElement('button');
         replyGo.type = 'button';
-        replyGo.id = 'reply-submit-' + commentId;
+        replyGo.id = 'reply-submit-' + thisCommentId;
         replyGo.textContent = 'Reply';
         replyGo.style.cssText = 'border:none;background:#059669;color:white;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;';
         replyGo.addEventListener('click', function (e) {
           e.stopPropagation();
-          window.submitReply(commentId);
+          window.submitReply(thisCommentId);
         });
         replyAct.appendChild(replyCancel);
         replyAct.appendChild(replyGo);
@@ -1943,15 +1944,15 @@
         replyBox.appendChild(replyRowInner);
 
         const repliesWrap = document.createElement('div');
-        repliesWrap.id = 'replies-' + commentId;
+        repliesWrap.id = 'replies-' + thisCommentId;
         repliesWrap.className = 'replies-container';
 
-        const replyQ = query(collection(db, 'communityPosts', postId, 'comments', commentId, 'replies'), orderBy('createdAt', 'asc'));
+        const replyQ = query(collection(db, 'communityPosts', postId, 'comments', thisCommentId, 'replies'), orderBy('createdAt', 'asc'));
         const unsubReplies = onSnapshot(replyQ, function (rsnap) {
           repliesWrap.innerHTML = '';
           rsnap.docs.forEach(function (rd) {
             const r = rd.data() || {};
-            const rName = (String(r.authorUsername || 'Member').trim() || 'Member');
+            const rName = (String(r.authorName || r.authorUsername || 'Member').trim() || 'Member');
             const row = document.createElement('div');
             row.className = 'reply-item';
             row.id = 'reply-' + rd.id;
@@ -1997,7 +1998,7 @@
               delRep.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#d0d0d0;';
               delRep.addEventListener('click', function (e) {
                 e.stopPropagation();
-                window.requestDeleteReply(commentId, rd.id);
+                window.requestDeleteReply(thisCommentId, rd.id);
               });
               repActions.appendChild(delRep);
               rr.appendChild(repActions);
@@ -2075,7 +2076,7 @@
 
     window.submitComment = function () { submitThreadComment(); };
     window.cancelComment = function () { collapseComposer(); };
-    window.likePost = function () { likePostImpl(); };
+    window.likePost = function () { togglePostLike(); };
     window.scrollToComments = function () {
       const commentsSection = document.getElementById('comments-container');
       if (commentsSection) {
