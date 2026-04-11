@@ -486,6 +486,213 @@ nav {
 }
 .join-thanks.show { display: block; }
 
+/* Post-signup profile modal (full-screen; cannot dismiss by backdrop) */
+.post-signup-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  font-family: "DM Sans", sans-serif;
+}
+.post-signup-modal[hidden] {
+  display: none !important;
+}
+.post-signup-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: auto;
+}
+.post-signup-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  max-height: min(92vh, 900px);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+}
+.post-signup-card h2 {
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+  color: #064e3b;
+  margin: 0 0 8px;
+  line-height: 1.25;
+}
+.post-signup-sub {
+  font-size: 0.9rem;
+  color: #4b7c6b;
+  line-height: 1.55;
+  margin: 0 0 20px;
+}
+.psu-field {
+  margin-bottom: 16px;
+}
+.psu-field label,
+.psu-field legend {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 6px;
+}
+.psu-field input[type="text"],
+.psu-field select,
+.psu-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  border: 1px solid #c0deca;
+  border-radius: 12px;
+  font-family: "DM Sans", sans-serif;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.psu-field input:focus,
+.psu-field select:focus,
+.psu-field textarea:focus {
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+}
+.psu-field textarea {
+  min-height: 72px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.psu-bio-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.psu-bio-count {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+.psu-photo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.psu-photo-preview {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #d4eadb;
+  display: none;
+}
+.psu-photo-preview.is-visible {
+  display: block;
+}
+.psu-file-btn {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #059669;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.psu-file-input {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+.psu-intent-group {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.psu-intent-group legend {
+  margin-bottom: 10px;
+}
+.psu-intent-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.psu-intent-options label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1a2e24;
+  cursor: pointer;
+  margin: 0;
+}
+.psu-intent-options input {
+  margin-top: 3px;
+  accent-color: #059669;
+}
+.psu-error {
+  display: none;
+  font-size: 0.85rem;
+  color: #b91c1c;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+.psu-error.is-visible {
+  display: block;
+}
+.psu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+.psu-btn-primary {
+  width: 100%;
+  padding: 14px 18px;
+  background: #059669;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-family: "Sora", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.psu-btn-primary:hover:not(:disabled) {
+  background: #047857;
+  transform: translateY(-1px);
+}
+.psu-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+.psu-btn-skip {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: "DM Sans", sans-serif;
+}
+.psu-btn-skip:hover {
+  color: #475569;
+}
+
 @media (max-width: 768px) {
   nav {
     flex-direction: column; align-items: stretch;
@@ -595,6 +802,58 @@ nav {
   <div id="joinThanks" class="join-thanks" role="status">Thanks! We&apos;ll be in touch shortly to complete your account setup.</div>
 </div>
 
+<div id="post-signup-modal" class="post-signup-modal" hidden aria-modal="true" role="dialog" aria-labelledby="post-signup-title">
+  <div class="post-signup-backdrop" aria-hidden="true"></div>
+  <div class="post-signup-card">
+    <h2 id="post-signup-title">Welcome! Set up your profile</h2>
+    <p class="post-signup-sub">Add a few details so the community knows who you are. You can always edit these later.</p>
+    <div id="psu-error" class="psu-error" role="alert"></div>
+    <div class="psu-field">
+      <label for="psu-display-name">Display name <span style="color:#b91c1c">*</span></label>
+      <input type="text" id="psu-display-name" name="psu-display-name" maxlength="80" autocomplete="name" required />
+    </div>
+    <div class="psu-field">
+      <span class="psu-field-label" style="display:block;font-size:0.78rem;font-weight:600;color:#475569;margin-bottom:6px;">Profile photo <span style="font-weight:500;color:#94a3b8;">(optional)</span></span>
+      <div class="psu-photo-row">
+        <img id="psu-photo-preview" class="psu-photo-preview" alt="" />
+        <div>
+          <input type="file" id="psu-photo-input" class="psu-file-input" accept="image/*" />
+          <label for="psu-photo-input" class="psu-file-btn">Choose image</label>
+        </div>
+      </div>
+    </div>
+    <div class="psu-field">
+      <label for="psu-city">Current city <span style="color:#b91c1c">*</span></label>
+      <select id="psu-city" name="psu-city" required>
+        <option value="Athens">Athens</option>
+        <option value="Paris">Paris</option>
+        <option value="London">London</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="psu-field">
+      <label for="psu-bio">One-line bio <span style="font-weight:500;color:#94a3b8;">(optional)</span></label>
+      <textarea id="psu-bio" name="psu-bio" maxlength="120" rows="2" placeholder="e.g. Designer moving from Lisbon"></textarea>
+      <div class="psu-bio-row"><span id="psu-bio-count" class="psu-bio-count">0 / 120</span></div>
+    </div>
+    <div class="psu-field">
+      <fieldset class="psu-intent-group">
+        <legend>What brings you here? <span style="color:#b91c1c">*</span></legend>
+        <div class="psu-intent-options">
+          <label><input type="radio" name="psu-intent" value="Finding a flat" /> Finding a flat</label>
+          <label><input type="radio" name="psu-intent" value="Finding a flatmate" /> Finding a flatmate</label>
+          <label><input type="radio" name="psu-intent" value="Meeting people" /> Meeting people</label>
+          <label><input type="radio" name="psu-intent" value="Just exploring" /> Just exploring</label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="psu-actions">
+      <button type="button" class="psu-btn-primary" id="psu-submit">Continue</button>
+      <button type="button" class="psu-btn-skip" id="psu-skip">Skip for now</button>
+    </div>
+  </div>
+</div>
+
 <div id="fp-modal" class="fp-modal" hidden aria-modal="true" role="dialog" aria-labelledby="fp-modal-title">
   <div class="fp-modal-backdrop" id="fp-modal-backdrop" tabindex="-1"></div>
   <div class="fp-modal-card">
@@ -635,8 +894,10 @@ nav {
   import { getAuth, createUserWithEmailAndPassword,
     signInWithEmailAndPassword, GoogleAuthProvider,
     signInWithPopup, sendPasswordResetEmail,
-    setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    setPersistence, browserLocalPersistence, browserSessionPersistence,
+    getAdditionalUserInfo, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
@@ -650,6 +911,7 @@ nav {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
   const cityNames = {
     paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milan: 'Milan',
@@ -701,9 +963,182 @@ nav {
     goAfterAuth();
   }
 
-  async function redirectNewAccountAfterAuth(uid) {
-    await routeAfterAuth();
+  function shouldShowPostSignupModal() {
+    if (redirectTarget !== 'community') return false;
+    if (returnPath) return false;
+    return true;
   }
+
+  const postSignupModalEl = document.getElementById('post-signup-modal');
+  const psuDisplayName = document.getElementById('psu-display-name');
+  const psuPhotoInput = document.getElementById('psu-photo-input');
+  const psuPhotoPreview = document.getElementById('psu-photo-preview');
+  const psuCity = document.getElementById('psu-city');
+  const psuBio = document.getElementById('psu-bio');
+  const psuBioCount = document.getElementById('psu-bio-count');
+  const psuSubmit = document.getElementById('psu-submit');
+  const psuSkip = document.getElementById('psu-skip');
+  const psuError = document.getElementById('psu-error');
+
+  var postSignupUser = null;
+
+  function psuHideError() {
+    psuError.textContent = '';
+    psuError.classList.remove('is-visible');
+  }
+  function psuShowError(msg) {
+    psuError.textContent = msg;
+    psuError.classList.add('is-visible');
+  }
+
+  function openPostSignupModal(user, opts) {
+    opts = opts || {};
+    postSignupUser = user;
+    psuHideError();
+    psuDisplayName.value = String((opts.prefillName != null ? opts.prefillName : user.displayName) || '').trim()
+      || (user.email ? String(user.email).split('@')[0] : '');
+    psuBio.value = '';
+    psuBioCount.textContent = '0 / 120';
+    psuPhotoInput.value = '';
+    psuPhotoPreview.classList.remove('is-visible');
+    psuPhotoPreview.removeAttribute('src');
+    document.querySelectorAll('input[name="psu-intent"]').forEach(function (r) { r.checked = false; });
+    var cities = ['Athens', 'Paris', 'London'];
+    var cn = cityName && cities.indexOf(cityName) >= 0 ? cityName : 'Other';
+    psuCity.value = cn;
+    if (opts.prefillPhoto && String(opts.prefillPhoto).trim()) {
+      psuPhotoPreview.src = opts.prefillPhoto;
+      psuPhotoPreview.classList.add('is-visible');
+    }
+    postSignupModalEl.hidden = false;
+    document.body.style.overflow = 'hidden';
+    setTimeout(function () { psuDisplayName.focus(); }, 80);
+  }
+
+  function closePostSignupModal() {
+    postSignupModalEl.hidden = true;
+    document.body.style.overflow = '';
+    postSignupUser = null;
+  }
+
+  function goAfterPostSignupModal(cityForPortal) {
+    var c = cityForPortal || cityName;
+    try {
+      localStorage.setItem('livvo_city', c);
+    } catch (e) {}
+    if (returnPath) {
+      window.location.href = returnPath;
+      return;
+    }
+    window.location.href = 'community-portal.html?city=' + encodeURIComponent(c);
+  }
+
+  psuBio.addEventListener('input', function () {
+    var n = (psuBio.value || '').length;
+    psuBioCount.textContent = n + ' / 120';
+  });
+
+  psuPhotoInput.addEventListener('change', function () {
+    var f = psuPhotoInput.files && psuPhotoInput.files[0];
+    if (!f) {
+      psuPhotoPreview.classList.remove('is-visible');
+      psuPhotoPreview.removeAttribute('src');
+      return;
+    }
+    var url = URL.createObjectURL(f);
+    psuPhotoPreview.onload = function () { try { URL.revokeObjectURL(url); } catch (e) {} };
+    psuPhotoPreview.src = url;
+    psuPhotoPreview.classList.add('is-visible');
+  });
+
+  psuSkip.addEventListener('click', async function () {
+    if (!postSignupUser) return;
+    psuSubmit.disabled = true;
+    psuSkip.disabled = true;
+    try {
+      var u = postSignupUser;
+      await setDoc(doc(db, 'users', u.uid), {
+        uid: u.uid,
+        email: String(u.email || '').trim(),
+        displayName: String(u.displayName || '').trim() || (u.email ? u.email.split('@')[0] : ''),
+        photoURL: u.photoURL || null,
+        profileComplete: false,
+        createdAt: serverTimestamp()
+      }, { merge: true });
+      closePostSignupModal();
+      goAfterPostSignupModal(cityName);
+    } catch (err) {
+      console.error('Post-signup skip:', err);
+      psuShowError('Could not save. Please try again.');
+    } finally {
+      psuSubmit.disabled = false;
+      psuSkip.disabled = false;
+    }
+  });
+
+  psuSubmit.addEventListener('click', async function () {
+    if (!postSignupUser) return;
+    psuHideError();
+    var displayName = (psuDisplayName.value || '').trim();
+    if (!displayName) {
+      psuShowError('Please enter a display name.');
+      psuDisplayName.focus();
+      return;
+    }
+    var city = psuCity.value;
+    var bio = (psuBio.value || '').trim().slice(0, 120);
+    var intentEl = document.querySelector('input[name="psu-intent"]:checked');
+    if (!intentEl) {
+      psuShowError('Please choose what brings you here.');
+      return;
+    }
+    var intent = intentEl.value;
+    var u = postSignupUser;
+    psuSubmit.disabled = true;
+    psuSkip.disabled = true;
+    try {
+      var uploadedPhotoURL = null;
+      if (psuPhotoInput.files && psuPhotoInput.files[0]) {
+        var file = psuPhotoInput.files[0];
+        var path = 'profile-photos/' + u.uid + '/' + Date.now() + '_' + file.name.replace(/\s+/g, '_');
+        var sRef = ref(storage, path);
+        await uploadBytes(sRef, file);
+        uploadedPhotoURL = await getDownloadURL(sRef);
+      } else if (u.photoURL && String(u.photoURL).trim()) {
+        uploadedPhotoURL = u.photoURL;
+      }
+      var finalPhoto = uploadedPhotoURL || null;
+      await updateProfile(u, {
+        displayName: displayName,
+        photoURL: finalPhoto || undefined
+      });
+      await setDoc(doc(db, 'users', u.uid), {
+        uid: u.uid,
+        email: String(u.email || '').trim(),
+        displayName: displayName,
+        username: displayName,
+        photoURL: finalPhoto,
+        city: city,
+        bio: bio,
+        aboutMe: bio,
+        intent: intent,
+        profileComplete: true,
+        createdAt: serverTimestamp()
+      }, { merge: true });
+      closePostSignupModal();
+      goAfterPostSignupModal(city);
+    } catch (err) {
+      console.error('Post-signup submit:', err);
+      var msg = 'Something went wrong. Please try again.';
+      if (err && err.code === 'storage/unauthorized') {
+        msg = 'Photo upload was blocked. Try a smaller image or skip for now.';
+      }
+      psuShowError(msg);
+    } finally {
+      psuSubmit.disabled = false;
+      psuSkip.disabled = false;
+    }
+  });
 
   async function ensureUserDoc(user) {
     if (!user || !user.uid) return;
@@ -729,16 +1164,32 @@ nav {
     }
   }
 
+  function googleAuthErrorEl() {
+    return document.getElementById('panel-signup').classList.contains('active')
+      ? document.getElementById('signup-error')
+      : document.getElementById('signin-error');
+  }
+
   // Google button (popup)
   async function handleGooglePopupSignIn() {
     try {
       var provider = new GoogleAuthProvider();
       var result = await signInWithPopup(auth, provider);
+      var info = getAdditionalUserInfo(result);
+      var isNew = info && info.isNewUser === true;
+      if (shouldShowPostSignupModal() && isNew) {
+        openPostSignupModal(result.user, {
+          fromGoogle: true,
+          prefillName: result.user.displayName,
+          prefillPhoto: result.user.photoURL
+        });
+        return;
+      }
       await ensureUserDoc(result.user);
       goAfterAuth();
     } catch (err) {
       console.error('Google sign-in error:', err);
-      showError(document.getElementById('signin-error'), getFriendlyError(err && err.code));
+      showError(googleAuthErrorEl(), getFriendlyError(err && err.code));
     }
   }
 
@@ -891,8 +1342,12 @@ nav {
       return;
     }
     try {
+      if (shouldShowPostSignupModal()) {
+        openPostSignupModal(cred.user, { fromGoogle: false });
+        return;
+      }
       await ensureUserDoc(cred.user);
-      await redirectNewAccountAfterAuth(cred.user.uid);
+      goAfterAuth();
     } catch (err) {
       console.error('Post-signup profile route:', err);
       goAfterAuth();

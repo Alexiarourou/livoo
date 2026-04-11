@@ -3247,6 +3247,14 @@ nav {
         banner.style.display = 'none';
         return;
       }
+      if (userData.profileComplete === true) {
+        banner.style.display = 'none';
+        return;
+      }
+      if (userData.profileComplete === false) {
+        banner.style.display = 'flex';
+        return;
+      }
       var navPhoto = String((userData && userData.photoURL) || '').trim()
         || String((currentUser && currentUser.photoURL) || '').trim();
       var missingPhoto = !navPhoto;
@@ -3295,10 +3303,12 @@ nav {
         if (el) el.href = psh;
       });
       var missing = [];
-      if (!photoURL) missing.push('• Profile photo');
-      var bioCheck = ud.bio || ud.aboutMe;
-      if (!bioCheck || !String(bioCheck).trim()) missing.push('• Bio');
-      if (!prof) missing.push('• What you do');
+      if (ud.profileComplete !== true) {
+        if (!photoURL) missing.push('• Profile photo');
+        var bioCheck = ud.bio || ud.aboutMe;
+        if (!bioCheck || !String(bioCheck).trim()) missing.push('• Bio');
+        if (!prof) missing.push('• What you do');
+      }
       var mf = document.getElementById('sidebar-missing-fields');
       var ml = document.getElementById('sidebar-missing-list');
       if (missing.length > 0 && mf && ml) {
