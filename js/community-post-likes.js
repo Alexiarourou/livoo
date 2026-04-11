@@ -11,7 +11,7 @@ import {
 
 /**
  * Post-level likes: communityPosts/{postId}/likes/{uid}, counter on post.upvoteCount.
- * One listener per button; processing + disabled block stacked clicks until Firestore finishes.
+ * `processing` is per-button closure state — must stay outside the async click handler.
  */
 export async function initPostLikeButton(db, auth, postId, btnEl, countEl, opts) {
   opts = opts || {};
@@ -49,18 +49,24 @@ export async function initPostLikeButton(db, auth, postId, btnEl, countEl, opts)
 
   let processing = false;
 
-  async function onLikeClick(e) {
+  const onLikeClick = async (e) => {
     if (e) {
       e.stopPropagation();
       e.preventDefault();
     }
+
+    console.log("Like clicked, processing:", processing, "disabled:", btnEl.disabled);
 
     if (!auth.currentUser) {
       window.location.href = signupUrl;
       return;
     }
 
-    if (processing) return;
+    if (processing) {
+      console.log("Blocked — already processing");
+      return;
+    }
+
     processing = true;
     btnEl.disabled = true;
 
@@ -84,7 +90,7 @@ export async function initPostLikeButton(db, auth, postId, btnEl, countEl, opts)
       processing = false;
       btnEl.disabled = false;
     }
-  }
+  };
 
   btnEl.addEventListener("click", onLikeClick);
 
