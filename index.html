@@ -152,6 +152,25 @@
   .wl-i:focus{border-color:rgba(52,211,153,.32);}
   .wl-note{font-size:11px;color:rgba(110,168,130,.3);}
 
+  /* Waitlist modal */
+  .wl-modal[hidden]{display:none !important;}
+  .wl-modal{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;}
+  .wl-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+  .wl-modal-panel{position:relative;z-index:1;width:100%;max-width:400px;background:rgba(7,22,13,.98);border:1px solid var(--border);border-radius:16px;padding:26px 22px 22px;box-shadow:0 24px 60px rgba(0,0,0,.55);}
+  .wl-modal-x{position:absolute;top:10px;right:10px;width:36px;height:36px;border:none;background:transparent;color:rgba(223,240,231,.55);font-size:22px;line-height:1;cursor:none;border-radius:8px;transition:color .15s,background .15s;}
+  .wl-modal-x:hover{color:var(--mint);background:rgba(52,211,153,.08);}
+  .wl-modal-panel h2{font-size:20px;font-weight:800;color:var(--white);letter-spacing:-.5px;margin:0 0 6px 0;}
+  .wl-modal-sub{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 18px 0;}
+  .wl-modal-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .wl-modal-field label{font-size:12px;font-weight:600;color:rgba(223,240,231,.75);}
+  .wl-modal-field input,.wl-modal-field select{width:100%;box-sizing:border-box;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.17);border-radius:10px;padding:10px 13px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;}
+  .wl-modal-field input::placeholder{color:rgba(110,168,130,.35);}
+  .wl-modal-field input:focus,.wl-modal-field select:focus{border-color:rgba(52,211,153,.35);}
+  .wl-modal-field select{cursor:none;appearance:auto;}
+  .wl-modal-submit{width:100%;margin-top:6px;justify-content:center;}
+  #notify-success .wl-modal-sub{margin-bottom:16px;}
+  #notify-success #notify-city-name{font-weight:700;color:var(--mint);}
+
   /* FOOTER */
   footer{padding:26px 5%;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
   .fc{font-size:12px;color:rgba(110,168,130,.28);}
@@ -243,7 +262,7 @@
     <h1>Your home and<br><span class="hl">your people</span> abroad</h1>
     <p class="hero-sub">Rentals, flatmates, and real community — all before you land.</p>
     <div class="hero-btns">
-      <button class="btn-pri"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Browse rentals</button>
+      <button type="button" class="btn-pri" onclick="window.location.href='search-athens.html'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Browse rentals</button>
       <button class="btn-ghost" onclick="window.location='community.html'">Join the community</button>
     </div>
     <div class="ticker-wrap">
@@ -394,8 +413,7 @@
   <h2 class="cta-t r">Ready when you are</h2>
   <p class="cta-s r d1">Don't see your city? Join the waitlist — we'll let you know the moment we launch near you.</p>
   <div class="waitlist r d2">
-    <input class="wl-i" type="email" id="waitlist-email" placeholder="your@email.com">
-    <button class="btn-pri" onclick="var e=document.getElementById('waitlist-email').value;if(e)window.location='signup.html?email='+encodeURIComponent(e);">Notify me</button>
+    <button type="button" class="btn-pri" id="waitlist-notify-open">Notify me</button>
   </div>
   <p class="wl-note r d3">30 seconds. No credit card.</p>
 </section>
@@ -415,6 +433,67 @@
   </div>
 </footer>
 
+<div id="waitlist-modal" class="wl-modal" hidden aria-modal="true" role="dialog" aria-labelledby="waitlist-modal-title">
+  <div class="wl-modal-backdrop" id="waitlist-modal-backdrop" tabindex="-1"></div>
+  <div class="wl-modal-panel">
+    <button type="button" class="wl-modal-x" id="waitlist-modal-close" aria-label="Close">×</button>
+    <div id="waitlist-modal-body">
+    <h2 id="waitlist-modal-title">Get notified</h2>
+    <p class="wl-modal-sub">We&apos;ll email you when we launch near you.</p>
+    <form id="waitlist-modal-form">
+      <div class="wl-modal-field">
+        <label for="waitlist-modal-email">Email</label>
+        <input class="wl-i" type="email" id="waitlist-modal-email" name="email" required autocomplete="email" placeholder="your@email.com" maxlength="320" />
+      </div>
+      <div class="wl-modal-field">
+        <label for="waitlist-modal-city">City</label>
+        <select id="waitlist-modal-city" name="city" required>
+          <option value="">Select a city</option>
+          <option value="amsterdam">Amsterdam</option>
+          <option value="athens">Athens</option>
+          <option value="barcelona">Barcelona</option>
+          <option value="berlin">Berlin</option>
+          <option value="bologna">Bologna</option>
+          <option value="brussels">Brussels</option>
+          <option value="budapest">Budapest</option>
+          <option value="copenhagen">Copenhagen</option>
+          <option value="dublin">Dublin</option>
+          <option value="florence">Florence</option>
+          <option value="ghent">Ghent</option>
+          <option value="geneva">Geneva</option>
+          <option value="hamburg">Hamburg</option>
+          <option value="krakow">Krakow</option>
+          <option value="lisbon">Lisbon</option>
+          <option value="london">London</option>
+          <option value="madrid">Madrid</option>
+          <option value="milan">Milan</option>
+          <option value="munich">Munich</option>
+          <option value="paris">Paris</option>
+          <option value="porto">Porto</option>
+          <option value="prague">Prague</option>
+          <option value="riga">Riga</option>
+          <option value="rome">Rome</option>
+          <option value="rotterdam">Rotterdam</option>
+          <option value="seville">Seville</option>
+          <option value="stockholm">Stockholm</option>
+          <option value="tallinn">Tallinn</option>
+          <option value="tbilisi">Tbilisi</option>
+          <option value="valencia">Valencia</option>
+          <option value="vienna">Vienna</option>
+          <option value="warsaw">Warsaw</option>
+          <option value="zurich">Zurich</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-pri wl-modal-submit">Continue</button>
+    </form>
+    </div>
+    <div id="notify-success" hidden>
+      <p class="wl-modal-sub">We&apos;ll email you as soon as <span id="notify-city-name">your city</span> launches on Livvo.</p>
+      <a class="btn-pri wl-modal-submit" id="notify-continue-signup" href="signup.html">Continue to sign up</a>
+    </div>
+  </div>
+</div>
+
 <script>
   const cur=document.getElementById('cur'),ring=document.getElementById('ring');
   let mx=0,my=0,rx=0,ry=0;
@@ -427,6 +506,65 @@
   window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40));
   const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('v');}),{threshold:.1});
   document.querySelectorAll('.r').forEach(el=>io.observe(el));
+
+  (function () {
+    var cityNames = {
+      paris: 'Paris', athens: 'Athens', london: 'London', madrid: 'Madrid', milan: 'Milan',
+      barcelona: 'Barcelona', berlin: 'Berlin', amsterdam: 'Amsterdam', lisbon: 'Lisbon',
+      prague: 'Prague', budapest: 'Budapest', vienna: 'Vienna', copenhagen: 'Copenhagen',
+      stockholm: 'Stockholm', dublin: 'Dublin', brussels: 'Brussels', valencia: 'Valencia',
+      seville: 'Seville', porto: 'Porto', rome: 'Rome', florence: 'Florence', bologna: 'Bologna',
+      munich: 'Munich', hamburg: 'Hamburg', zurich: 'Zurich', geneva: 'Geneva', rotterdam: 'Rotterdam',
+      ghent: 'Ghent', krakow: 'Krakow', warsaw: 'Warsaw', tallinn: 'Tallinn', riga: 'Riga', tbilisi: 'Tbilisi'
+    };
+    var modal = document.getElementById('waitlist-modal');
+    var openBtn = document.getElementById('waitlist-notify-open');
+    var backdrop = document.getElementById('waitlist-modal-backdrop');
+    var closeBtn = document.getElementById('waitlist-modal-close');
+    var form = document.getElementById('waitlist-modal-form');
+    var emailIn = document.getElementById('waitlist-modal-email');
+    var citySel = document.getElementById('waitlist-modal-city');
+    var modalBody = document.getElementById('waitlist-modal-body');
+    var notifySuccess = document.getElementById('notify-success');
+    var notifyCityName = document.getElementById('notify-city-name');
+    var notifyContinue = document.getElementById('notify-continue-signup');
+    function openModal() {
+      if (!modal) return;
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      if (emailIn) setTimeout(function () { emailIn.focus(); }, 50);
+    }
+    function closeModal() {
+      if (!modal) return;
+      modal.hidden = true;
+      document.body.style.overflow = '';
+      if (form) form.reset();
+      if (modalBody) modalBody.hidden = false;
+      if (notifySuccess) notifySuccess.hidden = true;
+    }
+    function submitNotifyMe(e) {
+      e.preventDefault();
+      var email = emailIn && String(emailIn.value || '').trim();
+      var city = citySel && String(citySel.value || '').trim();
+      if (!email || !city) return;
+      console.log('City selected:', city);
+      if (notifyCityName) notifyCityName.textContent = cityNames[city] || 'your city';
+      if (notifyContinue) {
+        notifyContinue.href = 'signup.html?email=' + encodeURIComponent(email) + '&city=' + encodeURIComponent(city);
+      }
+      if (modalBody) modalBody.hidden = true;
+      if (notifySuccess) notifySuccess.hidden = false;
+    }
+    if (openBtn) openBtn.addEventListener('click', openModal);
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal && !modal.hidden) closeModal();
+    });
+    if (form) {
+      form.addEventListener('submit', submitNotifyMe);
+    }
+  })();
 </script>
 </body>
 </html>
