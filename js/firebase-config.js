@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { initializeFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI",
@@ -10,3 +11,11 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
+
+/**
+ * Long-polling avoids Safari/WebKit blocking the Firestore streaming Listen channel
+ * ("Fetch API cannot load ... due to access control checks"). Must use this db everywhere.
+ */
+export const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true
+});

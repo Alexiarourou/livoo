@@ -1,6 +1,5 @@
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
-  getFirestore,
   doc,
   getDoc,
   setDoc,
@@ -10,7 +9,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-import { app } from "./firebase-config.js";
+import { app, db } from "./firebase-config.js";
 
 /* Busy guards: must stay at module scope so they persist across auth callbacks and clicks. */
 const busyPosts = new Set();
@@ -18,7 +17,6 @@ const busyComments = new Set();
 const busyReplies = new Set();
 
 const auth = getAuth(app);
-const db = getFirestore(app);
 
 /** Prefer toast when unauthenticated; likes run before redirect timers on some pages. */
 function requireAuthForLike(kind) {
@@ -49,6 +47,12 @@ function docSnapExists(snap) {
   return false;
 }
 
+/** Init reads are best-effort; deployed rules may differ or Listen may fail before auth attaches. */
+function logInitLikeError(e, label) {
+  if (e && e.code === "permission-denied") return;
+  console.error(label, e);
+}
+
 function replyBusyKey(postId, commentId, replyId) {
   return postId + "\0" + commentId + "\0" + replyId;
 }
@@ -71,7 +75,7 @@ export async function initLikedButtonsForCurrentUser() {
         if (docSnapExists(snap)) btn.classList.add("liked");
         else btn.classList.remove("liked");
       } catch (e) {
-        console.error("Init like state error:", e);
+        logInitLikeError(e, "Init like state error:");
       }
     })
   );
@@ -96,7 +100,7 @@ export async function initCommentLikeButtonsForCurrentUser() {
         if (docSnapExists(snap)) btn.classList.add("liked");
         else btn.classList.remove("liked");
       } catch (e) {
-        console.error("Init comment like state error:", e);
+        logInitLikeError(e, "Init comment like state error:");
       }
     })
   );
@@ -132,7 +136,7 @@ export async function initReplyLikeButtonsForCurrentUser() {
         if (docSnapExists(snap)) btn.classList.add("liked");
         else btn.classList.remove("liked");
       } catch (e) {
-        console.error("Init reply like state error:", e);
+        logInitLikeError(e, "Init reply like state error:");
       }
     })
   );

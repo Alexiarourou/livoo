@@ -590,10 +590,9 @@
   </div>
 
   <script type="module">
-    import { app } from "./js/firebase-config.js";
+    import { app, db } from "./js/firebase-config.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import {
-      getFirestore,
       doc,
       getDoc,
       setDoc,
@@ -661,7 +660,6 @@
     })();
 
     const auth = getAuth(app);
-    const db = getFirestore(app);
     let postData = null;
     let threadPostEditBackup = null;
     let threadRepliesUnsubs = [];

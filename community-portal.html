@@ -1733,10 +1733,10 @@ nav {
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
 
 <script type="module">
-  import { app } from "./js/firebase-config.js";
+  import { app, db } from "./js/firebase-config.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import {
-    getFirestore, collection, query, where, addDoc, doc, getDoc, getDocs,
+    collection, query, where, addDoc, doc, getDoc, getDocs,
     limit, increment, deleteDoc, setDoc, updateDoc, serverTimestamp, orderBy, onSnapshot
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
@@ -1836,7 +1836,6 @@ nav {
     const cityDisplayName = displayNameFromParam(rawCity);
 
     const auth = getAuth(app);
-    const db = getFirestore(app);
     const storage = getStorage(app);
     let postImageFile = null;
     const portalContent = document.getElementById('portal-content');
