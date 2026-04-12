@@ -175,15 +175,18 @@
     .meta-pill { text-align: left; padding: 0; font-size: 0.88rem; }
     .like-btn { transition: all 0.15s ease; }
     .comment-like-btn { transition: all 0.15s ease; }
-    [id^="clb-"] { transition: all 0.15s ease; }
+    [id^="clb-"],
+    [id^="rlb-"] { transition: all 0.15s ease; }
     /* Subtle liked state for comment hearts */
     .comment-like-btn.liked,
     [id^="clb-"].liked { color: #e53e3e !important; }
     .comment-like-btn.liked svg path,
     [id^="clb-"].liked svg path { fill: #e53e3e; stroke: #e53e3e; }
     .reply-like-btn { transition: all 0.15s ease; }
-    .reply-like-btn.liked { color: #e53e3e !important; }
-    .reply-like-btn.liked svg path { fill: #e53e3e; stroke: #e53e3e; }
+    .reply-like-btn.liked,
+    [id^="rlb-"].liked { color: #e53e3e !important; }
+    .reply-like-btn.liked svg path,
+    [id^="rlb-"].liked svg path { fill: #e53e3e; stroke: #e53e3e; }
 
     /* Comment delete inline confirm */
     .delete-confirm-bar {
@@ -1093,6 +1096,16 @@
     window.collapseComposer = collapseComposer;
     window.showToast = showToast;
 
+    /** Programmatic entry points — delegated handler in js/likes.js performs the real toggle. */
+    window.likeComment = function (commentId) {
+      var btn = document.getElementById('clb-' + commentId);
+      if (btn) btn.click();
+    };
+    window.likeReply = function (commentId, replyId) {
+      var btn = document.getElementById('rlb-' + replyId);
+      if (btn) btn.click();
+    };
+
     window.filterComments = function (query) {
       var q = String(query || '').toLowerCase().trim();
       var comments = document.querySelectorAll('.comment-wrapper');
@@ -1839,6 +1852,29 @@
 
         const replyQ = query(collection(db, 'communityPosts', postId, 'comments', thisCommentId, 'replies'), orderBy('createdAt', 'asc'));
         const unsubReplies = onSnapshot(replyQ, function (rsnap) {
+          var chg = rsnap.docChanges();
+          if (
+            chg.length &&
+            repliesWrap.children.length &&
+            chg.every(function (c) { return c.type === 'modified'; })
+          ) {
+            chg.forEach(function (c) {
+              if (c.type !== 'modified') return;
+              var id = c.doc.id;
+              var r = c.doc.data() || {};
+              var cnt = Math.max(0, Number(r.likes || r.likeCount || 0));
+              var el = document.getElementById('rlc-' + id);
+              if (el) el.textContent = String(cnt);
+            });
+            if (typeof window.initReplyLikeButtonsForCurrentUser === 'function') {
+              window.initReplyLikeButtonsForCurrentUser();
+            } else {
+              import('./js/likes.js').then(function (m) {
+                if (m.initReplyLikeButtonsForCurrentUser) return m.initReplyLikeButtonsForCurrentUser();
+              }).catch(function () {});
+            }
+            return;
+          }
           repliesWrap.innerHTML = '';
           rsnap.docs.forEach(function (rd) {
             const r = rd.data() || {};
@@ -1885,11 +1921,12 @@
             var replyLikeBtn = document.createElement('button');
             replyLikeBtn.type = 'button';
             replyLikeBtn.className = 'reply-like-btn';
+            replyLikeBtn.id = 'rlb-' + rd.id;
             replyLikeBtn.setAttribute('data-post-id', postId);
             replyLikeBtn.setAttribute('data-comment-id', thisCommentId);
             replyLikeBtn.setAttribute('data-reply-id', rd.id);
             replyLikeBtn.style.cssText = 'border:none;background:none;padding:0;cursor:pointer;font-size:12px;color:#b0c8b0;display:flex;align-items:center;gap:3px;transition:color 0.1s;';
-            replyLikeBtn.innerHTML = heartStrokeSvg + '<span class="reply-like-count" style="font-size:11px;">' + String(initialReplyLikes) + '</span>';
+            replyLikeBtn.innerHTML = heartStrokeSvg + '<span class="reply-like-count" id="rlc-' + rd.id + '" style="font-size:11px;">' + String(initialReplyLikes) + '</span>';
             replyActionRow.appendChild(replyLikeBtn);
             if (currentUser && String(r.authorUid || '') === currentUser.uid) {
               var delRep = document.createElement('button');

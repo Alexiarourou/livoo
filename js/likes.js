@@ -187,6 +187,8 @@ document.body.addEventListener('click', async (e) => {
     const replyRef = doc(db, 'communityPosts', postId, 'comments', commentId, 'replies', replyId);
     const likeRef = doc(db, 'communityPosts', postId, 'comments', commentId, 'replies', replyId, 'likes', uid);
     const countEl = rbtn.querySelector('.reply-like-count');
+    const prevShown = countEl ? parseInt(countEl.textContent, 10) || 0 : 0;
+    const prevLiked = rbtn.classList.contains('liked');
 
     try {
       const snap = await getDoc(likeRef);
@@ -194,20 +196,21 @@ document.body.addEventListener('click', async (e) => {
       const cur = Math.max(0, Number((replySnap.data() || {}).likes || (replySnap.data() || {}).likeCount || 0));
 
       if (snap.exists()) {
+        rbtn.classList.remove('liked');
+        if (countEl) countEl.textContent = String(Math.max(0, prevShown - 1));
         await deleteDoc(likeRef);
         if (cur > 0) await updateDoc(replyRef, { likes: increment(-1) });
-        rbtn.classList.remove('liked');
       } else {
+        rbtn.classList.add('liked');
+        if (countEl) countEl.textContent = String(prevShown + 1);
         await setDoc(likeRef, { likedAt: serverTimestamp() });
         await updateDoc(replyRef, { likes: increment(1) });
-        rbtn.classList.add('liked');
-      }
-      const rs = await getDoc(replyRef);
-      if (countEl) {
-        countEl.textContent = String(Math.max(0, Number((rs.data() || {}).likes || (rs.data() || {}).likeCount || 0)));
       }
     } catch (err) {
       console.error('Reply like error:', err);
+      if (prevLiked) rbtn.classList.add('liked');
+      else rbtn.classList.remove('liked');
+      if (countEl) countEl.textContent = String(prevShown);
     } finally {
       busyReplies.delete(bKey);
       rbtn.disabled = false;
@@ -235,6 +238,8 @@ document.body.addEventListener('click', async (e) => {
     const commentRef = doc(db, 'communityPosts', postId, 'comments', commentId);
     const likeRef = doc(db, 'communityPosts', postId, 'comments', commentId, 'likes', uid);
     const countEl = cbtn.querySelector('.comment-like-count');
+    const prevShownC = countEl ? parseInt(countEl.textContent, 10) || 0 : 0;
+    const prevLikedC = cbtn.classList.contains('liked');
 
     try {
       const snap = await getDoc(likeRef);
@@ -242,20 +247,21 @@ document.body.addEventListener('click', async (e) => {
       const cur = Math.max(0, Number((commentSnap.data() || {}).likes || (commentSnap.data() || {}).likeCount || 0));
 
       if (snap.exists()) {
+        cbtn.classList.remove('liked');
+        if (countEl) countEl.textContent = String(Math.max(0, prevShownC - 1));
         await deleteDoc(likeRef);
         if (cur > 0) await updateDoc(commentRef, { likes: increment(-1) });
-        cbtn.classList.remove('liked');
       } else {
+        cbtn.classList.add('liked');
+        if (countEl) countEl.textContent = String(prevShownC + 1);
         await setDoc(likeRef, { likedAt: serverTimestamp() });
         await updateDoc(commentRef, { likes: increment(1) });
-        cbtn.classList.add('liked');
-      }
-      const cs = await getDoc(commentRef);
-      if (countEl) {
-        countEl.textContent = String(Math.max(0, Number((cs.data() || {}).likes || (cs.data() || {}).likeCount || 0)));
       }
     } catch (err) {
       console.error('Comment like error:', err);
+      if (prevLikedC) cbtn.classList.add('liked');
+      else cbtn.classList.remove('liked');
+      if (countEl) countEl.textContent = String(prevShownC);
     } finally {
       busyComments.delete(commentId);
       cbtn.disabled = false;
@@ -282,24 +288,28 @@ document.body.addEventListener('click', async (e) => {
   const uid = userPost.uid;
   const postRef = doc(db, 'communityPosts', postId);
   const likeRef = doc(db, 'communityPosts', postId, 'likes', uid);
+  const countSpan = btn.querySelector('.like-count');
+  const prevPostCount = countSpan ? parseInt(countSpan.textContent, 10) || 0 : 0;
+  const prevPostLiked = btn.classList.contains('liked');
 
   try {
     const snap = await getDoc(likeRef);
     if (snap.exists()) {
+      btn.classList.remove('liked');
+      if (countSpan) countSpan.textContent = String(Math.max(0, prevPostCount - 1));
       await deleteDoc(likeRef);
       await updateDoc(postRef, { upvoteCount: increment(-1) });
-      btn.classList.remove('liked');
-      const c = btn.querySelector('.like-count');
-      if (c) c.textContent = Math.max(0, parseInt(c.textContent) - 1);
     } else {
+      btn.classList.add('liked');
+      if (countSpan) countSpan.textContent = String(prevPostCount + 1);
       await setDoc(likeRef, { likedAt: serverTimestamp() });
       await updateDoc(postRef, { upvoteCount: increment(1) });
-      btn.classList.add('liked');
-      const c = btn.querySelector('.like-count');
-      if (c) c.textContent = parseInt(c.textContent) + 1;
     }
   } catch(err) {
     console.error('Like error:', err);
+    if (prevPostLiked) btn.classList.add('liked');
+    else btn.classList.remove('liked');
+    if (countSpan) countSpan.textContent = String(prevPostCount);
   } finally {
     busyPosts.delete(postId);
     btn.disabled = false;

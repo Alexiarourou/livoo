@@ -1855,16 +1855,6 @@ nav {
     const POSTS_PER_PAGE = 15;
     let followedTopicSlugs = [];
     let notifUnsub = null;
-    /** Unsubs for per-post doc listeners (live commentCount from post document). */
-    let postCardMetaUnsubs = [];
-
-    function detachPostCardMetaListeners() {
-      postCardMetaUnsubs.forEach(function (u) {
-        try { u(); } catch (e) {}
-      });
-      postCardMetaUnsubs = [];
-    }
-
     function docCreatedMillis(snap) {
       const ts = (snap.data() && snap.data().createdAt);
       if (ts && typeof ts.toMillis === 'function') return ts.toMillis();
@@ -2801,7 +2791,6 @@ nav {
         clientFeedActive = false;
         clientFeedPool = [];
         clientFeedOffset = 0;
-        detachPostCardMetaListeners();
         feedEl.innerHTML = '';
         hidePaginationFooter();
       }
@@ -2817,7 +2806,6 @@ nav {
           hint = 'You do not have permission to read posts.';
         }
         if (reset || !feedEl.querySelector('.post-card')) {
-          detachPostCardMetaListeners();
           feedEl.innerHTML = '<p class="feed-empty">' + hint + '</p>';
         }
         hidePaginationFooter();
@@ -3102,14 +3090,8 @@ nav {
         card.appendChild(actionBar);
 
         feedEl.appendChild(card);
-
-        const metaUnsub = onSnapshot(doc(db, 'communityPosts', postId), function (snap) {
-          if (!snap.exists()) return;
-          var n = Math.max(0, Number((snap.data() || {}).commentCount || 0));
-          var span = document.getElementById(ccSpanId);
-          if (span) span.textContent = n + ' comment' + (n === 1 ? '' : 's');
-        });
-        postCardMetaUnsubs.push(metaUnsub);
+        /* Comment count is from the initial query snapshot only — no per-post onSnapshot (avoids
+           churn when upvoteCount changes from likes, which used to fight “popular” order UX). */
       }
     }
 
