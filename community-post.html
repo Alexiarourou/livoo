@@ -1866,13 +1866,8 @@
               var el = document.getElementById('rlc-' + id);
               if (el) el.textContent = String(cnt);
             });
-            if (typeof window.initReplyLikeButtonsForCurrentUser === 'function') {
-              window.initReplyLikeButtonsForCurrentUser();
-            } else {
-              import('./js/likes.js').then(function (m) {
-                if (m.initReplyLikeButtonsForCurrentUser) return m.initReplyLikeButtonsForCurrentUser();
-              }).catch(function () {});
-            }
+            /* Do not call initReplyLikeButtons here — it races with likes.js and can clear .liked
+               before the subcollection like doc is written. */
             return;
           }
           repliesWrap.innerHTML = '';

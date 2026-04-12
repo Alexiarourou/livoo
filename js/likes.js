@@ -38,9 +38,15 @@ function requireAuthForLike(kind) {
   return null;
 }
 
-/** Firestore snapshot: this project’s runtime exposes exists as a method. */
-function snapExists(snap) {
-  return snap.exists();
+/**
+ * Firestore Web modular snapshots expose `exists` as a boolean property (see community-post
+ * `if (!snap.exists)`). Calling `snap.exists()` throws and breaks every like toggle.
+ */
+function docSnapExists(snap) {
+  if (!snap) return false;
+  if (typeof snap.exists === "boolean") return snap.exists;
+  if (typeof snap.exists === "function") return snap.exists();
+  return false;
 }
 
 function replyBusyKey(postId, commentId, replyId) {
@@ -62,7 +68,7 @@ export async function initLikedButtonsForCurrentUser() {
       const likeRef = doc(db, "communityPosts", postId, "likes", user.uid);
       try {
         const snap = await getDoc(likeRef);
-        if (snapExists(snap)) btn.classList.add("liked");
+        if (docSnapExists(snap)) btn.classList.add("liked");
         else btn.classList.remove("liked");
       } catch (e) {
         console.error("Init like state error:", e);
@@ -87,7 +93,7 @@ export async function initCommentLikeButtonsForCurrentUser() {
       const likeRef = doc(db, "communityPosts", postId, "comments", commentId, "likes", user.uid);
       try {
         const snap = await getDoc(likeRef);
-        if (snapExists(snap)) btn.classList.add("liked");
+        if (docSnapExists(snap)) btn.classList.add("liked");
         else btn.classList.remove("liked");
       } catch (e) {
         console.error("Init comment like state error:", e);
@@ -123,7 +129,7 @@ export async function initReplyLikeButtonsForCurrentUser() {
       );
       try {
         const snap = await getDoc(likeRef);
-        if (snapExists(snap)) btn.classList.add("liked");
+        if (docSnapExists(snap)) btn.classList.add("liked");
         else btn.classList.remove("liked");
       } catch (e) {
         console.error("Init reply like state error:", e);
@@ -195,7 +201,7 @@ document.body.addEventListener('click', async (e) => {
       const replySnap = await getDoc(replyRef);
       const cur = Math.max(0, Number((replySnap.data() || {}).likes || (replySnap.data() || {}).likeCount || 0));
 
-      if (snap.exists()) {
+      if (docSnapExists(snap)) {
         rbtn.classList.remove('liked');
         if (countEl) countEl.textContent = String(Math.max(0, prevShown - 1));
         await deleteDoc(likeRef);
@@ -246,7 +252,7 @@ document.body.addEventListener('click', async (e) => {
       const commentSnap = await getDoc(commentRef);
       const cur = Math.max(0, Number((commentSnap.data() || {}).likes || (commentSnap.data() || {}).likeCount || 0));
 
-      if (snap.exists()) {
+      if (docSnapExists(snap)) {
         cbtn.classList.remove('liked');
         if (countEl) countEl.textContent = String(Math.max(0, prevShownC - 1));
         await deleteDoc(likeRef);
@@ -294,7 +300,7 @@ document.body.addEventListener('click', async (e) => {
 
   try {
     const snap = await getDoc(likeRef);
-    if (snap.exists()) {
+    if (docSnapExists(snap)) {
       btn.classList.remove('liked');
       if (countSpan) countSpan.textContent = String(Math.max(0, prevPostCount - 1));
       await deleteDoc(likeRef);

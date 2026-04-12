@@ -1769,6 +1769,13 @@ nav {
   let currentUser = null;
   let currentProfileData = null;
 
+  function fsDocExists(snap) {
+    if (!snap) return false;
+    if (typeof snap.exists === 'boolean') return snap.exists;
+    if (typeof snap.exists === 'function') return snap.exists();
+    return false;
+  }
+
   window.switchCityFromDropdown = function switchCityFromDropdown(city) {
     const params = new URLSearchParams(window.location.search);
     params.set('city', city);
@@ -2679,7 +2686,7 @@ nav {
       };
       try {
         const uSnap = await getDoc(doc(db, 'users', authorUid));
-        if (uSnap.exists()) {
+        if (fsDocExists(uSnap)) {
           const ud = uSnap.data() || {};
           const username = String(ud.username || ud.displayName || fallbackUsername || 'Anonymous').trim();
           var photoFromUserDoc = String(ud.photoURL || '').trim();
@@ -3455,7 +3462,7 @@ nav {
         }
 
         const profileDoc = await getDoc(doc(db, 'users', user.uid));
-        const pdata = profileDoc.exists() ? profileDoc.data() : null;
+        const pdata = fsDocExists(profileDoc) ? profileDoc.data() : null;
         showPortal(user, pdata);
       } catch (error) {
         console.error('Portal error:', error);
@@ -3476,7 +3483,7 @@ nav {
       if (!u) return;
       try {
         const profileDoc = await getDoc(doc(db, 'users', u.uid));
-        const pdata = profileDoc.exists() ? profileDoc.data() : null;
+        const pdata = fsDocExists(profileDoc) ? profileDoc.data() : null;
         showPortal(u, pdata);
       } catch (e) {
         showPortal(u, null);
