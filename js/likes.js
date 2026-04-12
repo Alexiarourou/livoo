@@ -20,6 +20,24 @@ const busyReplies = new Set();
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/** Prefer toast when unauthenticated; likes run before redirect timers on some pages. */
+function requireAuthForLike(kind) {
+  const user = auth.currentUser;
+  if (user) return user;
+  const msg =
+    kind === "post"
+      ? "Sign in to like posts"
+      : kind === "comment"
+        ? "Sign in to like comments"
+        : "Sign in to like replies";
+  if (typeof window !== "undefined" && typeof window.showToast === "function") {
+    window.showToast(msg);
+  } else {
+    window.location.href = "signup.html";
+  }
+  return null;
+}
+
 /** Firestore snapshot: this project’s runtime exposes exists as a method. */
 function snapExists(snap) {
   return snap.exists();
@@ -157,17 +175,15 @@ document.body.addEventListener('click', async (e) => {
     const replyId = rbtn.dataset.replyId;
     const bKey = replyBusyKey(postId, commentId, replyId);
 
-    if (!auth.currentUser) {
-      window.location.href = 'signup.html';
-      return;
-    }
+    const userReply = requireAuthForLike("reply");
+    if (!userReply) return;
 
     if (busyReplies.has(bKey)) return;
 
     busyReplies.add(bKey);
     rbtn.disabled = true;
 
-    const uid = auth.currentUser.uid;
+    const uid = userReply.uid;
     const replyRef = doc(db, 'communityPosts', postId, 'comments', commentId, 'replies', replyId);
     const likeRef = doc(db, 'communityPosts', postId, 'comments', commentId, 'replies', replyId, 'likes', uid);
     const countEl = rbtn.querySelector('.reply-like-count');
@@ -207,17 +223,15 @@ document.body.addEventListener('click', async (e) => {
     const postId = cbtn.dataset.postId;
     const commentId = cbtn.dataset.commentId;
 
-    if (!auth.currentUser) {
-      window.location.href = 'signup.html';
-      return;
-    }
+    const userComment = requireAuthForLike("comment");
+    if (!userComment) return;
 
     if (busyComments.has(commentId)) return;
 
     busyComments.add(commentId);
     cbtn.disabled = true;
 
-    const uid = auth.currentUser.uid;
+    const uid = userComment.uid;
     const commentRef = doc(db, 'communityPosts', postId, 'comments', commentId);
     const likeRef = doc(db, 'communityPosts', postId, 'comments', commentId, 'likes', uid);
     const countEl = cbtn.querySelector('.comment-like-count');
@@ -252,19 +266,20 @@ document.body.addEventListener('click', async (e) => {
   const btn = e.target.closest('.like-btn[data-post-id]');
   if (!btn) return;
 
+  e.preventDefault();
+  e.stopPropagation();
+
   const postId = btn.dataset.postId;
 
-  if (!auth.currentUser) {
-    window.location.href = 'signup.html';
-    return;
-  }
+  const userPost = requireAuthForLike("post");
+  if (!userPost) return;
 
   if (busyPosts.has(postId)) return;
 
   busyPosts.add(postId);
   btn.disabled = true;
 
-  const uid = auth.currentUser.uid;
+  const uid = userPost.uid;
   const postRef = doc(db, 'communityPosts', postId);
   const likeRef = doc(db, 'communityPosts', postId, 'likes', uid);
 

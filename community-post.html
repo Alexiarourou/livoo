@@ -610,6 +610,9 @@
       writeBatch
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    let currentUser = null;
+    let currentProfileData = null;
+
     const CATEGORY_LABELS = {
       housing: 'Housing Tips', events: 'Events', flatmate: 'Flatmate Search', general: 'General',
       recommendations: 'Recommendations', visa_admin: 'Visa & Admin', jobs_remote: 'Jobs & Remote Work',
@@ -656,8 +659,6 @@
 
     const auth = getAuth(app);
     const db = getFirestore(app);
-    let currentUser = null;
-    let currentProfileData = null;
     let postData = null;
     let threadPostEditBackup = null;
     let threadRepliesUnsubs = [];
@@ -2307,12 +2308,13 @@
     }
 
     onAuthStateChanged(auth, async function (user) {
+      currentUser = user;
       if (!user) {
+        currentProfileData = null;
         scheduleRedirect();
         return;
       }
       if (authTimer) { clearTimeout(authTimer); authTimer = null; }
-      currentUser = user;
       try {
         const pd = await getDoc(doc(db, 'users', user.uid));
         currentProfileData = pd.exists ? pd.data() : null;

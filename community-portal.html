@@ -1765,6 +1765,10 @@ nav {
     bangkok: 'Bangkok', bali: 'Bali'
   };
 
+  /** Module scope — must not live inside showPortal() or other functions (likes / UI read this). */
+  let currentUser = null;
+  let currentProfileData = null;
+
   window.switchCityFromDropdown = function switchCityFromDropdown(city) {
     const params = new URLSearchParams(window.location.search);
     params.set('city', city);
@@ -1962,8 +1966,6 @@ nav {
       var sel = document.getElementById('sort-select');
       if (sel) sel.value = activeSort;
     }
-    let currentUser = null;
-    let currentProfileData = null;
     let cityDisplay = cityDisplayName;
 
     function closeNotificationsDropdown() {
@@ -3290,7 +3292,6 @@ nav {
 
     function showPortal(user, profileData) {
       if (!user) return;
-      currentUser = user;
       currentProfileData = profileData || null;
       var ft = profileData && profileData.followedTopics;
       followedTopicSlugs = Array.isArray(ft) ? ft.map(function (x) { return String(x || '').trim(); }).filter(Boolean) : [];
@@ -3459,8 +3460,10 @@ nav {
     }
 
     onAuthStateChanged(auth, async function (user) {
+      currentUser = user;
       try {
         if (!user) {
+          currentProfileData = null;
           scheduleRedirectIfStillSignedOut('signup.html?redirect=community&city=' + encodeURIComponent(city));
           return;
         }
