@@ -8,159 +8,250 @@
 <style>
   :root {
     --green:#059669;--green-d:#047857;--mint:#34d399;
-    --bg:#0b2016;--bg2:#0d2519;
-    --card:rgba(255,255,255,.04);
-    --border:rgba(52,211,153,.12);--border-h:rgba(52,211,153,.28);
-    --text:#dff0e7;--muted:#6ea882;--white:#fff;
+    --bg:#152b1e;
+    --surface:#1d3a28;
+    --surface2:#254d35;
+    --card:rgba(255,255,255,.07);
+    --border:rgba(255,255,255,.1);
+    --border-h:rgba(52,211,153,.35);
+    --text:#eaf5ef;--muted:#a8ccb8;--white:#fff;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none;}
-  .cursor{width:9px;height:9px;background:var(--mint);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s;}
-  .cursor-ring{width:28px;height:28px;border:1.5px solid rgba(52,211,153,.28);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .18s,height .18s,border-color .18s;}
+  .cursor{width:9px;height:9px;background:var(--mint);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .12s;}
+  .cursor-ring{width:28px;height:28px;border:1.5px solid rgba(52,211,153,.3);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .18s,height .18s,border-color .18s;}
 
   /* NAV */
-  nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 5%;background:rgba(11,32,22,.42);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(52,211,153,.05);transition:background .3s;}
-  nav.scrolled{background:rgba(11,32,22,.95);}
+  nav{position:fixed;top:0;left:0;right:0;z-index:200;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 5%;background:rgba(21,43,30,.55);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.06);transition:background .3s;}
+  nav.scrolled{background:rgba(21,43,30,.97);}
   .logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
-  .logo-v{width:38px;height:38px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;font-family:'Sora',sans-serif;box-shadow:0 0 16px rgba(5,150,105,.32);}
-  .logo-text{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.5px;}
-  .nav-links{display:flex;align-items:center;gap:2px;list-style:none;}
-  .nav-link{display:flex;align-items:center;gap:3px;padding:7px 12px;color:rgba(223,240,231,.52);font-size:13px;font-weight:500;text-decoration:none;border-radius:7px;transition:color .2s,background .2s;cursor:none;}
-  .nav-link:hover,.nav-link.active{color:var(--text);background:rgba(52,211,153,.06);}
+  .logo-v{width:36px;height:36px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;color:#fff;font-family:'Sora',sans-serif;box-shadow:0 0 14px rgba(5,150,105,.3);}
+  .logo-text{font-size:21px;font-weight:700;color:#fff;letter-spacing:-.5px;}
+  .nav-links{display:flex;align-items:center;gap:1px;list-style:none;}
+  .nav-link{display:flex;align-items:center;gap:3px;padding:7px 13px;color:rgba(234,245,239,.65);font-size:13px;font-weight:500;text-decoration:none;border-radius:7px;transition:color .2s,background .2s;cursor:none;}
+  .nav-link:hover,.nav-link.active{color:var(--text);background:rgba(52,211,153,.07);}
   .nav-link.active{color:var(--mint);}
-  .nav-cta{padding:8px 17px;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:none;transition:background .2s,transform .15s;display:flex;align-items:center;gap:5px;text-decoration:none;}
-  .nav-cta:hover{background:var(--green-d);transform:translateY(-1px);}
+  .nav-join{padding:8px 18px;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:none;transition:background .2s,transform .15s;display:flex;align-items:center;gap:5px;text-decoration:none;}
+  .nav-join:hover{background:var(--green-d);transform:translateY(-1px);}
 
   /* HERO */
-  .hero{padding:120px 5% 80px;text-align:center;position:relative;overflow:hidden;}
-  .hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 65% 55% at 50% 0%,rgba(5,150,105,.14) 0%,transparent 65%);}
-  .hero-grid{position:absolute;inset:0;z-index:0;background-image:linear-gradient(rgba(52,211,153,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(52,211,153,.03) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,black 20%,transparent 80%);}
-  .hero-inner{position:relative;z-index:2;max-width:680px;margin:0 auto;}
+  .hero{padding:116px 5% 72px;text-align:center;position:relative;overflow:hidden;}
+  .hero-bg{position:absolute;inset:0;z-index:0;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(5,150,105,.12) 0%,transparent 65%),
+               radial-gradient(ellipse 40% 40% at 20% 80%,rgba(52,211,153,.06) 0%,transparent 60%);
+  }
+  .hero-grid{position:absolute;inset:0;z-index:0;
+    background-image:linear-gradient(rgba(52,211,153,.04) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(52,211,153,.04) 1px,transparent 1px);
+    background-size:60px 60px;
+    mask-image:radial-gradient(ellipse 85% 65% at 50% 0%,black 20%,transparent 80%);
+  }
+  .hero-inner{position:relative;z-index:2;max-width:660px;margin:0 auto;}
 
-  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
   @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
 
-  .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(52,211,153,.09);border:1px solid rgba(52,211,153,.2);border-radius:100px;font-size:11px;font-weight:600;color:var(--mint);letter-spacing:.07em;text-transform:uppercase;margin-bottom:18px;animation:fadeUp .5s ease both;}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 13px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.18);border-radius:100px;font-size:11px;font-weight:600;color:var(--mint);letter-spacing:.07em;text-transform:uppercase;margin-bottom:20px;animation:fadeUp .5s ease both;}
   .badge-dot{width:5px;height:5px;background:var(--mint);border-radius:50%;animation:blink 2s ease infinite;}
-  .hero h1{font-size:clamp(38px,5.5vw,72px);font-weight:800;line-height:1.0;letter-spacing:-2.5px;color:#fff;margin-bottom:14px;animation:fadeUp .55s .1s ease both;}
-  .hero h1 .hl{background:linear-gradient(120deg,var(--mint),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-  .hero-sub{font-size:16px;color:rgba(255,255,255,.6);max-width:460px;line-height:1.65;margin:0 auto 28px;animation:fadeUp .55s .2s ease both;}
-  .btn-pri{padding:12px 24px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;font-weight:600;cursor:none;transition:all .2s;box-shadow:0 0 20px rgba(5,150,105,.35);display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
-  .btn-pri:hover{background:var(--green-d);transform:translateY(-2px);box-shadow:0 6px 22px rgba(5,150,105,.46);}
+  .hero h1{font-size:clamp(38px,5.5vw,70px);font-weight:800;line-height:1.0;letter-spacing:-2.5px;color:#fff;margin-bottom:14px;animation:fadeUp .55s .1s ease both;}
+  .hero h1 .hl{background:linear-gradient(120deg,var(--mint) 0%,var(--green) 60%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .hero-sub{font-size:16px;color:rgba(255,255,255,.75);max-width:440px;line-height:1.65;margin:0 auto 28px;font-weight:400;animation:fadeUp .55s .2s ease both;}
+  .btn-pri{padding:12px 24px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;font-weight:600;cursor:none;transition:all .2s;box-shadow:0 0 22px rgba(5,150,105,.32);display:inline-flex;align-items:center;gap:7px;text-decoration:none;}
+  .btn-pri:hover{background:var(--green-d);transform:translateY(-2px);box-shadow:0 6px 24px rgba(5,150,105,.45);}
 
   /* SHARED */
-  section{padding:76px 5%;}
+  section{padding:80px 5%;}
   .sec-ey{font-size:10px;font-weight:700;color:var(--mint);letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px;display:block;}
-  .sec-t{font-size:clamp(24px,3.2vw,40px);font-weight:800;color:var(--white);letter-spacing:-1.6px;line-height:1.08;margin-bottom:9px;}
-  .sec-s{font-size:14px;color:var(--muted);max-width:440px;line-height:1.65;margin-bottom:40px;}
-  .sec-center{text-align:center;}
-  .sec-center .sec-s{margin-left:auto;margin-right:auto;}
+  .sec-t{font-size:clamp(24px,3.2vw,42px);font-weight:800;color:var(--white);letter-spacing:-1.8px;line-height:1.06;margin-bottom:10px;}
+  .sec-s{font-size:14px;color:var(--muted);max-width:440px;line-height:1.65;margin-bottom:44px;}
+  .centered{text-align:center;}
+  .centered .sec-s{margin-left:auto;margin-right:auto;}
+
+  /* CITY SEARCH */
+  .city-search-wrap{display:flex;justify-content:center;margin-bottom:32px;}
+  .city-search-box{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:12px;padding:11px 16px;width:100%;max-width:380px;transition:border-color .2s,background .2s;}
+  .city-search-box:focus-within{border-color:var(--border-h);background:rgba(255,255,255,.09);}
+  .city-search-box svg{color:var(--muted);flex-shrink:0;}
+  .city-search-box input{background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:14px;color:var(--text);width:100%;}
+  .city-search-box input::placeholder{color:rgba(168,204,184,.4);}
 
   /* CITY GRID */
-  .city-grid-top{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;}
-  .city-grid-bot{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-  .city-card{border-radius:13px;overflow:hidden;position:relative;aspect-ratio:1/1;cursor:none;transition:transform .28s,box-shadow .28s;text-decoration:none;display:block;}
-  .city-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 16px 38px rgba(0,0,0,.55);}
-  .city-photo{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;transition:transform .4s;}
-  .city-card:hover .city-photo{transform:scale(1.05);}
-  .city-grad{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,.82) 100%);}
-  .city-foot{position:absolute;bottom:0;left:0;right:0;padding:36px 14px 13px;z-index:2;}
-  .city-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:2px;}
-  .city-from{font-size:10px;color:rgba(255,255,255,.52);}
-  .city-arrow{display:inline-flex;align-items:center;gap:4px;margin-top:7px;font-size:10px;font-weight:600;color:var(--mint);opacity:0;transition:opacity .2s,transform .2s;transform:translateX(-4px);}
-  .city-card:hover .city-arrow{opacity:1;transform:translateX(0);}
-  .city-arrow svg{width:10px;height:10px;}
+  .city-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .city-card{border-radius:14px;overflow:hidden;position:relative;aspect-ratio:1/1;cursor:none;transition:transform .28s,box-shadow .28s;text-decoration:none;display:block;}
+  .city-card:hover{transform:translateY(-5px) scale(1.015);box-shadow:0 18px 42px rgba(0,0,0,.6);}
+  .city-photo{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .4s;}
+  .city-card:hover .city-photo{transform:scale(1.06);}
+  .city-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.05) 20%,rgba(0,0,0,.78) 100%);}
+  .city-foot{position:absolute;bottom:0;left:0;right:0;padding:40px 14px 14px;z-index:2;}
+  .city-name{font-size:17px;font-weight:700;color:#fff;margin-bottom:2px;}
+  .city-price{font-size:10px;color:rgba(255,255,255,.7);margin-bottom:8px;}
+  .city-cta{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--mint);opacity:0;transform:translateY(4px);transition:opacity .22s,transform .22s;}
+  .city-cta svg{width:9px;height:9px;}
+  .city-card:hover .city-cta{opacity:1;transform:translateY(0);}
 
-  .cities-footer{text-align:center;margin-top:24px;display:flex;flex-direction:column;align-items:center;gap:10px;}
-  .btn-ghost-sm{padding:9px 20px;background:rgba(52,211,153,.06);color:var(--mint);border:1px solid rgba(52,211,153,.18);border-radius:9px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:none;transition:all .2s;text-decoration:none;display:inline-block;}
-  .btn-ghost-sm:hover{background:rgba(52,211,153,.12);transform:translateY(-1px);}
-  .request-link{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s;}
-  .request-link:hover{color:var(--mint);}
+  /* SEE ALL TOGGLE */
+  .cities-actions{text-align:center;margin-top:22px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .btn-toggle{padding:9px 20px;background:rgba(52,211,153,.07);color:var(--mint);border:1px solid rgba(52,211,153,.18);border-radius:9px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+  .btn-toggle:hover{background:rgba(52,211,153,.13);border-color:rgba(52,211,153,.3);}
+  .btn-toggle svg{width:12px;height:12px;transition:transform .25s;}
+  .btn-toggle.open svg{transform:rotate(180deg);}
+
+  .all-cities-panel{overflow:hidden;max-height:0;transition:max-height .4s ease,opacity .3s ease;opacity:0;}
+  .all-cities-panel.open{max-height:400px;opacity:1;}
+  .all-cities-inner{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:18px 0 4px;}
+  .city-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--surface);border:1px solid var(--border);border-radius:9px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;transition:all .18s;cursor:none;}
+  .city-chip:hover{background:var(--surface2);border-color:var(--border-h);color:var(--mint);}
+  .city-chip-dot{width:5px;height:5px;border-radius:50%;background:var(--mint);}
+
+  .request-city{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s;cursor:none;}
+  .request-city:hover{color:var(--mint);}
 
   /* FEATURES */
-  section.features{background:rgba(5,18,10,.55);}
+  section.features{background:var(--surface);}
   .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-  .feat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;transition:transform .24s,border-color .24s;cursor:none;}
-  .feat:hover{transform:translateY(-4px);border-color:var(--border-h);}
-  .feat-ico{width:40px;height:40px;background:rgba(52,211,153,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
-  .feat-ico svg{width:19px;height:19px;color:var(--mint);}
-  .feat-h{font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;}
-  .feat-p{font-size:12px;color:var(--muted);line-height:1.6;}
+  .feat{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:14px;padding:26px;transition:transform .24s,border-color .24s,box-shadow .24s;cursor:none;}
+  .feat:hover{transform:translateY(-4px);border-color:var(--border-h);box-shadow:0 12px 32px rgba(0,0,0,.3);}
+  .feat-ico{width:42px;height:42px;background:rgba(52,211,153,.1);border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+  .feat-ico svg{width:20px;height:20px;color:var(--mint);}
+  .feat-h{font-size:15px;font-weight:700;color:var(--white);margin-bottom:7px;}
+  .feat-p{font-size:13px;color:var(--muted);line-height:1.6;}
+
+  /* CONV PREVIEW BLUR */
+  .conv-preview{max-width:720px;margin:0 auto;}
+  .conv-blurred{position:relative;}
+  .conv-blur-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:10px;}
+  .cb-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .cb-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;color:white;}
+  .cb-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;}
+  .cb-title{font-size:14px;font-weight:700;color:var(--white);line-height:1.3;}
+  .conv-blur-overlay{position:absolute;inset:0;border-radius:14px;background:linear-gradient(to bottom,rgba(21,43,30,.3) 0%,rgba(21,43,30,.97) 45%);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:40px;gap:10px;}
+  .conv-blur-overlay svg{color:var(--mint);}
+  .conv-blur-overlay p{font-size:14px;font-weight:600;color:var(--text);}
 
   /* CONVERSATIONS */
-  .conv-grid{display:flex;flex-direction:column;gap:12px;max-width:680px;margin:0 auto;}
-  .conv-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;transition:border-color .2s,transform .2s;cursor:none;}
-  .conv-card:hover{border-color:var(--border-h);transform:translateY(-2px);}
-  .conv-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-  .conv-user{display:flex;align-items:center;gap:9px;}
-  .conv-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+  section.conv-section{background:rgba(255,255,255,.02);}
+  .conv-list{display:flex;flex-direction:column;gap:12px;max-width:720px;margin:0 auto;}
+  .conv-card{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:14px;padding:20px 24px;transition:border-color .2s,transform .2s,box-shadow .2s;cursor:none;}
+  .conv-card:hover{border-color:var(--border-h);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.3);}
+  .conv-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .conv-user{display:flex;align-items:center;gap:10px;}
+  .conv-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
   .av-n{background:linear-gradient(135deg,#059669,#34d399);color:white;}
-  .av-r{background:linear-gradient(135deg,#0891b2,#22d3ee);color:white;}
-  .av-s{background:linear-gradient(135deg,#7c3aed,#a78bfa);color:white;}
-  .conv-meta{font-size:11px;color:var(--muted);}
-  .conv-meta strong{color:var(--text);font-weight:600;}
-  .conv-tag{padding:2px 9px;border-radius:100px;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
-  .tag-rec{background:rgba(239,68,68,.12);color:#f87171;}
-  .tag-housing{background:rgba(5,150,105,.15);color:var(--mint);}
-  .tag-general{background:rgba(52,211,153,.08);color:var(--mint);}
-  .conv-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:5px;line-height:1.3;}
-  .conv-body{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:12px;}
-  .conv-foot{display:flex;align-items:center;gap:14px;}
-  .conv-stat{display:flex;align-items:center;gap:4px;font-size:11px;color:rgba(126,184,154,.45);}
-  .conv-stat svg{width:11px;height:11px;}
+  .av-r{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:white;}
+  .av-s{background:linear-gradient(135deg,#92400e,#f59e0b);color:white;}
+  .conv-name{font-size:13px;font-weight:600;color:var(--white);}
+  .conv-meta{font-size:11px;color:var(--muted);margin-top:1px;}
+
+  /* TAG COLORS */
+  .tag{padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;}
+  .tag-rec{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.2);}
+  .tag-housing{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.2);}
+  .tag-general{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
+
+  .conv-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;line-height:1.3;}
+  .conv-body{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
+  .conv-foot{display:flex;align-items:center;gap:16px;}
+  .conv-stat{display:flex;align-items:center;gap:4px;font-size:11px;color:rgba(141,184,160,.45);}
+  .conv-stat svg{width:12px;height:12px;}
 
   /* CTA */
-  section.cta{text-align:center;background:rgba(5,18,10,.4);border-top:1px solid var(--border);}
-  .cta-t{font-size:clamp(28px,4vw,52px);font-weight:800;color:var(--white);letter-spacing:-2px;line-height:1.0;max-width:520px;margin:0 auto 11px;}
-  .cta-s{font-size:14px;color:var(--muted);max-width:320px;margin:0 auto 28px;line-height:1.6;}
+  section.cta-sec{text-align:center;background:var(--surface);border-top:1px solid var(--border);}
+  .cta-t{font-size:clamp(28px,4vw,50px);font-weight:800;color:var(--white);letter-spacing:-2px;line-height:1.0;max-width:500px;margin:0 auto 12px;}
+  .cta-s{font-size:14px;color:var(--muted);max-width:340px;margin:0 auto 28px;line-height:1.6;}
 
   /* FOOTER */
   footer{padding:28px 5%;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
-  .fc{font-size:12px;color:rgba(110,168,130,.28);}
-  .fl{display:flex;gap:16px;}
+  .fc{font-size:12px;color:rgba(168,204,184,.5);}
+  .fl{display:flex;gap:18px;}
   .fla{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s;cursor:none;}
   .fla:hover{color:var(--mint);}
 
   /* MODAL */
-  .modal-overlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
-  .modal-box{background:#0d2519;border:1px solid rgba(52,211,153,.2);border-radius:20px;padding:36px;max-width:420px;width:100%;position:relative;}
-  .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;line-height:1;font-family:'Sora',sans-serif;}
+  .modal-wrap{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;}
+  .modal-box{background:#1d3a28;border:1px solid rgba(52,211,153,.18);border-radius:20px;padding:36px;max-width:400px;width:100%;position:relative;}
+  .modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(255,255,255,.35);font-size:18px;cursor:pointer;line-height:1;font-family:'Sora',sans-serif;transition:color .2s;}
   .modal-close:hover{color:var(--text);}
-  .modal-title{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-.8px;margin-bottom:7px;}
-  .modal-sub{font-family:'Sora',sans-serif;font-size:13px;color:#6ea882;margin-bottom:22px;line-height:1.5;}
-  .modal-input{width:100%;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.18);border-radius:10px;padding:11px 14px;font-family:'Sora',sans-serif;font-size:13px;color:#dff0e7;outline:none;transition:border-color .2s;margin-bottom:11px;}
-  .modal-input:focus{border-color:rgba(52,211,153,.35);}
-  .modal-input::placeholder{color:rgba(110,168,130,.3);}
+  .modal-title{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.8px;margin-bottom:6px;}
+  .modal-sub{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.5;}
+  .modal-field{width:100%;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.16);border-radius:10px;padding:11px 14px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;margin-bottom:10px;}
+  .modal-field:focus{border-color:rgba(52,211,153,.35);}
+  .modal-field::placeholder{color:rgba(141,184,160,.3);}
   .modal-btn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:4px;}
   .modal-btn:hover{background:var(--green-d);}
-  .modal-note{font-family:'Sora',sans-serif;font-size:11px;color:rgba(110,168,130,.35);text-align:center;margin-top:11px;}
+  .modal-note{font-size:11px;color:rgba(141,184,160,.3);text-align:center;margin-top:10px;}
 
   /* REVEAL */
   .r{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease;}
   .r.v{opacity:1;transform:translateY(0);}
-  .d1{transition-delay:.1s;}.d2{transition-delay:.2s;}.d3{transition-delay:.3s;}.d4{transition-delay:.4s;}
+  .d1{transition-delay:.1s;}.d2{transition-delay:.2s;}.d3{transition-delay:.3s;}.d4{transition-delay:.35s;}
+
+  /* STICKY CTA */
+  .sticky-cta{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--surface);border-top:1px solid var(--border);padding:12px 16px;align-items:center;justify-content:space-between;gap:12px;backdrop-filter:blur(16px);}
+  .sticky-text{font-size:13px;font-weight:500;color:var(--muted);}
+  .sticky-btn{padding:9px 18px;background:var(--green);color:#fff;border-radius:8px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;transition:background .2s;}
+  .sticky-btn:hover{background:var(--green-d);}
 
   /* MOBILE */
   @media(max-width:768px){
+    .sticky-cta{display:flex;}
     nav{padding:0 4%;height:54px;}
     .logo-text{font-size:19px;}
-    .logo-v{width:34px;height:34px;font-size:18px;}
+    .logo-v{width:33px;height:33px;font-size:17px;}
     .nav-links{display:none;}
-    .hero{padding:90px 4% 60px;}
-    .hero h1{font-size:clamp(32px,9vw,48px);letter-spacing:-2px;}
-    .hero-sub{font-size:14px;}
+    .nav-join{padding:7px 14px;font-size:12px;}
+
+    .hero{padding:88px 4% 56px;}
+    .hero h1{font-size:clamp(30px,9vw,46px);letter-spacing:-1.8px;}
+    .hero-sub{font-size:14px;max-width:100%;}
+    .btn-pri{font-size:13px;padding:11px 20px;}
+
     section{padding:52px 4%;}
-    .city-grid-top,.city-grid-bot{grid-template-columns:repeat(2,1fr);gap:10px;}
-    .city-card{aspect-ratio:4/3;}
+    section.features{padding:52px 4%;}
+    section.conv-section{padding:52px 4%;}
+    section.cta-sec{padding:52px 4%;}
+
+    .sec-t{font-size:clamp(22px,7vw,32px);letter-spacing:-1.2px;}
+    .sec-s{font-size:13px;max-width:100%;margin-bottom:28px;}
+
+    .city-search-box{max-width:100%;}
+
+    .city-grid{grid-template-columns:repeat(2,1fr);gap:9px;}
+    .city-card{aspect-ratio:3/4;border-radius:12px;}
+    .city-name{font-size:15px;}
+    .city-price{font-size:9px;}
+
+    .cities-actions{gap:9px;}
+    .all-cities-inner{gap:7px;padding:14px 0 2px;}
+    .city-chip{font-size:12px;padding:6px 11px;}
+    .btn-toggle{font-size:12px;padding:8px 16px;}
+
     .feat-grid{grid-template-columns:1fr;gap:10px;}
-    .conv-card{padding:16px;}
-    footer{flex-direction:column;gap:14px;text-align:center;padding:22px 4%;}
+    .feat{padding:20px;}
+    .feat-ico{width:38px;height:38px;margin-bottom:12px;}
+
+    .conv-blur-card{padding:14px 16px;}
+    .cb-title{font-size:13px;}
+    .conv-blur-overlay{padding-bottom:32px;gap:8px;}
+    .conv-blur-overlay p{font-size:13px;}
+
+    .cta-t{font-size:clamp(24px,8vw,38px);letter-spacing:-1.5px;}
+    .cta-s{font-size:13px;max-width:100%;}
+
+    footer{flex-direction:column;gap:14px;text-align:center;padding:22px 4%;padding-bottom:80px;}
     .fl{flex-wrap:wrap;justify-content:center;gap:12px;}
+
+    .modal-box{padding:26px 20px;}
+    .modal-title{font-size:18px;}
   }
   @media(max-width:480px){
-    .city-grid-top,.city-grid-bot{grid-template-columns:repeat(2,1fr);gap:8px;}
+    .city-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
     .city-card{aspect-ratio:1/1;border-radius:11px;}
+    .city-foot{padding:30px 11px 11px;}
+    .city-name{font-size:14px;}
+    .hero h1{font-size:clamp(28px,10vw,40px);letter-spacing:-1.5px;}
+    .hero-badge{font-size:10px;}
+    .feat-grid{gap:8px;}
   }
 </style>
 </head>
@@ -180,7 +271,10 @@
     <li><a class="nav-link" href="flatmate-signup.html">Find a Flatmate</a></li>
     <li><a class="nav-link" href="landlord-dashboard.html">For Landlords</a></li>
   </ul>
-  <a class="nav-cta" href="signup.html">Join the community <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+  <a class="nav-join" href="signup.html">
+    Join the community
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+  </a>
 </nav>
 
 <!-- HERO -->
@@ -190,7 +284,7 @@
   <div class="hero-inner">
     <div class="hero-badge"><div class="badge-dot"></div>Where your next chapter begins</div>
     <h1>Find your people<br>in a <span class="hl">new city</span></h1>
-    <p class="hero-sub">Join city groups, connect with people moving to the same place as you, and feel at home before you even arrive.</p>
+    <p class="hero-sub">The community for people who move abroad. Find your people before you land.</p>
     <a class="btn-pri" href="signup.html">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Join the community
@@ -200,20 +294,26 @@
 
 <!-- CITY CARDS -->
 <section>
-  <div class="sec-center">
+  <div class="centered">
     <span class="sec-ey r">Where we are</span>
     <h2 class="sec-t r d1">Choose your city</h2>
-    <p class="sec-s r d2">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
+    <p class="sec-s r d2">Join before you arrive. Meet people, find flatmates, get local tips.</p>
+  </div>
+  <div class="city-search-wrap r d3">
+    <div class="city-search-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="city-search" placeholder="Search a city..." autocomplete="off">
+    </div>
   </div>
 
-  <div class="city-grid-top">
+  <div class="city-grid">
     <a class="city-card r" href="community-portal.html?city=athens">
       <div class="city-photo" style="background-image:url('https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80')"></div>
       <div class="city-grad"></div>
       <div class="city-foot">
         <div class="city-name">Athens</div>
-        <div class="city-from">from €600/mo</div>
-        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="city-price">from €600/mo</div>
+        <div class="city-cta">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
       </div>
     </a>
     <a class="city-card r d1" href="community-portal.html?city=london">
@@ -221,8 +321,8 @@
       <div class="city-grad"></div>
       <div class="city-foot">
         <div class="city-name">London</div>
-        <div class="city-from">from £1,400/mo</div>
-        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="city-price">from £1,400/mo</div>
+        <div class="city-cta">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
       </div>
     </a>
     <a class="city-card r d2" href="community-portal.html?city=paris">
@@ -230,8 +330,8 @@
       <div class="city-grad"></div>
       <div class="city-foot">
         <div class="city-name">Paris</div>
-        <div class="city-from">from €1,100/mo</div>
-        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="city-price">from €1,100/mo</div>
+        <div class="city-cta">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
       </div>
     </a>
     <a class="city-card r d3" href="community-portal.html?city=madrid">
@@ -239,20 +339,20 @@
       <div class="city-grad"></div>
       <div class="city-foot">
         <div class="city-name">Madrid</div>
-        <div class="city-from">from €900/mo</div>
-        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="city-price">from €900/mo</div>
+        <div class="city-cta">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
       </div>
     </a>
   </div>
 
-  <div class="city-grid-bot" style="margin-top:12px;">
+  <div class="city-grid" style="margin-top:12px;">
     <a class="city-card r" href="community-portal.html?city=barcelona">
       <div class="city-photo" style="background-image:url('https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&q=80')"></div>
       <div class="city-grad"></div>
       <div class="city-foot">
         <div class="city-name">Barcelona</div>
-        <div class="city-from">from €1,000/mo</div>
-        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="city-price">from €1,000/mo</div>
+        <div class="city-cta">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
       </div>
     </a>
     <a class="city-card r d1" href="community-portal.html?city=berlin">
@@ -260,8 +360,8 @@
       <div class="city-grad"></div>
       <div class="city-foot">
         <div class="city-name">Berlin</div>
-        <div class="city-from">from €1,100/mo</div>
-        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="city-price">from €1,100/mo</div>
+        <div class="city-cta">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
       </div>
     </a>
     <a class="city-card r d2" href="community-portal.html?city=lisbon">
@@ -269,8 +369,8 @@
       <div class="city-grad"></div>
       <div class="city-foot">
         <div class="city-name">Lisbon</div>
-        <div class="city-from">from €900/mo</div>
-        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="city-price">from €900/mo</div>
+        <div class="city-cta">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
       </div>
     </a>
     <a class="city-card r d3" href="community-portal.html?city=amsterdam">
@@ -278,137 +378,119 @@
       <div class="city-grad"></div>
       <div class="city-foot">
         <div class="city-name">Amsterdam</div>
-        <div class="city-from">from €1,400/mo</div>
-        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="city-price">from €1,400/mo</div>
+        <div class="city-cta">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
       </div>
     </a>
   </div>
 
-  <div class="cities-footer r">
-    <a class="btn-ghost-sm" href="#">See all cities</a>
-    <a class="request-link" href="#" onclick="document.getElementById('request-modal').style.display='flex';return false;">Can't find your city? Request it →</a>
+  <div class="cities-actions r">
+    <button class="btn-toggle" id="toggle-btn" onclick="toggleCities()">
+      See all cities
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+
+    <div class="all-cities-panel" id="cities-panel">
+      <div class="all-cities-inner">
+        <a class="city-chip" href="community-portal.html?city=bologna"><div class="city-chip-dot"></div>Bologna</a>
+        <a class="city-chip" href="community-portal.html?city=brussels"><div class="city-chip-dot"></div>Brussels</a>
+        <a class="city-chip" href="community-portal.html?city=budapest"><div class="city-chip-dot"></div>Budapest</a>
+        <a class="city-chip" href="community-portal.html?city=copenhagen"><div class="city-chip-dot"></div>Copenhagen</a>
+        <a class="city-chip" href="community-portal.html?city=dublin"><div class="city-chip-dot"></div>Dublin</a>
+        <a class="city-chip" href="community-portal.html?city=dubai"><div class="city-chip-dot"></div>Dubai</a>
+        <a class="city-chip" href="community-portal.html?city=edinburgh"><div class="city-chip-dot"></div>Edinburgh</a>
+        <a class="city-chip" href="community-portal.html?city=florence"><div class="city-chip-dot"></div>Florence</a>
+        <a class="city-chip" href="community-portal.html?city=krakow"><div class="city-chip-dot"></div>Krakow</a>
+        <a class="city-chip" href="community-portal.html?city=ljubljana"><div class="city-chip-dot"></div>Ljubljana</a>
+        <a class="city-chip" href="community-portal.html?city=milan"><div class="city-chip-dot"></div>Milan</a>
+        <a class="city-chip" href="community-portal.html?city=naples"><div class="city-chip-dot"></div>Naples</a>
+        <a class="city-chip" href="community-portal.html?city=new-york"><div class="city-chip-dot"></div>New York</a>
+        <a class="city-chip" href="community-portal.html?city=oslo"><div class="city-chip-dot"></div>Oslo</a>
+        <a class="city-chip" href="community-portal.html?city=porto"><div class="city-chip-dot"></div>Porto</a>
+        <a class="city-chip" href="community-portal.html?city=prague"><div class="city-chip-dot"></div>Prague</a>
+        <a class="city-chip" href="community-portal.html?city=riga"><div class="city-chip-dot"></div>Riga</a>
+        <a class="city-chip" href="community-portal.html?city=rome"><div class="city-chip-dot"></div>Rome</a>
+        <a class="city-chip" href="community-portal.html?city=seville"><div class="city-chip-dot"></div>Seville</a>
+        <a class="city-chip" href="community-portal.html?city=stockholm"><div class="city-chip-dot"></div>Stockholm</a>
+        <a class="city-chip" href="community-portal.html?city=tallinn"><div class="city-chip-dot"></div>Tallinn</a>
+        <a class="city-chip" href="community-portal.html?city=valencia"><div class="city-chip-dot"></div>Valencia</a>
+        <a class="city-chip" href="community-portal.html?city=vienna"><div class="city-chip-dot"></div>Vienna</a>
+        <a class="city-chip" href="community-portal.html?city=vilnius"><div class="city-chip-dot"></div>Vilnius</a>
+        <a class="city-chip" href="community-portal.html?city=warsaw"><div class="city-chip-dot"></div>Warsaw</a>
+        <a class="city-chip" href="community-portal.html?city=zurich"><div class="city-chip-dot"></div>Zurich</a>
+        <a class="city-chip" href="#" onclick="openRequestModal();return false;" style="border-style:dashed;color:var(--muted);">+ Request a city</a>
+      </div>
+    </div>
+
+    <a class="request-city" href="#" onclick="openRequestModal();return false;">Can't find your city? Request it</a>
   </div>
 </section>
 
 <!-- FEATURES -->
 <section class="features">
-  <div class="sec-center">
+  <div class="centered">
     <span class="sec-ey r">What you get</span>
     <h2 class="sec-t r d1">More than a forum</h2>
-    <p class="sec-s r d2">Real people, real advice, real community — before and after you arrive.</p>
+    <p class="sec-s r d2">Real people, honest advice, real community. Before and after you arrive.</p>
   </div>
   <div class="feat-grid">
     <div class="feat r">
       <div class="feat-ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       </div>
-      <div class="feat-h">Meet people before you arrive</div>
-      <div class="feat-p">Connect with others moving to the same city. No more arriving alone.</div>
+      <div class="feat-h">Ask anything, get real answers</div>
+      <div class="feat-p">Best neighbourhoods, hidden gems, visa tips, flatmate horror stories. The honest stuff you won't find on Google.</div>
     </div>
     <div class="feat r d1">
       <div class="feat-ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </div>
-      <div class="feat-h">Local tips from real people</div>
-      <div class="feat-p">Honest advice on neighbourhoods, transport, hidden gems and day-to-day life.</div>
+      <div class="feat-h">Find a flatmate before you land</div>
+      <div class="feat-p">Connect with people moving to the same city at the same time. Share a flat, split costs, skip the loneliness.</div>
     </div>
     <div class="feat r d2">
       <div class="feat-ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>
-          <line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
       </div>
-      <div class="feat-h">Events and meetups</div>
-      <div class="feat-p">Local events, casual meetups and things to do from your very first weekend.</div>
+      <div class="feat-h">Know your city before day one</div>
+      <div class="feat-p">34 cities. Local groups for every one. From the best coffee spots to which arrondissement to avoid.</div>
     </div>
   </div>
 </section>
 
-<!-- REAL CONVERSATIONS -->
-<section>
-  <div class="sec-center">
+<!-- CONVERSATIONS -->
+<section class="conv-section">
+  <div class="centered">
     <span class="sec-ey r">Community</span>
     <h2 class="sec-t r d1">Real conversations, real people</h2>
     <p class="sec-s r d2">A snapshot from Athens, London, and Paris.</p>
   </div>
 
-  <div class="conv-grid">
-    <div class="conv-card r">
-      <div class="conv-head">
-        <div class="conv-user">
-          <div class="conv-av av-n">N</div>
-          <div class="conv-meta"><strong>Nikos</strong> · Athens · 3h ago</div>
-        </div>
-        <span class="conv-tag tag-rec">Recommendations</span>
+  <div class="conv-preview r">
+    <div class="conv-blurred">
+      <div class="conv-blur-card">
+        <div class="cb-head"><div class="cb-av" style="background:linear-gradient(135deg,#059669,#34d399)">N</div><div><div class="cb-name">Nikos · Athens</div><div class="cb-tag tag-rec">Recommendations</div></div></div>
+        <div class="cb-title">Best souvlaki in Athens that locals actually eat?</div>
       </div>
-      <div class="conv-title">Best souvlaki in Athens that locals actually eat?</div>
-      <div class="conv-body">Just moved to Exarchia. Need the real spots, not the tourist traps near Syntagma.</div>
-      <div class="conv-foot">
-        <span class="conv-stat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          14
-        </span>
-        <span class="conv-stat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          9 comments
-        </span>
+      <div class="conv-blur-card">
+        <div class="cb-head"><div class="cb-av" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6)">R</div><div><div class="cb-name">Romain · London</div><div class="cb-tag tag-housing">Housing Tips</div></div></div>
+        <div class="cb-title">Best areas for a first flat in London under £1,500?</div>
       </div>
-    </div>
-
-    <div class="conv-card r d1">
-      <div class="conv-head">
-        <div class="conv-user">
-          <div class="conv-av av-r">R</div>
-          <div class="conv-meta"><strong>Romain</strong> · London · 2h ago</div>
-        </div>
-        <span class="conv-tag tag-housing">Housing Tips</span>
+      <div class="conv-blur-card">
+        <div class="cb-head"><div class="cb-av" style="background:linear-gradient(135deg,#92400e,#f59e0b)">S</div><div><div class="cb-name">Sofia · Paris</div><div class="cb-tag tag-general">General</div></div></div>
+        <div class="cb-title">Which arrondissement for a young expat on a budget?</div>
       </div>
-      <div class="conv-title">Best areas for a first flat in London?</div>
-      <div class="conv-body">Budget around £1,200 to £1,500. Is Hackney still the sweet spot or should I look at zones 3 to 4?</div>
-      <div class="conv-foot">
-        <span class="conv-stat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          12
-        </span>
-        <span class="conv-stat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          8 comments
-        </span>
-      </div>
-    </div>
-
-    <div class="conv-card r d2">
-      <div class="conv-head">
-        <div class="conv-user">
-          <div class="conv-av av-s">S</div>
-          <div class="conv-meta"><strong>Sofia</strong> · Paris · 5h ago</div>
-        </div>
-        <span class="conv-tag tag-general">General</span>
-      </div>
-      <div class="conv-title">Which arrondissement for a young expat on a budget?</div>
-      <div class="conv-body">Looking at the 10th, 11th and 19th. Any strong opinions from people who've lived there?</div>
-      <div class="conv-foot">
-        <span class="conv-stat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          8
-        </span>
-        <span class="conv-stat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          11 comments
-        </span>
+      <div class="conv-blur-overlay">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <p>Join to see live conversations</p>
+        <a class="btn-pri" href="signup.html" style="margin-top:4px;font-size:13px;padding:10px 22px;">Create free account</a>
       </div>
     </div>
   </div>
 </section>
 
 <!-- CTA -->
-<section class="cta">
+<section class="cta-sec">
   <h2 class="cta-t r">Ready to find your people?</h2>
   <p class="cta-s r d1">Takes 30 seconds. Join free and connect with your city community today.</p>
   <a class="btn-pri r d2" href="signup.html" style="margin:0 auto;">
@@ -431,31 +513,86 @@
 </footer>
 
 <!-- REQUEST CITY MODAL -->
-<div class="modal-overlay" id="request-modal">
+<div class="modal-wrap" id="request-modal">
   <div class="modal-box">
     <button class="modal-close" onclick="document.getElementById('request-modal').style.display='none'">✕</button>
     <div class="modal-title">Request your city</div>
-    <div class="modal-sub">Which city are you looking for? We'll let you know when it's live.</div>
-    <input class="modal-input" type="text" placeholder="City name">
-    <input class="modal-input" type="email" placeholder="your@email.com">
+    <div class="modal-sub">Which city are you looking for? We'll let you know the moment it's live.</div>
+    <input class="modal-field" type="text" placeholder="City name (e.g. Lisbon, Dubai...)">
+    <input class="modal-field" type="email" placeholder="your@email.com">
     <button class="modal-btn">Submit request</button>
     <div class="modal-note">No spam. Unsubscribe anytime.</div>
   </div>
 </div>
 
 <script>
+  // Cursor
   const cur=document.getElementById('cur'),ring=document.getElementById('ring');
   let mx=0,my=0,rx=0,ry=0;
   document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
   (function a(){rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a);})();
-  document.querySelectorAll('a,.feat,.conv-card,.city-card').forEach(el=>{
+  document.querySelectorAll('a,button,.feat,.conv-card,.city-card,.city-chip').forEach(el=>{
     el.addEventListener('mouseenter',()=>{cur.style.transform='translate(-50%,-50%) scale(2.2)';ring.style.width='44px';ring.style.height='44px';ring.style.borderColor='rgba(52,211,153,.44)';});
-    el.addEventListener('mouseleave',()=>{cur.style.transform='translate(-50%,-50%) scale(1)';ring.style.width='28px';ring.style.height='28px';ring.style.borderColor='rgba(52,211,153,.28)';});
+    el.addEventListener('mouseleave',()=>{cur.style.transform='translate(-50%,-50%) scale(1)';ring.style.width='28px';ring.style.height='28px';ring.style.borderColor='rgba(52,211,153,.3)';});
   });
+
+  // Nav scroll
   window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40));
-  document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.style.display='none';}));
-  const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('v');}),{threshold:.1});
+
+  // See all cities toggle
+  function toggleCities(){
+    const panel=document.getElementById('cities-panel');
+    const btn=document.getElementById('toggle-btn');
+    const isOpen=panel.classList.contains('open');
+    panel.classList.toggle('open',!isOpen);
+    btn.classList.toggle('open',!isOpen);
+    btn.childNodes[0].textContent=isOpen?'See all cities ':'Hide cities ';
+  }
+
+  // Request modal
+  function openRequestModal(){
+    document.getElementById('request-modal').style.display='flex';
+  }
+  document.getElementById('request-modal').addEventListener('click',e=>{
+    if(e.target===document.getElementById('request-modal'))
+      document.getElementById('request-modal').style.display='none';
+  });
+
+  // City search filter
+  document.getElementById('city-search').addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    const chips = document.querySelectorAll('.city-chip');
+    chips.forEach(chip => {
+      if (!chip.href || chip.textContent.includes('Request')) return;
+      const name = chip.textContent.trim().toLowerCase();
+      chip.style.display = name.includes(q) ? '' : 'none';
+    });
+    // Auto-open panel if typing
+    if (q.length > 0) {
+      const panel = document.getElementById('cities-panel');
+      const btn = document.getElementById('toggle-btn');
+      if (!panel.classList.contains('open')) {
+        panel.classList.add('open');
+        btn.classList.add('open');
+        btn.childNodes[0].textContent = 'Hide cities ';
+      }
+    }
+  });
+
+  // Hide sticky bar after clicking join
+  document.querySelectorAll('.sticky-btn').forEach(b => b.addEventListener('click', () => {
+    document.getElementById('sticky-cta').style.display = 'none';
+  }));
+
+  // Scroll reveal
+  const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('v');}),{threshold:.08});
   document.querySelectorAll('.r').forEach(el=>io.observe(el));
 </script>
+<!-- MOBILE STICKY CTA -->
+<div class="sticky-cta" id="sticky-cta">
+  <span class="sticky-text">Find your people in your city</span>
+  <a class="sticky-btn" href="signup.html">Join free</a>
+</div>
+
 </body>
 </html>
