@@ -17,5 +17,8 @@ export const app = initializeApp(firebaseConfig);
  * ("Fetch API cannot load ... due to access control checks"). Must use this db everywhere.
  */
 export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true
+  /* Safari often blocks WebChannel streams to googleapis (“access control checks”).
+     Force long-polling for reads AND writes; auto-detect is a fallback if behaviour changes. */
+  experimentalForceLongPolling: true,
+  experimentalAutoDetectLongPolling: true
 });

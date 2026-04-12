@@ -2231,8 +2231,8 @@ nav {
         const snap = await getDocs(
           query(
             collection(db, 'communityPosts'),
-            where('city', '==', feedCity),
             where('category', '==', 'events'),
+            where('city', '==', feedCity),
             orderBy('createdAt', 'desc'),
             limit(3)
           )
