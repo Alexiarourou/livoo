@@ -1,399 +1,461 @@
 <!DOCTYPE html>
-<!-- Livvo Community - Paris, Athens, London -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Community | Livvo</title>
-<meta name="description" content="Join city groups and connect with people in Paris, Athens, London, and more. Free for everyone.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23059669'/><path d='M8 12l8 12 8-12-4-6H12z' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-<link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="community.css">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:#059669;--green-d:#047857;--mint:#34d399;
+    --bg:#0b2016;--bg2:#0d2519;
+    --card:rgba(255,255,255,.04);
+    --border:rgba(52,211,153,.12);--border-h:rgba(52,211,153,.28);
+    --text:#dff0e7;--muted:#6ea882;--white:#fff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none;}
+  .cursor{width:9px;height:9px;background:var(--mint);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s;}
+  .cursor-ring{width:28px;height:28px;border:1.5px solid rgba(52,211,153,.28);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .18s,height .18s,border-color .18s;}
 
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 5%;background:rgba(11,32,22,.42);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(52,211,153,.05);transition:background .3s;}
+  nav.scrolled{background:rgba(11,32,22,.95);}
+  .logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
+  .logo-v{width:38px;height:38px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;font-family:'Sora',sans-serif;box-shadow:0 0 16px rgba(5,150,105,.32);}
+  .logo-text{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.5px;}
+  .nav-links{display:flex;align-items:center;gap:2px;list-style:none;}
+  .nav-link{display:flex;align-items:center;gap:3px;padding:7px 12px;color:rgba(223,240,231,.52);font-size:13px;font-weight:500;text-decoration:none;border-radius:7px;transition:color .2s,background .2s;cursor:none;}
+  .nav-link:hover,.nav-link.active{color:var(--text);background:rgba(52,211,153,.06);}
+  .nav-link.active{color:var(--mint);}
+  .nav-cta{padding:8px 17px;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:none;transition:background .2s,transform .15s;display:flex;align-items:center;gap:5px;text-decoration:none;}
+  .nav-cta:hover{background:var(--green-d);transform:translateY(-1px);}
+
+  /* HERO */
+  .hero{padding:120px 5% 80px;text-align:center;position:relative;overflow:hidden;}
+  .hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 65% 55% at 50% 0%,rgba(5,150,105,.14) 0%,transparent 65%);}
+  .hero-grid{position:absolute;inset:0;z-index:0;background-image:linear-gradient(rgba(52,211,153,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(52,211,153,.03) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,black 20%,transparent 80%);}
+  .hero-inner{position:relative;z-index:2;max-width:680px;margin:0 auto;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(52,211,153,.09);border:1px solid rgba(52,211,153,.2);border-radius:100px;font-size:11px;font-weight:600;color:var(--mint);letter-spacing:.07em;text-transform:uppercase;margin-bottom:18px;animation:fadeUp .5s ease both;}
+  .badge-dot{width:5px;height:5px;background:var(--mint);border-radius:50%;animation:blink 2s ease infinite;}
+  .hero h1{font-size:clamp(38px,5.5vw,72px);font-weight:800;line-height:1.0;letter-spacing:-2.5px;color:#fff;margin-bottom:14px;animation:fadeUp .55s .1s ease both;}
+  .hero h1 .hl{background:linear-gradient(120deg,var(--mint),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .hero-sub{font-size:16px;color:rgba(255,255,255,.6);max-width:460px;line-height:1.65;margin:0 auto 28px;animation:fadeUp .55s .2s ease both;}
+  .btn-pri{padding:12px 24px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;font-weight:600;cursor:none;transition:all .2s;box-shadow:0 0 20px rgba(5,150,105,.35);display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
+  .btn-pri:hover{background:var(--green-d);transform:translateY(-2px);box-shadow:0 6px 22px rgba(5,150,105,.46);}
+
+  /* SHARED */
+  section{padding:76px 5%;}
+  .sec-ey{font-size:10px;font-weight:700;color:var(--mint);letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px;display:block;}
+  .sec-t{font-size:clamp(24px,3.2vw,40px);font-weight:800;color:var(--white);letter-spacing:-1.6px;line-height:1.08;margin-bottom:9px;}
+  .sec-s{font-size:14px;color:var(--muted);max-width:440px;line-height:1.65;margin-bottom:40px;}
+  .sec-center{text-align:center;}
+  .sec-center .sec-s{margin-left:auto;margin-right:auto;}
+
+  /* CITY GRID */
+  .city-grid-top{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;}
+  .city-grid-bot{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .city-card{border-radius:13px;overflow:hidden;position:relative;aspect-ratio:1/1;cursor:none;transition:transform .28s,box-shadow .28s;text-decoration:none;display:block;}
+  .city-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 16px 38px rgba(0,0,0,.55);}
+  .city-photo{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;transition:transform .4s;}
+  .city-card:hover .city-photo{transform:scale(1.05);}
+  .city-grad{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,.82) 100%);}
+  .city-foot{position:absolute;bottom:0;left:0;right:0;padding:36px 14px 13px;z-index:2;}
+  .city-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:2px;}
+  .city-from{font-size:10px;color:rgba(255,255,255,.52);}
+  .city-arrow{display:inline-flex;align-items:center;gap:4px;margin-top:7px;font-size:10px;font-weight:600;color:var(--mint);opacity:0;transition:opacity .2s,transform .2s;transform:translateX(-4px);}
+  .city-card:hover .city-arrow{opacity:1;transform:translateX(0);}
+  .city-arrow svg{width:10px;height:10px;}
+
+  .cities-footer{text-align:center;margin-top:24px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .btn-ghost-sm{padding:9px 20px;background:rgba(52,211,153,.06);color:var(--mint);border:1px solid rgba(52,211,153,.18);border-radius:9px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:none;transition:all .2s;text-decoration:none;display:inline-block;}
+  .btn-ghost-sm:hover{background:rgba(52,211,153,.12);transform:translateY(-1px);}
+  .request-link{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s;}
+  .request-link:hover{color:var(--mint);}
+
+  /* FEATURES */
+  section.features{background:rgba(5,18,10,.55);}
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .feat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;transition:transform .24s,border-color .24s;cursor:none;}
+  .feat:hover{transform:translateY(-4px);border-color:var(--border-h);}
+  .feat-ico{width:40px;height:40px;background:rgba(52,211,153,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+  .feat-ico svg{width:19px;height:19px;color:var(--mint);}
+  .feat-h{font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;}
+  .feat-p{font-size:12px;color:var(--muted);line-height:1.6;}
+
+  /* CONVERSATIONS */
+  .conv-grid{display:flex;flex-direction:column;gap:12px;max-width:680px;margin:0 auto;}
+  .conv-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;transition:border-color .2s,transform .2s;cursor:none;}
+  .conv-card:hover{border-color:var(--border-h);transform:translateY(-2px);}
+  .conv-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .conv-user{display:flex;align-items:center;gap:9px;}
+  .conv-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+  .av-n{background:linear-gradient(135deg,#059669,#34d399);color:white;}
+  .av-r{background:linear-gradient(135deg,#0891b2,#22d3ee);color:white;}
+  .av-s{background:linear-gradient(135deg,#7c3aed,#a78bfa);color:white;}
+  .conv-meta{font-size:11px;color:var(--muted);}
+  .conv-meta strong{color:var(--text);font-weight:600;}
+  .conv-tag{padding:2px 9px;border-radius:100px;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+  .tag-rec{background:rgba(239,68,68,.12);color:#f87171;}
+  .tag-housing{background:rgba(5,150,105,.15);color:var(--mint);}
+  .tag-general{background:rgba(52,211,153,.08);color:var(--mint);}
+  .conv-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:5px;line-height:1.3;}
+  .conv-body{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:12px;}
+  .conv-foot{display:flex;align-items:center;gap:14px;}
+  .conv-stat{display:flex;align-items:center;gap:4px;font-size:11px;color:rgba(126,184,154,.45);}
+  .conv-stat svg{width:11px;height:11px;}
+
+  /* CTA */
+  section.cta{text-align:center;background:rgba(5,18,10,.4);border-top:1px solid var(--border);}
+  .cta-t{font-size:clamp(28px,4vw,52px);font-weight:800;color:var(--white);letter-spacing:-2px;line-height:1.0;max-width:520px;margin:0 auto 11px;}
+  .cta-s{font-size:14px;color:var(--muted);max-width:320px;margin:0 auto 28px;line-height:1.6;}
+
+  /* FOOTER */
+  footer{padding:28px 5%;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .fc{font-size:12px;color:rgba(110,168,130,.28);}
+  .fl{display:flex;gap:16px;}
+  .fla{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s;cursor:none;}
+  .fla:hover{color:var(--mint);}
+
+  /* MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
+  .modal-box{background:#0d2519;border:1px solid rgba(52,211,153,.2);border-radius:20px;padding:36px;max-width:420px;width:100%;position:relative;}
+  .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;line-height:1;font-family:'Sora',sans-serif;}
+  .modal-close:hover{color:var(--text);}
+  .modal-title{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-.8px;margin-bottom:7px;}
+  .modal-sub{font-family:'Sora',sans-serif;font-size:13px;color:#6ea882;margin-bottom:22px;line-height:1.5;}
+  .modal-input{width:100%;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.18);border-radius:10px;padding:11px 14px;font-family:'Sora',sans-serif;font-size:13px;color:#dff0e7;outline:none;transition:border-color .2s;margin-bottom:11px;}
+  .modal-input:focus{border-color:rgba(52,211,153,.35);}
+  .modal-input::placeholder{color:rgba(110,168,130,.3);}
+  .modal-btn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:4px;}
+  .modal-btn:hover{background:var(--green-d);}
+  .modal-note{font-family:'Sora',sans-serif;font-size:11px;color:rgba(110,168,130,.35);text-align:center;margin-top:11px;}
+
+  /* REVEAL */
+  .r{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease;}
+  .r.v{opacity:1;transform:translateY(0);}
+  .d1{transition-delay:.1s;}.d2{transition-delay:.2s;}.d3{transition-delay:.3s;}.d4{transition-delay:.4s;}
+
+  /* MOBILE */
+  @media(max-width:768px){
+    nav{padding:0 4%;height:54px;}
+    .logo-text{font-size:19px;}
+    .logo-v{width:34px;height:34px;font-size:18px;}
+    .nav-links{display:none;}
+    .hero{padding:90px 4% 60px;}
+    .hero h1{font-size:clamp(32px,9vw,48px);letter-spacing:-2px;}
+    .hero-sub{font-size:14px;}
+    section{padding:52px 4%;}
+    .city-grid-top,.city-grid-bot{grid-template-columns:repeat(2,1fr);gap:10px;}
+    .city-card{aspect-ratio:4/3;}
+    .feat-grid{grid-template-columns:1fr;gap:10px;}
+    .conv-card{padding:16px;}
+    footer{flex-direction:column;gap:14px;text-align:center;padding:22px 4%;}
+    .fl{flex-wrap:wrap;justify-content:center;gap:12px;}
+  }
+  @media(max-width:480px){
+    .city-grid-top,.city-grid-bot{grid-template-columns:repeat(2,1fr);gap:8px;}
+    .city-card{aspect-ratio:1/1;border-radius:11px;}
+  }
+</style>
 </head>
-<body class="community-page">
+<body>
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="ring"></div>
 
-<nav>
-  <input type="checkbox" id="nav-toggle" class="nav-toggle-input" tabindex="-1" aria-hidden="true">
-  <div class="nav-bar-top">
-  <a class="logo" href="index.html" aria-label="Livvo home">
-    <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><path d="M2 3L9 15L16 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <span class="logo-word">li<span>vv</span>o</span>
+<!-- NAV -->
+<nav id="nav">
+  <a class="logo" href="index.html">
+    <div class="logo-v">V</div>
+    <span class="logo-text">livvo</span>
   </a>
-  <label for="nav-toggle" class="nav-burger" aria-label="Open menu"><span aria-hidden="true">☰</span></label>
-  </div>
-  <div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="community.html" class="active">Community</a>
-    <a href="signup.html" class="btn-nav">Join the community</a>
-  </div>
+  <ul class="nav-links">
+    <li><a class="nav-link" href="index.html">Home</a></li>
+    <li><a class="nav-link active" href="community.html">Community</a></li>
+    <li><a class="nav-link" href="flatmate-signup.html">Find a Flatmate</a></li>
+    <li><a class="nav-link" href="landlord-dashboard.html">For Landlords</a></li>
+  </ul>
+  <a class="nav-cta" href="signup.html">Join the community <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
-  <p class="hero-tag">Where your next chapter begins</p>
-  <h1>Find your people<br>in a <em>new city</em></h1>
-  <p>Join city groups, connect with people moving to the same place as you, and feel at home before you even arrive.</p>
-  <div class="cta-row">
-    <a href="signup.html" class="btn-primary btn-cta-main">Join the community</a>
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-badge"><div class="badge-dot"></div>Where your next chapter begins</div>
+    <h1>Find your people<br>in a <span class="hl">new city</span></h1>
+    <p class="hero-sub">Join city groups, connect with people moving to the same place as you, and feel at home before you even arrive.</p>
+    <a class="btn-pri" href="signup.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Join the community
+    </a>
   </div>
 </section>
 
-<div id="cities">
-  <div class="section-header">
-    <h2 class="section-title">Choose your city</h2>
-    <p class="section-sub">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
+<!-- CITY CARDS -->
+<section>
+  <div class="sec-center">
+    <span class="sec-ey r">Where we are</span>
+    <h2 class="sec-t r d1">Choose your city</h2>
+    <p class="sec-s r d2">Join the community before you even arrive. Meet people, find flatmates, get local tips.</p>
   </div>
-  <div class="cities-featured-grid">
-    <a href="community-portal.html?city=athens" class="city-feature-card">
-      <div class="city-feature-card-media">
-        <img src="https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80" alt="Athens">
-        <div class="city-feature-card-gradient" aria-hidden="true"></div>
-        <div class="city-feature-card-labels">
-          <span class="city-feature-name">Athens</span>
-          <span class="city-feature-rent">from €600/mo</span>
-        </div>
-        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
-      </div>
-    </a>
-    <a href="community-portal.html?city=london" class="city-feature-card">
-      <div class="city-feature-card-media">
-        <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&q=80" alt="London">
-        <div class="city-feature-card-gradient" aria-hidden="true"></div>
-        <div class="city-feature-card-labels">
-          <span class="city-feature-name">London</span>
-          <span class="city-feature-rent">from £1,400/mo</span>
-        </div>
-        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
-      </div>
-    </a>
-    <a href="community-portal.html?city=paris" class="city-feature-card">
-      <div class="city-feature-card-media">
-        <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80" alt="Paris">
-        <div class="city-feature-card-gradient" aria-hidden="true"></div>
-        <div class="city-feature-card-labels">
-          <span class="city-feature-name">Paris</span>
-          <span class="city-feature-rent">from €1,100/mo</span>
-        </div>
-        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
-      </div>
-    </a>
-    <a href="community-portal.html?city=madrid" class="city-feature-card">
-      <div class="city-feature-card-media">
-        <img src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800" alt="Madrid">
-        <div class="city-feature-card-gradient" aria-hidden="true"></div>
-        <div class="city-feature-card-labels">
-          <span class="city-feature-name">Madrid</span>
-          <span class="city-feature-rent">from €900/mo</span>
-        </div>
-        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
-      </div>
-    </a>
-    <a href="community-portal.html?city=barcelona" class="city-feature-card">
-      <div class="city-feature-card-media">
-        <img src="https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800" alt="Barcelona">
-        <div class="city-feature-card-gradient" aria-hidden="true"></div>
-        <div class="city-feature-card-labels">
-          <span class="city-feature-name">Barcelona</span>
-          <span class="city-feature-rent">from €1,000/mo</span>
-        </div>
-        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
-      </div>
-    </a>
-    <a href="community-portal.html?city=berlin" class="city-feature-card">
-      <div class="city-feature-card-media">
-        <img src="https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&q=80" alt="Berlin">
-        <div class="city-feature-card-gradient" aria-hidden="true"></div>
-        <div class="city-feature-card-labels">
-          <span class="city-feature-name">Berlin</span>
-          <span class="city-feature-rent">from €1,100/mo</span>
-        </div>
-        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
-      </div>
-    </a>
-    <a href="community-portal.html?city=lisbon" class="city-feature-card">
-      <div class="city-feature-card-media">
-        <img src="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=600&q=80" alt="Lisbon">
-        <div class="city-feature-card-gradient" aria-hidden="true"></div>
-        <div class="city-feature-card-labels">
-          <span class="city-feature-name">Lisbon</span>
-          <span class="city-feature-rent">from €900/mo</span>
-        </div>
-        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
-      </div>
-    </a>
-    <a href="community-portal.html?city=amsterdam" class="city-feature-card">
-      <div class="city-feature-card-media">
-        <img src="https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=600&q=80" alt="Amsterdam">
-        <div class="city-feature-card-gradient" aria-hidden="true"></div>
-        <div class="city-feature-card-labels">
-          <span class="city-feature-name">Amsterdam</span>
-          <span class="city-feature-rent">from €1,400/mo</span>
-        </div>
-        <div class="city-feature-hover-cta" aria-hidden="true">View community →</div>
-      </div>
-    </a>
-  </div>
-  <div class="cities-see-all-wrap">
-    <button type="button" class="btn-see-all-cities" id="cities-see-all-btn" aria-expanded="false" aria-controls="cities-all-pills-panel">See all cities</button>
-    <div id="cities-all-pills-panel" class="cities-all-pills-panel" role="region" aria-label="All cities">
-      <div class="cities-quick-pills-inner" id="cities-all-pills-inner"></div>
-    </div>
-  </div>
-  <p class="cities-more-note"><a href="#" id="cities-cant-find-open" aria-haspopup="dialog">Can&apos;t find your city? Request your city →</a></p>
-</div>
 
-<section class="section" id="community-benefits" aria-label="What you get from the community">
-  <div class="cards cards-grid-3">
-    <div class="card card-static">
-      <div class="card-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+  <div class="city-grid-top">
+    <a class="city-card r" href="community-portal.html?city=athens">
+      <div class="city-photo" style="background-image:url('https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80')"></div>
+      <div class="city-grad"></div>
+      <div class="city-foot">
+        <div class="city-name">Athens</div>
+        <div class="city-from">from €600/mo</div>
+        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
       </div>
-      <h3>Meet people before you arrive</h3>
-      <p>Connect with others moving to the same city. No more arriving alone.</p>
-    </div>
-    <div class="card card-static">
-      <div class="card-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    </a>
+    <a class="city-card r d1" href="community-portal.html?city=london">
+      <div class="city-photo" style="background-image:url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&q=80')"></div>
+      <div class="city-grad"></div>
+      <div class="city-foot">
+        <div class="city-name">London</div>
+        <div class="city-from">from £1,400/mo</div>
+        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
       </div>
-      <h3>Local tips from real people</h3>
-      <p>Get honest advice on neighbourhoods, transport, hidden gems and day-to-day life.</p>
-    </div>
-    <div class="card card-static">
-      <div class="card-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </a>
+    <a class="city-card r d2" href="community-portal.html?city=paris">
+      <div class="city-photo" style="background-image:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80')"></div>
+      <div class="city-grad"></div>
+      <div class="city-foot">
+        <div class="city-name">Paris</div>
+        <div class="city-from">from €1,100/mo</div>
+        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
       </div>
-      <h3>Events and meetups</h3>
-      <p>Find local events, casual meetups and things to do from your first weekend.</p>
-    </div>
+    </a>
+    <a class="city-card r d3" href="community-portal.html?city=madrid">
+      <div class="city-photo" style="background-image:url('https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80')"></div>
+      <div class="city-grad"></div>
+      <div class="city-foot">
+        <div class="city-name">Madrid</div>
+        <div class="city-from">from €900/mo</div>
+        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+      </div>
+    </a>
+  </div>
+
+  <div class="city-grid-bot" style="margin-top:12px;">
+    <a class="city-card r" href="community-portal.html?city=barcelona">
+      <div class="city-photo" style="background-image:url('https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&q=80')"></div>
+      <div class="city-grad"></div>
+      <div class="city-foot">
+        <div class="city-name">Barcelona</div>
+        <div class="city-from">from €1,000/mo</div>
+        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+      </div>
+    </a>
+    <a class="city-card r d1" href="community-portal.html?city=berlin">
+      <div class="city-photo" style="background-image:url('https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&q=80')"></div>
+      <div class="city-grad"></div>
+      <div class="city-foot">
+        <div class="city-name">Berlin</div>
+        <div class="city-from">from €1,100/mo</div>
+        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+      </div>
+    </a>
+    <a class="city-card r d2" href="community-portal.html?city=lisbon">
+      <div class="city-photo" style="background-image:url('https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=600&q=80')"></div>
+      <div class="city-grad"></div>
+      <div class="city-foot">
+        <div class="city-name">Lisbon</div>
+        <div class="city-from">from €900/mo</div>
+        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+      </div>
+    </a>
+    <a class="city-card r d3" href="community-portal.html?city=amsterdam">
+      <div class="city-photo" style="background-image:url('https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=600&q=80')"></div>
+      <div class="city-grad"></div>
+      <div class="city-foot">
+        <div class="city-name">Amsterdam</div>
+        <div class="city-from">from €1,400/mo</div>
+        <div class="city-arrow">View community <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+      </div>
+    </a>
+  </div>
+
+  <div class="cities-footer r">
+    <a class="btn-ghost-sm" href="#">See all cities</a>
+    <a class="request-link" href="#" onclick="document.getElementById('request-modal').style.display='flex';return false;">Can't find your city? Request it →</a>
   </div>
 </section>
 
-<!-- Community preview section -->
-<section class="section" id="community-preview-real">
-  <div style="padding:30px 0;text-align:center;">
-    <h2 style="font-size:28px;font-weight:800;color:#064e3b;margin-bottom:8px;">Real conversations, real people</h2>
-    <p style="font-size:15px;color:#5a7a5a;margin-bottom:40px;">Here's a snapshot from Athens, London, and Paris.</p>
-    <div style="max-width:680px;margin:0 auto;text-align:left;display:flex;flex-direction:column;gap:10px;">
-      <div style="background:white;border:1px solid #e8f0e8;border-radius:14px;padding:18px;cursor:pointer;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <div style="width:32px;height:32px;border-radius:50%;background:#0d9488;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">N</div>
-          <span style="font-size:12px;color:#6b8f6b;">Nikos · Athens · 3h ago</span>
-          <span style="margin-left:auto;font-size:10px;background:#fde8e8;color:#a81a1a;padding:2px 8px;border-radius:20px;font-weight:600;">Recommendations</span>
-        </div>
-        <div style="font-size:15px;font-weight:700;color:#064e3b;margin-bottom:4px;">Best souvlaki in Athens that locals actually eat?</div>
-        <div style="font-size:13px;color:#5a7a5a;">Just moved to Exarchia — need the real spots, not the tourist traps near Syntagma.</div>
-        <div style="display:flex;gap:12px;margin-top:10px;">
-          <span style="font-size:12px;color:#9ab09a;">❤️ 14</span>
-          <span style="font-size:12px;color:#9ab09a;">💬 9 comments</span>
-        </div>
+<!-- FEATURES -->
+<section class="features">
+  <div class="sec-center">
+    <span class="sec-ey r">What you get</span>
+    <h2 class="sec-t r d1">More than a forum</h2>
+    <p class="sec-s r d2">Real people, real advice, real community — before and after you arrive.</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat r">
+      <div class="feat-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
       </div>
-      <div style="background:white;border:1px solid #e8f0e8;border-radius:14px;padding:18px;cursor:pointer;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <div style="width:32px;height:32px;border-radius:50%;background:#059669;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">R</div>
-          <span style="font-size:12px;color:#6b8f6b;">Romain · London · 2h ago</span>
-          <span style="margin-left:auto;font-size:10px;background:#fde8e8;color:#a81a1a;padding:2px 8px;border-radius:20px;font-weight:600;">Housing Tips</span>
-        </div>
-        <div style="font-size:15px;font-weight:700;color:#064e3b;margin-bottom:4px;">Best areas for a first flat in London?</div>
-        <div style="font-size:13px;color:#5a7a5a;">Budget around £1,200–£1,500 — is Hackney still the sweet spot or should I look at zones 3–4?</div>
-        <div style="display:flex;gap:12px;margin-top:10px;">
-          <span style="font-size:12px;color:#9ab09a;">❤️ 12</span>
-          <span style="font-size:12px;color:#9ab09a;">💬 8 comments</span>
-        </div>
+      <div class="feat-h">Meet people before you arrive</div>
+      <div class="feat-p">Connect with others moving to the same city. No more arriving alone.</div>
+    </div>
+    <div class="feat r d1">
+      <div class="feat-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
       </div>
-      <div style="background:white;border:1px solid #e8f0e8;border-radius:14px;padding:18px;cursor:pointer;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <div style="width:32px;height:32px;border-radius:50%;background:#4a4aaa;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">S</div>
-          <span style="font-size:12px;color:#6b8f6b;">Sofia · Paris · 5h ago</span>
-          <span style="margin-left:auto;font-size:10px;background:#e8f4fd;color:#1a6fa8;padding:2px 8px;border-radius:20px;font-weight:600;">General</span>
-        </div>
-        <div style="font-size:15px;font-weight:700;color:#064e3b;margin-bottom:4px;">Which arrondissement for a young expat on a budget?</div>
-        <div style="font-size:13px;color:#5a7a5a;">Looking at the 10th, 11th and 19th — any strong opinions from people who've lived there?</div>
-        <div style="display:flex;gap:12px;margin-top:10px;">
-          <span style="font-size:12px;color:#9ab09a;">❤️ 8</span>
-          <span style="font-size:12px;color:#9ab09a;">💬 11 comments</span>
-        </div>
+      <div class="feat-h">Local tips from real people</div>
+      <div class="feat-p">Honest advice on neighbourhoods, transport, hidden gems and day-to-day life.</div>
+    </div>
+    <div class="feat r d2">
+      <div class="feat-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>
+          <line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+        </svg>
       </div>
+      <div class="feat-h">Events and meetups</div>
+      <div class="feat-p">Local events, casual meetups and things to do from your very first weekend.</div>
     </div>
   </div>
 </section>
 
-<section id="join" style="padding:80px 24px;text-align:center;background:#f0f7f0;scroll-margin-top:72px;">
-  <div style="max-width:480px;margin:0 auto;">
+<!-- REAL CONVERSATIONS -->
+<section>
+  <div class="sec-center">
+    <span class="sec-ey r">Community</span>
+    <h2 class="sec-t r d1">Real conversations, real people</h2>
+    <p class="sec-s r d2">A snapshot from Athens, London, and Paris.</p>
+  </div>
 
-    <h2 style="font-size:36px;font-weight:800;color:#1a2e1a;margin:0 0 8px 0;line-height:1.2;letter-spacing:-0.02em;">
-      Create your account
-    </h2>
-    <p style="font-size:15px;color:#6b8f6b;margin:0 0 32px 0;">
-      Only takes 30 seconds.
-    </p>
+  <div class="conv-grid">
+    <div class="conv-card r">
+      <div class="conv-head">
+        <div class="conv-user">
+          <div class="conv-av av-n">N</div>
+          <div class="conv-meta"><strong>Nikos</strong> · Athens · 3h ago</div>
+        </div>
+        <span class="conv-tag tag-rec">Recommendations</span>
+      </div>
+      <div class="conv-title">Best souvlaki in Athens that locals actually eat?</div>
+      <div class="conv-body">Just moved to Exarchia. Need the real spots, not the tourist traps near Syntagma.</div>
+      <div class="conv-foot">
+        <span class="conv-stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          14
+        </span>
+        <span class="conv-stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          9 comments
+        </span>
+      </div>
+    </div>
 
-    <a href="signup.html" class="cta-bottom-account">Create account</a>
+    <div class="conv-card r d1">
+      <div class="conv-head">
+        <div class="conv-user">
+          <div class="conv-av av-r">R</div>
+          <div class="conv-meta"><strong>Romain</strong> · London · 2h ago</div>
+        </div>
+        <span class="conv-tag tag-housing">Housing Tips</span>
+      </div>
+      <div class="conv-title">Best areas for a first flat in London?</div>
+      <div class="conv-body">Budget around £1,200 to £1,500. Is Hackney still the sweet spot or should I look at zones 3 to 4?</div>
+      <div class="conv-foot">
+        <span class="conv-stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          12
+        </span>
+        <span class="conv-stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          8 comments
+        </span>
+      </div>
+    </div>
 
+    <div class="conv-card r d2">
+      <div class="conv-head">
+        <div class="conv-user">
+          <div class="conv-av av-s">S</div>
+          <div class="conv-meta"><strong>Sofia</strong> · Paris · 5h ago</div>
+        </div>
+        <span class="conv-tag tag-general">General</span>
+      </div>
+      <div class="conv-title">Which arrondissement for a young expat on a budget?</div>
+      <div class="conv-body">Looking at the 10th, 11th and 19th. Any strong opinions from people who've lived there?</div>
+      <div class="conv-foot">
+        <span class="conv-stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          8
+        </span>
+        <span class="conv-stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          11 comments
+        </span>
+      </div>
+    </div>
   </div>
 </section>
 
-<footer class="site-footer-community" aria-label="Site footer">
-  <div class="site-footer-community-inner">
-    <div class="site-footer-community-brand">
-      <span class="site-footer-community-logo">li<span>vv</span>o</span>
-      <p>© 2026 Livvo. All rights reserved.</p>
-    </div>
-    <div class="site-footer-community-links" role="navigation" aria-label="Footer links">
-      <a href="about-us.html">About</a>
-      <a href="privacy-policy.html">Privacy Policy</a>
-      <a href="contact.html">Contact</a>
-    </div>
+<!-- CTA -->
+<section class="cta">
+  <h2 class="cta-t r">Ready to find your people?</h2>
+  <p class="cta-s r d1">Takes 30 seconds. Join free and connect with your city community today.</p>
+  <a class="btn-pri r d2" href="signup.html" style="margin:0 auto;">
+    Create free account
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div style="width:26px;height:26px;background:var(--green);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:13px;font-weight:800;color:white;">V</div>
+    <span class="fc">© 2026 Livvo. All rights reserved.</span>
+  </div>
+  <div class="fl">
+    <a class="fla" href="about-us.html">About</a>
+    <a class="fla" href="privacy-policy.html">Privacy Policy</a>
+    <a class="fla" href="contact.html">Contact</a>
   </div>
 </footer>
 
-<div id="modal-city-request" class="cr-modal" hidden aria-modal="true" role="dialog" aria-labelledby="city-request-title">
-  <div class="cr-modal-backdrop" id="city-request-backdrop" tabindex="-1"></div>
-  <div class="cr-modal-panel">
-    <button type="button" class="cr-modal-x" id="city-request-close" aria-label="Close">×</button>
-    <h2 id="city-request-title">Request your city</h2>
-    <form id="city-request-form">
-      <div class="cr-form-row">
-        <label for="city-request-city">Which city are you looking for?</label>
-        <input type="text" id="city-request-city" name="city" required maxlength="200" autocomplete="address-level2" placeholder="e.g. Munich" />
-      </div>
-      <div class="cr-form-row">
-        <label for="city-request-email">Your email</label>
-        <input type="email" id="city-request-email" name="email" required maxlength="320" autocomplete="email" placeholder="you@example.com" />
-      </div>
-      <button type="submit" class="cr-modal-submit" id="city-request-submit">Submit</button>
-    </form>
-    <p id="city-request-thanks" class="cr-modal-thanks" hidden>Thanks! We&apos;ll let you know when it&apos;s live.</p>
+<!-- REQUEST CITY MODAL -->
+<div class="modal-overlay" id="request-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('request-modal').style.display='none'">✕</button>
+    <div class="modal-title">Request your city</div>
+    <div class="modal-sub">Which city are you looking for? We'll let you know when it's live.</div>
+    <input class="modal-input" type="text" placeholder="City name">
+    <input class="modal-input" type="email" placeholder="your@email.com">
+    <button class="modal-btn">Submit request</button>
+    <div class="modal-note">No spam. Unsubscribe anytime.</div>
   </div>
 </div>
 
 <script>
-(function () {
-  /* Master city list — alphabetical; keep in sync with community-portal.html #city-switcher */
-  var EUROPEAN_CITIES = [
-    'Amsterdam', 'Athens', 'Barcelona', 'Berlin', 'Bologna', 'Brussels', 'Budapest', 'Copenhagen',
-    'Dublin', 'Dubai', 'Edinburgh', 'Florence', 'Krakow', 'Lisbon', 'Ljubljana', 'London', 'Madrid',
-    'Milan', 'Naples', 'New York', 'Oslo', 'Paris', 'Porto', 'Prague', 'Riga', 'Rome', 'Seville',
-    'Stockholm', 'Tallinn', 'Valencia', 'Vilnius', 'Vienna', 'Warsaw', 'Zurich'
-  ];
-
-  function cityToPortalSlug(name) {
-    if (name === 'New York') return 'newyork';
-    return String(name || '').toLowerCase().replace(/\s+/g, '');
-  }
-
-  var seeAllBtn = document.getElementById('cities-see-all-btn');
-  var allPillsPanel = document.getElementById('cities-all-pills-panel');
-  var pillsInner = document.getElementById('cities-all-pills-inner');
-  if (seeAllBtn && allPillsPanel && pillsInner) {
-    if (!pillsInner.childElementCount) {
-      EUROPEAN_CITIES.forEach(function (city) {
-        var a = document.createElement('a');
-        a.href = 'community-portal.html?city=' + encodeURIComponent(cityToPortalSlug(city));
-        a.className = 'cities-quick-pill';
-        a.textContent = city;
-        pillsInner.appendChild(a);
-      });
-      var morePill = document.createElement('span');
-      morePill.className = 'cities-quick-pill cities-quick-pill-more';
-      morePill.textContent = 'More cities coming…';
-      pillsInner.appendChild(morePill);
-    }
-    allPillsPanel.classList.remove('is-open');
-    seeAllBtn.setAttribute('aria-expanded', 'false');
-    seeAllBtn.textContent = 'See all cities';
-    pillsInner.setAttribute('inert', '');
-    seeAllBtn.addEventListener('click', function () {
-      var expanded = allPillsPanel.classList.toggle('is-open');
-      seeAllBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-      seeAllBtn.textContent = expanded ? 'Show less' : 'See all cities';
-      if (expanded) pillsInner.removeAttribute('inert');
-      else pillsInner.setAttribute('inert', '');
-    });
-  }
-})();
-</script>
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import { getFirestore, collection, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-
-const firebaseConfig = {
-  apiKey: 'AIzaSyBfKo7gumTCJ1FtqnrV-uGAgoIvhZPowTI',
-  authDomain: 'livvo-573e1.firebaseapp.com',
-  projectId: 'livvo-573e1',
-  storageBucket: 'livvo-573e1.firebasestorage.app',
-  messagingSenderId: '438563892670',
-  appId: '1:438563892670:web:c038316d9d3fcbee065def'
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const modal = document.getElementById('modal-city-request');
-const backdrop = document.getElementById('city-request-backdrop');
-const closeBtn = document.getElementById('city-request-close');
-const cantFindOpen = document.getElementById('cities-cant-find-open');
-const form = document.getElementById('city-request-form');
-const thanks = document.getElementById('city-request-thanks');
-const submitBtn = document.getElementById('city-request-submit');
-const cityIn = document.getElementById('city-request-city');
-const emailIn = document.getElementById('city-request-email');
-
-function openCityRequestModal() {
-  if (!modal) return;
-  modal.hidden = false;
-  document.body.style.overflow = 'hidden';
-  if (thanks) thanks.hidden = true;
-  if (form) form.style.display = '';
-  if (submitBtn) submitBtn.disabled = false;
-}
-
-function closeCityRequestModal() {
-  if (!modal) return;
-  modal.hidden = true;
-  document.body.style.overflow = '';
-  if (form) {
-    form.style.display = '';
-    form.reset();
-  }
-  if (thanks) thanks.hidden = true;
-  if (submitBtn) submitBtn.disabled = false;
-}
-
-if (cantFindOpen) cantFindOpen.addEventListener('click', function (e) {
-  e.preventDefault();
-  openCityRequestModal();
-});
-if (backdrop) backdrop.addEventListener('click', closeCityRequestModal);
-if (closeBtn) closeBtn.addEventListener('click', closeCityRequestModal);
-
-if (form) {
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    var city = cityIn && cityIn.value.trim();
-    var email = emailIn && emailIn.value.trim();
-    if (!city || !email) return;
-    if (submitBtn) submitBtn.disabled = true;
-    try {
-      await addDoc(collection(db, 'cityRequests'), {
-        city: city,
-        email: email,
-        createdAt: Timestamp.now()
-      });
-      form.style.display = 'none';
-      if (thanks) thanks.hidden = false;
-      setTimeout(function () {
-        closeCityRequestModal();
-      }, 2000);
-    } catch (err) {
-      console.error(err);
-      alert('Something went wrong. Please try again.');
-      if (submitBtn) submitBtn.disabled = false;
-    }
+  const cur=document.getElementById('cur'),ring=document.getElementById('ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+  (function a(){rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a);})();
+  document.querySelectorAll('a,.feat,.conv-card,.city-card').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cur.style.transform='translate(-50%,-50%) scale(2.2)';ring.style.width='44px';ring.style.height='44px';ring.style.borderColor='rgba(52,211,153,.44)';});
+    el.addEventListener('mouseleave',()=>{cur.style.transform='translate(-50%,-50%) scale(1)';ring.style.width='28px';ring.style.height='28px';ring.style.borderColor='rgba(52,211,153,.28)';});
   });
-}
+  window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40));
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.style.display='none';}));
+  const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('v');}),{threshold:.1});
+  document.querySelectorAll('.r').forEach(el=>io.observe(el));
 </script>
 </body>
 </html>
