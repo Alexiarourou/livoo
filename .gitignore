@@ -1,1 +1,8 @@
-.claude/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.zip
+*.DS_Store
+.env
+node_modules/
